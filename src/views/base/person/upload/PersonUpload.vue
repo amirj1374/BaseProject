@@ -1,10 +1,6 @@
 <script lang="ts" setup>
-import {h, ref} from 'vue';
+import {ref} from 'vue';
 import DataTable from '@/components/shared/DataTable.vue';
-import {useRouter} from "vue-router";
-import BaseIcon from "@/components/shared/BaseIcon.vue";
-import {RefreshIcon} from "vue-tabler-icons";
-import LinkableText from "@/components/shared/LinkableText.vue";
 
 const loading = ref(false);
 const header = ref([

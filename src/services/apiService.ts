@@ -3,7 +3,7 @@ import type { AxiosInstance } from "axios";
 export default (axiosInstance: AxiosInstance, resource: string) => ({
   fetch(filters: Record<string, any> = {}, page: number = 1, limit: number = 10) {
     return axiosInstance.get(`/api/v1/${resource}`, {
-      // params: { ...filters, page, limit },
+      params: { ...filters, page, limit },
     });
   },
 
