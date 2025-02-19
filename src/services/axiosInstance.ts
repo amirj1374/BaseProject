@@ -1,0 +1,47 @@
+import axios, { type AxiosInstance } from "axios";
+import envConfig from '@/config/envConfig';
+
+const createAxiosInstance = (): AxiosInstance => {
+  const instance = axios.create({
+    baseURL: envConfig.API_URL, // Use the API URL from the environment config
+    timeout: 5000, // Optional: Request timeout in milliseconds
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  // Interceptors for requests
+  instance.interceptors.request.use(
+    (config) => {
+      // You can modify the request before sending, e.g., add tokens
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => {
+      // Handle request errors
+      return Promise.reject(error);
+    }
+  );
+
+  // Interceptors for responses
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      // Handle response errors globally
+      if (error.response?.status === 401) {
+        // Example: Redirect to login if unauthorized
+        console.error("Unauthorized, redirecting to login...");
+      }
+      return Promise.reject(error);
+    }
+  );
+
+  return instance;
+};
+
+const axiosInstance = createAxiosInstance();
+
+export default axiosInstance;
