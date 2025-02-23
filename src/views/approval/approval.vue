@@ -1,0 +1,153 @@
+<script lang="ts" setup>
+import { ref, computed } from 'vue';
+import SectionOne from '@/components/sections/SectionOne.vue';
+import SectionTwo from '@/components/sections/SectionTwo.vue';
+import SectionThree from '@/components/sections/SectionThree.vue';
+
+// Define your steps with titles and the corresponding component.
+const steps = [
+  { title: 'ثبت درخواست هویتی مشتری', component: SectionOne },
+  { title: 'اطلاعات نوع درخواست', component: SectionTwo },
+  { title: 'وثایق', component: SectionThree },
+  { title: 'اطلاعات ضامن / ضامنین', component: SectionThree },
+];
+
+const stepper = ref(1); // Current step
+const totalSteps = steps.length;
+
+// This ref will hold the currently active section's component instance.
+const sectionRef = ref<InstanceType<typeof SectionOne> | null>(null);
+
+// Parent-level loading state for the Next button.
+const submitting = ref(false);
+
+// Advance to the next step.
+const nextStep = () => {
+  if (stepper.value < totalSteps) {
+    stepper.value++;
+  }
+};
+
+// Go to the previous step
+const prevStep = () => {
+  if (stepper.value > 1) {
+    stepper.value--;
+  }
+};
+
+// Handle form submission logic for the current step
+const handleSubmit = async () => {
+  if (!sectionRef.value) return;
+  submitting.value = true;
+  try {
+    // Call submitData() method from the child.
+    await sectionRef.value.submitData();
+    // If successful, move to the next step.
+    nextStep();
+  } catch (err) {
+    console.error('Submission error:', err);
+  } finally {
+    submitting.value = false;
+  }
+};
+
+// Compute the current component based on the current step.
+const currentComponent = computed(() => {
+  return steps[stepper.value - 1].component;
+});
+</script>
+
+<template>
+    <v-app class="stepperContainer">
+      <div class="stepperHeader">
+        <span v-for="(step, index) in steps" :key="index">
+          <span :class="{ active: stepper === index + 1 }">{{ step.title }}</span>
+          <span v-if="index < steps.length - 1"> &gt; </span>
+        </span>
+      </div>
+      <!-- Add a transition wrapper around the component -->
+      <transition name="fade" mode="out-in">
+        <!-- Dynamically render the active section and bind a ref -->
+        <component :is="currentComponent" ref="sectionRef" />
+      </transition>
+      <!-- Actions for Next and Previous -->
+      <div class="actions">
+        <v-btn @click="prevStep" :disabled="stepper === 1">
+          مرحله قبلی
+        </v-btn>
+        <v-btn
+          color="primary"
+          @click="handleSubmit"
+          :loading="submitting"
+        >
+          مرحله بعد
+        </v-btn>
+      </div>
+    </v-app>
+</template>
+
+<style scoped>
+.stepperContainer {
+  height: calc(100vh - 110px); /* Set the height to the full viewport height */
+  max-width: 100%; /* Prevent overflow horizontally */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Space the header, content, and buttons */
+  overflow: hidden; /* Prevent content overflow */
+  padding: 20px;
+}
+
+.stepperHeader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 16px;
+  width: 100%; /* Ensure the header takes the full width */
+}
+
+.stepperHeader span {
+  padding: 0 10px;
+}
+
+.stepperHeader .active {
+  font-weight: bold;
+  color: rgb(var(--v-theme-secondary));
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  flex-direction: row-reverse;
+}
+
+.v-btn {
+  min-width: 100px;
+}
+
+/* Styling for Previous and Next buttons */
+.v-btn {
+  text-align: center;
+  justify-content: center;
+}
+
+/* Transition effect for step change */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+/* Ensure the content takes the full remaining height */
+.v-stepper__content {
+  height: calc(100vh - 100px); /* Adjust the content height for screen */
+  overflow-y: auto; /* Add scrolling if needed */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+</style>
+

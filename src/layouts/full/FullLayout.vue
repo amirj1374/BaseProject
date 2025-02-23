@@ -10,7 +10,7 @@ const customizer = useCustomizerStore();
 </script>
 
 <template>
-  <v-locale-provider rtl>
+  <v-locale-provider :rtl="true">
     <v-app
       :theme="customizer.actTheme"
       :class="[customizer.fontTheme, customizer.mini_sidebar ? 'mini-sidebar' : '', customizer.inputBg ? 'inputWithbg' : '']"
@@ -18,7 +18,6 @@ const customizer = useCustomizerStore();
       <Customizer />
       <VerticalSidebarVue/>
       <VerticalHeaderVue/>
-
       <v-main>
         <loading/>
         <v-container fluid class="page-wrapper">

@@ -27,7 +27,6 @@ function validate(values: any, { setErrors }: any) {
   <h5 class="text-h5 text-center my-4 mb-8"></h5>
   <Form @submit="validate" class="mt-7 loginForm" v-slot="{ errors, isSubmitting }">
     <v-text-field
-      dir="rtl"
       v-model="username"
       :rules="emailRules"
       label="نام کاربری"
@@ -39,7 +38,6 @@ function validate(values: any, { setErrors }: any) {
       color="primary"
     ></v-text-field>
     <v-text-field
-      dir="rtl"
       v-model="password"
       :rules="passwordRules"
       label="رمز عبور"
@@ -48,10 +46,8 @@ function validate(values: any, { setErrors }: any) {
       variant="outlined"
       color="primary"
       hide-details="auto"
-
       :type="show1 ? 'text' : 'password'"
       @click:append="show1 = !show1"
-      class="pwdInput"
     ></v-text-field>
 <!--    :append-icon="show1 ? '$eye' : '$eyeOff'"-->
 
@@ -98,15 +94,6 @@ function validate(values: any, { setErrors }: any) {
   padding: 2px 40px;
   border-color: rgba(0, 0, 0, 0.08);
   margin: 20px 15px;
-}
-.pwdInput {
-  position: relative;
-  .v-input__append {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
 }
 .loginForm {
   .v-text-field .v-field--active input {

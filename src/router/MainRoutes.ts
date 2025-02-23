@@ -67,10 +67,25 @@ const MainRoutes = {
       component: () => import('@/views/base/bank/account/onlineTransaction/AccountOnlineTransaction.vue')
     },
     {
+      name: 'Approval',
+      path: '/approval',
+      component: () => import('@/views/approval/approval.vue')
+    },
+    {
       name: 'AccountTransaction',
       path: '/base/bank/:bankId/account/:accountId/transaction',
       component: () => import('@/views/base/bank/account/transaction/AccountTransaction.vue')
-    }
+    },
+    {
+      name: 'AccountTransaction',
+      path: '/base/bank/:bankId/account/:accountId/transaction',
+      component: () => import('@/views/base/bank/account/transaction/AccountTransaction.vue')
+    },
+    {
+      name: 'AccountTransaction',
+      path: '/base/bank/:bankId/account/:accountId/transaction',
+      component: () => import('@/views/base/bank/account/transaction/AccountTransaction.vue')
+    },
   ]
 };
 

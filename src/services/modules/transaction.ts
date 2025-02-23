@@ -1,12 +1,12 @@
 import type { AxiosInstance } from "axios";
 
 export default (axiosInstance: AxiosInstance) => ({
-  fetchTransaction(id: string) {
-    return axiosInstance.get(`/personTransaction-requests/${id}`);
+  fetchTransaction() {
+    return axiosInstance.get(`/enumerationController/getWarrantyContractTypes`);
   },
 
-  createTransaction(data: any) {
-    return axiosInstance.post("/personTransaction-requests", data);
+  insertPersonByNationalCode(data: any) {
+    return axiosInstance.post("/PersonInfoController/insertPersonByNationalCode", data);
   },
 
   updateTransaction(id: string, data: any) {

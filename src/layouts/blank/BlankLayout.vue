@@ -1,7 +1,7 @@
 // ===============================|| Blank Layout ||=============================== //
 <template>
   <v-app>
-    <v-locale-provider rtl>
+    <v-locale-provider :rtl="true">
       <RouterView />
     </v-locale-provider>
   </v-app>

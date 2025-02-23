@@ -13,7 +13,7 @@ const createAxiosInstance = (): AxiosInstance => {
   // Interceptors for requests
   instance.interceptors.request.use(
     (config) => {
-      // You can modify the request before sending, e.g., add tokens
+      // You can modify the create before sending, e.g., add tokens
       const token = localStorage.getItem("authToken");
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -21,7 +21,7 @@ const createAxiosInstance = (): AxiosInstance => {
       return config;
     },
     (error) => {
-      // Handle request errors
+      // Handle create errors
       return Promise.reject(error);
     }
   );
