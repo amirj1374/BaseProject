@@ -9,11 +9,12 @@ const steps = [
   { title: 'ثبت درخواست هویتی مشتری', component: SectionOne },
   { title: 'اطلاعات نوع درخواست', component: SectionTwo },
   { title: 'وثایق', component: SectionThree },
-  { title: 'اطلاعات ضامن / ضامنین', component: SectionThree },
+  { title: 'اطلاعات ضامن / ضامنین', component: SectionThree }
 ];
 
 const stepper = ref(1); // Current step
 const totalSteps = steps.length;
+const error = ref<string | null>(null);
 
 // This ref will hold the currently active section's component instance.
 const sectionRef = ref<InstanceType<typeof SectionOne> | null>(null);
@@ -45,7 +46,7 @@ const handleSubmit = async () => {
     // If successful, move to the next step.
     nextStep();
   } catch (err) {
-    console.error('Submission error:', err);
+    error.value = `${err}`;
   } finally {
     submitting.value = false;
   }
@@ -58,32 +59,27 @@ const currentComponent = computed(() => {
 </script>
 
 <template>
-    <v-app class="stepperContainer">
-      <div class="stepperHeader">
-        <span v-for="(step, index) in steps" :key="index">
-          <span :class="{ active: stepper === index + 1 }">{{ step.title }}</span>
-          <span v-if="index < steps.length - 1"> &gt; </span>
-        </span>
-      </div>
-      <!-- Add a transition wrapper around the component -->
-      <transition name="fade" mode="out-in">
-        <!-- Dynamically render the active section and bind a ref -->
-        <component :is="currentComponent" ref="sectionRef" />
-      </transition>
-      <!-- Actions for Next and Previous -->
-      <div class="actions">
-        <v-btn @click="prevStep" :disabled="stepper === 1">
-          مرحله قبلی
-        </v-btn>
-        <v-btn
-          color="primary"
-          @click="handleSubmit"
-          :loading="submitting"
-        >
-          مرحله بعد
-        </v-btn>
-      </div>
-    </v-app>
+  <v-app class="stepperContainer">
+    <div class="stepperHeader">
+      <span v-for="(step, index) in steps" :key="index">
+        <span :class="{ active: stepper === index + 1 }">{{ step.title }}</span>
+      <span v-if="index < steps.length - 1"> ＜ </span>
+      </span>
+    </div>
+    <!-- Add a transition wrapper around the component -->
+    <transition name="fade" mode="out-in">
+      <!-- Dynamically render the active section and bind a ref -->
+      <component :is="currentComponent" ref="sectionRef" />
+    </transition>
+    <!-- Actions for Next and Previous -->
+    <div class="actions">
+      <v-btn @click="prevStep" :disabled="stepper === 1"> مرحله قبلی </v-btn>
+      <v-btn color="primary" @click="handleSubmit" :loading="submitting"> مرحله بعد </v-btn>
+    </div>
+    <v-snackbar v-if="error" v-model="error" color="error" timeout="3000">
+      {{ error }}
+    </v-snackbar>
+  </v-app>
 </template>
 
 <style scoped>
@@ -133,11 +129,13 @@ const currentComponent = computed(() => {
 }
 
 /* Transition effect for step change */
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.3s ease-in-out;
 }
 
-.fade-enter, .fade-leave-to {
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
 }
 
@@ -150,4 +148,3 @@ const currentComponent = computed(() => {
   justify-content: center;
 }
 </style>
-
