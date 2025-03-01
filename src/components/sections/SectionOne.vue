@@ -10,75 +10,31 @@ interface CustomerDTO {
 interface InsertPersonPayload {
   personType: number;
   customerDTO: CustomerDTO;
+  approvalRequestId: number
 }
 
 const loading = ref(false);
 const canSubmit = ref(false);
 const error = ref<string | null>(null);
-const data = ref([]);
+const data = ref(<any>[]);
 const items = [
   { title: 'مسئول', value: 1 },
   { title: 'مشتری', value: 2 },
   { title: 'ضامن', value: 3 },
 ];
 const header = [
-  {
-    title: 'نام',
-    align: 'start',
-    key: 'firstName',
-  },
-  {
-    title: 'نام خانوادگی',
-    align: 'start',
-    key: 'lastName',
-  },
-  {
-    title: 'کدملی / شناسه ملی',
-    align: 'start',
-    key: 'nationalCode',
-  },
-  {
-    title: 'نوع مشتری',
-    align: 'start',
-    key: 'personType',
-  },
-  {
-    title: 'گروه مشتری',
-    align: 'start',
-    key: 'personRelationType',
-  },
-  {
-    title: 'نام شرکت',
-    align: 'start',
-    key: 'customerType',
-  },
-  {
-    title: 'آدرس',
-    align: 'start',
-    key: 'address',
-  },
-  {
-    title: 'کدپستی',
-    align: 'start',
-    key: 'postalCode\n',
-  },
-  {
-    title: 'شماره تماس',
-    align: 'start',
-    key: 'name',
-  },
-  {
-    title: 'نام شعبه',
-    align: 'start',
-    key: 'branchName',
-  },
-  {
-    title: 'کد شعبه',
-    align: 'start',
-    key: 'branchCode',
-  },
-
-]
+  { title: 'نام', align: 'center', key: 'firstName', width: '150px' },
+  { title: 'نام خانوادگی', align: 'center', key: 'lastName', width: '150px' },
+  { title: 'کدملی', align: 'center', key: 'nationalCode', width: '150px' },
+  { title: 'نوع مشتری', align: 'center', key: 'personType', width: '150px' },
+  { title: 'گروه مشتری', align: 'center', key: 'personRelationType', width: '150px' },
+  { title: 'نام شرکت', align: 'center', key: 'customerType', width: '120px' },
+  { title: 'آدرس', align: 'center', key: 'address', width: '200px' },
+  { title: 'کدپستی', align: 'center', key: 'postalCode', width: '120px' },
+  { title: 'شماره تماس', align: 'center', key: 'name', width: '150px' },
+  { title: 'نام شعبه', align: 'center', key: 'branchName', width: '150px' },
+  { title: 'کد شعبه', align: 'center', key: 'branchCode', width: '120px' },
+];
 
 const formData = ref({
   personType: null,
@@ -90,7 +46,7 @@ const isFormValid = computed(() => {
 });
 const callApi = async () => {
   if (!isFormValid.value) {
-    error.value = 'Please fill all required fields correctly.';
+    error.value = 'لطفا فرم های بالا رو کامل کنید';
     return;
   }
 
@@ -102,6 +58,7 @@ const callApi = async () => {
       customerDTO: {
         nationalCode: formData.value.nationalCode,
       },
+      approvalRequestId: 1052
     };
     const response = await api.transaction.insertPersonByNationalCode(payload);
     data.value = response;  // Assume response data is in the format you need
@@ -131,7 +88,6 @@ defineExpose({ submitData });
 <template>
   <v-card variant="flat">
       <form @submit.prevent="submitData">
-        <v-container>
           <v-row>
             <!-- National Code Input -->
             <v-col cols="12" md="6">
@@ -162,16 +118,18 @@ defineExpose({ submitData });
                 </v-btn>
             </v-col>
             <v-col cols="12" md="12">
-              <v-data-table
-                :headers="header"
-                :items="data"
-                item-value="name"
-                hide-default-footer
-              ></v-data-table>
+              <div class="table-scroll">
+                <v-data-table
+                  :headers="header"
+                  :items="data"
+                  hide-default-footer
+                  no-data-text="رکوردی وجود ندارد"
+                  sticky
+                ></v-data-table>
+              </div>
             </v-col>
           </v-row>
-        </v-container>
-        <v-snackbar v-if="error" v-model="error" color="error" timeout="3000">
+        <v-snackbar v-if="error" v-model="error" color="error" timeout="5500">
           {{ error }}
         </v-snackbar>
       </form>
@@ -179,6 +137,10 @@ defineExpose({ submitData });
 </template>
 
 <style scoped>
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
 .error {
   color: red;
   margin-top: 0.5em;

@@ -12,7 +12,7 @@ const steps = [
   { title: 'اطلاعات ضامن / ضامنین', component: SectionThree }
 ];
 
-const stepper = ref(1); // Current step
+const stepper = ref(2); // Current step
 const totalSteps = steps.length;
 const error = ref<string | null>(null);
 
