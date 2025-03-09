@@ -26,7 +26,7 @@ import { useCustomizerStore } from '@/stores/customizer';
 const customizer = useCustomizerStore();
 setTimeout(() => {
   customizer.loading = false; // Remove the loading screen after 4 seconds
-}, 3000);
+}, 1);
 </script>
 
 <style scoped>

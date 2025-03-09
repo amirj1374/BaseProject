@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, defineExpose, onMounted } from 'vue'
+import { ref } from 'vue'
 import axios from 'axios'
 import { api } from '@/services/api';
 
@@ -9,21 +9,27 @@ const props = defineProps<{
 }>()
 
 const loading = ref(false)
+const select = ref('')
 const ex4 = ref(['red', 'indigo', 'orange', 'primary', 'secondary', 'success', 'info', 'warning', 'error', 'red darken-3', 'indigo darken-3', 'orange darken-3'])
+const items = ref([
+  { title: 'مسئول', value: 1 },
+  { title: 'مشتری', value: 2 },
+  { title: 'ضامن', value: 3 }
+]);
 const error = ref<string | null>(null)
-  const customerId = ref('12345')
-  const duration = ref('2022')
+  // const customerId = ref('12345')
+  // const duration = ref('2022')
 
 // the methud get all data
-const fetchData = async() => {
-  loading.value = true
-  error.value = null
-  try {
-    const response = api.transaction.getAccountTurnOver(customerId.value, duration.value);
-  } catch {
-
-  }
-}
+// const fetchData = async() => {
+//   loading.value = true
+//   error.value = null
+//   try {
+//     const response = api.transaction.getAccountTurnOver(customerId.value, duration.value);
+//   } catch {
+//
+//   }
+// }
 
 // The method that performs the API call.
 const submitData = async (): Promise<void> => {
@@ -77,6 +83,22 @@ defineExpose({ submitData })
             class="inputCenter"
             hide-details
           ></v-checkbox>
+          <v-card title="تسهیلات" text="..." variant="outlined" >
+            <v-select
+              v-model="select"
+              :items="items"
+              item-title="title"
+              item-value="value"
+              label="نوع مصوبه"
+              variant="outlined"
+              persistent-hint
+              single-line
+              clearable
+            ></v-select>
+            <v-card-actions>
+              <v-btn variant="outlined" color="primary">تایید</v-btn>
+            </v-card-actions>
+          </v-card>
         </v-col>
         <v-col
           cols="12"
@@ -114,10 +136,6 @@ defineExpose({ submitData })
 </template>
 
 <style scoped>
-.error {
-  color: red;
-  margin-top: 0.5em;
-}
 .inputCenter {
   display: flex;
   justify-content: center;
