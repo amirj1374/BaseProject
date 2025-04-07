@@ -3,16 +3,18 @@ import { ref, computed } from 'vue';
 import SectionOne from '@/components/sections/SectionOne.vue';
 import SectionTwo from '@/components/sections/SectionTwo.vue';
 import SectionThree from '@/components/sections/SectionThree.vue';
-
+import SectionFour from '@/components/sections/SectionFour.vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 // Define your steps with titles and the corresponding component.
 const steps = [
   { title: 'ثبت درخواست هویتی مشتری', component: SectionOne },
   { title: 'اطلاعات نوع درخواست', component: SectionTwo },
   { title: 'وثایق', component: SectionThree },
-  { title: 'اطلاعات ضامن / ضامنین', component: SectionThree }
+  { title: 'اطلاعات ضامن / ضامنین', component: SectionFour }
 ];
 
-const stepper = ref(2); // Current step
+const stepper = ref(1); // Current step
 const totalSteps = steps.length;
 const error = ref<string | null>(null);
 
@@ -23,9 +25,12 @@ const sectionRef = ref<InstanceType<typeof SectionOne> | null>(null);
 const submitting = ref(false);
 
 // Advance to the next step.
-const nextStep = () => {
+const nextStep = async () => {
   if (stepper.value < totalSteps) {
+    console.log(stepper.value);
     stepper.value++;
+  } else {
+    await router.push('/test/test');
   }
 };
 
@@ -44,7 +49,7 @@ const handleSubmit = async () => {
     // Call submitData() method from the child.
     await sectionRef.value.submitData();
     // If successful, move to the next step.
-    nextStep();
+    await nextStep()
   } catch (err) {
     error.value = `${err}`;
   } finally {
@@ -84,7 +89,7 @@ const currentComponent = computed(() => {
 
 <style scoped>
 .stepperContainer {
-  height: calc(100vh - 110px); /* Set the height to the full viewport height */
+  height: calc(100vh - 130px); /* Set the height to the full viewport height */
   max-width: 100%; /* Prevent overflow horizontally */
   display: flex;
   flex-direction: column;

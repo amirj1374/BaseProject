@@ -1,0 +1,84 @@
+[
+  {
+    "loanContractTypeCode": "001",
+    "annualLimitApprovalAmount": null,
+    "caseLimitApprovalAmount": null,
+    "annualLimitCurrentPrincipalRemain": null,
+    "annualLimitCurrentInterestRemain": null,
+    "caseLimitCurrentPrincipalRemain": null,
+    "caseLimitCurrentInterestRemain": null,
+    "overDuePrincipalRemain": null,
+    "overDueInterestRemain": null,
+    "penaltyAmount": null,
+    "collateralsInfoList": null
+  },
+  {
+    "loanContractTypeCode": "005",
+    "annualLimitApprovalAmount": null,
+    "caseLimitApprovalAmount": null,
+    "annualLimitCurrentPrincipalRemain": null,
+    "annualLimitCurrentInterestRemain": null,
+    "caseLimitCurrentPrincipalRemain": null,
+    "caseLimitCurrentInterestRemain": null,
+    "overDuePrincipalRemain": null,
+    "overDueInterestRemain": null,
+    "penaltyAmount": null,
+    "collateralsInfoList": null
+  },
+  {
+    "loanContractTypeCode": "006",
+    "annualLimitApprovalAmount": null,
+    "caseLimitApprovalAmount": null,
+    "annualLimitCurrentPrincipalRemain": null,
+    "annualLimitCurrentInterestRemain": null,
+    "caseLimitCurrentPrincipalRemain": null,
+    "caseLimitCurrentInterestRemain": null,
+    "overDuePrincipalRemain": null,
+    "overDueInterestRemain": null,
+    "penaltyAmount": null,
+    "collateralsInfoList": null
+  },
+  {
+    "loanContractTypeCode": "012",
+    "annualLimitApprovalAmount": null,
+    "caseLimitApprovalAmount": null,
+    "annualLimitCurrentPrincipalRemain": null,
+    "annualLimitCurrentInterestRemain": null,
+    "caseLimitCurrentPrincipalRemain": null,
+    "caseLimitCurrentInterestRemain": null,
+    "overDuePrincipalRemain": null,
+    "overDueInterestRemain": null,
+    "penaltyAmount": null,
+    "collateralsInfoList": null
+  },
+  {
+    "loanContractTypeCode": "009",
+    "annualLimitApprovalAmount": 0,
+    "caseLimitApprovalAmount": 0,
+    "annualLimitCurrentPrincipalRemain": 0,
+    "annualLimitCurrentInterestRemain": 0,
+    "caseLimitCurrentPrincipalRemain": 0,
+    "caseLimitCurrentInterestRemain": 0,
+    "overDuePrincipalRemain": 0,
+    "overDueInterestRemain": 0,
+    "penaltyAmount": 0,
+    "collateralsInfoList": [
+      {
+        "collateralTypeCode": 1,
+        "promissoryNote": {
+          "customerName": "مهدی رسولی",
+          "assignedAmount": 180000000000,
+          "assignedDate": "2024-05-07T14:29:28.000+00:00",
+          "fromNumber": 1,
+          "toNumber": 100
+        },
+        "deposit": null,
+        "estate": null,
+        "sharesBond": null,
+        "stock": null,
+        "otherCollAssignedValues": 0
+      }
+    ]
+  }
+]
+

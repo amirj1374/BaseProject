@@ -23,9 +23,9 @@ function fakeBackend() {
 
   const customers = [
     {
-      id: 1, firstName: 'Ali', lastName: 'Ahmadi', nationalCode: '1234567890', personType: 'Real',
-      personRelationType: 'VIP', customerType: 'Company A', address: 'Tehran, Iran', postalCode: '1111111111',
-      name: '021-12345678', branchName: 'Central', branchCode: '001'
+      id: 1, firstName: 'امیر', lastName: 'جلیلی', nationalCode: '0018523897', personType: 'حقیقی',
+      personRelationType: 'ویژه', customerType: 'کاسپین', address: 'تهران, ایران', postalCode: '1111111111',
+      name: '021-12345678', branchName: 'تختی', branchCode: '1054'
     },
   ];
 
