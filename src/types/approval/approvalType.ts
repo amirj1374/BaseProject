@@ -23,3 +23,22 @@ export interface FetchCustomerPayload	 {
   nationalCode?: string | null
   branchCode: string
 }
+
+export interface CurrenciesDto {
+  description: string,
+  code: string
+}
+
+export interface ContractTypeDto {
+  id: number,
+  parentId: number,
+  code: string,
+  shortTitle: string,
+  longTitle: string,
+  mainGroup: string,
+  childOrder: string,
+  activationDate: string,
+  equivalentCode: number,
+  parameterValue: string,
+  active: string
+}

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import SectionOne from '@/components/sections/SectionOne.vue';
-import SectionTwo from '@/components/sections/SectionTwo.vue';
+import SectionTwo from '@/components/sections/approvalType/SectionTwo.vue';
 import SectionThree from '@/components/sections/SectionThree.vue';
 import SectionFour from '@/components/sections/SectionFour.vue';
 import { useRouter } from 'vue-router';
@@ -74,14 +74,14 @@ const currentComponent = computed(() => {
     <!-- Add a transition wrapper around the component -->
     <transition name="fade" mode="out-in">
       <!-- Dynamically render the active section and bind a ref -->
-      <component style="height: 70vh" :is="currentComponent" ref="sectionRef" />
+      <component style="height: 62vh" :is="currentComponent" ref="sectionRef" />
     </transition>
     <!-- Actions for Next and Previous -->
     <div class="actions">
       <v-btn @click="prevStep" :disabled="stepper === 1"> مرحله قبلی </v-btn>
       <v-btn color="primary" @click="handleSubmit" :loading="submitting"> مرحله بعد </v-btn>
     </div>
-    <v-snackbar v-if="error" v-model="error" color="error" timeout="3000">
+    <v-snackbar v-if="error" v-model="error" color="error" timeout="2500">
       {{ error }}
     </v-snackbar>
   </v-app>

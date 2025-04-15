@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { api } from '@/services/api';
 //utils
 import { DateConverter } from '@/utils/date-convertor';
@@ -99,9 +99,10 @@ const changePattern = async () => {
 };
 // submit form
 const submitData = async () => {
-  if (canSubmit.value === false) {
-    return console.log('error');
-  } else return Promise.resolve();
+ return Promise.resolve();
+  // if (canSubmit.value === false) {
+  //   return Promise.reject("ابتدا مشتری مورد نظر را انتخاب کنید");
+  // } else return Promise.resolve();
 };
 
 defineExpose({ submitData });
@@ -118,6 +119,7 @@ defineExpose({ submitData });
           </v-radio-group>
         </v-col>
       </v-row>
+      <v-divider inset></v-divider>
       <v-row class="mt-2">
         <!-- Cif Code Input -->
         <v-col v-if="searchParam === 'cif'" cols="12" md="6">
@@ -131,6 +133,9 @@ defineExpose({ submitData });
         <v-col cols="12" md="12" class="text-center">
           <v-btn color="secondary" @click="search" type="primary"> جستجو</v-btn>
         </v-col>
+
+        <v-divider inset></v-divider>
+
         <v-col cols="12" md="12">
           <div class="table-scroll">
             <v-data-table :headers="headers" :items="data" hide-default-footer no-data-text="رکوردی وجود ندارد" sticky></v-data-table>

@@ -22,3 +22,12 @@ export class DateConverter {
     return `${gy}-${String(gm).padStart(2, '0')}-${String(gd).padStart(2, '0')}`;
   }
 }
+
+{
+  {
+    loanReuestType : 'gurantee'
+  }
+  {
+    loanReuestType : 'facilities'
+  }
+}

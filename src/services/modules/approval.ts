@@ -7,18 +7,18 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post(`/api/v1/loan-requests`, data);
   },
 
-  insertPersonByNationalCode(data: any) {
-    return axiosInstance.post("/PersonInfoController/insertPersonByNationalCode", data);
+  fetchCurrencies() {
+    return axiosInstance.post("/api/v1/general/currencies");
   },
-  
-  getAccountTurnOver(customerId: string, duration: string) {
-    return axiosInstance.get("/InquiryAPI/getAccountTurnOver", {
-      params: {customerId, duration}
+  getContractType(loanRequestType: string) {
+    return axiosInstance.get("/api/v1/general/get-contract-type", {
+      params: {loanRequestType}
     });
   },
-
-  updateTransaction(id: string, data: any) {
-    return axiosInstance.put(`/personTransaction-requests/${id}`, data);
+  getFacilities(contractId: number, loanRequestTypeCode: string) {
+    return axiosInstance.get("/api/v1/general/get-facilities", {
+      params: {contractId, loanRequestTypeCode}
+    });
   },
 
   deleteTransaction(id: string) {
