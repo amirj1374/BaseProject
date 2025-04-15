@@ -1,8 +1,8 @@
 import type { AxiosInstance } from "axios";
 
 export default (axiosInstance: AxiosInstance) => ({
-  fetchTransaction() {
-    return axiosInstance.get(`/enumerationController/getWarrantyContractTypes`);
+  fetchCustomer(data: any) {
+    return axiosInstance.post(`/api/v1/loan-requests`, data);
   },
 
   insertPersonByNationalCode(data: any) {

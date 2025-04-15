@@ -1,9 +1,9 @@
 import axiosInstance from "@/services/axiosInstance";
 import apiService from "@/services/apiService";
-import transaction from "@/services/modules/transaction";
+import approval from "@/services/modules/approval";
 
 export const api = {
   person: apiService(axiosInstance, "person"),
-  transaction: transaction(axiosInstance),
+  approval: approval(axiosInstance),
   user: apiService(axiosInstance, "user"),
 };
