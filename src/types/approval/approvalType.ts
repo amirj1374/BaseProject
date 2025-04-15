@@ -3,11 +3,23 @@ export interface CustomerDto {
   updatedAt?: string,
   createdBy?: string,
   updatedBy?: string,
-  id?: 3252,
+  id?: number,
   trackingCode?: string,
   status?: string,
   requestDate?: string,
   cif?: string,
   summery?: string,
   branchCode?: string,
+  nationalCode?: string,
+  customerName?: string
+  address?: number
+  postalCode?: number
+  phoneNo?: number
+  branchName?: string
+}
+
+export interface FetchCustomerPayload	 {
+  cif?: string | null
+  nationalCode?: string | null
+  branchCode: string
 }

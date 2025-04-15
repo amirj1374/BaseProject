@@ -1,7 +1,9 @@
 import type { AxiosInstance } from "axios";
+import type { FetchCustomerPayload } from '@/types/approval/approvalType';
+
 
 export default (axiosInstance: AxiosInstance) => ({
-  fetchCustomer(data: any) {
+  fetchCustomer(data: FetchCustomerPayload) {
     return axiosInstance.post(`/api/v1/loan-requests`, data);
   },
 

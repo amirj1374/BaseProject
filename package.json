@@ -26,6 +26,8 @@
     "axios-mock-adapter": "^1.22.0",
     "chance": "1.1.11",
     "date-fns": "3.6.0",
+    "jalaali-js": "^1.2.8",
+    "jspdf": "^3.0.0",
     "lodash": "4.17.21",
     "lottie-web": "^5.12.2",
     "pinia": "2.1.7",
@@ -41,8 +43,7 @@
     "vue3-print-nb": "0.1.4",
     "vuetify": "3.6.5",
     "webpack-plugin-vuetify": "3.0.3",
-    "yup": "1.4.0",
-    "jspdf": "^3.0.0"
+    "yup": "1.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.1.1",

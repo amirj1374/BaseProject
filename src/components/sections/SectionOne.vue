@@ -1,22 +1,20 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { api } from '@/services/api';
+//utils
+import { DateConverter } from '@/utils/date-convertor';
 //type
-import type { CustomerDto } from '@/types/approval/approvalType';
+import type { CustomerDto, FetchCustomerPayload } from '@/types/approval/approvalType';
+import type { AxiosResponse } from 'axios';
 
-interface GetCustomer {
-  cif: string | null;
-  nationalCode: string | null;
-  branchCode: string | null;
-}
-type AllowedStatus = 'nationalCode' | 'cif'
+type AllowedStatus = 'nationalCode' | 'cif';
 
-const searchParam = ref<AllowedStatus>('cif')
+const searchParam = ref<AllowedStatus>('cif');
 // const customers = ref<CustomerDto>([]);
 const loading = ref(false);
 const canSubmit = ref(false);
 const error = ref<string | null>(null);
-const data = ref(<any>[]);
+const data = ref(<CustomerDto[]>[]);
 const headers = ref([
   { title: 'شماره مشتری', align: 'center', key: 'cif', width: '150px' },
   { title: 'کدملی', align: 'center', key: 'nationalCode', width: '150px' },
@@ -27,28 +25,15 @@ const headers = ref([
   { title: 'نام شعبه', align: 'center', key: 'branchName', width: '150px' },
   { title: 'نوع وضعیت', align: 'center', key: 'status', width: '150px' },
   { title: 'کد پیگیری', align: 'center', key: 'trackingCode', width: '150px' },
-  { title: 'تاریخ درخواست', align: 'center', key: 'requestDate', width: '200px' },
+  { title: 'تاریخ درخواست', align: 'center', key: 'requestDate', width: '200px' }
 ]);
+// initial data
+const formData = ref({
+  cif: '',
+  nationalCode: ''
+});
 
-// async function fetchCustomers(nationalCode: string, personType: string) {
-//   try {
-//     const response = await fetch('/customers/search', {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({ nationalCode, personType })
-//     });
-//
-//
-//     // ✅ Now this will work
-//     data.value = await response.json();
-//     canSubmit.value = true;
-//     return data;
-//   } catch (error) {
-//     console.error('Error fetching customers:', error);
-//     return [];
-//   }
-// }
-
+// get customer
 async function search() {
   if (!isFormValid.value) {
     error.value = 'لطفا فرم های بالا رو کامل کنید';
@@ -59,7 +44,7 @@ async function search() {
   error.value = null;
 
   try {
-    const payload: GetCustomer = {
+    const payload: FetchCustomerPayload = {
       cif: formData.value.cif || null,
       nationalCode: formData.value.nationalCode || null,
       branchCode: '1001'
@@ -70,16 +55,16 @@ async function search() {
     if (response.status === 200 && response.data) {
       const raw = response.data;
       const customerInfo = raw.customerInfo || {};
-
+      // generate data for data table
       data.value = [
         {
-          updatedAt: raw.updatedAt,
-          createdBy: raw.createdBy,
-          updatedBy: raw.updatedBy,
+          updatedAt: DateConverter.toShamsi(raw.updatedAt) ?? '-',
+          createdBy: DateConverter.toShamsi(raw.createdBy) ?? '-',
+          updatedBy: DateConverter.toShamsi(raw.updatedBy) ?? '-',
           id: raw.id,
           trackingCode: raw.trackingCode,
           status: raw.status,
-          requestDate: raw.requestDate,
+          requestDate: DateConverter.toShamsi(raw.requestDate) ?? '-',
           cif: customerInfo.cif ?? raw.cif ?? '-',
           summery: raw.summery ?? '-',
           branchCode: raw.branchCode ?? customerInfo.branchCode ?? '-',
@@ -88,10 +73,9 @@ async function search() {
           address: customerInfo.custaddress ?? '-',
           postalCode: customerInfo.postalCode ?? '-',
           phoneNo: customerInfo.phoneno ?? customerInfo.mobileno ?? '-',
-          branchName: customerInfo.branchName ?? '-',
+          branchName: customerInfo.branchName ?? '-'
         }
       ];
-
       canSubmit.value = true;
     } else {
       error.value = `خطا: ${response.statusText}`;
@@ -104,28 +88,20 @@ async function search() {
   }
 }
 
-
-const formData = ref({
-  cif: '',
-  nationalCode: ''
-});
-
+// check validation
 const isFormValid = computed(() => {
   return formData.value.nationalCode?.length >= 10 || formData.value.cif !== null;
 });
-
+// change search pattern
 const changePattern = async () => {
   formData.value.cif = '';
   formData.value.nationalCode = '';
-
-}
+};
+// submit form
 const submitData = async () => {
-  console.log('yes yes')
-  // if (canSubmit.value === true) {
-  //   return Promise.resolve();
-  // } else {
-  //   return Promise.reject('شما مجاز به ادامه فرآیند نیستید');
-  // }
+  if (canSubmit.value === false) {
+    return console.log('error');
+  } else return Promise.resolve();
 };
 
 defineExpose({ submitData });
@@ -136,7 +112,7 @@ defineExpose({ submitData });
     <form @submit.prevent="submitData">
       <v-row class="mt-2">
         <v-col cols="12" md="12">
-          <v-radio-group inline  v-model="searchParam" class="radioBtnContainer" @change="changePattern">
+          <v-radio-group inline v-model="searchParam" class="radioBtnContainer" @change="changePattern">
             <v-radio label="شماره مشتری" value="cif"></v-radio>
             <v-radio label="کدملی" value="nationalCode"></v-radio>
           </v-radio-group>
@@ -153,7 +129,7 @@ defineExpose({ submitData });
         </v-col>
         <!-- Person Type Select -->
         <v-col cols="12" md="12" class="text-center">
-          <v-btn color="secondary" @click="search" type="primary"> جستجو </v-btn>
+          <v-btn color="secondary" @click="search" type="primary"> جستجو</v-btn>
         </v-col>
         <v-col cols="12" md="12">
           <div class="table-scroll">
@@ -173,10 +149,12 @@ defineExpose({ submitData });
   overflow-x: auto;
   max-width: 100%;
 }
+
 .error {
   color: red;
   margin-top: 0.5em;
 }
+
 .radioBtnContainer {
   width: 100%;
   display: flex;

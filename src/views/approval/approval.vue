@@ -74,7 +74,7 @@ const currentComponent = computed(() => {
     <!-- Add a transition wrapper around the component -->
     <transition name="fade" mode="out-in">
       <!-- Dynamically render the active section and bind a ref -->
-      <component :is="currentComponent" ref="sectionRef" />
+      <component style="height: 70vh" :is="currentComponent" ref="sectionRef" />
     </transition>
     <!-- Actions for Next and Previous -->
     <div class="actions">
