@@ -4,14 +4,15 @@ import { api } from '@/services/api';
 //utils
 import { DateConverter } from '@/utils/date-convertor';
 //type
-import type { CustomerDto, FetchCustomerPayload } from '@/types/approval/approvalType';
+import type { CustomerDto, FetchCustomerPayload, FetchGuarantorPayload } from '@/types/approval/approvalType';
 import type { AxiosResponse } from 'axios';
 
 type AllowedStatus = 'nationalCode' | 'cif';
 
-const searchParam = ref<AllowedStatus>('cif');
+const searchParam = ref<AllowedStatus>('nationalCode');
 // const customers = ref<CustomerDto>([]);
 const loading = ref(false);
+const hideInput = ref(false);
 const canSubmit = ref(false);
 const error = ref<string | null>(null);
 const data = ref(<CustomerDto[]>[]);
@@ -40,17 +41,16 @@ async function search() {
   error.value = null;
 
   try {
-    const payload: FetchCustomerPayload = {
-      cif: formData.value.cif || null,
+    const payload: FetchGuarantorPayload = {
       nationalCode: formData.value.nationalCode || null,
-      branchCode: '1001'
+      loanRequestId: '2805'
     };
 
-    const response = await api.approval.fetchCustomer(payload);
+    const response = await api.approval.fetchGuarantor(payload);
 
     if (response.status === 200 && response.data) {
       const raw = response.data;
-      const customerInfo = raw.customerInfo || {};
+      const guarantorInfo = raw.guarantorInfo || {};
       // generate data for data table
       data.value = [
         {
@@ -61,15 +61,15 @@ async function search() {
           trackingCode: raw.trackingCode,
           status: raw.status,
           requestDate: DateConverter.toShamsi(raw.requestDate) ?? '-',
-          cif: customerInfo.cif ?? raw.cif ?? '-',
+          cif: guarantorInfo.cif ?? raw.cif ?? '-',
           summery: raw.summery ?? '-',
-          branchCode: raw.branchCode ?? customerInfo.branchCode ?? '-',
-          nationalCode: raw.nationalCode ?? customerInfo.nationalCode ?? '-',
-          customerName: customerInfo.customerName ?? '-',
-          address: customerInfo.custaddress ?? '-',
-          postalCode: customerInfo.postalCode ?? '-',
-          phoneNo: customerInfo.phoneno ?? customerInfo.mobileno ?? '-',
-          branchName: customerInfo.branchName ?? '-'
+          branchCode: raw.branchCode ?? guarantorInfo.branchCode ?? '-',
+          nationalCode: raw.nationalCode ?? guarantorInfo.nationalCode ?? '-',
+          customerName: guarantorInfo.customerName ?? '-',
+          address: guarantorInfo.custaddress ?? '-',
+          postalCode: guarantorInfo.postalCode ?? '-',
+          phoneNo: guarantorInfo.phoneno ?? guarantorInfo.mobileno ?? '-',
+          branchName: guarantorInfo.branchName ?? '-'
         }
       ];
       canSubmit.value = true;
@@ -78,6 +78,7 @@ async function search() {
     }
   } catch (err: any) {
     error.value = err.message || 'خطای سرور.';
+    hideInput.value = true
     canSubmit.value = false;
   } finally {
     loading.value = false;
@@ -95,7 +96,7 @@ const changePattern = async () => {
 };
 // submit form
 const submitData = async () => {
- return Promise.resolve();
+  return Promise.resolve();
   // if (canSubmit.value === false) {
   //   return Promise.reject("ابتدا مشتری مورد نظر را انتخاب کنید");
   // } else return Promise.resolve();
@@ -118,17 +119,27 @@ defineExpose({ submitData });
       <v-divider inset></v-divider>
       <v-row class="mt-2">
         <!-- Cif Code Input -->
-        <v-col v-if="searchParam === 'cif'" cols="12" md="6">
+        <v-col v-if="searchParam === 'cif'" cols="12" md="4">
           <v-text-field v-model="formData.cif" label="شماره مشتری" variant="outlined" density="comfortable" />
         </v-col>
         <!-- National Code Input -->
-        <v-col v-if="searchParam === 'nationalCode'" cols="12" md="6">
+        <v-col v-if="searchParam === 'nationalCode'" cols="12" md="4">
           <v-text-field v-model="formData.nationalCode" label="کد ملی" variant="outlined" density="comfortable" />
         </v-col>
-        <!-- Person Type Select -->
-        <v-col cols="12" md="12" class="text-center">
-          <v-btn color="secondary" @click="search" type="primary"> جستجو</v-btn>
+
+        <v-col v-if="hideInput" cols="12" md="4">
+          <v-text-field v-model="formData.nationalCode" label="کد ملی" variant="outlined" density="comfortable" />
         </v-col>
+        <v-col v-if="hideInput" cols="12" md="4">
+          <v-text-field v-model="formData.nationalCode" label="کد ملی" variant="outlined" density="comfortable" />
+        </v-col>
+      </v-row>
+        <!-- Person Type Select -->
+        <v-row>
+          <v-col cols="12" md="12" class="text-center">
+            <v-btn color="secondary" @click="search" type="primary"> جستجو</v-btn>
+          </v-col>
+        </v-row>
 
         <v-divider inset></v-divider>
 
@@ -137,7 +148,6 @@ defineExpose({ submitData });
             <v-data-table :headers="headers" :items="data" hide-default-footer no-data-text="رکوردی وجود ندارد" sticky></v-data-table>
           </div>
         </v-col>
-      </v-row>
       <v-snackbar v-if="error" v-model="error" color="error" timeout="5500">
         {{ error }}
       </v-snackbar>

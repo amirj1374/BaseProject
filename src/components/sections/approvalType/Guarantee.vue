@@ -17,6 +17,7 @@ const formSchema = yup.object({
   selectedFacilities: yup.string().nullable().required('نوع محصول الزامی است'),
   price: yup.string().nullable().required('مبلغ الزامی است'),
   selectedCollateral: yup.array().nullable().required('انتخاب وثیقه الزامی است'),
+  percentDeposit: yup.string().nullable().required('درصد سپرده نقدی الزامی است'),
   term: yup.number().nullable().required('محاسبه روز الزامی است')
 });
 const contractTypes = ref<ContractTypeDto[]>([]);
@@ -39,6 +40,7 @@ const { value: selectedRepaymentType } = useField<RepaymentType | null>('selecte
 const { value: selectedFacilities } = useField<FacilitiesDto[] | null>('selectedFacilities');
 const { value: price } = useField<string | null>('price');
 const { value: selectedCollateral } = useField<string | null>('selectedCollateral');
+const { value: percentDeposit } = useField<string | null>('percentDeposit');
 const { value: term } = useField<number | null>('term');
 const { value: year } = useField<number | null>('year');
 const { value: month } = useField<number | null>('month');
@@ -58,7 +60,7 @@ const props = defineProps<{
 }>();
 
 onMounted(async () => {
-  const currenciesRes = await api.approval.getContractType('ContractCode');
+  const currenciesRes = await api.approval.getContractType('GuaranteeType');
   contractTypes.value = currenciesRes.data.generalParameterList;
 });
 // Fetch facilities by contract type ID
@@ -85,12 +87,12 @@ watch(selectedContractType, (id) => {
 
 <template>
   <v-btn size="large" :base-color="valid ? 'lightsuccess' : 'lighterror'" @click="isDialogActive = true">
-    تسهیلات
+    ضمانت نامه
     <AlertCircleIcon v-if="!valid" style="margin-right: 20px" size="20" />
     <SquareRoundedCheckFilledIcon v-if="valid" style="margin-right: 20px" size="20" />
   </v-btn>
   <v-dialog max-width="1200" v-model="isDialogActive">
-    <v-card title="تسهیلات">
+    <v-card title="ضمانت نامه">
       <v-card-text>
         <v-row>
           <v-col cols="12" md="4">
@@ -191,7 +193,7 @@ watch(selectedContractType, (id) => {
             ></v-text-field>
           </v-col>
           <v-col cols="12" md="2">
-              <v-btn size="x-large" color="secondary" variant="text" @click="dayCalculate"> محاسبه</v-btn>
+            <v-btn size="x-large" color="secondary" variant="text" @click="dayCalculate"> محاسبه</v-btn>
           </v-col>
           <v-col cols="12" md="4">
             <v-text-field
@@ -228,6 +230,17 @@ watch(selectedContractType, (id) => {
               variant="outlined"
               color="primary"
               label="مبلغ"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="3">
+            <v-text-field
+              v-model="percentDeposit"
+              :error-messages="errors.percentDeposit"
+              density="comfortable"
+              hide-details="auto"
+              variant="outlined"
+              color="primary"
+              label="درصد سپرده نقدی"
             ></v-text-field>
           </v-col>
         </v-row>

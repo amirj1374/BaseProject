@@ -2,19 +2,21 @@
 import { ref, computed } from 'vue';
 import SectionOne from '@/components/sections/SectionOne.vue';
 import SectionTwo from '@/components/sections/approvalType/SectionTwo.vue';
-import SectionThree from '@/components/sections/SectionThree.vue';
+import SectionThree from '@/components/sections/guarantor/SectionThree.vue';
 import SectionFour from '@/components/sections/SectionFour.vue';
+import SectionFive from '@/components/sections/history/SectionFive.vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 // Define your steps with titles and the corresponding component.
 const steps = [
   { title: 'ثبت درخواست هویتی مشتری', component: SectionOne },
   { title: 'اطلاعات نوع درخواست', component: SectionTwo },
-  { title: 'وثایق', component: SectionThree },
-  { title: 'اطلاعات ضامن / ضامنین', component: SectionFour }
+  { title: 'اطلاعات ضامن / ضامنین', component: SectionThree },
+  { title: 'استعلام', component: SectionFour },
+  { title: 'پیشنویس', component: SectionFive }
 ];
 
-const stepper = ref(1); // Current step
+const stepper = ref(5); // Current step
 const totalSteps = steps.length;
 const error = ref<string | null>(null);
 
@@ -68,7 +70,7 @@ const currentComponent = computed(() => {
     <div class="stepperHeader">
       <span v-for="(step, index) in steps" :key="index">
         <span :class="{ active: stepper === index + 1 }">{{ step.title }}</span>
-      <span v-if="index < steps.length - 1"> ＜ </span>
+      <span v-if="index < steps.length - 1"> 🢀 </span>
       </span>
     </div>
     <!-- Add a transition wrapper around the component -->

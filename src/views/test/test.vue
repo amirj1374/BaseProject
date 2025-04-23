@@ -12,9 +12,14 @@ import IRANSansWeb from './IRANSansWeb';
 import Page01 from './page01';
 import Page02 from './page02';
 import dataJson from './data.json'
-
+import { api } from '@/services/api';
 const generatedPdf = ref<string>('');
 
+
+//deposit-info
+onMounted(async () => {
+  const currenciesRes = await api.approval.getDepositInfo(3252);
+})
 const generatePDF = async () => {
   // ساخت بیس جنریتور
   const doc = new jsPDF({

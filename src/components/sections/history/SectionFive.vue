@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
-import Facilities from '@/components/sections/approvalType/Facilities.vue';
+import Facilities from '@/components/sections/history/FacilitiesHistory.vue';
 import { api } from '@/services/api';
 import type { CurrenciesDto, CustomerDto, RequestInformationDto } from '@/types/approval/approvalType';
-import Guarantee from '@/components/sections/approvalType/Guarantee.vue';
+import Guarantee from '@/components/sections/history/GuaranteesHistory.vue';
 import Lc from '@/components/sections/approvalType/Lc.vue';
 
 const loading = ref(false);
@@ -87,13 +87,6 @@ defineExpose({ submitData });
           <!-- Lc Checkbox -->
           <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
             <Lc :currencies="currencies" @save="saveLcData" />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12"  md="12">
-                <div class="table-scroll" style="margin-top: 25px">
-                  <v-data-table :headers="headers" :items="dataTable" hide-default-footer no-data-text="رکوردی وجود ندارد" sticky></v-data-table>
-                </div>
           </v-col>
         </v-row>
       </v-container>
