@@ -2,9 +2,9 @@
 import { onMounted, ref } from 'vue';
 import Facilities from '@/components/sections/history/FacilitiesHistory.vue';
 import { api } from '@/services/api';
-import type { CurrenciesDto, CustomerDto, RequestInformationDto } from '@/types/approval/approvalType';
+import type { CurrenciesDto,RequestInformationDto } from '@/types/approval/approvalType';
 import Guarantee from '@/components/sections/history/GuaranteesHistory.vue';
-import Lc from '@/components/sections/approvalType/Lc.vue';
+import Lc from '@/components/sections/history/LcHistory.vue';
 
 const loading = ref(false);
 const currencies = ref<CurrenciesDto[]>([]);

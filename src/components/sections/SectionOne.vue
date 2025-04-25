@@ -95,10 +95,9 @@ const changePattern = async () => {
 };
 // submit form
 const submitData = async () => {
- return Promise.resolve();
-  // if (canSubmit.value === false) {
-  //   return Promise.reject("ابتدا مشتری مورد نظر را انتخاب کنید");
-  // } else return Promise.resolve();
+  if (canSubmit.value === false) {
+    return Promise.reject("ابتدا مشتری مورد نظر را انتخاب کنید");
+  } else return Promise.resolve();
 };
 
 defineExpose({ submitData });

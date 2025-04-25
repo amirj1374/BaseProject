@@ -2,10 +2,13 @@
 import { onMounted, ref } from 'vue';
 import Facilities from '@/components/sections/approvalType/Facilities.vue';
 import { api } from '@/services/api';
-import type { CurrenciesDto, CustomerDto, RequestInformationDto } from '@/types/approval/approvalType';
+import type { CollateralDto, CurrenciesDto, CustomerDto, RequestInformationDto } from '@/types/approval/approvalType';
 import Guarantee from '@/components/sections/approvalType/Guarantee.vue';
 import Lc from '@/components/sections/approvalType/Lc.vue';
+import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
+import { ApprovalTypeOptions } from '@/constants/enums/approval';
 
+const collaterals = ref<CollateralDto[]>([]);
 const loading = ref(false);
 const currencies = ref<CurrenciesDto[]>([]);
 const facilitiesData = ref();
@@ -14,19 +17,30 @@ const lcData = ref();
 const dataTable = ref(<RequestInformationDto[]>[]);
 const headers = ref([
   { title: 'ارز', align: 'center', key: 'currency', width: '150px' },
-  { title: 'مبلغ', align: 'center', key: 'price', width: '150px' },
-  { title: 'مصوبه', align: 'center', key: 'selectedApprovalType', width: '150px' },
-  { title: 'وثیقه', align: 'center', key: 'selectedCollateral', width: '120px' },
-  { title: 'نوع عقد', align: 'center', key: 'selectedContractType', width: '200px' },
-  { title: 'محصول', align: 'center', key: 'selectedFacilities', width: '200px' },
-  { title: 'بازپرداخت', align: 'center', key: 'selectedRepaymentType', width: '200px' },
-  { title: 'مبلغ', align: 'center', key: 'price', width: '200px' },
-  { title: 'مدت', align: 'center', key: 'term', width: '200px' },
+  { title: 'مبلغ', align: 'center', key: 'amount', width: '200px' },
+  { title: 'مصوبه', align: 'center', key: 'approvalType', width: '150px' },
+  { title: 'نوع درخواست', align: 'center', key: 'requestType', width: '150px' },
+  { title: 'نوع عقد', align: 'center', key: 'contractTypeId', width: '200px' },
+  { title: 'محصول', align: 'center', key: 'facilityId', width: '200px' },
+  { title: 'بازپرداخت', align: 'center', key: 'repaymentType', width: '200px' },
+  { title: 'مدت', align: 'center', key: 'durationDay', width: '200px' },
   { title: 'روز', align: 'center', key: 'day', width: '150px' },
   { title: 'ماه', align: 'center', key: 'month', width: '150px' },
-  { title: 'سال', align: 'center', key: 'year', width: '200px' },
+  { title: 'سال', align: 'center', key: 'year', width: '200px' }
 ]);
 
+const getRequestType = (requestType: string): string => {
+  switch (requestType) {
+    case 'ContractCode':
+      return 'تسهیلات';
+    case 'GuaranteeType':
+      return 'ضمانت‌نامه';
+    case 'LetterOfCredit':
+      return 'اعتبار اسنادی';
+    default:
+      return '-';
+  }
+};
 onMounted(async () => {
   const currenciesRes = await api.approval.fetchCurrencies();
   currencies.value = currenciesRes.data;
@@ -48,21 +62,37 @@ const saveLcData = (data: RequestInformationDto) => {
 };
 
 // API submission method
-const submitData = async (): Promise<void> => {
+const submitData = async (): Promise<{ success: boolean; message: string }> => {
   try {
     const payload = {
-      facilities: facilitiesData.value,
-      guarantee: guaranteeData.value,
-      lc: lcData.value
+      loanRequestDetailList: [facilitiesData.value, guaranteeData.value, lcData.value].filter(Boolean),
+      loanRequestId: 6102
     };
 
-    console.log('Final submission payload:', payload);
+    if (payload.loanRequestDetailList.length === 0) {
+      return Promise.reject({ success: false, message: 'هیچ داده‌ای برای ارسال وجود ندارد.' });
+    }
 
-    // return Promise.resolve();
-  } catch (err) {
-    console.error('Submit error', err);
+    const res = await api.approval.saveLoanRequest(payload);
+    return Promise.resolve({ success: true, message: 'درخواست با موفقیت ثبت شد.' });
+  } catch (err: any) {
+    return Promise.reject({
+      success: false,
+      message: err
+    });
   }
 };
+
+
+const repaymentTypeMap = RepaymentTypeOptions.reduce((acc, cur) => {
+  acc[cur.value] = cur.title;
+  return acc;
+}, {} as Record<string, string>);
+
+const approvalTypeMap = ApprovalTypeOptions.reduce((acc, cur) => {
+  acc[cur.value] = cur.title;
+  return acc;
+}, {} as Record<string, string>);
 
 defineExpose({ submitData });
 </script>
@@ -86,14 +116,26 @@ defineExpose({ submitData });
           </v-col>
           <!-- Lc Checkbox -->
           <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
-            <Lc :currencies="currencies" @save="saveLcData" />
+            <Lc :collateral="collaterals" :currencies="currencies" @save="saveLcData" />
           </v-col>
         </v-row>
         <v-row>
-          <v-col cols="12"  md="12">
-                <div class="table-scroll" style="margin-top: 25px">
-                  <v-data-table :headers="headers" :items="dataTable" hide-default-footer no-data-text="رکوردی وجود ندارد" sticky></v-data-table>
-                </div>
+          <v-col cols="12" md="12">
+            <div class="table-scroll" style="margin-top: 25px">
+              <v-data-table :headers="headers" :items="dataTable" hide-default-footer no-data-text="رکوردی وجود ندارد" sticky>
+                <!-- Custom display for approvalType -->
+                <template #item.requestType="{ item }">
+                  {{ getRequestType(item.requestType) }}
+                </template>
+                <template #item.repaymentType="{ item }">
+                  {{ repaymentTypeMap[item.repaymentType] || '-' }}
+                </template>
+                <!-- Custom display for facility -->
+                <template #item.approvalType="{ item }">
+                  {{ approvalTypeMap[item.approvalType] || '-' }}
+                </template>
+              </v-data-table>
+            </div>
           </v-col>
         </v-row>
       </v-container>

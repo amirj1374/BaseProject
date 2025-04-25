@@ -1,5 +1,6 @@
 import type { AxiosInstance } from "axios";
 import type { FetchCustomerPayload, FetchGuarantorPayload } from '@/types/approval/approvalType';
+import { array } from 'yup';
 
 
 export default (axiosInstance: AxiosInstance) => ({
@@ -10,11 +11,12 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post(`/api/v1/guarantor`, data);
   },
   fetchCurrencies() {
-    return axiosInstance.post("/api/v1/general/currencies");
+    return axiosInstance.post("/api/v1/general/currencies",);
   },
   getContractType(loanRequestType: string) {
     return axiosInstance.get("/api/v1/general/get-contract-type", {
-      params: {loanRequestType}
+      params: {loanRequestType},
+      timeout: 60000 // مثلاً 10 ثانیه
     });
   },
   getFacilities(contractId: number, loanRequestTypeCode: string) {
@@ -31,6 +33,18 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.get("/api/v1/deposit-info", {
       params: {loanRequestId}
     });
+  },
+
+  getLcCollateral() {
+    return axiosInstance.post("/api/v1/general/lc-collateral");
+  },
+
+  getCollateral(facilityId: number) {
+    return axiosInstance.post("/api/v1/general/collateral", {facilityId});
+  },
+
+  saveLoanRequest(loanRequestDetailList: {}) {
+    return axiosInstance.post("/api/v1/loan-request-detail", loanRequestDetailList);
   },
 
   deleteTransaction(id: string) {

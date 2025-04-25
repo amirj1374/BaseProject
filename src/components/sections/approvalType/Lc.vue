@@ -1,27 +1,31 @@
 <script lang="ts" setup>
-import type { ContractTypeDto, CurrenciesDto, FacilitiesDto } from '@/types/approval/approvalType';
+import type { CollateralDto, CurrenciesDto, FacilitiesDto } from '@/types/approval/approvalType';
 import { ApprovalTypeOptions, type ApprovalType } from '@/constants/enums/approval';
-import { RepaymentTypeOptions, RepaymentTypeEnum } from '@/constants/enums/repaymentType';
-import type { RepaymentType } from '@/constants/enums/repaymentType';
-import { onMounted, ref, watch } from 'vue';
+import { ContractTypeOption, type ContractType } from '@/constants/enums/contractType';
+import { RepaymentTypeOptions, type RepaymentType } from '@/constants/enums/repaymentType';
+import { LcProductOption} from '@/constants/enums/lcProductType';
+import { ref, watch } from 'vue';
 import { api } from '@/services/api';
 import * as yup from 'yup';
 import { useForm, useField } from 'vee-validate';
-import FakeData from '@/components/sections/sectionTwoData.json';
 
 const formSchema = yup.object({
-  selectedApprovalType: yup.string().nullable().required('نوع مصوبه الزامی است'),
+  approvalType: yup.string().nullable().required('نوع مصوبه الزامی است'),
   currency: yup.string().nullable().required('نوع ارز الزامی است'),
-  selectedContractType: yup.string().nullable().required('نوع عقد الزامی است'),
-  selectedRepaymentType: yup.string().nullable().required('نحوه بازپرداخت الزامی است'),
-  selectedFacilities: yup.string().nullable().required('نوع محصول الزامی است'),
-  price: yup.string().nullable().required('مبلغ الزامی است'),
-  selectedCollateral: yup.array().nullable().required('انتخاب وثیقه الزامی است'),
-  percentDeposit: yup.string().nullable().required('درصد سپرده نقدی الزامی است'),
-  term: yup.number().nullable().required('محاسبه روز الزامی است')
+  lcContractType: yup.string().nullable().required('نوع عقد الزامی است'),
+  repaymentType: yup.string().nullable().required('نحوه بازپرداخت الزامی است'),
+  lcProductType: yup.string().nullable().required('نوع محصول الزامی است'),
+  amount: yup.string().nullable().required('مبلغ الزامی است'),
+  collateralsString: yup.array().nullable().required('انتخاب وثیقه الزامی است'),
+  percentDeposit: yup
+    .number()
+    .nullable()
+    .required('درصد سپرده نقدی الزامی است')
+    .min(1, 'حداقل میزان مجار باید بالا تر از 1 باشد')
+    .max(100, '"حداکثر میزان مجار 100 باشد'),
+  durationDay: yup.number().nullable().required('محاسبه روز الزامی است')
 });
-const contractTypes = ref<ContractTypeDto[]>([]);
-const facilities = ref<FacilitiesDto[]>([]);
+const collateralList = ref<CollateralDto[]>([]);
 const isDialogActive = ref(false);
 const error = ref<string | null>(null);
 // form data
@@ -33,24 +37,26 @@ const emit = defineEmits<{
 const { handleSubmit, errors } = useForm({
   validationSchema: formSchema
 });
-const { value: selectedApprovalType } = useField<ApprovalType | null>('selectedApprovalType');
+const { value: approvalType } = useField<ApprovalType | null>('approvalType');
 const { value: currency } = useField<string | null>('currency');
-const { value: selectedContractType } = useField<string | null>('selectedContractType');
-const { value: selectedRepaymentType } = useField<RepaymentType | null>('selectedRepaymentType');
-const { value: selectedFacilities } = useField<FacilitiesDto[] | null>('selectedFacilities');
-const { value: price } = useField<string | null>('price');
-const { value: selectedCollateral } = useField<string | null>('selectedCollateral');
-const { value: percentDeposit } = useField<string | null>('percentDeposit');
-const { value: term } = useField<number | null>('term');
+const { value: requestType } = useField<string | "LetterOfCredit">('requestType');
+const { value: lcContractType } = useField<string | null>('lcContractType');
+const { value: repaymentType } = useField<RepaymentType | null>('repaymentType');
+const { value: lcProductType } = useField<[] | null>('lcProductType');
+const { value: amount } = useField<string | null>('amount');
+const { value: collateralsString } = useField<[] | null>('collateralsString');
+const { value: percentDeposit } = useField<[] | null>('percentDeposit');
+const { value: durationDay } = useField<number | null>('durationDay');
 const { value: year } = useField<number | null>('year');
 const { value: month } = useField<number | null>('month');
 const { value: day } = useField<number | null>('day');
 
 const handleSave = handleSubmit((values) => {
+  values.requestType = 'LetterOfCredit';
+  console.log(values);
   emit('save', {
     ...values
   });
-  console.log(values);
   valid.value = true;
   isDialogActive.value = false;
 });
@@ -59,35 +65,30 @@ const props = defineProps<{
   currencies: CurrenciesDto[];
 }>();
 
-onMounted(async () => {
-  const currenciesRes = await api.approval.getContractType('LetterOfCredit');
-  contractTypes.value = currenciesRes.data.generalParameterList;
-});
-// Fetch facilities by contract type ID
-const getFacilities = async (contractTypeId: any) => {
-  if (!contractTypeId) return;
-  const res = await api.approval.getFacilities(contractTypeId, 'ContractCode'); // <- adjust this method name if needed
-  facilities.value = res.data.facilityDtoList;
+const getLcCollateral = async () => {
+  if (!isDialogActive) return;
+  const lcCollateralRes = await api.approval.getLcCollateral();
+  collateralList.value = lcCollateralRes.data;
 };
+
+watch(isDialogActive, (active) => {
+  if (active) {
+    getLcCollateral();
+  }
+});
 
 const dayCalculate = async () => {
   if (year.value === null && month.value === null && day.value === null) {
     error.value = 'لطفا مقادیر تاریخ را وارد کنید';
   }
   const res = await api.approval.getCalculatedDay(year.value, month.value, day.value); // <- adjust this method name if needed
-  term.value = res.data;
+  durationDay.value = res.data;
 };
-
-watch(selectedContractType, (id) => {
-  if (id) {
-    getFacilities(selectedContractType.value);
-  }
-});
 </script>
 
 <template>
   <v-btn size="large" :base-color="valid ? 'lightsuccess' : 'lighterror'" @click="isDialogActive = true">
-اعتبار اسنادی
+    اعتبار اسنادی
     <AlertCircleIcon v-if="!valid" style="margin-right: 20px" size="20" />
     <SquareRoundedCheckFilledIcon v-if="valid" style="margin-right: 20px" size="20" />
   </v-btn>
@@ -97,11 +98,11 @@ watch(selectedContractType, (id) => {
         <v-row>
           <v-col cols="12" md="4">
             <v-autocomplete
-              v-model="selectedApprovalType"
+              v-model="approvalType"
               clearable
               label="نوع مصوبه"
               :items="ApprovalTypeOptions"
-              :error-messages="errors.selectedApprovalType"
+              :error-messages="errors.approvalType"
               variant="outlined"
               item-title="title"
               item-value="value"
@@ -119,48 +120,21 @@ watch(selectedContractType, (id) => {
               item-value="code"
             ></v-autocomplete>
           </v-col>
-          <v-col cols="12" md="4" sm="4">
-            <v-autocomplete
-              v-model="selectedCollateral"
-              :error-messages="errors.selectedCollateral"
-              :items="FakeData.collateral"
-              item-title="DESCRIPTION"
-              item-value="ID"
-              label="نوع وثیقه"
-              variant="outlined"
-              multiple
-              clearable
-            ></v-autocomplete>
-          </v-col>
-        </v-row>
-        <v-row>
           <v-col cols="12" md="4">
             <v-autocomplete
-              v-model="selectedContractType"
-              :items="contractTypes"
-              :error-messages="errors.selectedContractType"
-              item-title="longTitle"
-              item-value="id"
+              v-model="lcContractType"
+              :items="ContractTypeOption"
+              :error-messages="errors.lcContractType"
+              item-title="title"
+              item-value="value"
               label="نوع عقد"
               variant="outlined"
               no-data-text="دیتا یافت نشد"
               clearable
             ></v-autocomplete>
           </v-col>
-          <v-col cols="12" md="8">
-            <v-autocomplete
-              :items="facilities"
-              v-model="selectedFacilities"
-              :error-messages="errors.selectedFacilities"
-              item-title="facilityName"
-              item-value="facilityCode"
-              no-data-text="لطفا ابتدا نوع عقد رو انتخاب کنید"
-              label="نوع محصول"
-              variant="outlined"
-              clearable
-            ></v-autocomplete>
-          </v-col>
         </v-row>
+        <v-row> </v-row>
         <v-row>
           <v-col cols="12" md="2">
             <v-text-field
@@ -170,6 +144,7 @@ watch(selectedContractType, (id) => {
               variant="outlined"
               color="primary"
               label="سال"
+              type="number"
             ></v-text-field>
           </v-col>
           <v-col cols="12" md="2">
@@ -180,6 +155,7 @@ watch(selectedContractType, (id) => {
               variant="outlined"
               color="primary"
               label="ماه"
+              type="number"
             ></v-text-field>
           </v-col>
           <v-col cols="12" md="2">
@@ -190,6 +166,7 @@ watch(selectedContractType, (id) => {
               variant="outlined"
               color="primary"
               label="روز"
+              type="number"
             ></v-text-field>
           </v-col>
           <v-col cols="12" md="2">
@@ -197,8 +174,8 @@ watch(selectedContractType, (id) => {
           </v-col>
           <v-col cols="12" md="4">
             <v-text-field
-              v-model="term"
-              :error-messages="errors.term"
+              v-model="durationDay"
+              :error-messages="errors.durationDay"
               density="comfortable"
               variant="outlined"
               color="primary"
@@ -208,11 +185,11 @@ watch(selectedContractType, (id) => {
           </v-col>
         </v-row>
         <v-row>
-          <v-col cols="12" md="3">
+          <v-col cols="12" md="4">
             <v-select
               :items="RepaymentTypeOptions"
-              v-model="selectedRepaymentType"
-              :error-messages="errors.selectedRepaymentType"
+              v-model="repaymentType"
+              :error-messages="errors.repaymentType"
               item-title="title"
               item-value="value"
               no-data-text="یافت نشد"
@@ -221,18 +198,19 @@ watch(selectedContractType, (id) => {
               clearable
             ></v-select>
           </v-col>
-          <v-col cols="12" md="3">
+          <v-col cols="12" md="4">
             <v-text-field
-              v-model="price"
-              :error-messages="errors.price"
+              v-model="amount"
+              :error-messages="errors.amount"
               density="comfortable"
               hide-details="auto"
               variant="outlined"
               color="primary"
               label="مبلغ"
+              type="number"
             ></v-text-field>
           </v-col>
-          <v-col cols="12" md="3">
+          <v-col cols="12" md="4">
             <v-text-field
               v-model="percentDeposit"
               :error-messages="errors.percentDeposit"
@@ -241,7 +219,38 @@ watch(selectedContractType, (id) => {
               variant="outlined"
               color="primary"
               label="درصد سپرده نقدی"
+              type="number"
+              :min="1"
+              :max="100"
             ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" md="4" sm="4">
+            <v-autocomplete
+              v-model="collateralsString"
+              :error-messages="errors.collateralsString"
+              :items="collateralList"
+              item-title="description"
+              item-value="collateralTypeCode"
+              label="نوع وثیقه"
+              variant="outlined"
+              multiple
+              clearable
+            ></v-autocomplete>
+          </v-col>
+          <v-col cols="12" md="4">
+            <v-autocomplete
+              v-model="lcProductType"
+              :items="LcProductOption"
+              :error-messages="errors.lcProductType"
+              item-title="title"
+              item-value="value"
+              label="نوع عقد"
+              variant="outlined"
+              no-data-text="دیتا یافت نشد"
+              clearable
+            ></v-autocomplete>
           </v-col>
         </v-row>
       </v-card-text>

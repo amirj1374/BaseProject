@@ -34,6 +34,11 @@ export interface CurrenciesDto {
   code: string;
 }
 
+export interface CollateralDto {
+  description: string;
+  collateralTypeCode: string;
+}
+
 export interface ContractTypeDto {
   id: number;
   parentId: number;
@@ -54,18 +59,17 @@ export interface FacilitiesDto {
   facilityName: string;
   contractId: number;
 }
-
 export interface RequestInformationDto {
+  contractTypeId: string;
+  approvalType: string;
+  requestType: string;
+  amount: string;
   currency: string;
-  day: string;
-  month: string;
-  price?: string;
-  pricePercentage?: string;
-  selectedApprovalType: string;
-  selectedCollateral: number;
-  selectedContractType: number;
-  selectedFacilities: string;
-  selectedRepaymentType: string;
-  term: number;
-  year: string;
+  facilityId: string;
+  year?: number;
+  month?: number;
+  day?: number;
+  repaymentType: string;
+  collaterals: [];
+  percentDeposit?: number;
 }

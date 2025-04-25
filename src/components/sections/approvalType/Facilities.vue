@@ -1,25 +1,26 @@
 <script lang="ts" setup>
-import type { ContractTypeDto, CurrenciesDto, FacilitiesDto } from '@/types/approval/approvalType';
+import type { CollateralDto, ContractTypeDto, CurrenciesDto, FacilitiesDto } from '@/types/approval/approvalType';
 import { ApprovalTypeOptions, type ApprovalType } from '@/constants/enums/approval';
-import { RepaymentTypeOptions, RepaymentTypeEnum } from '@/constants/enums/repaymentType';
+import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import type { RepaymentType } from '@/constants/enums/repaymentType';
 import { onMounted, ref, watch } from 'vue';
 import { api } from '@/services/api';
 import * as yup from 'yup';
 import { useForm, useField } from 'vee-validate';
-import FakeData from '@/components/sections/sectionTwoData.json';
 
 const formSchema = yup.object({
-  selectedApprovalType: yup.string().nullable().required('نوع مصوبه الزامی است'),
+  requestType: yup.string(),
+  approvalType: yup.string().nullable().required('نوع مصوبه الزامی است'),
   currency: yup.string().nullable().required('نوع ارز الزامی است'),
-  selectedContractType: yup.string().nullable().required('نوع عقد الزامی است'),
-  selectedRepaymentType: yup.string().nullable().required('نحوه بازپرداخت الزامی است'),
-  selectedFacilities: yup.string().nullable().required('نوع محصول الزامی است'),
-  price: yup.string().nullable().required('مبلغ الزامی است'),
-  selectedCollateral: yup.array().nullable().required('انتخاب وثیقه الزامی است'),
-  term: yup.number().nullable().required('محاسبه روز الزامی است')
+  contractTypeId: yup.string().nullable().required('نوع عقد الزامی است'),
+  repaymentType: yup.string().nullable().required('نحوه بازپرداخت الزامی است'),
+  facilityId: yup.string().nullable().required('نوع محصول الزامی است'),
+  amount: yup.string().nullable().required('مبلغ الزامی است'),
+  durationDay: yup.number().nullable().required('محاسبه روز الزامی است'),
+  collateralsString: yup.array().nullable().required('انتخاب وثیقه الزامی است'),
 });
 const contractTypes = ref<ContractTypeDto[]>([]);
+const collateral = ref<CollateralDto[]>([]);
 const facilities = ref<FacilitiesDto[]>([]);
 const isDialogActive = ref(false);
 const error = ref<string | null>(null);
@@ -32,23 +33,24 @@ const emit = defineEmits<{
 const { handleSubmit, errors } = useForm({
   validationSchema: formSchema
 });
-const { value: selectedApprovalType } = useField<ApprovalType | null>('selectedApprovalType');
+const { value: approvalType } = useField<ApprovalType | null>('approvalType');
 const { value: currency } = useField<string | null>('currency');
-const { value: selectedContractType } = useField<string | null>('selectedContractType');
-const { value: selectedRepaymentType } = useField<RepaymentType | null>('selectedRepaymentType');
-const { value: selectedFacilities } = useField<FacilitiesDto[] | null>('selectedFacilities');
-const { value: price } = useField<string | null>('price');
-const { value: selectedCollateral } = useField<string | null>('selectedCollateral');
-const { value: term } = useField<number | null>('term');
+const { value: requestType } = useField<string | "ContractCode">('requestType');
+const { value: contractTypeId } = useField<string | null>('contractTypeId');
+const { value: repaymentType } = useField<RepaymentType | null>('repaymentType');
+const { value: facilityId } = useField<FacilitiesDto[] | null>('facilityId');
+const { value: amount } = useField<string | null>('amount');
+const { value: collateralsString } = useField<[] | null>('collateralsString');
+const { value: durationDay } = useField<number | null>('durationDay');
 const { value: year } = useField<number | null>('year');
 const { value: month } = useField<number | null>('month');
 const { value: day } = useField<number | null>('day');
 
 const handleSave = handleSubmit((values) => {
+  values.requestType = 'ContractCode';
   emit('save', {
     ...values
   });
-  console.log(values);
   valid.value = true;
   isDialogActive.value = false;
 });
@@ -56,11 +58,12 @@ const handleSave = handleSubmit((values) => {
 const props = defineProps<{
   currencies: CurrenciesDto[];
 }>();
-
-onMounted(async () => {
-  const currenciesRes = await api.approval.getContractType('ContractCode');
-  contractTypes.value = currenciesRes.data.generalParameterList;
-});
+// Fetch facilities by contract type ID
+const getContractType = async () => {
+  if (!isDialogActive) return;
+  const res = await api.approval.getContractType('ContractCode'); // <- adjust this method name if needed
+  contractTypes.value = res.data.generalParameterList;
+};
 // Fetch facilities by contract type ID
 const getFacilities = async (contractTypeId: any) => {
   if (!contractTypeId) return;
@@ -68,17 +71,37 @@ const getFacilities = async (contractTypeId: any) => {
   facilities.value = res.data.facilityDtoList;
 };
 
+// Fetch collateral by facility type ID
+const getCollateral = async (facilityId: any) => {
+  if (!facilityId) return;
+  const res = await api.approval.getCollateral(facilityId); // <- adjust this method name if needed
+  collateral.value = res.data;
+};
+
 const dayCalculate = async () => {
   if (year.value === null && month.value === null && day.value === null) {
     error.value = 'لطفا مقادیر تاریخ را وارد کنید';
   }
   const res = await api.approval.getCalculatedDay(year.value, month.value, day.value); // <- adjust this method name if needed
-  term.value = res.data;
+  durationDay.value = res.data;
 };
 
-watch(selectedContractType, (id) => {
+
+watch(isDialogActive, (active) => {
+  if (active) {
+    getContractType();
+  }
+});
+
+watch(contractTypeId, (id) => {
   if (id) {
-    getFacilities(selectedContractType.value);
+    getFacilities(contractTypeId.value);
+  }
+});
+
+watch(facilityId, (id) => {
+  if (id) {
+    getCollateral(facilityId.value);
   }
 });
 </script>
@@ -95,11 +118,11 @@ watch(selectedContractType, (id) => {
         <v-row>
           <v-col cols="12" md="4">
             <v-autocomplete
-              v-model="selectedApprovalType"
+              v-model="approvalType"
               clearable
               label="نوع مصوبه"
               :items="ApprovalTypeOptions"
-              :error-messages="errors.selectedApprovalType"
+              :error-messages="errors.approvalType"
               variant="outlined"
               item-title="title"
               item-value="value"
@@ -117,26 +140,26 @@ watch(selectedContractType, (id) => {
               item-value="code"
             ></v-autocomplete>
           </v-col>
-          <v-col cols="12" md="4" sm="4">
-            <v-autocomplete
-              v-model="selectedCollateral"
-              :error-messages="errors.selectedCollateral"
-              :items="FakeData.collateral"
-              item-title="DESCRIPTION"
-              item-value="ID"
-              label="نوع وثیقه"
+          <v-col cols="12" md="4">
+            <v-select
+              :items="RepaymentTypeOptions"
+              v-model="repaymentType"
+              :error-messages="errors.repaymentType"
+              item-title="title"
+              item-value="value"
+              no-data-text="یافت نشد"
+              label="نحوه بازپرداخت"
               variant="outlined"
-              multiple
               clearable
-            ></v-autocomplete>
+            ></v-select>
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="12" md="4">
             <v-autocomplete
-              v-model="selectedContractType"
+              v-model="contractTypeId"
               :items="contractTypes"
-              :error-messages="errors.selectedContractType"
+              :error-messages="errors.contractTypeId"
               item-title="longTitle"
               item-value="id"
               label="نوع عقد"
@@ -148,8 +171,8 @@ watch(selectedContractType, (id) => {
           <v-col cols="12" md="8">
             <v-autocomplete
               :items="facilities"
-              v-model="selectedFacilities"
-              :error-messages="errors.selectedFacilities"
+              v-model="facilityId"
+              :error-messages="errors.facilityId"
               item-title="facilityName"
               item-value="facilityCode"
               no-data-text="لطفا ابتدا نوع عقد رو انتخاب کنید"
@@ -195,8 +218,8 @@ watch(selectedContractType, (id) => {
           </v-col>
           <v-col cols="12" md="4">
             <v-text-field
-              v-model="term"
-              :error-messages="errors.term"
+              v-model="durationDay"
+              :error-messages="errors.durationDay "
               density="comfortable"
               variant="outlined"
               color="primary"
@@ -206,23 +229,23 @@ watch(selectedContractType, (id) => {
           </v-col>
         </v-row>
         <v-row>
-          <v-col cols="12" md="3">
-            <v-select
-              :items="RepaymentTypeOptions"
-              v-model="selectedRepaymentType"
-              :error-messages="errors.selectedRepaymentType"
-              item-title="title"
-              item-value="value"
-              no-data-text="یافت نشد"
-              label="نحوه بازپرداخت"
+          <v-col cols="12" md="4" sm="4">
+            <v-autocomplete
+              v-model="collateralsString"
+              :error-messages="errors.collateralsString"
+              :items="collateral"
+              item-title="description"
+              item-value="collateralTypeCode"
+              label="نوع وثیقه"
               variant="outlined"
+              multiple
               clearable
-            ></v-select>
+            ></v-autocomplete>
           </v-col>
           <v-col cols="12" md="3">
             <v-text-field
-              v-model="price"
-              :error-messages="errors.price"
+              v-model="amount"
+              :error-messages="errors.amount"
               density="comfortable"
               hide-details="auto"
               variant="outlined"
