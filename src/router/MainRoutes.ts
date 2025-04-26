@@ -3,13 +3,13 @@ const MainRoutes = {
   meta: {
     requiresAuth: true
   },
-  redirect: '/main/dashboard/default',
+  redirect: '/main/approval',
   component: () => import('@/layouts/full/FullLayout.vue'),
   children: [
     {
       name: 'LandingPage',
       path: '/',
-      component: () => import('@/views/dashboards/default/DefaultDashboard.vue')
+      component: () => import('@/views/approval/approval.vue')
     },
     {
       name: 'Default',

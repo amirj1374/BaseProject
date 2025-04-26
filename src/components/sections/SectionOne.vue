@@ -5,10 +5,11 @@ import { api } from '@/services/api';
 import { DateConverter } from '@/utils/date-convertor';
 //type
 import type { CustomerDto, FetchCustomerPayload } from '@/types/approval/approvalType';
-import type { AxiosResponse } from 'axios';
+import approval from '@/services/modules/approval';
+import { useApprovalStore } from '@/stores/approval';
 
 type AllowedStatus = 'nationalCode' | 'cif';
-
+const approvalStore = useApprovalStore()
 const searchParam = ref<AllowedStatus>('cif');
 // const customers = ref<CustomerDto>([]);
 const loading = ref(false);
@@ -72,6 +73,7 @@ async function search() {
           branchName: customerInfo.branchName ?? '-'
         }
       ];
+      approvalStore.SET_LOAN_REQUEST_ID(raw.customerInfo.loanRequest.id)
       canSubmit.value = true;
     } else {
       error.value = `خطا: ${response.statusText}`;

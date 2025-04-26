@@ -7,7 +7,9 @@ import Guarantee from '@/components/sections/approvalType/Guarantee.vue';
 import Lc from '@/components/sections/approvalType/Lc.vue';
 import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import { ApprovalTypeOptions } from '@/constants/enums/approval';
+import { useApprovalStore } from '@/stores/approval';
 
+const approvalStore = useApprovalStore()
 const collaterals = ref<CollateralDto[]>([]);
 const loading = ref(false);
 const currencies = ref<CurrenciesDto[]>([]);
@@ -66,7 +68,8 @@ const submitData = async (): Promise<{ success: boolean; message: string }> => {
   try {
     const payload = {
       loanRequestDetailList: [facilitiesData.value, guaranteeData.value, lcData.value].filter(Boolean),
-      loanRequestId: 6102
+      loanRequestId: approvalStore.getLoanRequestId
+
     };
 
     if (payload.loanRequestDetailList.length === 0) {

@@ -14,7 +14,7 @@ const error = ref<string | null>(null);
 //   isDialogActive.value = false;
 // });
 const header = ref([
-  { title: 'ضمانت نامه های ریالی / ارزی', key: 'bgContractTypeCode', sortable: true, editable: false },
+  { title: 'ضمانت نامه های ریالی / ارزی', key: 'bgContractTypeCodeTitle', sortable: true, editable: false },
   { title: 'مبلغ تصویبی / حد سالانه', key: 'annualLimitApprovalAmount', sortable: true, editable: true },
   { title: 'مبلغ تصویبی / موردی', key: 'caseLimitApprovalAmount', sortable: true, editable: true },
   { title: 'مانده استفاده شده / فعال حد سالانه', key: 'annualLimitAmountRemain', sortable: true, editable: true },

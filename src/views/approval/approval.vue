@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 import SectionOne from '@/components/sections/SectionOne.vue';
 import SectionTwo from '@/components/sections/approvalType/SectionTwo.vue';
 import SectionThree from '@/components/sections/guarantor/SectionThree.vue';
-import SectionFour from '@/components/sections/SectionFour.vue';
+import SectionFour from '@/components/sections/inquiry/SectionFour.vue';
 import SectionFive from '@/components/sections/history/SectionFive.vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
@@ -16,7 +16,7 @@ const steps = [
   { title: 'پیشنویس', component: SectionFive }
 ];
 
-const stepper = ref(2); // Current step
+const stepper = ref(1); // Current step
 const totalSteps = steps.length;
 const error = ref<string | null>(null);
 
@@ -80,8 +80,8 @@ const currentComponent = computed(() => {
     </transition>
     <!-- Actions for Next and Previous -->
     <div class="actions">
-      <v-btn @click="prevStep" :disabled="stepper === 1"> مرحله قبلی </v-btn>
       <v-btn color="primary" @click="handleSubmit" :loading="submitting"> مرحله بعد </v-btn>
+      <v-btn @click="prevStep" :disabled="stepper === 1"> مرحله قبلی </v-btn>
     </div>
     <v-snackbar v-if="error" v-model="error" color="error" timeout="2500">
       {{ error }}

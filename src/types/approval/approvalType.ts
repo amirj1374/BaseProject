@@ -26,7 +26,15 @@ export interface FetchCustomerPayload {
 
 export interface FetchGuarantorPayload {
   nationalCode?: string | null;
+  cif?: string | null;
+  guarantorName?: string | null;
   loanRequestId: string;
+}
+
+export interface GuarantorDto {
+  nationalCode?: string | null;
+  cif?: string | null;
+  guarantorName?: string | null;
 }
 
 export interface CurrenciesDto {
@@ -59,6 +67,7 @@ export interface FacilitiesDto {
   facilityName: string;
   contractId: number;
 }
+
 export interface RequestInformationDto {
   contractTypeId: string;
   approvalType: string;
@@ -72,4 +81,63 @@ export interface RequestInformationDto {
   repaymentType: string;
   collaterals: [];
   percentDeposit?: number;
+}
+
+export interface InquiryDto {
+  value?: string;
+  label?: string;
+  collateral?: string;
+}
+
+
+export interface DepositAccount {
+  createdAt: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+  id: string | null;
+  accountNo: string;
+  accountStatus: string;
+  accountType: string;
+  avgBalanceHalf: string;
+  avgBalanceQuarter: string;
+  avgBalanceYear: string;
+  branch: string;
+  countCreditTurnoverHalf: string;
+  countCreditTurnoverQuarter: string;
+  countCreditTurnoverYear: string;
+  countDebitTurnoverHalf: string;
+  countDebitTurnoverQuarter: string;
+  countDebitTurnoverYear: string;
+  creditTurnoverHalf: string;
+  creditTurnoverQuarter: string;
+  creditTurnoverYear: string;
+  currency: string;
+  debitTurnoverHalf: string;
+  debitTurnoverQuarter: string;
+  debitTurnoverYear: string;
+  finalBalance: string;
+  interestRate: string | null;
+  openingDate: string;
+}
+
+export interface DepositListResponse {
+  depositList: DepositAccount[];
+}
+
+export interface ConsiderationPayload {
+  havePromissoryNote : boolean,
+  signatory : string | null,
+  beneficiaryCustomer : string | null,
+  relatedName : string | null,
+  unrelatedObligationsAmount : number | null,
+  currentOffersAmount : number | null,
+  approvalNumber : number | null,
+  approvedFacilitiesAmount : number | null,
+  approvalDate: string | null
+  creditLimitDate: string | null
+  loanRequestId : number | null,
+  atBranchLevel : boolean,
+  notUsed : boolean,
+  previousLoanAppropriate : boolean,
 }

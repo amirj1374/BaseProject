@@ -17,11 +17,11 @@ export interface menu {
 }
 
 const sidebarItem: menu[] = [
-  {
-    title: 'صفحه اصلی',
-    icon: HomeIcon,
-    to: '/dashboard/default'
-  },
+  // {
+  //   title: 'صفحه اصلی',
+  //   icon: HomeIcon,
+  //   to: '/dashboard/default'
+  // },
   {
     title: 'اطلاعات پایه',
     icon: DatabaseIcon

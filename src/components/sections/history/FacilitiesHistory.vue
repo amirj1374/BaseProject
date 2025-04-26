@@ -14,7 +14,7 @@ const error = ref<string | null>(null);
 //   isDialogActive.value = false;
 // });
 const header = ref([
-  { title: 'نوع تسهیلات', key: 'loanContractTypeCode', sortable: true, editable: false },
+  { title: 'نوع تسهیلات', key: 'loanContractTypeTitle', sortable: true, editable: false },
   { title: 'مبلغ تصویبی حد سالانه', key: 'annualLimitApprovalAmount', sortable: true, editable: true },
   { title: 'مبلغ تصویبی موردی', key: 'caseLimitApprovalAmount', sortable: true, editable: true },
   { title: ' اصل - مانده استفاده شدهی جاری حد سالانه', key: 'annualLimitCurrentPrincipalRemain', sortable: true, editable: true },

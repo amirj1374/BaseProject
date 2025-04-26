@@ -1,6 +1,10 @@
 import type { AxiosInstance } from "axios";
-import type { FetchCustomerPayload, FetchGuarantorPayload } from '@/types/approval/approvalType';
-import { array } from 'yup';
+import type {
+  ConsiderationPayload,
+  DepositAccount,
+  FetchCustomerPayload,
+  FetchGuarantorPayload
+} from '@/types/approval/approvalType';
 
 
 export default (axiosInstance: AxiosInstance) => ({
@@ -45,6 +49,22 @@ export default (axiosInstance: AxiosInstance) => ({
 
   saveLoanRequest(loanRequestDetailList: {}) {
     return axiosInstance.post("/api/v1/loan-request-detail", loanRequestDetailList);
+  },
+
+  getInquiry(loanRequestId: string) {
+    return axiosInstance.post('/api/v1/sap-inquiry', { loanRequestId });
+  },
+
+  getAllDeposit(loanRequestId: string) {
+    return axiosInstance.post('/api/v1/deposit-info/get-all-deposit', { loanRequestId });
+  },
+
+  saveDeposit(loanRequestId: string, depositList: DepositAccount) {
+    return axiosInstance.post('/api/v1/deposit-info/save-selected-deposit', { loanRequestId, depositList });
+  },
+
+  saveConsideration(payload: ConsiderationPayload, loanRequestId: string) {
+    return axiosInstance.post('/api/v1/deposit-info/save-selected-deposit',{payload,loanRequestId});
   },
 
   deleteTransaction(id: string) {

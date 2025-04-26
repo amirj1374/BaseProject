@@ -1,33 +1,32 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 import { api } from '@/services/api';
-//utils
-import { DateConverter } from '@/utils/date-convertor';
-//type
-import type { CustomerDto, FetchCustomerPayload, FetchGuarantorPayload } from '@/types/approval/approvalType';
-import type { AxiosResponse } from 'axios';
-
-type AllowedStatus = 'nationalCode' | 'cif';
-
-const searchParam = ref<AllowedStatus>('nationalCode');
-// const customers = ref<CustomerDto>([]);
+import type {
+  FetchGuarantorPayload,
+  GuarantorDto
+} from '@/types/approval/approvalType';
+import { useApprovalStore } from '@/stores/approval';
+const approvalStore = useApprovalStore()
 const loading = ref(false);
+const dialog = ref(false);
 const hideInput = ref(false);
 const canSubmit = ref(false);
 const error = ref<string | null>(null);
-const data = ref(<CustomerDto[]>[]);
+const cif = ref<string | null>(null);
+const trackingCode = ref<string | null>(null);
+const nationalCode = ref<string | null>(null);
+const GuarantorName = ref<string | null>(null);
+const data = ref(<GuarantorDto[]>[]);
+const success = ref<string | null>(null); // Added success message
 const headers = ref([
-  { title: 'شماره مشتری', align: 'center', key: 'cif', width: '150px' },
+  { title: 'نام ضامن', align: 'center', key: 'guarantorName', width: '150px' },
   { title: 'کدملی / شناسه ملی', align: 'center', key: 'nationalCode', width: '150px' },
-  { title: 'نام مشتری', align: 'center', key: 'customerName', width: '150px' },
-  { title: 'نام شعبه', align: 'center', key: 'branchName', width: '150px' },
-  { title: 'کدپستی', align: 'center', key: 'postalCode', width: '120px' },
-  { title: 'آدرس', align: 'center', key: 'address', width: '200px' },
 ]);
 // initial data
 const formData = ref({
-  cif: '',
-  nationalCode: ''
+  cif: cif,
+  nationalCode: nationalCode,
+  GuarantorName: GuarantorName
 });
 
 // get customer
@@ -42,34 +41,27 @@ async function search() {
 
   try {
     const payload: FetchGuarantorPayload = {
-      nationalCode: formData.value.nationalCode || null,
-      loanRequestId: '2805'
+      nationalCode: formData.value.nationalCode,
+      cif: formData.value.cif,
+      guarantorName: formData.value.GuarantorName,
+      loanRequestId: approvalStore.getLoanRequestId
     };
 
     const response = await api.approval.fetchGuarantor(payload);
+    console.log(response)
 
     if (response.status === 200 && response.data) {
       const raw = response.data;
       const guarantorInfo = raw.guarantorInfo || {};
+      success.value = 'اطلاعات ضامن با موفقیت دریافت شد';
+      trackingCode.value = raw.loanRequest.trackingCode;
+      dialog.value = true;
       // generate data for data table
       data.value = [
         {
-          updatedAt: DateConverter.toShamsi(raw.updatedAt) ?? '-',
-          createdBy: DateConverter.toShamsi(raw.createdBy) ?? '-',
-          updatedBy: DateConverter.toShamsi(raw.updatedBy) ?? '-',
-          id: raw.id,
-          trackingCode: raw.trackingCode,
-          status: raw.status,
-          requestDate: DateConverter.toShamsi(raw.requestDate) ?? '-',
           cif: guarantorInfo.cif ?? raw.cif ?? '-',
-          summery: raw.summery ?? '-',
-          branchCode: raw.branchCode ?? guarantorInfo.branchCode ?? '-',
           nationalCode: raw.nationalCode ?? guarantorInfo.nationalCode ?? '-',
-          customerName: guarantorInfo.customerName ?? '-',
-          address: guarantorInfo.custaddress ?? '-',
-          postalCode: guarantorInfo.postalCode ?? '-',
-          phoneNo: guarantorInfo.phoneno ?? guarantorInfo.mobileno ?? '-',
-          branchName: guarantorInfo.branchName ?? '-'
+          guarantorName: raw.guarantorName ?? guarantorInfo.guarantorName ?? '-',
         }
       ];
       canSubmit.value = true;
@@ -77,9 +69,10 @@ async function search() {
       error.value = `خطا: ${response.statusText}`;
     }
   } catch (err: any) {
-    error.value = err.message || 'خطای سرور.';
+    error.value = err.response.data.message || 'خطای سرور.';
     hideInput.value = true
     canSubmit.value = false;
+
   } finally {
     loading.value = false;
   }
@@ -89,17 +82,11 @@ async function search() {
 const isFormValid = computed(() => {
   return formData.value.nationalCode?.length >= 10 || formData.value.cif !== null;
 });
-// change search pattern
-const changePattern = async () => {
-  formData.value.cif = '';
-  formData.value.nationalCode = '';
-};
 // submit form
 const submitData = async () => {
-  return Promise.resolve();
-  // if (canSubmit.value === false) {
-  //   return Promise.reject("ابتدا مشتری مورد نظر را انتخاب کنید");
-  // } else return Promise.resolve();
+  if (canSubmit.value === false) {
+    return Promise.reject("ابتدا ضامن مورد نظر را انتخاب کنید");
+  } else return Promise.resolve();
 };
 
 defineExpose({ submitData });
@@ -109,29 +96,13 @@ defineExpose({ submitData });
   <v-card variant="flat">
     <form @submit.prevent="submitData">
       <v-row class="mt-2">
-        <v-col cols="12" md="12">
-          <v-radio-group inline v-model="searchParam" class="radioBtnContainer" @change="changePattern">
-            <v-radio label="شماره مشتری" value="cif"></v-radio>
-            <v-radio label="کدملی" value="nationalCode"></v-radio>
-          </v-radio-group>
-        </v-col>
-      </v-row>
-      <v-divider inset></v-divider>
-      <v-row class="mt-2">
-        <!-- Cif Code Input -->
-        <v-col v-if="searchParam === 'cif'" cols="12" md="4">
-          <v-text-field v-model="formData.cif" label="شماره مشتری" variant="outlined" density="comfortable" />
-        </v-col>
         <!-- National Code Input -->
-        <v-col v-if="searchParam === 'nationalCode'" cols="12" md="4">
+        <v-col cols="12" md="4">
           <v-text-field v-model="formData.nationalCode" label="کد ملی" variant="outlined" density="comfortable" />
         </v-col>
 
         <v-col v-if="hideInput" cols="12" md="4">
-          <v-text-field v-model="formData.nationalCode" label="کد ملی" variant="outlined" density="comfortable" />
-        </v-col>
-        <v-col v-if="hideInput" cols="12" md="4">
-          <v-text-field v-model="formData.nationalCode" label="کد ملی" variant="outlined" density="comfortable" />
+          <v-text-field v-model="formData.GuarantorName" label="نام و نام خانوادگی" variant="outlined" density="comfortable" />
         </v-col>
       </v-row>
         <!-- Person Type Select -->
@@ -142,7 +113,27 @@ defineExpose({ submitData });
         </v-row>
 
         <v-divider inset></v-divider>
-
+      <v-dialog
+        v-model="dialog"
+        width="auto"
+      >
+        <v-card
+          max-width="400"
+          prepend-icon="mdi-update"
+          title="پیام سیستم"
+        >
+          <v-card-text>
+            <v-alert
+              v-if="success"
+              type="success"
+              variant="tonal"
+              class="my-4"
+            >
+              کد رهگیری  {{ trackingCode }} با موفقیت صادر شد
+            </v-alert>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
         <v-col cols="12" md="12">
           <div class="table-scroll">
             <v-data-table :headers="headers" :items="data" hide-default-footer no-data-text="رکوردی وجود ندارد" sticky></v-data-table>
