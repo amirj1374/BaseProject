@@ -170,7 +170,7 @@ const dayCalculate = async () => {
             ></v-text-field>
           </v-col>
           <v-col cols="12" md="2">
-            <v-btn size="x-large" color="secondary" variant="outlined" @click="dayCalculate"> محاسبه</v-btn>
+            <v-btn size="x-large" color="secondary" variant="outlined" @click="dayCalculate">محاسبه</v-btn>
           </v-col>
           <v-col cols="12" md="4">
             <v-text-field

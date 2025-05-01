@@ -1,70 +1,93 @@
-/*This is for the logo*/
+/* This is for the logo */
 .leftSidebar {
   border: 0px;
   box-shadow: none !important;
+
   .logo {
     padding-left: 7px;
   }
 }
-/*This is for the Vertical sidebar*/
+
+/* This is for the Vertical sidebar */
 .scrollnavbar {
-  height: calc(100vh - 200px);
+  height: calc(100vh - 100px);
+
   .smallCap {
     padding: 0px 0 0 4px !important;
     font-size: 0.875rem;
     font-weight: 500;
   }
+
   .v-list {
     color: rgb(var(--v-theme-lightText));
   }
-  /*General Menu css*/
+
+  /* General Menu css */
   .v-list-group__items .v-list-item,
   .v-list-item {
     border-radius: $border-radius-root;
     padding-inline-start: calc(12px + var(--indent-padding) / 2) !important;
+    transition: background-color 0.3s ease, color 0.3s ease; // ✅ Smooth transitions
+
     &:hover {
       color: rgb(var(--v-theme-secondary));
+      background-color: rgba(var(--v-theme-secondary), 0.05); // ✅ Smooth background on hover
     }
+
     .v-list-item__prepend {
       margin-inline-end: 13px;
     }
+
     .v-list-item__append {
       font-size: 0.875rem;
+
       .v-icon {
         margin-inline-start: 13px;
       }
     }
+
     .v-list-item-title {
       font-size: 0.875rem;
     }
   }
+
   .leftPadding {
     margin-left: 4px;
   }
-  /*This is for the dropdown*/
+
+  /* This is for the dropdown */
   .v-list {
     .v-list-item--active {
+      transition: background-color 5.8s ease, color 5.8s ease; // ✅ Smooth transitions
+      background-color: rgba(var(--v-theme-secondary), 0.05); // ✅ Active background color
       .v-list-item-title {
         font-weight: 500;
       }
     }
+
     .sidebarchip .v-icon {
       margin-inline-start: -3px;
     }
+
     .v-list-group {
+      background-color: rgba(var(--v-theme-secondary), 0.02);
       .v-list-item:hover > .v-list-item__overlay,
       .v-list-item--active > .v-list-item__overlay {
-        background-color: transparent;
+        background-color: rgba(var(--v-theme-secondary), 0.05);
+        transition: background-color 5.8s ease-in-out, color 5.8s ease-in-out; // ✅ Smooth transitions
       }
+
       .v-list-item:focus-visible > .v-list-item__overlay {
         opacity: 0;
       }
     }
+
     > .v-list-group {
       position: relative;
+
       > .v-list-item--active,
       > .v-list-item:hover {
-        background: rgb(var(--v-theme-secondary), 0.05);
+        background: rgba(var(--v-theme-secondary), 0.05); // ✅ Use rgba for smoother feeling
       }
 
       &:after {
@@ -75,33 +98,41 @@
         height: calc(100% - 46px);
         width: 1px;
         opacity: 1;
-        background: rgb(var(--v-theme-primary), 0.15);
+        background: rgba(var(--v-theme-secondary), 0.15);
       }
     }
   }
 }
+
+/* When sidebar is collapsed (rail mode) */
 .v-navigation-drawer--rail {
   .scrollnavbar .v-list .v-list-group__items,
   .hide-menu {
     opacity: 0;
   }
+
   .leftPadding {
     margin-left: 0px;
   }
 }
+
+/* Mini Sidebar Hover Expand */
 @media only screen and (min-width: 1170px) {
   .mini-sidebar {
     .logo {
       width: 40px;
       overflow: hidden;
     }
+
     .leftSidebar:hover {
       box-shadow: $box-shadow !important;
     }
+
     .v-navigation-drawer--expand-on-hover:hover {
       .logo {
         width: 100%;
       }
+
       .v-list .v-list-group__items,
       .hide-menu {
         opacity: 1;

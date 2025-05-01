@@ -9,7 +9,7 @@ import approval from '@/services/modules/approval';
 import { useApprovalStore } from '@/stores/approval';
 
 type AllowedStatus = 'nationalCode' | 'cif';
-const approvalStore = useApprovalStore()
+const approvalStore = useApprovalStore();
 const searchParam = ref<AllowedStatus>('cif');
 // const customers = ref<CustomerDto>([]);
 const loading = ref(false);
@@ -23,6 +23,7 @@ const headers = ref([
   { title: 'نام شعبه', align: 'center', key: 'branchName', width: '150px' },
   { title: 'کدپستی', align: 'center', key: 'postalCode', width: '120px' },
   { title: 'آدرس', align: 'center', key: 'address', width: '200px' },
+  { title: 'گروه مشتری', align: 'center', key: 'clientgroupname', width: '200px' }
 ]);
 // initial data
 const formData = ref({
@@ -73,7 +74,7 @@ async function search() {
           branchName: customerInfo.branchName ?? '-'
         }
       ];
-      approvalStore.SET_LOAN_REQUEST_ID(raw.customerInfo.loanRequest.id)
+      approvalStore.SET_LOAN_REQUEST_ID(raw.customerInfo.loanRequest.id);
       canSubmit.value = true;
     } else {
       error.value = `خطا: ${response.statusText}`;
@@ -98,7 +99,7 @@ const changePattern = async () => {
 // submit form
 const submitData = async () => {
   if (canSubmit.value === false) {
-    return Promise.reject("ابتدا مشتری مورد نظر را انتخاب کنید");
+    return Promise.reject('ابتدا مشتری مورد نظر را انتخاب کنید');
   } else return Promise.resolve();
 };
 

@@ -33,7 +33,7 @@ import TotalPay from '@/views/dashboards/default/components/TotalPay.vue';
 
     <v-col cols="12" lg="8">
       <TotalGrowth />
-    </v-col>
+    </v-col>`
 
     <v-col cols="12" lg="4">
       <PopularStocks />

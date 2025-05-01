@@ -43,3 +43,8 @@ html {
     transform: rotate(270deg);
   }
 }
+.v-text-field {
+  .v-field {
+    border-radius: 10px !important;
+  }
+}

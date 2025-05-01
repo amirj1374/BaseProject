@@ -3,7 +3,7 @@ import type {
   ConsiderationPayload,
   DepositAccount,
   FetchCustomerPayload,
-  FetchGuarantorPayload
+  FetchGuarantorPayload, UploadFile
 } from '@/types/approval/approvalType';
 
 
@@ -67,6 +67,15 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post('/api/v1/deposit-info/save-selected-deposit',{payload,loanRequestId});
   },
 
+  uploadExcel(payload: UploadFile) {
+    return axiosInstance.post(`/api/v1/general/save-doc`, payload, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Accept': '*/*',
+      },
+      timeout: 60000
+    });
+  },
   deleteTransaction(id: string) {
     return axiosInstance.delete(`/personTransaction-requests/${id}`);
   },

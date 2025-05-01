@@ -21,7 +21,7 @@ export interface CustomerDto {
 export interface FetchCustomerPayload {
   cif?: string | null;
   nationalCode?: string | null;
-  loanRequestId: string;
+  branchCode: string
 }
 
 export interface FetchGuarantorPayload {
@@ -140,4 +140,12 @@ export interface ConsiderationPayload {
   atBranchLevel : boolean,
   notUsed : boolean,
   previousLoanAppropriate : boolean,
+}
+
+export interface UploadFile {
+customerNumber?: string | null;
+customerCode?: string | null ;
+docTypeCode: string ;
+file: File ;
+description?: string
 }
