@@ -1,27 +1,27 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import SectionOne from '@/components/sections/SectionOne.vue';
-import SectionTwo from '@/components/sections/approvalType/SectionTwo.vue';
-import SectionThree from '@/components/sections/guarantor/SectionThree.vue';
-import SectionFour from '@/components/sections/inquiry/SectionFour.vue';
-import SectionFive from '@/components/sections/history/SectionFive.vue';
+import Customers from '@/components/sections/customers/customers.vue';
+import ApprovalType from '@/components/sections/approvalType/approvalType.vue';
+import Guarantor from '@/components/sections/guarantor/guarantor.vue';
+import Inquiry from '@/components/sections/inquiry/inquiry.vue';
+import Draft from '@/components/sections/draft/draft.vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 // Define your steps with titles and the corresponding component.
 const steps = [
-  { title: 'ثبت درخواست هویتی مشتری', component: SectionOne },
-  { title: 'اطلاعات نوع درخواست', component: SectionTwo },
-  { title: 'اطلاعات ضامن / ضامنین', component: SectionThree },
-  { title: 'استعلام', component: SectionFour },
-  { title: 'پیشنویس', component: SectionFive }
+  { title: 'ثبت درخواست هویتی مشتری', component: Customers },
+  { title: 'اطلاعات نوع درخواست', component: ApprovalType },
+  { title: 'اطلاعات ضامن / ضامنین', component: Guarantor },
+  { title: 'استعلام', component: Inquiry },
+  { title: 'پیشنویس', component: Draft }
 ];
 
-const stepper = ref(2); // Current step
+const stepper = ref(1); // Current step
 const totalSteps = steps.length;
 const error = ref<string | null>(null);
 
 // This ref will hold the currently active section's component instance.
-const sectionRef = ref<InstanceType<typeof SectionOne> | null>(null);
+const sectionRef = ref<InstanceType<typeof Customers> | null>(null);
 
 // Parent-level loading state for the Next button.
 const submitting = ref(false);

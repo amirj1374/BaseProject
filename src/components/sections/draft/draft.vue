@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
-import Facilities from '@/components/sections/history/FacilitiesHistory.vue';
+import Facilities from '@/components/sections/draft/FacilitiesHistory.vue';
 import { api } from '@/services/api';
 import type { CurrenciesDto,RequestInformationDto } from '@/types/approval/approvalType';
-import Guarantee from '@/components/sections/history/GuaranteesHistory.vue';
-import Lc from '@/components/sections/history/LcHistory.vue';
-import Deposit from '@/components/sections/history/Deposit.vue';
-import Consideration from '@/components/sections/history/Consideration.vue';
+import Guarantee from '@/components/sections/draft/GuaranteesHistory.vue';
+import Lc from '@/components/sections/draft/LcHistory.vue';
+import Deposit from '@/components/sections/draft/Deposit.vue';
+import Consideration from '@/components/sections/draft/Consideration.vue';
 import { useApprovalStore } from '@/stores/approval';
 
 const loading = ref(false);

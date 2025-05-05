@@ -3,14 +3,18 @@ import { computed, ref } from 'vue';
 import { api } from '@/services/api';
 //utils
 import { DateConverter } from '@/utils/date-convertor';
+import { nationalCodeRule } from '@/validators/nationalCodeRule';
+
 //type
 import type { CustomerDto, FetchCustomerPayload } from '@/types/approval/approvalType';
-import approval from '@/services/modules/approval';
 import { useApprovalStore } from '@/stores/approval';
 
 type AllowedStatus = 'nationalCode' | 'cif';
 const approvalStore = useApprovalStore();
 const searchParam = ref<AllowedStatus>('cif');
+const errors = ref<{ nationalCode?: string[] }>({});
+const nationalCode = ref('');
+const nationalCodeErrors = ref([]);
 // const customers = ref<CustomerDto>([]);
 const loading = ref(false);
 const canSubmit = ref(false);
@@ -30,17 +34,26 @@ const formData = ref({
   cif: '',
   nationalCode: ''
 });
-
 // get customer
 async function search() {
-  if (!isFormValid.value) {
-    error.value = 'لطفا فرم های بالا رو کامل کنید';
+  errors.value = {}; // Clear previous errors
+
+  if (searchParam.value === 'nationalCode') {
+    const result = nationalCodeRule(formData.value.nationalCode);
+    if (result !== false) {
+      errors.value.nationalCode = [result];
+      error.value = 'کد ملی نامعتبر است';
+      return;
+    }
+  }
+
+  if (searchParam.value === 'cif' && !formData.value.cif) {
+    error.value = 'شماره مشتری الزامی است';
     return;
   }
 
   loading.value = true;
   error.value = null;
-
   try {
     const payload: FetchCustomerPayload = {
       cif: formData.value.cif || null,
@@ -125,7 +138,13 @@ defineExpose({ submitData });
         </v-col>
         <!-- National Code Input -->
         <v-col v-if="searchParam === 'nationalCode'" cols="12" md="6">
-          <v-text-field v-model="formData.nationalCode" label="کد ملی" variant="outlined" density="comfortable" />
+          <v-text-field
+            v-model="formData.nationalCode"
+            label="کد ملی"
+            variant="outlined"
+            density="comfortable"
+            :error-messages="nationalCodeErrors"
+          />
         </v-col>
         <!-- Person Type Select -->
         <v-col cols="12" md="12" class="text-center">

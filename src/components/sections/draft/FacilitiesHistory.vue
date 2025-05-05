@@ -16,14 +16,17 @@ const error = ref<string | null>(null);
 const header = ref([
   { title: 'نوع تسهیلات', key: 'loanContractTypeTitle', sortable: true, editable: false },
   { title: 'مبلغ تصویبی حد سالانه', key: 'annualLimitApprovalAmount', sortable: true, editable: true },
+  { title: 'مبلغ تصویبی سقف', key: 'maximumLimitApprovalAmount', sortable: true, editable: true },
   { title: 'مبلغ تصویبی موردی', key: 'caseLimitApprovalAmount', sortable: true, editable: true },
   { title: ' اصل - مانده استفاده شدهی جاری حد سالانه', key: 'annualLimitCurrentPrincipalRemain', sortable: true, editable: true },
-  { title: 'سود-مانده استفاده شدهی جاری حد سالانه', key: 'annualLimitCurrentInterestRemain', sortable: true, editable: true },
+  { title: 'سود - مانده استفاده شدهی جاری حد سالانه', key: 'annualLimitCurrentInterestRemain', sortable: true, editable: true },
+  { title: 'اصل - مانده استفاده شدهی جاری سقف', key: 'maximumLimitCurrentPrincipalRemain', sortable: true, editable: true },
+  { title: 'سود - مانده استفاده شدهی جاری سقف', key: 'maximumLimitCurrentInterestRemain', sortable: true, editable: true },
   { title: '- اصل - مانده استفاده شدهی جاری موردی', key: 'caseLimitCurrentPrincipalRemain', sortable: true, editable: true },
   { title: 'سود-مانده استفاده شدهی جاری موردی', key: 'caseLimitCurrentInterestRemain', sortable: true, editable: true },
-  { title: 'اصل /سررسید گذشته', key: 'overDuePrincipalRemain', sortable: true, editable: true },
-  { title: 'سود /سررسید گذشته', key: 'overDueInterestRemain', sortable: true, editable: true },
-  { title: 'خسارت /سررسید گذشته', key: 'penaltyAmount', sortable: true, editable: true },
+  { title: 'اصل / سررسید گذشته', key: 'overDuePrincipalRemain', sortable: true, editable: true },
+  { title: 'سود / سررسید گذشته', key: 'overDueInterestRemain', sortable: true, editable: true },
+  { title: 'وجه التزام / سررسید گذشته', key: 'penaltyAmount', sortable: true, editable: true },
   { title: 'مبالغ سفته', key: 'estateAmount', sortable: true, editable: true },
 ]);
 </script>
