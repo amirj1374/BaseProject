@@ -3,13 +3,16 @@ import type {
   ConsiderationPayload,
   DepositAccount,
   FetchCustomerPayload,
-  FetchGuarantorPayload, UploadFile
+  FetchGuarantorPayload, SummaryDto, UploadFile
 } from '@/types/approval/approvalType';
 
 
 export default (axiosInstance: AxiosInstance) => ({
   fetchCustomer(data: FetchCustomerPayload) {
     return axiosInstance.post(`/api/v1/loan-requests`, data);
+  },
+  fetchSummary(data: SummaryDto) {
+    return axiosInstance.post(`/api/v1/loan-requests/summary-request`, data);
   },
   fetchGuarantor(data: FetchGuarantorPayload) {
     return axiosInstance.post(`/api/v1/guarantor`, data);

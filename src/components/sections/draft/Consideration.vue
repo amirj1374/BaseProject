@@ -169,8 +169,8 @@ const submitData = async () => {
         </v-row>
       </v-card-text>
       <v-card-actions style="display: flex; justify-content: space-evenly; padding: 25px 10px">
-        <v-btn color="error" variant="elevated" text="انصراف" @click="isDialogActive = false"></v-btn>
         <v-btn color="primary" variant="elevated" text="ذخیره" @click="submitData" />
+        <v-btn color="error" variant="elevated" text="انصراف" @click="isDialogActive = false"></v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

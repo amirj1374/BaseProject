@@ -1,6 +1,7 @@
 export class NationalCodeValidator {
-  static isValid(nationalCode: string): boolean {
-    if (!/^\d{10,11}$/.test(nationalCode)) return false;
+  static isValid(nationalCode: string, customerType: 'Real' | 'Legal'): boolean {
+    if (customerType === 'Real' && !/^\d{10}$/.test(nationalCode)) return false;
+    if (customerType === 'Legal' && !/^\d{11}$/.test(nationalCode)) return false;
 
     const invalidCodes = [
       '0000000000', '1111111111', '2222222222', '3333333333',

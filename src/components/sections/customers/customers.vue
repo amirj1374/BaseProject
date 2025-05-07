@@ -12,6 +12,11 @@ import { useApprovalStore } from '@/stores/approval';
 type AllowedStatus = 'nationalCode' | 'cif';
 const approvalStore = useApprovalStore();
 const searchParam = ref<AllowedStatus>('cif');
+const customerType = ref<'Real' | 'Legal'>('Real');
+const customerTypes = ref<{ title: string; value: 'Real' | 'Legal' }[]>([
+  { title: 'حقیقی', value: 'Real' },
+  { title: 'حقوقی', value: 'Legal' }
+]);
 const errors = ref<{ nationalCode?: string[] }>({});
 const nationalCode = ref('');
 const nationalCodeErrors = ref([]);
@@ -39,14 +44,13 @@ async function search() {
   errors.value = {}; // Clear previous errors
 
   if (searchParam.value === 'nationalCode') {
-    const result = nationalCodeRule(formData.value.nationalCode);
+    const result = nationalCodeRule(formData.value.nationalCode, customerType.value);
     if (result !== false) {
       errors.value.nationalCode = [result];
       error.value = 'کد ملی نامعتبر است';
       return;
     }
   }
-
   if (searchParam.value === 'cif' && !formData.value.cif) {
     error.value = 'شماره مشتری الزامی است';
     return;
@@ -132,6 +136,9 @@ defineExpose({ submitData });
       </v-row>
       <v-divider inset></v-divider>
       <v-row class="mt-2">
+        <v-col cols="12" md="6">
+          <v-select v-model="customerType" label="نوع مشتری" variant="outlined" density="comfortable" :items="customerTypes" />
+        </v-col>
         <!-- Cif Code Input -->
         <v-col v-if="searchParam === 'cif'" cols="12" md="6">
           <v-text-field v-model="formData.cif" label="شماره مشتری" variant="outlined" density="comfortable" />

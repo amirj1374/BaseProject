@@ -149,3 +149,10 @@ docTypeCode: string ;
 file: File ;
 description?: string
 }
+
+export interface SummaryDto {
+  id: string;
+  summary: string;
+  activityType: string;
+  description: string;
+}

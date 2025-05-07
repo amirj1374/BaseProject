@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
+// sections
 import Customers from '@/components/sections/customers/customers.vue';
+import Summary from '@/components/sections/summary/summary.vue';
 import ApprovalType from '@/components/sections/approvalType/approvalType.vue';
 import Guarantor from '@/components/sections/guarantor/guarantor.vue';
 import Inquiry from '@/components/sections/inquiry/inquiry.vue';
@@ -10,6 +12,7 @@ const router = useRouter();
 // Define your steps with titles and the corresponding component.
 const steps = [
   { title: 'ثبت درخواست هویتی مشتری', component: Customers },
+  { title: 'خلاصه درخواست', component: Summary },
   { title: 'اطلاعات نوع درخواست', component: ApprovalType },
   { title: 'اطلاعات ضامن / ضامنین', component: Guarantor },
   { title: 'استعلام', component: Inquiry },
@@ -29,7 +32,6 @@ const submitting = ref(false);
 // Advance to the next step.
 const nextStep = async () => {
   if (stepper.value < totalSteps) {
-    console.log(stepper.value);
     stepper.value++;
   } else {
     await router.push('/test/test');
