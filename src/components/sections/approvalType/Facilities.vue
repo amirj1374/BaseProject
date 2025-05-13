@@ -7,7 +7,7 @@ import { onMounted, ref, watch } from 'vue';
 import { api } from '@/services/api';
 import * as yup from 'yup';
 import { useForm, useField } from 'vee-validate';
-import CollateralSelect from './CollateralSelect.vue';
+import VPriceTextField from '@/components/shared/VPriceTextField.vue';
 
 const formSchema = yup.object({
   requestType: yup.string(),
@@ -234,7 +234,7 @@ watch(contractTypeId, (id) => {
             ></v-text-field>
           </v-col>
           <v-col cols="12" md="2">
-            <v-text-field
+            <VPriceTextField
               v-model="amount"
               :error-messages="errors.amount"
               density="comfortable"
@@ -242,7 +242,7 @@ watch(contractTypeId, (id) => {
               variant="outlined"
               color="primary"
               label="مبلغ"
-            ></v-text-field>
+            ></VPriceTextField>
           </v-col>
         </v-row>
         <v-row>
