@@ -7,6 +7,7 @@ import { onMounted, ref, watch } from 'vue';
 import { api } from '@/services/api';
 import * as yup from 'yup';
 import { useForm, useField } from 'vee-validate';
+import CollateralSelect from './CollateralSelect.vue';
 
 const formSchema = yup.object({
   requestType: yup.string(),
@@ -40,7 +41,7 @@ const { value: contractTypeId } = useField<string | null>('contractTypeId');
 const { value: repaymentType } = useField<RepaymentType | null>('repaymentType');
 const { value: facilityId } = useField<FacilitiesDto[] | null>('facilityId');
 const { value: amount } = useField<string | null>('amount');
-const { value: collateralsString } = useField<[] | null>('collateralsString');
+const { value: collateralsString } = useField<string[] | null>('collateralsString');
 const { value: durationDay } = useField<number | null>('durationDay');
 const { value: year } = useField<number | null>('year');
 const { value: month } = useField<number | null>('month');
@@ -72,10 +73,9 @@ const getFacilities = async (contractTypeId: any) => {
 };
 
 // Fetch collateral by facility type ID
-const getCollateral = async (facilityId: any) => {
-  if (!facilityId) return;
-  const res = await api.approval.getCollateral(facilityId); // <- adjust this method name if needed
-  collateral.value = res.data;
+const getCollateral = async () => {
+  const res = await api.approval.getCollateral(); // <- adjust this method name if needed
+  collateral.value = res.data.map((item: CollateralDto) => ({ ...item, percent: 0, amount: 0 }));
 };
 
 const dayCalculate = async () => {
@@ -86,6 +86,18 @@ const dayCalculate = async () => {
   durationDay.value = res.data;
 };
 
+const showCollateralDialog = ref(false);
+const selectedCollaterals = ref<Array<{ collateral: CollateralDto; percent: number; amount: number }>>([]);
+
+const handleCollateralSave = (data: { collateral: CollateralDto; percent: number; amount: number }) => {
+  console.log('Saving collateral:', data);
+  selectedCollaterals.value.push(data);
+  collateralsString.value = selectedCollaterals.value.map(item => item.collateral.collateralTypeCode);
+};
+
+onMounted(async () => {
+  await getCollateral();
+});
 
 watch(isDialogActive, (active) => {
   if (active) {
@@ -98,12 +110,6 @@ watch(contractTypeId, (id) => {
     getFacilities(contractTypeId.value);
   }
 });
-
-watch(facilityId, (id) => {
-  if (id) {
-    getCollateral(facilityId.value);
-  }
-});
 </script>
 
 <template>
@@ -112,7 +118,7 @@ watch(facilityId, (id) => {
     <AlertCircleIcon v-if="!valid" style="margin-right: 20px" size="20" />
     <SquareRoundedCheckFilledIcon v-if="valid" style="margin-right: 20px" size="20" />
   </v-btn>
-  <v-dialog max-width="1200" v-model="isDialogActive">
+  <v-dialog max-width="2000" v-model="isDialogActive">
     <v-card title="تسهیلات">
       <v-card-text>
         <v-row>
@@ -214,9 +220,9 @@ watch(facilityId, (id) => {
             ></v-text-field>
           </v-col>
           <v-col cols="12" md="2">
-              <v-btn size="x-large" color="secondary" variant="outlined" @click="dayCalculate"> محاسبه</v-btn>
+              <v-btn size="large" color="secondary" variant="outlined" @click="dayCalculate"> محاسبه</v-btn>
           </v-col>
-          <v-col cols="12" md="4">
+          <v-col cols="12" md="2">
             <v-text-field
               v-model="durationDay"
               :error-messages="errors.durationDay "
@@ -227,22 +233,7 @@ watch(facilityId, (id) => {
               readonly
             ></v-text-field>
           </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12" md="4" sm="4">
-            <v-autocomplete
-              v-model="collateralsString"
-              :error-messages="errors.collateralsString"
-              :items="collateral"
-              item-title="description"
-              item-value="collateralTypeCode"
-              label="نوع وثیقه"
-              variant="outlined"
-              multiple
-              clearable
-            ></v-autocomplete>
-          </v-col>
-          <v-col cols="12" md="3">
+          <v-col cols="12" md="2">
             <v-text-field
               v-model="amount"
               :error-messages="errors.amount"
@@ -254,14 +245,58 @@ watch(facilityId, (id) => {
             ></v-text-field>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col cols="12" md="12" sm="4">
+            <v-btn
+              color="primary"
+              variant="outlined"
+              @click="showCollateralDialog = true"
+              class="mb-4"
+            >
+              افزودن وثیقه
+            </v-btn>
+            <v-table v-if="selectedCollaterals.length > 0">
+              <thead>
+                <tr>
+                  <th>نوع وثیقه</th>
+                  <th>درصد</th>
+                  <th>مبلغ</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in selectedCollaterals" :key="index">
+                  <td>{{ item.collateral.description }}</td>
+                  <td>%{{ item.percent }}</td>
+                  <td>{{ item.amount.toLocaleString() }}</td>
+                  <td>
+                    <v-btn
+                      color="error"
+                      size="small"
+                      @click="selectedCollaterals.splice(index, 1)"
+                    >
+                      حذف
+                    </v-btn>
+                  </td>
+                </tr>
+              </tbody>
+            </v-table>
+          </v-col>
+        </v-row>
       </v-card-text>
       <v-card-actions style="display: flex; justify-content: space-evenly; padding: 25px 10px">
-        <v-btn color="error" variant="elevated" text="انصراف" @click="isDialogActive = false"></v-btn>
         <v-btn color="primary" variant="elevated" text="ذخیره" @click="handleSave" />
+        <v-btn color="error" variant="elevated" text="انصراف" @click="isDialogActive = false"></v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
   <v-snackbar v-if="error" v-model="error" color="error" timeout="2500">
     {{ error }}
   </v-snackbar>
+  <CollateralSelect
+    v-if="showCollateralDialog"
+    :collaterals="collateral"
+    @save="handleCollateralSave"
+    @close="showCollateralDialog = false"
+  />
 </template>

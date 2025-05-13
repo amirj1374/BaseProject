@@ -42,14 +42,9 @@ export default (axiosInstance: AxiosInstance) => ({
     });
   },
 
-  getLcCollateral() {
-    return axiosInstance.post("/api/v1/general/lc-collateral");
+  getCollateral() {
+    return axiosInstance.get("/api/v1/general/collateral");
   },
-
-  getCollateral(facilityId: number) {
-    return axiosInstance.post("/api/v1/general/collateral", {facilityId});
-  },
-
   saveLoanRequest(loanRequestDetailList: {}) {
     return axiosInstance.post("/api/v1/loan-request-detail", loanRequestDetailList);
   },

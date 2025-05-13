@@ -26,9 +26,6 @@ const headers = ref([
   { title: 'محصول', align: 'center', key: 'facilityId', width: '200px' },
   { title: 'بازپرداخت', align: 'center', key: 'repaymentType', width: '200px' },
   { title: 'مدت', align: 'center', key: 'durationDay', width: '200px' },
-  { title: 'روز', align: 'center', key: 'day', width: '150px' },
-  { title: 'ماه', align: 'center', key: 'month', width: '150px' },
-  { title: 'سال', align: 'center', key: 'year', width: '200px' }
 ]);
 
 const getRequestType = (requestType: string): string => {
