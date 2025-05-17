@@ -1,13 +1,10 @@
 import type { AxiosInstance } from "axios";
 
 export default (axiosInstance: AxiosInstance, resource: string) => ({
-  fetch(page: number, size: number, filters?: Record<string, any>) {
+  fetch(filters?: Record<string, any>) {
     return axiosInstance.get(`/api/v1/${resource}`, {
       params: { 
         ...filters,
-        page, 
-        size, 
-        sort: 'id',
       }
     });
   },
@@ -21,6 +18,6 @@ export default (axiosInstance: AxiosInstance, resource: string) => ({
   },
 
   delete(id: string | Record<string, any>) {
-    return axiosInstance.delete(`/api/v1/${resource}`, { data: { id } });
+    return axiosInstance.delete(`/api/v1/${resource}/${id}`);
   },
 });

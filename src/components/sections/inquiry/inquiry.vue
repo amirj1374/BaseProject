@@ -92,7 +92,7 @@ defineExpose({ submitData });
           </div>
 
           <div v-else-if="responseStatus === 'empty'">
-            <v-alert type="warning" class="mt-4" border="start" variant="tonal">
+            <v-alert type="warning" class="mt-4" variant="tonal">
               داده‌ای یافت نشد.
             </v-alert>
           </div>

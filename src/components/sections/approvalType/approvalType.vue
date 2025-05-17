@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 import Facilities from '@/components/sections/approvalType/Facilities.vue';
 import { api } from '@/services/api';
-import type { CollateralDto, CurrenciesDto, CustomerDto, RequestInformationDto } from '@/types/approval/approvalType';
+import type { CollateralDto, ContractTypeDto, CurrenciesDto, CustomerDto, RequestInformationDto } from '@/types/approval/approvalType';
 import Guarantee from '@/components/sections/approvalType/Guarantee.vue';
 import Lc from '@/components/sections/approvalType/Lc.vue';
 import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
@@ -13,10 +13,10 @@ const approvalStore = useApprovalStore()
 const collaterals = ref<CollateralDto[]>([]);
 const loading = ref(false);
 const currencies = ref<CurrenciesDto[]>([]);
-const facilitiesData = ref();
-const guaranteeData = ref();
-const lcData = ref();
-const dataTable = ref(<RequestInformationDto[]>[]);
+const facilitiesData = ref<RequestInformationDto | null>(null);
+const guaranteeData = ref<RequestInformationDto | null>(null);
+const lcData = ref<RequestInformationDto | null>(null);
+const dataTable = ref<RequestInformationDto[]>([]);
 const headers = ref([
   { title: 'ارز', align: 'center', key: 'currency', width: '150px' },
   { title: 'مبلغ', align: 'center', key: 'amount', width: '200px' },
@@ -27,6 +27,10 @@ const headers = ref([
   { title: 'بازپرداخت', align: 'center', key: 'repaymentType', width: '200px' },
   { title: 'مدت', align: 'center', key: 'durationDay', width: '200px' },
 ]);
+
+const contractTypeMap = ref<Record<string, string>>({});
+const error = ref<string | null>(null);
+const valid = ref<boolean | null>(false);
 
 const getRequestType = (requestType: string): string => {
   switch (requestType) {
@@ -43,19 +47,47 @@ const getRequestType = (requestType: string): string => {
 onMounted(async () => {
   const currenciesRes = await api.approval.fetchCurrencies();
   currencies.value = currenciesRes.data;
+  
+  // Fetch contract types for mapping
+  const contractTypesRes = await api.approval.getContractType('ContractCode');
+  contractTypeMap.value = contractTypesRes.data.generalParameterList.reduce((acc: Record<string, string>, type: ContractTypeDto) => {
+    acc[type.id] = type.longTitle;
+    return acc;
+  }, {} as Record<string, string>);
 });
 
+const isDuplicate = (newData: RequestInformationDto): boolean => {
+  return dataTable.value.some(existingItem => 
+    existingItem.requestType === newData.requestType &&
+    existingItem.contractTypeId === newData.contractTypeId &&
+    existingItem.facilityId === newData.facilityId
+  );
+};
+
 const saveFacilitiesData = (data: RequestInformationDto) => {
+  if (isDuplicate(data)) {
+    console.warn('Duplicate entry detected');
+    return;
+  }
   facilitiesData.value = data;
   dataTable.value.push(data);
 };
 
 const saveGuaranteeData = (data: RequestInformationDto) => {
+  if (isDuplicate(data)) {
+    error.value = 'این نوع ضمانت نامه قبلاً اضافه شده است';
+    return;
+  }
   guaranteeData.value = data;
   dataTable.value.push(data);
+  valid.value = true;
 };
 
 const saveLcData = (data: RequestInformationDto) => {
+  if (isDuplicate(data)) {
+    console.warn('Duplicate entry detected');
+    return;
+  }
   lcData.value = data;
   dataTable.value.push(data);
 };
@@ -65,7 +97,7 @@ const submitData = async (): Promise<{ success: boolean; message: string }> => {
   try {
     const payload = {
       loanRequestDetailList: [facilitiesData.value, guaranteeData.value, lcData.value].filter(Boolean),
-      loanRequestId: approvalStore.getLoanRequestId
+      loanRequestId: approvalStore.loanRequestId
 
     };
 
@@ -133,6 +165,10 @@ defineExpose({ submitData });
                 <!-- Custom display for facility -->
                 <template #item.approvalType="{ item }">
                   {{ approvalTypeMap[item.approvalType] || '-' }}
+                </template>
+                <!-- Custom display for contract type -->
+                <template #item.contractTypeId="{ item }">
+                  {{ contractTypeMap[item.contractTypeId] || '-' }}
                 </template>
               </v-data-table>
             </div>

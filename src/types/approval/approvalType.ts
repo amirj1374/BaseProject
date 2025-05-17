@@ -16,6 +16,7 @@ export interface CustomerDto {
   postalCode?: number;
   phoneNo?: number;
   branchName?: string;
+  clientgroupname?: string;
 }
 
 export interface FetchCustomerPayload {
@@ -29,6 +30,13 @@ export interface FetchGuarantorPayload {
   cif?: string | null;
   guarantorName?: string | null;
   loanRequestId: string;
+}
+
+
+export interface FetchInquiryPayload {
+  nationalCode?: string | null;
+  loanRequestId: string;
+  guarantorInfoId?: string;
 }
 
 export interface GuarantorDto {

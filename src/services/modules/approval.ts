@@ -3,7 +3,10 @@ import type {
   ConsiderationPayload,
   DepositAccount,
   FetchCustomerPayload,
-  FetchGuarantorPayload, SummaryDto, UploadFile
+  FetchGuarantorPayload,
+  FetchInquiryPayload,
+  SummaryDto,
+  UploadFile
 } from '@/types/approval/approvalType';
 
 
@@ -49,8 +52,8 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post("/api/v1/loan-request-detail", loanRequestDetailList);
   },
 
-  getInquiry(loanRequestId: string) {
-    return axiosInstance.post('/api/v1/sap-inquiry', { loanRequestId });
+  getInquiry(payload: FetchInquiryPayload) {
+    return axiosInstance.post('/api/v1/sap-inquiry', payload);
   },
 
   getAllDeposit(loanRequestId: string) {
@@ -76,5 +79,8 @@ export default (axiosInstance: AxiosInstance) => ({
   },
   deleteTransaction(id: string) {
     return axiosInstance.delete(`/personTransaction-requests/${id}`);
+  },
+  getLcProduct(lcContractType: string) {
+    return axiosInstance.get(`/api/v1/general/product-type?lcContractType=${lcContractType}`);
   },
 });

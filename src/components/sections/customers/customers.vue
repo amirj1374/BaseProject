@@ -29,10 +29,10 @@ const headers = ref([
   { title: 'شماره مشتری', align: 'center', key: 'cif', width: '150px' },
   { title: 'کدملی / شناسه ملی', align: 'center', key: 'nationalCode', width: '150px' },
   { title: 'نام مشتری', align: 'center', key: 'customerName', width: '150px' },
+  { title: 'گروه مشتری', align: 'center', key: 'clientgroupname', width: '200px' },
   { title: 'نام شعبه', align: 'center', key: 'branchName', width: '150px' },
   { title: 'کدپستی', align: 'center', key: 'postalCode', width: '120px' },
-  { title: 'آدرس', align: 'center', key: 'address', width: '200px' },
-  { title: 'گروه مشتری', align: 'center', key: 'clientgroupname', width: '200px' }
+  { title: 'آدرس', align: 'center', key: 'address', width: '200px' }
 ]);
 // initial data
 const formData = ref({
@@ -88,7 +88,8 @@ async function search() {
           address: customerInfo.custaddress ?? '-',
           postalCode: customerInfo.postalCode ?? '-',
           phoneNo: customerInfo.phoneno ?? customerInfo.mobileno ?? '-',
-          branchName: customerInfo.branchName ?? '-'
+          branchName: raw.branchName ?? '-',
+          clientgroupname: customerInfo.clientgroupname ?? '-'
         }
       ];
       approvalStore.SET_LOAN_REQUEST_ID(raw.customerInfo.loanRequest.id);

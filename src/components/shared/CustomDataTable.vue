@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch, watchEffect } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import axiosInstance from '@/services/axiosInstance';
 import apiService from '@/services/apiService';
 import { useRouter } from 'vue-router';
@@ -34,9 +34,8 @@ interface CustomButtonAction {
 }
 
 interface Props {
-  apiResource?: string;
+  apiResource: string;
   headers: Header[];
-  itemsData?: any[];
   actions?: ('create' | 'edit' | 'delete' | 'view')[];
   routes?: Record<string, string>;
   downloadLink?: Record<string, string>;
@@ -45,34 +44,13 @@ interface Props {
   customButtons?: CustomButtonAction[];
   filterComponent?: Component;
   autoFetch?: boolean;
+  queryParams?: Record<string, any>;
+  showPagination?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   autoFetch: true,
-  itemsData: undefined
-});
-
-const localItemsStore = ref<any[]>([]);
-const isLocalDataMode = computed(() => Array.isArray(props.itemsData));
-
-watchEffect(() => {
-  if (isLocalDataMode.value && props.itemsData) {
-    localItemsStore.value = JSON.parse(JSON.stringify(props.itemsData));
-    currentPage.value = 1;
-    totalSize.value = localItemsStore.value.length;
-    totalPages.value = Math.ceil(localItemsStore.value.length / itemsPerPage.value);
-  } else {
-    localItemsStore.value = [];
-  }
-});
-
-const api = ref<ReturnType<typeof apiService> | null>(null);
-watchEffect(() => {
-  if (props.apiResource) {
-    api.value = apiService(axiosInstance, props.apiResource);
-  } else {
-    api.value = null;
-  }
+  showPagination: true
 });
 
 const items = ref<any[]>([]);
@@ -95,9 +73,11 @@ const sortBy = ref<{ key: string; order: 'asc' | 'desc' } | null>(null);
 const filterDialog = ref(false);
 const filterModel = ref<Record<string, any>>({});
 
+// Add a computed property to clean filter values
 const cleanFilterModel = computed(() => {
   const cleaned: Record<string, any> = {};
   Object.entries(filterModel.value).forEach(([key, value]) => {
+    // Check if value is not null, undefined, empty string, or empty array
     if (value !== null && value !== undefined && value !== '' && 
         !(Array.isArray(value) && value.length === 0)) {
       cleaned[key] = value;
@@ -106,6 +86,7 @@ const cleanFilterModel = computed(() => {
   return cleaned;
 });
 
+const api = apiService(axiosInstance, props.apiResource);
 const customActionDialog = ref(false);
 const customActionComponent = ref<Component | null>(null);
 const customActionItem = ref<any>(null);
@@ -115,42 +96,22 @@ const hasFilterComponent = computed(() => {
 });
 
 const fetchData = async () => {
-  if (isLocalDataMode.value) {
-    loading.value = true;
-    localItemsStore.value = localItemsStore.value.map(item => {
-      const newItem = { ...item };
-      props.headers.forEach(header => {
-        if (header.isDate && newItem[header.key] && typeof newItem[header.key] === 'string') {
-          try {
-            // Assuming DateConverter is available and working
-            // newItem[header.key] = DateConverter.toShamsi(newItem[header.key]);
-          } catch (error) {
-            console.error(`Error converting date for field ${header.key}:`, error);
-          }
-        }
-      });
-      return newItem;
-    });
-    totalSize.value = localItemsStore.value.length;
-    totalPages.value = Math.ceil(totalSize.value / itemsPerPage.value);
-    if (currentPage.value > totalPages.value && totalPages.value > 0) currentPage.value = totalPages.value;
-    else if (totalPages.value === 0) currentPage.value = 1;
-    loading.value = false;
-    return;
-  }
-
-  if (!api.value) {
-    items.value = [];
-    totalSize.value = 0;
-    totalPages.value = 0;
-    loading.value = false;
-    return;
-  }
   loading.value = true;
   error.value = null;
   try {
-    const response = await api.value.fetch(currentPage.value - 1, itemsPerPage.value, cleanFilterModel.value);
-    items.value = response.data.content || [];
+    const params: Record<string, any> = {
+      ...cleanFilterModel.value,
+      ...props.queryParams
+    };
+
+    // Only add pagination if we have items to paginate
+    if (totalSize.value > 0 || currentPage.value > 1) {
+      params.page = currentPage.value - 1;
+      params.size = itemsPerPage.value;
+    }
+
+    const response = await api.fetch(params);
+    items.value = response.data || [];
     
     // Convert dates to Shamsi format
     items.value = items.value.map(item => {
@@ -183,6 +144,11 @@ const fetchData = async () => {
   }
 };
 
+// Expose methods to parent component
+defineExpose({
+  fetchData
+});
+
 const openDialog = (item?: any) => {
   editedItem.value = item ? { ...item } : {};
   isEditing.value = !!item;
@@ -208,99 +174,49 @@ const openDeleteDialog = (item: any) => {
 const saveItem = async () => {
   if (!formModel.value) return;
 
-  const dataToSave = { ...formModel.value };
-  props.headers.forEach(header => {
-    if (header.isDate && dataToSave[header.key]) {
-      try {
-        // Assuming DateConverter is available and working
-        // dataToSave[header.key] = DateConverter.toGregorian(dataToSave[header.key]);
-      } catch (error) {
-        console.error(`Error converting date for field ${header.key}:`, error);
+  try {
+    // Convert Shamsi dates back to Gregorian before saving
+    const dataToSave = { ...formModel.value };
+    props.headers.forEach(header => {
+      if (header.isDate && dataToSave[header.key]) {
+        try {
+          dataToSave[header.key] = DateConverter.toGregorian(dataToSave[header.key]);
+        } catch (error) {
+          console.error(`Error converting date for field ${header.key}:`, error);
+        }
       }
-    }
-  });
+    });
 
-  if (isLocalDataMode.value) {
     if (isEditing.value && dataToSave.id) {
-      const index = localItemsStore.value.findIndex(item => item.id === dataToSave.id);
-      if (index !== -1) {
-        localItemsStore.value.splice(index, 1, { ...dataToSave });
-      } else {
-        // Item not found for update, could add as new or show error
-        localItemsStore.value.push({ ...dataToSave, id: Date.now().toString() }); // Add as new if not found
-      }
+      await api.update(dataToSave);
+      snackbarMessage.value = '✅ آیتم با موفقیت بروزرسانی شد!';
     } else {
-      localItemsStore.value.push({ ...dataToSave, id: dataToSave.id || Date.now().toString() });
+      const response = await api.create(dataToSave);
+      snackbarMessage.value = '✅ آیتم با موفقیت ایجاد شد!';
+      if (response.data) items.value.push(response.data);
     }
-    // Manually trigger re-computation for displayed items if not automatically picked up by totalSize/totalPages change
-    // This might involve a trick or ensuring dependencies of processedAndPaginatedItems are robustly reactive
-    // For now, let's assume changes to localItemsStore directly trigger computed prop updates.
-    // Update totalSize and totalPages as they are used by pagination display
-    totalSize.value = localItemsStore.value.length; 
-    totalPages.value = Math.ceil(localItemsStore.value.length / itemsPerPage.value);
-    if (currentPage.value > totalPages.value && totalPages.value > 0) currentPage.value = totalPages.value;
-    else if (totalPages.value === 0) currentPage.value = 1;
 
-    snackbarMessage.value = '✅ آیتم با موفقیت در لیست محلی ذخیره شد!';
-  } else if (api.value) { // API mode
-    try {
-      if (isEditing.value && dataToSave.id) {
-        await api.value.update(dataToSave);
-        snackbarMessage.value = '✅ آیتم با موفقیت بروزرسانی شد!';
-      } else {
-        const response = await api.value.create(dataToSave);
-        snackbarMessage.value = '✅ آیتم با موفقیت ایجاد شد!';
-        // if (response.data) items.value.push(response.data); // This might not be needed if fetchData is called
-      }
-      await fetchData(); // Refresh data from API
-    } catch (err) {
-      console.error('خطا در ذخیره اطلاعات', err);
-      snackbarMessage.value = '❌ خطا در ذخیره اطلاعات!';
-      snackbar.value = true; // Show error snackbar
-      return; // Prevent closing dialog on error
-    }
-  } else {
-    error.value = "ذخیره سازی پیکربندی نشده است (نه آیتم محلی و نه منبع API).";
+    snackbar.value = true;
+    dialog.value = false;
+    await fetchData();
+  } catch (err) {
+    console.error('خطا در ذخیره اطلاعات', err);
     snackbarMessage.value = '❌ خطا در ذخیره اطلاعات!';
     snackbar.value = true;
-    return;
   }
-
-  snackbar.value = true;
-  dialog.value = false;
 };
 
 const deleteItem = async (id: string) => {
-  if (isLocalDataMode.value) {
-    localItemsStore.value = localItemsStore.value.filter((item) => item.id !== id);
-    totalSize.value = localItemsStore.value.length;
-    totalPages.value = Math.ceil(localItemsStore.value.length / itemsPerPage.value);
-    if (currentPage.value > totalPages.value && totalPages.value > 0) {
-      currentPage.value = totalPages.value;
-    } else if (totalPages.value === 0) {
-      currentPage.value = 1;
-    }
-    snackbarMessage.value = '✅ آیتم با موفقیت از لیست محلی حذف شد!';
-  } else if (api.value) { // API mode
-    try {
-      await api.value.delete(id);
-      await fetchData(); // Refresh data from API
-      snackbarMessage.value = '✅ آیتم با موفقیت حذف شد!';
-    } catch (err) {
-      console.error('خطا در حذف اطلاعات', err);
-      snackbarMessage.value = '❌ خطا در حذف اطلاعات!';
-      snackbar.value = true; // Show error snackbar
-      return; // Prevent closing dialog on error
-    }
-  } else {
-    error.value = "حذف پیکربندی نشده است (نه آیتم محلی و نه منبع API).";
+  try {
+    await api.delete(id);
+    deleteDialog.value = false;
+    items.value = items.value.filter((item) => item.id !== id);
+    await fetchData();
+  } catch (err) {
+    console.error('خطا در حذف اطلاعات', err);
     snackbarMessage.value = '❌ خطا در حذف اطلاعات!';
     snackbar.value = true;
-    return;
   }
-
-  deleteDialog.value = false;
-  snackbar.value = true;
 };
 
 const goToRoute = (key: string, item?: any) => {
@@ -327,6 +243,7 @@ const goToRoute = (key: string, item?: any) => {
   router.push(routePath);
 };
 
+// The current download function is commented out. Here's a working version:
 const download = (key: string, item: any) => {
   if (!props.downloadLink || !item) return;
 
@@ -341,70 +258,32 @@ const download = (key: string, item: any) => {
 
   const link = document.createElement('a');
   link.href = fileUrl;
-  link.download = '';
+  link.download = ''; // or provide a filename
   link.target = '_blank';
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 };
 
-const processedAndPaginatedItems = computed(() => {
-  if (isLocalDataMode.value) {
-    let itemsToDisplay = [...localItemsStore.value];
+// const sortedItems = computed(() => {
+//   if (!sortBy.value) {
+//     const defaultKey = props.headers[0]?.key;
+//     return defaultKey ? [...items.value].sort((a, b) => (a[defaultKey] < b[defaultKey] ? -1 : 1)) : items.value;
+//   }
+//
+//   const { key, order } = sortBy.value;
+//   return [...items.value].sort((a, b) => {
+//     const orderFactor = order === 'asc' ? 1 : -1;
+//     if (a[key] < b[key]) return -1 * orderFactor;
+//     if (a[key] > b[key]) return 1 * orderFactor;
+//     return 0;
+//   });
+// });
 
-    if (Object.keys(cleanFilterModel.value).length > 0) {
-      itemsToDisplay = itemsToDisplay.filter(item => {
-        return Object.entries(cleanFilterModel.value).every(([key, filterValue]) => {
-          if (item[key] === undefined || item[key] === null) return false;
-          return String(item[key]).toLowerCase().includes(String(filterValue).toLowerCase());
-        });
-      });
-    }
-
-    totalSize.value = itemsToDisplay.length;
-    totalPages.value = Math.ceil(itemsToDisplay.length / itemsPerPage.value);
-    
-    if (currentPage.value > totalPages.value && totalPages.value > 0) {
-        currentPage.value = totalPages.value;
-    } else if (totalPages.value === 0 && itemsToDisplay.length === 0) {
-        currentPage.value = 1;
-    }
-
-    if (sortBy.value) {
-      const { key, order } = sortBy.value;
-      itemsToDisplay.sort((a, b) => {
-        const valA = a[key];
-        const valB = b[key];
-        const orderFactor = order === 'asc' ? 1 : -1;
-
-        if (valA === null || valA === undefined) return 1 * orderFactor;
-        if (valB === null || valB === undefined) return -1 * orderFactor;
-
-        if (typeof valA === 'number' && typeof valB === 'number') {
-          return (valA - valB) * orderFactor;
-        } else {
-          return String(valA).localeCompare(String(valB)) * orderFactor;
-        }
-      });
-    }
-
-    const start = (currentPage.value - 1) * itemsPerPage.value;
-    const end = start + itemsPerPage.value;
-    return itemsToDisplay.slice(start, end);
-  }
-  return items.value;
-});
-
-watch(currentPage, () => {
-  if (!isLocalDataMode.value) {
-    fetchData();
-  }
-});
+watch(currentPage, fetchData); // 👈 add this line
 
 onMounted(() => {
-  if (isLocalDataMode.value) {
-    fetchData();
-  } else if (props.autoFetch && props.apiResource) {
+  if (props.autoFetch) {
     fetchData();
   }
 });
@@ -433,38 +312,38 @@ const getTranslatedValue = (value: any, column: any) => {
 
   if (header.translate) {
     if (header.options) {
+      // Find matching option for enum value
       const option = header.options.find(opt => opt.value === value);
       return option?.title || value;
     }
+    // Fallback to basic translation if no options provided
     return translateValue(value);
   }
   return value;
 };
 
 const translateValue = (value: string) => {
+  // Example translation mapping
   const translations: Record<string, string> = {
     'ACTIVE': 'فعال',
     'INACTIVE': 'غیرفعال',
     'PENDING': 'در انتظار',
     'COMPLETED': 'تکمیل شده',
+    // Add more translations as needed
   };
   return translations[value] || value;
 };
 
 const applyFilter = () => {
-  currentPage.value = 1;
-  if (!isLocalDataMode.value) {
-    fetchData();
-  }
+  currentPage.value = 1; // Reset to first page when applying new filters
+  fetchData();
   filterDialog.value = false;
 };
 
 const resetFilter = () => {
   filterModel.value = {};
   currentPage.value = 1;
-  if (!isLocalDataMode.value) {
-    fetchData();
-  }
+  fetchData();
   filterDialog.value = false;
 };
 </script>
@@ -482,7 +361,7 @@ const resetFilter = () => {
     <v-data-table
       v-if="!loading"
       :headers="[...props.headers, { title: 'عملیات', key: 'actions', sortable: false }]"
-      :items="processedAndPaginatedItems"
+      :items="items"
       hide-default-footer
       class="elevation-1"
       no-data-text="رکوردی یافت نشد"
@@ -496,7 +375,7 @@ const resetFilter = () => {
                 >حذف ❌
               </v-btn>
               <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
-                >View
+                >🔍 View
               </v-btn>
               <template v-for="(route, key) in props.routes" :key="key">
                 <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(key, item)">
@@ -537,7 +416,7 @@ const resetFilter = () => {
     <Loading v-else />
   </div>
   <v-divider />
-  <div v-if="!loading" class="h-25 d-flex justify-space-between align-center px-4 bg-white">
+  <div v-if="!loading && props.showPagination" class="h-25 d-flex justify-space-between align-center px-4 bg-white">
     <h5>
       نمایش {{ (currentPage - 1) * items.length }} تا
       {{ currentPage * itemsPerPage }}
@@ -600,6 +479,7 @@ const resetFilter = () => {
     </v-card>
   </v-dialog>
 
+  <!-- Filter Dialog -->
   <v-dialog v-model="filterDialog" max-width="800">
     <v-card>
       <v-card-title>فیلتر</v-card-title>

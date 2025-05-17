@@ -19,7 +19,7 @@ const steps = [
   { title: 'پیشنویس', component: Draft }
 ];
 
-const stepper = ref(3); // Current step
+const stepper = ref(4); // Current step
 const totalSteps = steps.length;
 const error = ref<string | null>(null);
 

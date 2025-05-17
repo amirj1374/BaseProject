@@ -3,14 +3,31 @@ import type { CollateralDto, ContractTypeDto, CurrenciesDto, FacilitiesDto } fro
 import { ApprovalTypeOptions, type ApprovalType } from '@/constants/enums/approval';
 import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import type { RepaymentType } from '@/constants/enums/repaymentType';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import { api } from '@/services/api';
 import * as yup from 'yup';
 import { useForm, useField } from 'vee-validate';
+import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
 import VPriceTextField from '@/components/shared/VPriceTextField.vue';
 
+interface FacilityFormValues {
+  requestType?: string;
+  approvalType: ApprovalType | null;
+  currency: string | null;
+  contractTypeId: string | null;
+  repaymentType: RepaymentType | null;
+  facilityId: string | null; // Assuming facilityId is a string (facilityCode)
+  amount: string | null;
+  durationDay: number | null;
+  year: number | null;
+  month: number | null;
+  day: number | null;
+  other: string | null;
+  advancePayment: string | null;
+  selectedCollaterals: Array<{ collateral: CollateralDto; amount: number; percent: number }>;
+}
+
 const formSchema = yup.object({
-  requestType: yup.string(),
   approvalType: yup.string().nullable().required('نوع مصوبه الزامی است'),
   currency: yup.string().nullable().required('نوع ارز الزامی است'),
   contractTypeId: yup.string().nullable().required('نوع عقد الزامی است'),
@@ -18,96 +35,207 @@ const formSchema = yup.object({
   facilityId: yup.string().nullable().required('نوع محصول الزامی است'),
   amount: yup.string().nullable().required('مبلغ الزامی است'),
   durationDay: yup.number().nullable().required('محاسبه روز الزامی است'),
-  collateralsString: yup.array().nullable().required('انتخاب وثیقه الزامی است'),
+  other: yup.string().nullable(),
+  advancePayment: yup.string().nullable(),
+  year: yup.number().nullable(),
+  month: yup.number().nullable(),
+  day: yup.number().nullable(),
+  selectedCollaterals: yup
+    .array()
+    .of(
+      yup.object().shape({
+        collateral: yup.object().required(),
+        amount: yup.number().transform((value) => (isNaN(value) ? undefined : value)),
+        percent: yup.number().transform((value) => (isNaN(value) ? undefined : value)).min(0, 'درصد باید بین 0 تا 100 باشد').max(100, 'درصد باید بین 0 تا 100 باشد')
+      })
+    )
+    .nullable()
 });
 const contractTypes = ref<ContractTypeDto[]>([]);
-const collateral = ref<CollateralDto[]>([]);
+const allCollateralOptions = ref<CollateralDto[]>([]);
 const facilities = ref<FacilitiesDto[]>([]);
 const isDialogActive = ref(false);
 const error = ref<string | null>(null);
-// form data
 const valid = ref<boolean | null>(false);
+
 const emit = defineEmits<{
   (e: 'save', data: any): void;
 }>();
 
-const { handleSubmit, errors } = useForm({
-  validationSchema: formSchema
+const {
+  handleSubmit,
+  errors,
+  setFieldValue,
+  values: formValues
+} = useForm<FacilityFormValues>({
+  validationSchema: formSchema,
+  initialValues: {
+    approvalType: null,
+    currency: null,
+    contractTypeId: null,
+    repaymentType: null,
+    facilityId: null,
+    amount: null,
+    durationDay: null,
+    other: null,
+    advancePayment: null,
+    year: null,
+    month: null,
+    day: null,
+    selectedCollaterals: []
+  }
 });
+
 const { value: approvalType } = useField<ApprovalType | null>('approvalType');
 const { value: currency } = useField<string | null>('currency');
-const { value: requestType } = useField<string | "ContractCode">('requestType');
+// requestType is not a user input field, set in handleSave
 const { value: contractTypeId } = useField<string | null>('contractTypeId');
 const { value: repaymentType } = useField<RepaymentType | null>('repaymentType');
-const { value: facilityId } = useField<FacilitiesDto[] | null>('facilityId');
-const { value: amount } = useField<string | null>('amount');
-const { value: collateralsString } = useField<string[] | null>('collateralsString');
-const { value: durationDay } = useField<number | null>('durationDay');
+const { value: facilityId } = useField<string | null>('facilityId');
+const { value: formAmount, errorMessage: amountError } = useField<string | null>('amount');
+const { value: other } = useField<string | null>('other');
+const { value: advancePayment } = useField<string | null>('advancePayment');
+const { value: durationDay, errorMessage: durationDayError } = useField<number | null>('durationDay');
 const { value: year } = useField<number | null>('year');
 const { value: month } = useField<number | null>('month');
 const { value: day } = useField<number | null>('day');
+const { value: selectedCollaterals, errorMessage: selectedCollateralsError } = useField<
+  Array<{
+    collateral: CollateralDto;
+    amount: number;
+    percent: number;
+  }>
+>('selectedCollaterals');
 
-const handleSave = handleSubmit((values) => {
-  values.requestType = 'ContractCode';
-  emit('save', {
-    ...values
-  });
-  valid.value = true;
-  isDialogActive.value = false;
-});
-// define props
+const showCollateralInputDialog = ref(false);
+
+const handleSave = handleSubmit(
+  (currentFormValues) => {
+    console.log('handleSave function called');
+    console.log('Form values before save:', currentFormValues);
+    
+    const formattedCollaterals = currentFormValues.selectedCollaterals?.map(sc => ({
+      type: sc.collateral.collateralTypeCode,
+      amount: sc.amount,
+      percent: sc.percent
+    })) || [];
+
+    const submissionData = {
+      ...currentFormValues,
+      requestType: 'ContractCode',
+      collaterals: formattedCollaterals,
+      amount: currentFormValues.amount
+    };
+    
+    console.log('Submission data:', submissionData);
+    emit('save', submissionData);
+    valid.value = true;
+    isDialogActive.value = false;
+  },
+  (errors) => {
+    console.log('Validation errors:', errors);
+    error.value = 'لطفا تمام فیلدهای الزامی را پر کنید';
+  }
+);
+
 const props = defineProps<{
   currencies: CurrenciesDto[];
 }>();
-// Fetch facilities by contract type ID
+
 const getContractType = async () => {
-  if (!isDialogActive) return;
-  const res = await api.approval.getContractType('ContractCode'); // <- adjust this method name if needed
+  if (!isDialogActive.value || !api.approval) return;
+  const res = await api.approval.getContractType('ContractCode');
   contractTypes.value = res.data.generalParameterList;
 };
-// Fetch facilities by contract type ID
-const getFacilities = async (contractTypeId: any) => {
-  if (!contractTypeId) return;
-  const res = await api.approval.getFacilities(contractTypeId, 'ContractCode'); // <- adjust this method name if needed
+const getFacilities = async (id: any) => {
+  if (!id || !api.approval) return;
+  const res = await api.approval.getFacilities(id, 'ContractCode');
   facilities.value = res.data.facilityDtoList;
 };
 
-// Fetch collateral by facility type ID
-const getCollateral = async () => {
-  const res = await api.approval.getCollateral(); // <- adjust this method name if needed
-  collateral.value = res.data.map((item: CollateralDto) => ({ ...item, percent: 0, amount: 0 }));
+const getCollateralOptions = async () => {
+  try {
+    if (!api.approval) return;
+    const res = await api.approval.getCollateral();
+    allCollateralOptions.value = res.data;
+  } catch (err) {
+    console.error('Error fetching collateral options:', err);
+    error.value = 'Could not load collateral options.';
+  }
 };
 
 const dayCalculate = async () => {
   if (year.value === null && month.value === null && day.value === null) {
     error.value = 'لطفا مقادیر تاریخ را وارد کنید';
+    return;
   }
-  const res = await api.approval.getCalculatedDay(year.value, month.value, day.value); // <- adjust this method name if needed
-  durationDay.value = res.data;
+  if (!api.approval) return;
+  const res = await api.approval.getCalculatedDay(year.value, month.value, day.value);
+  // durationDay.value = res.data; // This should be: setFieldValue('durationDay', res.data)
+  setFieldValue('durationDay', res.data);
 };
 
-const showCollateralDialog = ref(false);
-const selectedCollaterals = ref<Array<{ collateral: CollateralDto; percent: number; amount: number }>>([]);
+const onCollateralDialogSave = (data: { collateral: CollateralDto | null; amount: string; percent: string }) => {
+  if (!data.collateral) {
+    return;
+  }
 
-const handleCollateralSave = (data: { collateral: CollateralDto; percent: number; amount: number }) => {
-  console.log('Saving collateral:', data);
-  selectedCollaterals.value.push(data);
-  collateralsString.value = selectedCollaterals.value.map(item => item.collateral.collateralTypeCode);
+  const parsedAmount = parseFloat(data.amount.replace(/,/g, '')) || 0;
+  const parsedPercent = parseFloat(data.percent) || 0;
+
+  const newCollateralEntry = {
+    collateral: data.collateral,
+    amount: parsedAmount,
+    percent: parsedPercent
+  };
+
+  const currentArray = selectedCollaterals.value ? [...selectedCollaterals.value] : [];
+  currentArray.push(newCollateralEntry);
+  setFieldValue('selectedCollaterals', currentArray);
+  showCollateralInputDialog.value = false;
 };
+
+const removeCollateralItem = (index: number) => {
+  if (selectedCollaterals.value) {
+    const currentArray = [...selectedCollaterals.value];
+    currentArray.splice(index, 1);
+    setFieldValue('selectedCollaterals', currentArray);
+  }
+};
+
+const collateralTableHeaders = ref([
+  { title: 'نوع وثیقه', key: 'collateral.description', sortable: false },
+  { title: 'مبلغ وثیقه', key: 'amount', sortable: false, align: 'end' },
+  { title: 'درصد ارزش گذاری', key: 'percent', sortable: false, align: 'end' },
+  { title: 'ارزش معادل وثیقه', key: 'equivalentValue', sortable: false, align: 'end' },
+  { title: 'عملیات', key: 'actions', sortable: false, align: 'center' }
+]);
+
+const processedSelectedCollaterals = computed(() => {
+  return (
+    selectedCollaterals.value?.map((item) => ({
+      ...item,
+      equivalentValue: (item.amount * item.percent) / 100
+    })) || []
+  );
+});
 
 onMounted(async () => {
-  await getCollateral();
+  // await getCollateralOptions(); // Fetched on dialog open if needed
 });
 
 watch(isDialogActive, (active) => {
   if (active) {
     getContractType();
+    if (allCollateralOptions.value.length === 0) {
+      getCollateralOptions();
+    }
   }
 });
 
 watch(contractTypeId, (id) => {
   if (id) {
-    getFacilities(contractTypeId.value);
+    getFacilities(id);
   }
 });
 </script>
@@ -118,7 +246,8 @@ watch(contractTypeId, (id) => {
     <AlertCircleIcon v-if="!valid" style="margin-right: 20px" size="20" />
     <SquareRoundedCheckFilledIcon v-if="valid" style="margin-right: 20px" size="20" />
   </v-btn>
-  <v-dialog max-width="2000" v-model="isDialogActive">
+
+  <v-dialog max-width="2500" v-model="isDialogActive" persistent>
     <v-card title="تسهیلات">
       <v-card-text>
         <v-row>
@@ -132,6 +261,8 @@ watch(contractTypeId, (id) => {
               variant="outlined"
               item-title="title"
               item-value="value"
+              density="comfortable"
+              hide-details="auto"
             ></v-autocomplete>
           </v-col>
           <v-col cols="12" md="4">
@@ -144,6 +275,7 @@ watch(contractTypeId, (id) => {
               variant="outlined"
               item-title="description"
               item-value="code"
+              density="comfortable"
             ></v-autocomplete>
           </v-col>
           <v-col cols="12" md="4">
@@ -157,6 +289,7 @@ watch(contractTypeId, (id) => {
               label="نحوه بازپرداخت"
               variant="outlined"
               clearable
+              density="comfortable"
             ></v-select>
           </v-col>
         </v-row>
@@ -176,8 +309,8 @@ watch(contractTypeId, (id) => {
           </v-col>
           <v-col cols="12" md="8">
             <v-autocomplete
-              :items="facilities"
               v-model="facilityId"
+              :items="facilities"
               :error-messages="errors.facilityId"
               item-title="facilityName"
               item-value="facilityCode"
@@ -197,7 +330,8 @@ watch(contractTypeId, (id) => {
               variant="outlined"
               color="primary"
               label="سال"
-            ></v-text-field>
+              type="number"
+            />
           </v-col>
           <v-col cols="12" md="2">
             <v-text-field
@@ -207,7 +341,8 @@ watch(contractTypeId, (id) => {
               variant="outlined"
               color="primary"
               label="ماه"
-            ></v-text-field>
+              type="number"
+            />
           </v-col>
           <v-col cols="12" md="2">
             <v-text-field
@@ -217,86 +352,98 @@ watch(contractTypeId, (id) => {
               variant="outlined"
               color="primary"
               label="روز"
-            ></v-text-field>
+              type="number"
+            />
           </v-col>
           <v-col cols="12" md="2">
-              <v-btn size="large" color="secondary" variant="outlined" @click="dayCalculate"> محاسبه</v-btn>
+            <v-btn size="x-large" color="secondary" variant="outlined" @click="dayCalculate"> محاسبه</v-btn>
           </v-col>
           <v-col cols="12" md="2">
             <v-text-field
               v-model="durationDay"
-              :error-messages="errors.durationDay "
+              :error-messages="durationDayError || errors.durationDay"
               density="comfortable"
               variant="outlined"
               color="primary"
-              label="مدت"
+              label="مدت (روز)"
               readonly
-            ></v-text-field>
+            />
           </v-col>
           <v-col cols="12" md="2">
-            <VPriceTextField
-              v-model="amount"
-              :error-messages="errors.amount"
+            <v-text-field
+              v-model="advancePayment"
+              label="پیش دریافت"
+              variant="outlined"
               density="comfortable"
               hide-details="auto"
-              variant="outlined"
-              color="primary"
-              label="مبلغ"
-            ></VPriceTextField>
+              type="number"
+            />
           </v-col>
         </v-row>
         <v-row>
-          <v-col cols="12" md="12" sm="4">
-            <v-btn
-              color="primary"
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="other"
+              label="سایر"
               variant="outlined"
-              @click="showCollateralDialog = true"
-              class="mb-4"
-            >
-              افزودن وثیقه
-            </v-btn>
-            <v-table v-if="selectedCollaterals.length > 0">
-              <thead>
-                <tr>
-                  <th>نوع وثیقه</th>
-                  <th>درصد</th>
-                  <th>مبلغ</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(item, index) in selectedCollaterals" :key="index">
-                  <td>{{ item.collateral.description }}</td>
-                  <td>%{{ item.percent }}</td>
-                  <td>{{ item.amount.toLocaleString() }}</td>
-                  <td>
-                    <v-btn
-                      color="error"
-                      size="small"
-                      @click="selectedCollaterals.splice(index, 1)"
-                    >
-                      حذف
-                    </v-btn>
-                  </td>
-                </tr>
-              </tbody>
-            </v-table>
+              density="comfortable"
+              hide-details="auto"
+            />
+          </v-col>
+          <v-col cols="12" md="6">
+            <VPriceTextField
+              v-model="formAmount"
+              :error-messages="amountError || errors.amount"
+              label="مبلغ تسهیلات"
+              variant="outlined"
+              density="comfortable"
+              prefix="میلیون ریال"
+            />
           </v-col>
         </v-row>
+        <v-row>
+          <v-col cols="12">
+            <v-btn color="primary" variant="tonal" @click="showCollateralInputDialog = true" class="mb-4"> افزودن وثیقه </v-btn>
+          </v-col>
+        </v-row>
+
+        <v-data-table
+          v-if="processedSelectedCollaterals.length > 0"
+          :headers="collateralTableHeaders"
+          :items="processedSelectedCollaterals"
+          density="compact"
+          class="elevation-1 mb-4"
+          hide-default-footer
+          no-data-text="هیچ وثیقه ای اضافه نشده است."
+        >
+          <template v-slot:item.amount="{ item }">
+            {{ item.amount.toLocaleString() }}
+          </template>
+          <template v-slot:item.percent="{ item }"> {{ item.percent }}% </template>
+          <template v-slot:item.equivalentValue="{ item }">
+            {{ item.equivalentValue.toLocaleString() }}
+          </template>
+          <template v-slot:item.actions="{ index }">
+            <v-tooltip location="top" text="حذف وثیقه">
+              <template v-slot:activator="{ props: tooltipProps }">
+                <v-btn icon variant="text" size="small" color="error" v-bind="tooltipProps" @click="removeCollateralItem(index)">
+                  ❌
+                </v-btn>
+              </template>
+            </v-tooltip>
+          </template>
+        </v-data-table>
       </v-card-text>
       <v-card-actions style="display: flex; justify-content: space-evenly; padding: 25px 10px">
-        <v-btn color="primary" variant="elevated" text="ذخیره" @click="handleSave" />
-        <v-btn color="error" variant="elevated" text="انصراف" @click="isDialogActive = false"></v-btn>
+        <v-btn color="primary" variant="elevated" @click="() => { console.log('Save button clicked'); handleSave(); }">ذخیره تسهیلات</v-btn>
+        <v-btn color="error" variant="elevated" @click="isDialogActive = false">انصراف</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
-  <v-snackbar v-if="error" v-model="error" color="error" timeout="2500">
+
+  <CollateralInputDialog v-model="showCollateralInputDialog" :collateral-options="allCollateralOptions" @save="onCollateralDialogSave" />
+
+  <v-snackbar v-if="error" v-model="error" color="error" timeout="3500" location="top right">
     {{ error }}
   </v-snackbar>
-  <CollateralSelect
-    v-if="showCollateralDialog"
-    :collaterals="collateral"
-    @save="handleCollateralSave"
-    @close="showCollateralDialog = false"
-  />
 </template>

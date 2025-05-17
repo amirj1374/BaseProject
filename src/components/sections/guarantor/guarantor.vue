@@ -3,25 +3,39 @@ import { computed, ref } from 'vue';
 import { api } from '@/services/api';
 import type {
   FetchGuarantorPayload,
-  GuarantorDto
+  GuarantorDto,
+  FetchInquiryPayload
 } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
+import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { BooleanEnumOptions } from '@/constants/enums/booleanEnum';
+
 const approvalStore = useApprovalStore()
 const loading = ref(false);
 const dialog = ref(false);
 const hideInput = ref(false);
 const canSubmit = ref(false);
+const isInquiry = ref(false);
 const error = ref<string | null>(null);
 const cif = ref<string | null>(null);
 const trackingCode = ref<string | null>(null);
 const nationalCode = ref<string | null>(null);
 const GuarantorName = ref<string | null>(null);
 const data = ref(<GuarantorDto[]>[]);
-const success = ref<string | null>(null); // Added success message
+const selectedGuarantors = ref<GuarantorDto[]>([]);
+const success = ref<string | null>(null);
+const dataTableRef = ref();
+
 const headers = ref([
-  { title: 'نام ضامن', align: 'center', key: 'guarantorName', width: '150px' },
-  { title: 'کدملی / شناسه ملی', align: 'center', key: 'nationalCode', width: '150px' },
+  { title: 'نام ضامن', key: 'guarantorName', align: 'center' },
+  { title: 'کدملی / شناسه ملی', key: 'nationalCode', align: 'left'},
+  { title: 'وضعیت استعلام', key: 'sapInquiryStatus', translate: true, align: 'right', width: 50,
+  options: BooleanEnumOptions,},
+  { title: 'تاریخ استعلام', key: 'createdAt', isDate: true },
+  { title: 'رتبه', key: 'label', },
+  { title: 'امتیاز مشتری', key: 'value', },
 ]);
+
 // initial data
 const formData = ref({
   cif: cif,
@@ -44,35 +58,51 @@ async function search() {
       nationalCode: formData.value.nationalCode,
       cif: formData.value.cif,
       guarantorName: formData.value.GuarantorName,
-      loanRequestId: approvalStore.getLoanRequestId
+      loanRequestId: approvalStore.loanRequestId
     };
 
     const response = await api.approval.fetchGuarantor(payload);
-    console.log(response)
 
     if (response.status === 200 && response.data) {
       const raw = response.data;
+      isInquiry = true
       const guarantorInfo = raw.guarantorInfo || {};
       success.value = 'اطلاعات ضامن با موفقیت دریافت شد';
-      trackingCode.value = raw.loanRequest.trackingCode;
       dialog.value = true;
-      // generate data for data table
-      data.value = [
-        {
-          cif: guarantorInfo.cif ?? raw.cif ?? '-',
-          nationalCode: raw.nationalCode ?? guarantorInfo.nationalCode ?? '-',
-          guarantorName: raw.guarantorName ?? guarantorInfo.guarantorName ?? '-',
-        }
-      ];
+      
+      // Check if guarantor already exists in data
+      const newGuarantor = {
+        cif: guarantorInfo.cif ?? raw.cif ?? '-',
+        nationalCode: raw.nationalCode ?? guarantorInfo.nationalCode ?? '-',
+        guarantorName: raw.guarantorName ?? guarantorInfo.guarantorName ?? '-',
+      };
+
+      const isDuplicate = data.value.some(
+        g => g.nationalCode === newGuarantor.nationalCode && g.nationalCode !== '-'
+      );
+
+      if (!isDuplicate) {
+        data.value.push(newGuarantor);
+        // Refetch data table after successful search
+        await dataTableRef.value?.fetchData();
+      } else {
+        error.value = 'این ضامن با این کد ملی قبلاً اضافه شده است';
+      }
+      
+      // Clear input fields after successful API call
+      formData.value.nationalCode = null;
+      formData.value.cif = null;
+      formData.value.GuarantorName = null;
+      hideInput.value = false;
+      
       canSubmit.value = true;
     } else {
       error.value = `خطا: ${response.statusText}`;
     }
   } catch (err: any) {
     error.value = err.response.data.message || 'خطای سرور.';
-    hideInput.value = true
+    hideInput.value = true;
     canSubmit.value = false;
-
   } finally {
     loading.value = false;
   }
@@ -80,14 +110,58 @@ async function search() {
 
 // check validation
 const isFormValid = computed(() => {
-  return formData.value.nationalCode?.length >= 10 || formData.value.cif !== null;
+  return (formData.value.nationalCode && formData.value.nationalCode.length >= 10) || formData.value.cif !== null;
 });
+
 // submit form
 const submitData = async () => {
-  if (canSubmit.value === false) {
+  if (selectedGuarantors.value.length === 0) {
     return Promise.reject("ابتدا ضامن مورد نظر را انتخاب کنید");
-  } else return Promise.resolve();
+  } else if (isInquiry.value === true){
+    return Promise.reject("استعلام ضامن انجام نشده است");
+  }
+  return Promise.resolve(selectedGuarantors.value);
 };
+
+// Custom action for inquiry
+const handleInquiry = async (item: any) => {
+  try {
+    const payload: FetchInquiryPayload = {
+      guarantorInfoId: item.id,
+      nationalCode: item.nationalCode,
+      loanRequestId: approvalStore.loanRequestId
+    };
+    const response = await api.approval.getInquiry(payload);
+    
+    if (response.status === 200 && response.data) {
+      const raw = response.data;
+      const guarantorInfo = raw.guarantorInfo || {};
+      await dataTableRef.value?.fetchData();
+      
+      // Update the item with new data
+      item.cif = guarantorInfo.cif ?? raw.cif ?? '-';
+      item.nationalCode = raw.nationalCode ?? guarantorInfo.nationalCode ?? '-';
+      item.guarantorName = raw.guarantorName ?? guarantorInfo.guarantorName ?? '-';
+      
+      // Show success message
+      success.value = 'اطلاعات ضامن با موفقیت دریافت شد';
+      dialog.value = true;
+    } else {
+      error.value = `خطا: ${response.statusText}`;
+    }
+  } catch (err: any) {
+    error.value = err.response?.data?.message || 'خطای سرور.';
+  }
+};
+
+// Custom button action for inquiry
+const customButtons = ref([
+  {
+    label: 'استعلام',
+    color: 'primary',
+    onClick: handleInquiry
+  }
+]);
 
 defineExpose({ submitData });
 </script>
@@ -113,7 +187,7 @@ defineExpose({ submitData });
         </v-row>
 
         <v-divider inset></v-divider>
-      <v-dialog
+      <!-- <v-dialog
         v-model="dialog"
         width="auto"
       >
@@ -133,11 +207,17 @@ defineExpose({ submitData });
             </v-alert>
           </v-card-text>
         </v-card>
-      </v-dialog>
+      </v-dialog> -->
         <v-col cols="12" md="12">
-          <div class="table-scroll">
-            <v-data-table :headers="headers" :items="data" hide-default-footer no-data-text="رکوردی وجود ندارد" sticky></v-data-table>
-          </div>
+          <CustomDataTable
+            ref="dataTableRef"
+            :api-resource="'guarantor'"
+            :headers="headers"
+            :actions="['delete']"
+            :query-params="{ loanRequestId: approvalStore.loanRequestId }"
+            :show-pagination="false"
+            :custom-buttons="customButtons"
+          />
         </v-col>
       <v-snackbar v-if="error" v-model="error" color="error" timeout="5500">
         {{ error }}
@@ -150,6 +230,28 @@ defineExpose({ submitData });
 .table-scroll {
   overflow-x: auto;
   max-width: 100%;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.custom-table th,
+.custom-table td {
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.custom-table th {
+  background-color: #f5f5f5;
+  font-weight: 500;
+}
+
+.custom-table tr:hover {
+  background-color: #f8f8f8;
 }
 
 .error {
