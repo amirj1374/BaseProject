@@ -39,11 +39,12 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post("/api/v1/general/calculate-day", {year, month, day});
   },
 
-  getDepositInfo(loanRequestId: number) {
-    return axiosInstance.get("/api/v1/deposit-info", {
+  getResult(loanRequestId: number) {
+    return axiosInstance.get("api/v1/1016", {
       params: {loanRequestId}
     });
   },
+
 
   getCollateral() {
     return axiosInstance.get("/api/v1/general/collateral");

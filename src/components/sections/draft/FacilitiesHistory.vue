@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { useApprovalStore } from '@/stores/approval';
 import { ref } from 'vue';
 const isDialogActive = ref(false);
 const valid = ref<boolean | null>(false);
 const error = ref<string | null>(null);
+const approvalStore = useApprovalStore()
 
 // const handleSave = handleSubmit((values) => {
 //   emit('save', {
@@ -44,6 +46,7 @@ const header = ref([
           <v-col cols="12" md="12">
             <CustomDataTable
               :apiResource="`loan-info`"
+              :queryParams="{ loanRequestId: approvalStore.getLoanRequestId }"
               :headers="header"
               :actions="['edit']"
               :pagination="false"

@@ -8,6 +8,7 @@ import Guarantor from '@/components/sections/guarantor/guarantor.vue';
 import Inquiry from '@/components/sections/inquiry/inquiry.vue';
 import Upload from '@/components/sections/upload/upload.vue';
 import Draft from '@/components/sections/draft/draft.vue';
+import Preview from '@/components/sections/preview/preview.vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 // Define your steps with titles and the corresponding component.
@@ -18,10 +19,11 @@ const steps = [
   { title: 'اطلاعات ضامن / ضامنین', component: Guarantor },
   { title: 'استعلام', component: Inquiry },
   { title: 'بارگذاری مدارک', component: Upload },
-  { title: 'پیشنویس', component: Draft }
+  { title: 'پیشنویس', component: Draft },
+  { title: 'نمایش فرم', component: Preview },
 ];
 
-const stepper = ref(5); // Current step
+const stepper = ref(7); // Current step
 const totalSteps = steps.length;
 const error = ref<string | null>(null);
 
@@ -114,7 +116,7 @@ const currentComponent = computed(() => {
 }
 
 .stepperHeader span {
-  padding: 0 5px;
+  padding: 0 3px;
 }
 
 .stepperHeader .active {

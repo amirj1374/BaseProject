@@ -53,6 +53,7 @@ async function save() {
 
     if (response.status === 200 && response.data) {
       const raw = response.data;
+      isDialogActive.value = false;
     } else {
       error.value = `خطا: ${response.statusText}`;
     }
