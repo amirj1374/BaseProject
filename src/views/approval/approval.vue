@@ -6,6 +6,7 @@ import Summary from '@/components/sections/summary/summary.vue';
 import ApprovalType from '@/components/sections/approvalType/approvalType.vue';
 import Guarantor from '@/components/sections/guarantor/guarantor.vue';
 import Inquiry from '@/components/sections/inquiry/inquiry.vue';
+import Upload from '@/components/sections/upload/upload.vue';
 import Draft from '@/components/sections/draft/draft.vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
@@ -16,10 +17,11 @@ const steps = [
   { title: 'اطلاعات نوع درخواست', component: ApprovalType },
   { title: 'اطلاعات ضامن / ضامنین', component: Guarantor },
   { title: 'استعلام', component: Inquiry },
+  { title: 'بارگذاری مدارک', component: Upload },
   { title: 'پیشنویس', component: Draft }
 ];
 
-const stepper = ref(1); // Current step
+const stepper = ref(5); // Current step
 const totalSteps = steps.length;
 const error = ref<string | null>(null);
 
@@ -112,7 +114,7 @@ const currentComponent = computed(() => {
 }
 
 .stepperHeader span {
-  padding: 0 10px;
+  padding: 0 5px;
 }
 
 .stepperHeader .active {

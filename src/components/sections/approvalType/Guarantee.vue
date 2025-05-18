@@ -111,8 +111,12 @@ const handleSave = handleSubmit(
       percent: sc.percent
     })) || [];
 
+    // Find the selected contract type object from the contractTypes array
+    const selectedContractType = contractTypes.value.find(ct => ct.id === parseInt(values.contractTypeId || '0'));
+
     const submissionData = {
       ...values,
+      contractType: selectedContractType, // Add the full contract type object
       collaterals: formattedCollaterals
     };
     

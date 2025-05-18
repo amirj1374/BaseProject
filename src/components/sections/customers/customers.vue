@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { api } from '@/services/api';
 //utils
 import { DateConverter } from '@/utils/date-convertor';
@@ -8,6 +8,7 @@ import { nationalCodeRule } from '@/validators/nationalCodeRule';
 //type
 import type { CustomerDto, FetchCustomerPayload } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
+import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 
 type AllowedStatus = 'nationalCode' | 'cif';
 const approvalStore = useApprovalStore();
@@ -20,29 +21,34 @@ const customerTypes = ref<{ title: string; value: 'Real' | 'Legal' }[]>([
 const errors = ref<{ nationalCode?: string[] }>({});
 const nationalCode = ref('');
 const nationalCodeErrors = ref([]);
-// const customers = ref<CustomerDto>([]);
 const loading = ref(false);
 const canSubmit = ref(false);
 const error = ref<string | null>(null);
-const data = ref(<CustomerDto[]>[]);
+const dataTableRef = ref();
 const headers = ref([
-  { title: 'شماره مشتری', align: 'center', key: 'cif', width: '150px' },
-  { title: 'کدملی / شناسه ملی', align: 'center', key: 'nationalCode', width: '150px' },
-  { title: 'نام مشتری', align: 'center', key: 'customerName', width: '150px' },
-  { title: 'گروه مشتری', align: 'center', key: 'clientgroupname', width: '200px' },
-  { title: 'نام شعبه', align: 'center', key: 'branchName', width: '150px' },
-  { title: 'کدپستی', align: 'center', key: 'postalCode', width: '120px' },
-  { title: 'آدرس', align: 'center', key: 'address', width: '200px' }
+  { title: 'شماره مشتری', key: 'cif', width: 150 },
+  { title: 'کدملی / شناسه ملی', align: 'center', key: 'nationalCode', width: 150 },
+  { title: 'نام مشتری', key: 'customerName', width: 150 },
+  { title: 'گروه مشتری', key: 'clientgroupname', width: 200 },
+  { title: 'نام شعبه', key: 'branchName', width: 150 },
+  { title: 'کدپستی', key: 'postalCode', width: 120 },
+  { title: 'آدرس', key: 'address', width: 200 }
 ]);
 // initial data
 const formData = ref({
   cif: '',
   nationalCode: ''
 });
+
+watch(() => approvalStore.loanRequestId, async (newLoanRequestId) => {
+  if (newLoanRequestId) {
+    await dataTableRef.value?.fetchData({ loanRequestId: newLoanRequestId });
+  }
+});
+
 // get customer
 async function search() {
   errors.value = {}; // Clear previous errors
-
   if (searchParam.value === 'nationalCode') {
     const result = nationalCodeRule(formData.value.nationalCode, customerType.value);
     if (result !== false) {
@@ -62,37 +68,13 @@ async function search() {
     const payload: FetchCustomerPayload = {
       cif: formData.value.cif || null,
       nationalCode: formData.value.nationalCode || null,
-      branchCode: '1001'
     };
 
     const response = await api.approval.fetchCustomer(payload);
 
     if (response.status === 200 && response.data) {
-      const raw = response.data;
-      const customerInfo = raw.customerInfo || {};
-      // generate data for data table
-      data.value = [
-        {
-          updatedAt: DateConverter.toShamsi(raw.updatedAt) ?? '-',
-          createdBy: DateConverter.toShamsi(raw.createdBy) ?? '-',
-          updatedBy: DateConverter.toShamsi(raw.updatedBy) ?? '-',
-          id: raw.id,
-          trackingCode: raw.trackingCode,
-          status: raw.status,
-          requestDate: DateConverter.toShamsi(raw.requestDate) ?? '-',
-          cif: customerInfo.cif ?? raw.cif ?? '-',
-          summery: raw.summery ?? '-',
-          branchCode: raw.branchCode ?? customerInfo.branchCode ?? '-',
-          nationalCode: raw.nationalCode ?? customerInfo.nationalCode ?? '-',
-          customerName: customerInfo.customerName ?? '-',
-          address: customerInfo.custaddress ?? '-',
-          postalCode: customerInfo.postalCode ?? '-',
-          phoneNo: customerInfo.phoneno ?? customerInfo.mobileno ?? '-',
-          branchName: raw.branchName ?? '-',
-          clientgroupname: customerInfo.clientgroupname ?? '-'
-        }
-      ];
-      approvalStore.SET_LOAN_REQUEST_ID(raw.customerInfo.loanRequest.id);
+      const newLoanRequestId = response.data.id;
+        approvalStore.SET_LOAN_REQUEST_ID(newLoanRequestId);
       canSubmit.value = true;
     } else {
       error.value = `خطا: ${response.statusText}`;
@@ -162,9 +144,15 @@ defineExpose({ submitData });
         <v-divider inset></v-divider>
 
         <v-col cols="12" md="12">
-          <div class="table-scroll">
-            <v-data-table :headers="headers" :items="data" hide-default-footer no-data-text="رکوردی وجود ندارد" sticky></v-data-table>
-          </div>
+          <CustomDataTable
+            ref="dataTableRef"
+            :api-resource="'customer-info'"
+            :headers="headers"
+            :actions="['delete']"
+            :query-params="{ loanRequestId: approvalStore.loanRequestId }"
+            :show-pagination="false"
+            :auto-fetch="false"
+          />
         </v-col>
       </v-row>
       <v-snackbar v-if="error" v-model="error" color="error" timeout="5500">

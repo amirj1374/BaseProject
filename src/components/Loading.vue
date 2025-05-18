@@ -2,12 +2,12 @@
   <transition name="fade">
     <div class="loading-overlay" v-if="customizer.loading">
       <div class="loading-wrapper">
-        <Vue3Lottie
-          :animation-link="'/persian.json'"
-          :loop="true"
-          :autoplay="true"
-          class="lottie-animation"
-        />
+<!--        <Vue3Lottie-->
+<!--          :animation-link="'/persian.json'"-->
+<!--          :loop="true"-->
+<!--          :autoplay="true"-->
+<!--          class="lottie-animation"-->
+<!--        />-->
         <!-- Add a separate transition for the span -->
         <transition name="fade-slide">
           <span v-if="customizer.loading">لطفا منتظر بمانید</span>

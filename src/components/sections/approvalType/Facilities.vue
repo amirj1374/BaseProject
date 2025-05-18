@@ -113,6 +113,7 @@ const handleSave = handleSubmit(
   (currentFormValues) => {
     console.log('handleSave function called');
     console.log('Form values before save:', currentFormValues);
+    console.log('Available contract types:', contractTypes.value);
     
     const formattedCollaterals = currentFormValues.selectedCollaterals?.map(sc => ({
       type: sc.collateral.collateralTypeCode,
@@ -120,14 +121,18 @@ const handleSave = handleSubmit(
       percent: sc.percent
     })) || [];
 
+    // Find the selected contract type object from the contractTypes array
+    const selectedContractType = contractTypes.value.find(ct => ct.id === parseInt(currentFormValues.contractTypeId || '0'));
+    console.log('Selected contract type:', selectedContractType);
+
     const submissionData = {
       ...currentFormValues,
       requestType: 'ContractCode',
+      contractType: selectedContractType, // Add the full contract type object
       collaterals: formattedCollaterals,
       amount: currentFormValues.amount
     };
     
-    console.log('Submission data:', submissionData);
     emit('save', submissionData);
     valid.value = true;
     isDialogActive.value = false;
@@ -144,8 +149,12 @@ const props = defineProps<{
 
 const getContractType = async () => {
   if (!isDialogActive.value || !api.approval) return;
-  const res = await api.approval.getContractType('ContractCode');
-  contractTypes.value = res.data.generalParameterList;
+  try {
+    const res = await api.approval.getContractType('ContractCode');
+    contractTypes.value = res.data.generalParameterList;
+  } catch (err: any) {
+    console.error('Error fetching contract types:', err);
+  }
 };
 const getFacilities = async (id: any) => {
   if (!id || !api.approval) return;

@@ -52,8 +52,14 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post("/api/v1/loan-request-detail", loanRequestDetailList);
   },
 
-  getInquiry(payload: FetchInquiryPayload) {
-    return axiosInstance.post('/api/v1/sap-inquiry', payload);
+  getInquiry(loanRequestId: string) {
+    return axiosInstance.post(`/api/v1/sap-inquiry?loanRequestId=${loanRequestId}`);
+  },
+
+  getInquiryCheque(loanRequestId: string) {
+    return axiosInstance.get('/api/v1/inquery/inquiry-cheque', {
+      params: { loanRequestId }
+    });
   },
 
   getAllDeposit(loanRequestId: string) {
@@ -83,4 +89,17 @@ export default (axiosInstance: AxiosInstance) => ({
   getLcProduct(lcContractType: string) {
     return axiosInstance.get(`/api/v1/general/product-type?lcContractType=${lcContractType}`);
   },
+
+  getAllDoc(loanRequestId: string) {
+    return axiosInstance.get(`api/v1/general/get-all-doc?loanRequestId=${loanRequestId}`);
+  },
+
+  saveDoc(formData: FormData) {
+    return axiosInstance.post('/api/v1/general/save-doc', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      timeout: 60000
+    });
+  }
 });

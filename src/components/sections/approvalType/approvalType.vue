@@ -28,7 +28,6 @@ const headers = ref([
   { title: 'مدت', align: 'center', key: 'durationDay', width: '200px' },
 ]);
 
-const contractTypeMap = ref<Record<string, string>>({});
 const error = ref<string | null>(null);
 const valid = ref<boolean | null>(false);
 
@@ -44,16 +43,10 @@ const getRequestType = (requestType: string): string => {
       return '-';
   }
 };
+
 onMounted(async () => {
   const currenciesRes = await api.approval.fetchCurrencies();
   currencies.value = currenciesRes.data;
-  
-  // Fetch contract types for mapping
-  const contractTypesRes = await api.approval.getContractType('ContractCode');
-  contractTypeMap.value = contractTypesRes.data.generalParameterList.reduce((acc: Record<string, string>, type: ContractTypeDto) => {
-    acc[type.id] = type.longTitle;
-    return acc;
-  }, {} as Record<string, string>);
 });
 
 const isDuplicate = (newData: RequestInformationDto): boolean => {
@@ -168,7 +161,7 @@ defineExpose({ submitData });
                 </template>
                 <!-- Custom display for contract type -->
                 <template #item.contractTypeId="{ item }">
-                  {{ contractTypeMap[item.contractTypeId] || '-' }}
+                  {{ item.contractType?.longTitle || '-' }}
                 </template>
               </v-data-table>
             </div>

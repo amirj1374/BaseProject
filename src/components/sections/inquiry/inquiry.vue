@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { api } from '@/services/api';
 import type { InquiryDto } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
@@ -9,19 +9,27 @@ const value = ref(0);
 const interval = ref<any | null>(null);
 const isLoading = ref(false);
 const responseStatus = ref<'idle' | 'success' | 'error' | 'empty'>('idle');
-const data = ref<InquiryDto | null>(null);
+const chequeData = ref<any>(null);
+const sapData = ref<any>(null);
 const canSubmit = ref(false);
 
 const getInquiry = async () => {
   value.value = 0;
   isLoading.value = true;
   responseStatus.value = 'idle';
-  data.value = null;
+  chequeData.value = null;
+  sapData.value = null;
 
   try {
-    const res = await api.approval.getInquiry(approvalStore.getLoanRequestId);
-    if (res.status === 200 && res.data) {
-      data.value = res.data;
+    // Cheque inquiry request
+    const chequeRes = await api.approval.getInquiryCheque('9552');
+    
+    // SAP inquiry request
+    const sapRes = await api.approval.getInquiry('9803');
+
+    if (chequeRes.status === 200 && sapRes.status === 200) {
+      chequeData.value = chequeRes.data;
+      sapData.value = sapRes.data;
       responseStatus.value = 'success';
     } else {
       responseStatus.value = 'empty';
@@ -41,6 +49,10 @@ const getInquiry = async () => {
   }, 100);
 };
 
+onMounted(() => {
+  getInquiry();
+});
+
 const submitData = async () => {
   if (canSubmit.value === false) {
     return Promise.reject("ابتدا استعلام های خود را انجام دهید");
@@ -54,7 +66,7 @@ defineExpose({ submitData });
   <v-container class="py-10" fluid>
     <v-row justify="center">
       <v-col cols="12" md="8" lg="6" class="text-center">
-        <v-card class="pa-6" elevation="2" >
+        <v-card class="pa-6" elevation="2">
           <div v-if="isLoading">
             <v-progress-circular
               :model-value="value"
@@ -69,26 +81,26 @@ defineExpose({ submitData });
             <div>در حال استعلام اطلاعات...</div>
           </div>
 
-          <div v-else-if="responseStatus === 'idle'">
-            <v-btn size="large" color="primary" @click="getInquiry">استعلام ساپ</v-btn>
-          </div>
-
           <div v-else-if="responseStatus === 'success'">
             <v-alert type="success" class="mb-4" border="start" variant="tonal">
               اطلاعات با موفقیت دریافت شد.
             </v-alert>
 
-            <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="lg">
-              <div class="mb-2">
-                <strong>امتیاز مشتری:</strong> {{ data?.value }}
-              </div>
-              <div class="mb-2">
-                <strong> رتبه:</strong> {{ data?.label }}
-              </div>
-              <div>
-                <strong> وثایق مجاز:</strong> {{ data?.collateral }}
-              </div>
-            </v-card>
+            <v-row>
+              <v-col cols="12" md="6">
+                <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="lg">
+                  <div class="text-subtitle-1 mb-2">استعلام چک</div>
+                  <pre class="text-body-2">{{ JSON.stringify(chequeData, null, 2) }}</pre>
+                </v-card>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="lg">
+                  <div class="text-subtitle-1 mb-2">استعلام ساپ</div>
+                  <pre class="text-body-2">{{ JSON.stringify(sapData, null, 2) }}</pre>
+                </v-card>
+              </v-col>
+            </v-row>
           </div>
 
           <div v-else-if="responseStatus === 'empty'">
@@ -107,3 +119,12 @@ defineExpose({ submitData });
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+  font-family: inherit;
+}
+</style>

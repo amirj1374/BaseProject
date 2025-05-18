@@ -22,7 +22,6 @@ export interface CustomerDto {
 export interface FetchCustomerPayload {
   cif?: string | null;
   nationalCode?: string | null;
-  branchCode: string
 }
 
 export interface FetchGuarantorPayload {
@@ -67,6 +66,7 @@ export interface ContractTypeDto {
   equivalentCode: number;
   parameterValue: string;
   active: string;
+  requestType: 'ContractCode' | 'GuaranteeType' | 'LetterOfCredit';
 }
 
 export interface FacilitiesDto {
@@ -78,6 +78,7 @@ export interface FacilitiesDto {
 
 export interface RequestInformationDto {
   contractTypeId: string;
+  contractType?: ContractTypeDto;
   approvalType: string;
   requestType: string;
   amount: string;
