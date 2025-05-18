@@ -16,6 +16,7 @@ const dialog = ref(false);
 const hideInput = ref(false);
 const canSubmit = ref(false);
 const isInquiry = ref(false);
+const isGuarantor = ref(false);
 const error = ref<string | null>(null);
 const cif = ref<string | null>(null);
 const trackingCode = ref<string | null>(null);
@@ -64,8 +65,8 @@ async function search() {
     const response = await api.approval.fetchGuarantor(payload);
 
     if (response.status === 200 && response.data) {
+      isGuarantor.value = true;
       const raw = response.data;
-      isInquiry = true
       const guarantorInfo = raw.guarantorInfo || {};
       success.value = 'اطلاعات ضامن با موفقیت دریافت شد';
       dialog.value = true;
@@ -113,16 +114,6 @@ const isFormValid = computed(() => {
   return (formData.value.nationalCode && formData.value.nationalCode.length >= 10) || formData.value.cif !== null;
 });
 
-// submit form
-const submitData = async () => {
-  if (selectedGuarantors.value.length === 0) {
-    return Promise.reject("ابتدا ضامن مورد نظر را انتخاب کنید");
-  } else if (isInquiry.value === true){
-    return Promise.reject("استعلام ضامن انجام نشده است");
-  }
-  return Promise.resolve(selectedGuarantors.value);
-};
-
 // Custom action for inquiry
 const handleInquiry = async (item: any) => {
   try {
@@ -143,15 +134,29 @@ const handleInquiry = async (item: any) => {
       item.nationalCode = raw.nationalCode ?? guarantorInfo.nationalCode ?? '-';
       item.guarantorName = raw.guarantorName ?? guarantorInfo.guarantorName ?? '-';
       
-      // Show success message
+      // Show success message and update inquiry status
       success.value = 'اطلاعات ضامن با موفقیت دریافت شد';
       dialog.value = true;
+      isInquiry.value = true;
     } else {
       error.value = `خطا: ${response.statusText}`;
+      isInquiry.value = false;
     }
   } catch (err: any) {
     error.value = err.response?.data?.message || 'خطای سرور.';
+    isInquiry.value = false;
   }
+};
+
+// submit form
+const submitData = async () => { 
+   if (isGuarantor.value === false){
+    return Promise.reject("ضامن انتخاب نشده است");
+  }
+  if (isInquiry.value === false){
+    return Promise.reject("استعلام ضامن انجام نشده است");
+  }
+  return Promise.resolve(data.value);
 };
 
 // Custom button action for inquiry
