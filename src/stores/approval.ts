@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 export const useApprovalStore = defineStore({
   id: 'approval',
   state: () => ({
-    loanRequestId: '9803',
+    loanRequestId: '',
   }),
 
   getters: {

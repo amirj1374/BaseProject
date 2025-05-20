@@ -23,7 +23,7 @@ const steps = [
   { title: 'نمایش فرم', component: Preview },
 ];
 
-const stepper = ref(7); // Current step
+const stepper = ref(1); // Current step
 const totalSteps = steps.length;
 const error = ref<string | null>(null);
 
@@ -121,7 +121,7 @@ const currentComponent = computed(() => {
 
 .stepperHeader .active {
   font-weight: bold;
-  color: rgb(var(--v-theme-secondary));
+  color: rgb(var(--v-theme-primary));
 }
 
 .actions {
@@ -161,3 +161,4 @@ const currentComponent = computed(() => {
   justify-content: center;
 }
 </style>
+

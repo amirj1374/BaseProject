@@ -1,27 +1,51 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { api } from '@/services/api';
 
-// Hardcoded PDF URL
-const pdfUrl = ref('http://192.168.251.98/ReportServer/Pages/ReportViewer.aspx?%2fCORE%2fform1016&loanRequestId=9803&rs:Format=PDF'); // Replace with your actual PDF URL
+const pdfUrl = ref('');
+let pdfObjectUrl: string | null = null;
+
+onMounted(async () => {
+  try {
+    const response = await api.approval.getResult('9803');
+    const byteCharacters = atob(response.data);
+    const byteNumbers = new Uint8Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], {type: "application/pdf"});
+    pdfObjectUrl = URL.createObjectURL(blob);
+    pdfUrl.value = pdfObjectUrl;
+  } catch (error) {
+    console.error('Error loading PDF:', error);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (pdfObjectUrl) {
+    URL.revokeObjectURL(pdfObjectUrl);
+  }
+});
 </script>
 
 <template>
   <v-container fluid>
     <v-row justify="center">
       <v-col cols="12" md="10" lg="8">
-        <v-card class="pa-4">
-          <div class="text-h6 mb-4">پیش‌نمایش PDF</div>
           <div class="iframe-container">
-            <iframe 
-              :src="pdfUrl" 
-              width="100%" 
-              height="400" 
-              frameborder="0"
-              class="pdf-iframe"
-              scrolling="auto"
-            ></iframe>
+            <iframe
+              v-if="pdfUrl"
+              :src="pdfUrl"
+              type="application/pdf"
+              class="pdf-object"
+            >
+              <p>Your browser does not support PDFs. Please download the PDF to view it.</p>
+            </iframe>
+            <div v-else class="d-flex justify-center align-center" style="height: 100%">
+              <v-progress-circular indeterminate />
+            </div>
           </div>
-        </v-card>
       </v-col>
     </v-row>
   </v-container>
@@ -30,12 +54,12 @@ const pdfUrl = ref('http://192.168.251.98/ReportServer/Pages/ReportViewer.aspx?%
 <style scoped>
 .iframe-container {
   width: 100%;
-  height: 600px;
+  height: 450px;
   overflow: hidden;
   position: relative;
 }
 
-.pdf-iframe {
+.pdf-object {
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   position: absolute;
@@ -43,6 +67,5 @@ const pdfUrl = ref('http://192.168.251.98/ReportServer/Pages/ReportViewer.aspx?%
   left: 0;
   width: 100%;
   height: 100%;
-  overflow: auto;
 }
 </style>

@@ -97,7 +97,7 @@ const getRelationTypeText = (type: string) => {
         :items="docs"
         :loading="loading"
         api-resource="general/get-all-doc"
-        :query-params="{ loanRequestId: '9803' }"
+        :query-params="{ loanRequestId: approvalStore.loanRequestId }"
         :auto-fetch="true"
         :show-pagination="false"
         :custom-buttons="customButtons"

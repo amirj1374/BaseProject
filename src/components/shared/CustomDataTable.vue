@@ -78,8 +78,7 @@ const cleanFilterModel = computed(() => {
   const cleaned: Record<string, any> = {};
   Object.entries(filterModel.value).forEach(([key, value]) => {
     // Check if value is not null, undefined, empty string, or empty array
-    if (value !== null && value !== undefined && value !== '' && 
-        !(Array.isArray(value) && value.length === 0)) {
+    if (value !== null && value !== undefined && value !== '' && !(Array.isArray(value) && value.length === 0)) {
       cleaned[key] = value;
     }
   });
@@ -95,15 +94,19 @@ const hasFilterComponent = computed(() => {
   return !!props.filterComponent;
 });
 
-const fetchData = async () => {
+const fetchData = async (queryParams?: {}) => {
   loading.value = true;
   error.value = null;
-  try {
-    const params: Record<string, any> = {
+  let params: Record<string, any> = {};
+  if (!queryParams) {
+    params = {
       ...cleanFilterModel.value,
       ...props.queryParams
     };
-
+  } else {
+    params = queryParams;
+  }
+  try {
     // Only add pagination if we have items to paginate
     if (totalSize.value > 0 || currentPage.value > 1) {
       params.page = currentPage.value - 1;
@@ -112,11 +115,11 @@ const fetchData = async () => {
 
     const response = await api.fetch(params);
     items.value = response.data || [];
-    
+
     // Convert dates to Shamsi format
-    items.value = items.value.map(item => {
+    items.value = items.value.map((item) => {
       const newItem = { ...item };
-      props.headers.forEach(header => {
+      props.headers.forEach((header) => {
         if (header.isDate && newItem[header.key]) {
           try {
             newItem[header.key] = DateConverter.toShamsi(newItem[header.key]);
@@ -127,7 +130,7 @@ const fetchData = async () => {
       });
       return newItem;
     });
-    
+
     totalSize.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
   } catch (err: any) {
@@ -146,7 +149,8 @@ const fetchData = async () => {
 
 // Expose methods to parent component
 defineExpose({
-  fetchData
+  fetchData,
+  items
 });
 
 const openDialog = (item?: any) => {
@@ -177,7 +181,7 @@ const saveItem = async () => {
   try {
     // Convert Shamsi dates back to Gregorian before saving
     const dataToSave = { ...formModel.value };
-    props.headers.forEach(header => {
+    props.headers.forEach((header) => {
       if (header.isDate && dataToSave[header.key]) {
         try {
           dataToSave[header.key] = DateConverter.toGregorian(dataToSave[header.key]);
@@ -295,7 +299,7 @@ const openCustomActionDialog = (action: CustomAction, item: any) => {
 };
 
 const getColumnStyle = (column: any, item: any) => {
-  const header = props.headers.find(h => h.key === column.key);
+  const header = props.headers.find((h) => h.key === column.key);
   if (!header) return {};
 
   const baseStyle = header.style || {};
@@ -307,13 +311,13 @@ const getColumnStyle = (column: any, item: any) => {
 };
 
 const getTranslatedValue = (value: any, column: any) => {
-  const header = props.headers.find(h => h.key === column.key);
+  const header = props.headers.find((h) => h.key === column.key);
   if (!header) return value;
 
   if (header.translate) {
     if (header.options) {
       // Find matching option for enum value
-      const option = header.options.find(opt => opt.value === value);
+      const option = header.options.find((opt) => opt.value === value);
       return option?.title || value;
     }
     // Fallback to basic translation if no options provided
@@ -325,10 +329,10 @@ const getTranslatedValue = (value: any, column: any) => {
 const translateValue = (value: string) => {
   // Example translation mapping
   const translations: Record<string, string> = {
-    'ACTIVE': 'فعال',
-    'INACTIVE': 'غیرفعال',
-    'PENDING': 'در انتظار',
-    'COMPLETED': 'تکمیل شده',
+    ACTIVE: 'فعال',
+    INACTIVE: 'غیرفعال',
+    PENDING: 'در انتظار',
+    COMPLETED: 'تکمیل شده'
     // Add more translations as needed
   };
   return translations[value] || value;
@@ -370,7 +374,9 @@ const resetFilter = () => {
         <tr>
           <td v-for="column in columns" :key="column.key" :style="getColumnStyle(column, item)">
             <template v-if="column.key === 'actions'">
-              <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)"> ویرایش ✏️ </v-btn>
+              <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
+                ویرایش ✏️
+              </v-btn>
               <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="mr-2" @click="openDeleteDialog(item)"
                 >حذف ❌
               </v-btn>
@@ -466,15 +472,10 @@ const resetFilter = () => {
   <v-dialog v-model="customActionDialog" max-width="800">
     <v-card>
       <v-card-title>
-        {{ props.customActions?.find(a => a.component === customActionComponent)?.title || '' }}
+        {{ props.customActions?.find((a) => a.component === customActionComponent)?.title || '' }}
       </v-card-title>
       <v-card-text>
-        <component
-          v-if="customActionComponent"
-          :is="customActionComponent"
-          :item="customActionItem"
-          @close="customActionDialog = false"
-        />
+        <component v-if="customActionComponent" :is="customActionComponent" :item="customActionItem" @close="customActionDialog = false" />
       </v-card-text>
     </v-card>
   </v-dialog>

@@ -24,6 +24,7 @@ const nationalCodeErrors = ref([]);
 const loading = ref(false);
 const canSubmit = ref(false);
 const error = ref<string | null>(null);
+const showError = ref(false);
 const dataTableRef = ref();
 const headers = ref([
   { title: 'شماره مشتری', key: 'cif', width: 150 },
@@ -40,9 +41,18 @@ const formData = ref({
   nationalCode: ''
 });
 
-watch(() => approvalStore.loanRequestId, async (newLoanRequestId) => {
-  if (newLoanRequestId) {
-    await dataTableRef.value?.fetchData({ loanRequestId: newLoanRequestId });
+watch(
+  () => approvalStore.loanRequestId,
+  async (newLoanRequestId) => {
+    if (newLoanRequestId) {
+      await dataTableRef.value?.fetchData({ loanRequestId: newLoanRequestId });
+    }
+  }
+);
+
+onMounted(async () => {
+  if (approvalStore.loanRequestId) {
+    await dataTableRef.value?.fetchData({ loanRequestId: approvalStore.loanRequestId });
   }
 });
 
@@ -54,11 +64,13 @@ async function search() {
     if (result !== false) {
       errors.value.nationalCode = [result];
       error.value = 'کد ملی نامعتبر است';
+      showError.value = true;
       return;
     }
   }
   if (searchParam.value === 'cif' && !formData.value.cif) {
     error.value = 'شماره مشتری الزامی است';
+    showError.value = true;
     return;
   }
 
@@ -74,13 +86,15 @@ async function search() {
 
     if (response.status === 200 && response.data) {
       const newLoanRequestId = response.data.id;
-        approvalStore.SET_LOAN_REQUEST_ID(newLoanRequestId);
+      approvalStore.SET_LOAN_REQUEST_ID(newLoanRequestId);
       canSubmit.value = true;
     } else {
       error.value = `خطا: ${response.statusText}`;
+      showError.value = true;
     }
   } catch (err: any) {
     error.value = err.message || 'خطای سرور.';
+    showError.value = true;
     canSubmit.value = false;
   } finally {
     loading.value = false;
@@ -93,14 +107,34 @@ const isFormValid = computed(() => {
 });
 // change search pattern
 const changePattern = async () => {
-  formData.value.cif = '';
-  formData.value.nationalCode = '';
+  try {
+    formData.value.cif = '';
+    formData.value.nationalCode = '';
+    error.value = null;
+    showError.value = false;
+  } catch (err) {
+    error.value = 'خطا در تغییر الگوی جستجو';
+    showError.value = true;
+  }
 };
 // submit form
 const submitData = async () => {
-  if (canSubmit.value === false) {
-    return Promise.reject('ابتدا مشتری مورد نظر را انتخاب کنید');
-  } else return Promise.resolve();
+  try {
+    if (approvalStore.loanRequestId === '') {
+      return Promise.reject('ابتدا مشتری مورد نظر را انتخاب کنید');
+    }
+    
+    const tableData = dataTableRef.value?.items;
+    if (!tableData || tableData.length === 0) {
+      return Promise.reject('اطلاعات مشتری یافت نشد');
+    }
+    
+    return Promise.resolve();
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'خطای ناشناخته';
+    showError.value = true;
+    return Promise.reject(error.value);
+  }
 };
 
 defineExpose({ submitData });
@@ -155,7 +189,7 @@ defineExpose({ submitData });
           />
         </v-col>
       </v-row>
-      <v-snackbar v-if="error" v-model="error" color="error" timeout="5500">
+      <v-snackbar v-model="showError" color="error" timeout="5500">
         {{ error }}
       </v-snackbar>
     </form>

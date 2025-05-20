@@ -39,13 +39,6 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post("/api/v1/general/calculate-day", {year, month, day});
   },
 
-  getResult(loanRequestId: number) {
-    return axiosInstance.get("api/v1/1016", {
-      params: {loanRequestId}
-    });
-  },
-
-
   getCollateral() {
     return axiosInstance.get("/api/v1/general/collateral");
   },
@@ -102,5 +95,11 @@ export default (axiosInstance: AxiosInstance) => ({
       },
       timeout: 60000
     });
-  }
+  },
+  getResult(loanRequestId: string) {
+    return axiosInstance.get("api/v1/1016/base", {
+      params: {loanRequestId},
+      responseType: 'text', // 👈 Required for binary data like PDFs
+    },);
+  },
 });
