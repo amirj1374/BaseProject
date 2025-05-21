@@ -3,7 +3,6 @@ import { computed, onMounted, ref, watch } from 'vue';
 import axiosInstance from '@/services/axiosInstance';
 import apiService from '@/services/apiService';
 import { useRouter } from 'vue-router';
-import Loading from '@/components/Loading.vue';
 import type { Component } from 'vue';
 import { DateConverter } from '@/utils/date-convertor';
 
@@ -353,73 +352,73 @@ const resetFilter = () => {
 </script>
 
 <template>
-  <v-snackbar v-model="snackbar" color="red" timeout="3000">{{ snackbarMessage }}</v-snackbar>
   <v-snackbar v-model="error" color="error" class="mb-4" timeout="3000">{{ error }}</v-snackbar>
-
   <div class="d-flex align-center mb-3">
     <v-btn v-if="props.actions?.includes('create')" color="green" class="me-2" @click="openDialog()">ایجاد ✅</v-btn>
     <v-btn v-if="hasFilterComponent" @click="filterDialog = true">فیلتر 🔍</v-btn>
   </div>
-
   <div style="overflow-x: auto; white-space: nowrap">
-    <v-data-table
-      v-if="!loading"
-      :headers="[...props.headers, { title: 'عملیات', key: 'actions', sortable: false }]"
-      :items="items"
-      hide-default-footer
-      class="elevation-1"
-      no-data-text="رکوردی یافت نشد"
-    >
-      <template v-slot:item="{ item, columns }">
-        <tr>
-          <td v-for="column in columns" :key="column.key" :style="getColumnStyle(column, item)">
-            <template v-if="column.key === 'actions'">
-              <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
-                ویرایش ✏️
-              </v-btn>
-              <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="mr-2" @click="openDeleteDialog(item)"
-                >حذف ❌
-              </v-btn>
-              <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
-                >🔍 View
-              </v-btn>
-              <template v-for="(route, key) in props.routes" :key="key">
-                <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(key, item)">
-                  {{ key.toUpperCase() }}
+    <template v-if="loading">
+      <v-skeleton-loader type="table" :loading="loading" class="mx-auto" max-width="100%" :boilerplate="false" />
+    </template>
+    <template v-else>
+      <v-data-table
+        :headers="[...props.headers, { title: 'عملیات', key: 'actions', sortable: false }]"
+        :items="items"
+        hide-default-footer
+        class="elevation-1 custom-table"
+        no-data-text="رکوردی یافت نشد"
+      >
+        <template v-slot:item="{ item, columns }">
+          <tr>
+            <td v-for="column in columns" :key="column.key" :style="getColumnStyle(column, item)">
+              <template v-if="column.key === 'actions'">
+                <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
+                  ویرایش ✏️
+                </v-btn>
+                <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="mr-2" @click="openDeleteDialog(item)"
+                  >حذف ❌
+                </v-btn>
+                <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
+                  >🔍 نمایش
+                </v-btn>
+                <template v-for="(route, key) in props.routes" :key="key">
+                  <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(key, item)">
+                    {{ key.toUpperCase() }}
+                  </v-btn>
+                </template>
+                <v-btn v-for="(link, key) in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
+                  {{ key.toUpperCase() }} ⬇️
+                </v-btn>
+                <v-btn
+                  v-for="action in props.customActions"
+                  :key="action.title"
+                  color="orange"
+                  size="small"
+                  class="mr-2"
+                  @click="openCustomActionDialog(action, item)"
+                >
+                  {{ action.title }}
+                </v-btn>
+                <v-btn
+                  v-for="button in props.customButtons"
+                  :key="button.label"
+                  :color="button.color || 'primary'"
+                  size="small"
+                  class="mr-2"
+                  @click="button.onClick(item)"
+                >
+                  {{ button.label }}
                 </v-btn>
               </template>
-              <v-btn v-for="(link, key) in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
-                {{ key.toUpperCase() }} ⬇️
-              </v-btn>
-              <v-btn
-                v-for="action in props.customActions"
-                :key="action.title"
-                color="orange"
-                size="small"
-                class="mr-2"
-                @click="openCustomActionDialog(action, item)"
-              >
-                {{ action.title }}
-              </v-btn>
-              <v-btn
-                v-for="button in props.customButtons"
-                :key="button.label"
-                :color="button.color || 'primary'"
-                size="small"
-                class="mr-2"
-                @click="button.onClick(item)"
-              >
-                {{ button.label }}
-              </v-btn>
-            </template>
-            <template v-else>
-              {{ getTranslatedValue(item[column.key], column) }}
-            </template>
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
-    <Loading v-else />
+              <template v-else>
+                {{ getTranslatedValue(item[column.key], column) }}
+              </template>
+            </td>
+          </tr>
+        </template>
+      </v-data-table>
+    </template>
   </div>
   <v-divider />
   <div v-if="!loading && props.showPagination" class="h-25 d-flex justify-space-between align-center px-4 bg-white">
@@ -500,3 +499,23 @@ const resetFilter = () => {
     </v-card>
   </v-dialog>
 </template>
+<style scoped>
+/* Make header text bold and styled */
+.custom-table thead th {
+  font-weight: 700;
+  background-color: #f5f5f5; /* Light gray background */
+  color: #333; /* Darker text */
+  padding: 12px;
+}
+
+/* Make all rows have same background and styled text */
+.custom-table tbody tr {
+  background-color: #fafafa;
+}
+
+.custom-table tbody td {
+  color: #444;
+  font-weight: 500;
+  padding: 12px;
+}
+</style>

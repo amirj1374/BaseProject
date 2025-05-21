@@ -14,6 +14,9 @@ export default (axiosInstance: AxiosInstance) => ({
   fetchCustomer(data: FetchCustomerPayload) {
     return axiosInstance.post(`/api/v1/loan-requests`, data);
   },
+  getLoanRequestDetail(loanRequestId: string) {
+    return axiosInstance.get(`/api/v1/loan-requests`, { params: {loanRequestId},});
+  },
   fetchSummary(data: SummaryDto) {
     return axiosInstance.post(`/api/v1/loan-requests/summary-request`, data);
   },
@@ -46,8 +49,8 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post("/api/v1/loan-request-detail", loanRequestDetailList);
   },
 
-  getInquiry(loanRequestId: string) {
-    return axiosInstance.post(`/api/v1/sap-inquiry?loanRequestId=${loanRequestId}`);
+  getInquiry(payload: FetchInquiryPayload) {
+    return axiosInstance.post('/api/v1/sap-inquiry', payload);
   },
 
   getInquiryCheque(loanRequestId: string) {

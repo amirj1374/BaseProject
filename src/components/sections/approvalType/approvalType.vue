@@ -89,9 +89,16 @@ const saveLcData = (data: RequestInformationDto) => {
 const submitData = async (): Promise<{ success: boolean; message: string }> => {
   try {
     const payload = {
-      loanRequestDetailList: [facilitiesData.value, guaranteeData.value, lcData.value].filter(Boolean),
+      loanRequestDetailList: [facilitiesData.value, guaranteeData.value, lcData.value]
+        .filter(Boolean)
+        .map(item => {
+          if (item) {
+            const { contractType, selectedCollaterals, ...rest } = item as any;
+            return rest;
+          }
+          return item;
+        }),
       loanRequestId: approvalStore.loanRequestId
-
     };
 
     if (payload.loanRequestDetailList.length === 0) {

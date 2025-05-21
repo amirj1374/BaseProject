@@ -1,35 +1,31 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { api } from '@/services/api';
-//utils
-import { DateConverter } from '@/utils/date-convertor';
-import { nationalCodeRule } from '@/validators/nationalCodeRule';
-
 //type
-import type { CustomerDto, FetchCustomerPayload, SummaryDto } from '@/types/approval/approvalType';
+import type { CustomerDto, SummaryDto } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
 
 type AllowedStatus = 'nationalCode' | 'cif';
 const approvalStore = useApprovalStore();
-const searchParam = ref<AllowedStatus>('cif');
 const errors = ref<{ nationalCode?: string[] }>({});
-const nationalCode = ref('');
-const nationalCodeErrors = ref([]);
-// const customers = ref<CustomerDto>([]);
 const loading = ref(false);
 const canSubmit = ref(false);
 const error = ref<string | null>(null);
-const data = ref(<CustomerDto[]>[]);
-const headers = ref([
-  { title: 'خلاصه درخواست', align: 'center', key: 'cif', width: '150px' },
-  { title: 'نوع فعالیت', align: 'center', key: 'nationalCode', width: '150px' },
-  { title: 'توضیحات', align: 'center', key: 'customerName', width: '150px' },
-]);
 // initial data
 const formData = ref({
   summary: '',
   activityType: '',
   description: ''
+});
+onMounted(async () => {
+  const response = await api.approval.getLoanRequestDetail(approvalStore.getLoanRequestId);
+  const data = response.data[0]; // Assuming it's an array with 1 item
+
+  formData.value = {
+    summary: data.summary || '',
+    activityType: data.activityType || '', // If missing in backend, fallbacks to ''
+    description: data.description || ''
+  };
 });
 // add request
 async function addRequest() {

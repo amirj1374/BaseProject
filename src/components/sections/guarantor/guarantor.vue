@@ -120,7 +120,7 @@ const handleInquiry = async (item: any) => {
     const payload: FetchInquiryPayload = {
       guarantorInfoId: item.id,
       nationalCode: item.nationalCode,
-      loanRequestId: approvalStore.loanRequestId
+      loanRequestId: approvalStore.getLoanRequestId
     };
     const response = await api.approval.getInquiry(payload);
     
@@ -149,13 +149,17 @@ const handleInquiry = async (item: any) => {
 };
 
 // submit form
-const submitData = async () => { 
-   if (isGuarantor.value === false){
-    return Promise.reject("ضامن انتخاب نشده است");
+const submitData = async () => {
+  const tableData = dataTableRef.value?.items;
+  if (!tableData || tableData.length === 0) {
+    return Promise.reject('اطلاعات ضامن یافت نشد');
   }
-  if (isInquiry.value === false){
-    return Promise.reject("استعلام ضامن انجام نشده است");
+
+  const allInquired = tableData.every((item: any) => item.sapInquiryStatus === true);
+  if (!allInquired) {
+    return Promise.reject('استعلام تمام ضامن‌ها انجام نشده است');
   }
+
   return Promise.resolve(data.value);
 };
 
@@ -177,7 +181,7 @@ defineExpose({ submitData });
       <v-row class="mt-2">
         <!-- National Code Input -->
         <v-col cols="12" md="4">
-          <v-text-field v-model="formData.nationalCode" label="کد ملی" variant="outlined" density="comfortable" />
+          <v-text-field v-model="formData.nationalCode" label="کد ملی" variant="outlined"  v-digit-limit="11" density="comfortable" />
         </v-col>
 
         <v-col v-if="hideInput" cols="12" md="4">

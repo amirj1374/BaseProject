@@ -289,9 +289,11 @@ const dayCalculate = async () => {
         </v-row>
         <v-row>
           <v-col cols="12" md="3">
-            <VPriceTextField
+            <v-text-field
               v-model="amount"
               label="مبلغ"
+              type="text"
+              v-money
               :error-messages="errors.amount"
               variant="outlined"
               density="comfortable"

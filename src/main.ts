@@ -7,6 +7,9 @@ import '@/scss/style.scss';
 import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';
 import VueApexCharts from 'vue3-apexcharts';
 import VueTablerIcons from 'vue-tabler-icons';
+import DigitLimit from '@/directives/v-digit-limit'
+import MoneyDirective from '@/directives/v-money'
+
 
 import { fakeBackend } from '@/utils/helpers/fake-backend';
 
@@ -22,4 +25,7 @@ app.use(VueTablerIcons);
 app.use(print);
 app.use(VueApexCharts);
 app.use(vuetify).mount('#app');
+app.directive('digit-limit', DigitLimit)
+app.directive('money', MoneyDirective)
+
 

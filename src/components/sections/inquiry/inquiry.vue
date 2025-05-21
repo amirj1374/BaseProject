@@ -22,10 +22,10 @@ const getInquiry = async () => {
 
   try {
     // Cheque inquiry request
-    const chequeRes = await api.approval.getInquiryCheque('9552');
+    const chequeRes = await api.approval.getInquiryCheque(approvalStore.getLoanRequestId);
     
     // SAP inquiry request
-    const sapRes = await api.approval.getInquiry('9803');
+    const sapRes = await api.approval.getInquiry(approvalStore.getLoanRequestId);
 
     if (chequeRes.status === 200 && sapRes.status === 200) {
       chequeData.value = chequeRes.data;

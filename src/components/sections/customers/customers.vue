@@ -30,7 +30,7 @@ const headers = ref([
   { title: 'شماره مشتری', key: 'cif', width: 150 },
   { title: 'کدملی / شناسه ملی', align: 'center', key: 'nationalCode', width: 150 },
   { title: 'نام مشتری', key: 'customerName', width: 150 },
-  { title: 'گروه مشتری', key: 'clientgroupname', width: 200 },
+  { title: 'گروه مشتری', key: 'clientGroupName', width: 200 },
   { title: 'نام شعبه', key: 'branchName', width: 150 },
   { title: 'کدپستی', key: 'postalCode', width: 120 },
   { title: 'آدرس', key: 'address', width: 200 }
@@ -153,7 +153,7 @@ defineExpose({ submitData });
       </v-row>
       <v-divider inset></v-divider>
       <v-row class="mt-2">
-        <v-col cols="12" md="6">
+        <v-col cols="12" md="6" v-if="searchParam === 'nationalCode'">
           <v-select v-model="customerType" label="نوع مشتری" variant="outlined" density="comfortable" :items="customerTypes" />
         </v-col>
         <!-- Cif Code Input -->
@@ -164,9 +164,11 @@ defineExpose({ submitData });
         <v-col v-if="searchParam === 'nationalCode'" cols="12" md="6">
           <v-text-field
             v-model="formData.nationalCode"
-            label="کد ملی"
+            :label="customerType === 'Real' ? 'کد ملی' : 'شناسه ملی'"
             variant="outlined"
             density="comfortable"
+            type="number"
+            v-digit-limit="11"
             :error-messages="nationalCodeErrors"
           />
         </v-col>
