@@ -1,18 +1,24 @@
-import { defineStore } from 'pinia';
+import { defineStore } from 'pinia'
+import type { CustomerDto, SummaryDto } from '@/types/approval/approvalType'
 
-export const useApprovalStore = defineStore({
-  id: 'approval',
+export const useApprovalStore = defineStore('approvalStore', {
   state: () => ({
-    loanRequestId: '',
+    customerInfo: {} as CustomerDto,
+    summaryRequest: {} as SummaryDto
   }),
 
-  getters: {
-    getLoanRequestId: (state) => state.loanRequestId,
-  },
   actions: {
-    SET_LOAN_REQUEST_ID(payload: string) {
-      this.loanRequestId = payload;
+    setCustomerInfo(payload: Partial<CustomerDto>) {
+      this.customerInfo = { ...this.customerInfo, ...payload }
     },
-  }
 
-});
+    setSummaryRequest(payload: Partial<SummaryDto>) {
+      this.summaryRequest = { ...this.summaryRequest, ...payload }
+    },
+
+    resetAll() {
+      this.customerInfo = {} as CustomerDto
+      this.summaryRequest = {} as SummaryDto
+    }
+  }
+})

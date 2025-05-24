@@ -18,49 +18,17 @@ const formData = ref({
   description: ''
 });
 onMounted(async () => {
-  const response = await api.approval.getLoanRequestDetail(approvalStore.getLoanRequestId);
-  const data = response.data[0]; // Assuming it's an array with 1 item
-
   formData.value = {
-    summary: data.summary || '',
-    activityType: data.activityType || '', // If missing in backend, fallbacks to ''
-    description: data.description || ''
+    summary: approvalStore.summaryRequest.summary || '',
+    activityType: approvalStore.summaryRequest.activityType || '',
+    description: approvalStore.summaryRequest.description || ''
   };
 });
-// add request
-async function addRequest() {
-  errors.value = {}; // Clear previous errors
-  loading.value = true;
-  error.value = null;
-  try {
-    const payload: SummaryDto = {
-      id: approvalStore.getLoanRequestId,
-      summary: formData.value.summary,
-      activityType: formData.value.activityType,
-      description: formData.value.description
-    };
-
-    const response = await api.approval.fetchSummary(payload);
-
-    if (response.status === 200 && response.data) {
-      canSubmit.value = true;
-    } else {
-      error.value = `خطا: ${response.statusText}`;
-    }
-  } catch (err: any) {
-    error.value = err.message || 'خطای سرور.';
-    canSubmit.value = false;
-  } finally {
-    loading.value = false;
-  }
-}
 
 // submit form
 const submitData = async () => {
-  await addRequest();
-  if (canSubmit.value === false) {
-    return Promise.reject('ابتدا مشتری مورد نظر را انتخاب کنید');
-  } else return Promise.resolve();
+  approvalStore.setSummaryRequest(formData.value);
+  return Promise.resolve();
 };
 
 defineExpose({ submitData });

@@ -1,14 +1,11 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { api } from '@/services/api';
 //utils
-import { DateConverter } from '@/utils/date-convertor';
 import { nationalCodeRule } from '@/validators/nationalCodeRule';
-
 //type
 import type { CustomerDto, FetchCustomerPayload } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 
 type AllowedStatus = 'nationalCode' | 'cif';
 const approvalStore = useApprovalStore();
@@ -25,7 +22,23 @@ const loading = ref(false);
 const canSubmit = ref(false);
 const error = ref<string | null>(null);
 const showError = ref(false);
-const dataTableRef = ref();
+const items = ref<CustomerDto[]>([])
+
+// Load initial data from store
+onMounted(() => {
+  if (approvalStore.customerInfo) {
+    items.value = [approvalStore.customerInfo];
+    // Set form data based on store data
+    if (approvalStore.customerInfo.nationalCode) {
+      searchParam.value = 'nationalCode';
+      formData.value.nationalCode = approvalStore.customerInfo.nationalCode;
+    } else if (approvalStore.customerInfo.cif) {
+      searchParam.value = 'cif';
+      formData.value.cif = approvalStore.customerInfo.cif;
+    }
+  }
+});
+
 const headers = ref([
   { title: 'شماره مشتری', key: 'cif', width: 150 },
   { title: 'کدملی / شناسه ملی', align: 'center', key: 'nationalCode', width: 150 },
@@ -39,21 +52,6 @@ const headers = ref([
 const formData = ref({
   cif: '',
   nationalCode: ''
-});
-
-watch(
-  () => approvalStore.loanRequestId,
-  async (newLoanRequestId) => {
-    if (newLoanRequestId) {
-      await dataTableRef.value?.fetchData({ loanRequestId: newLoanRequestId });
-    }
-  }
-);
-
-onMounted(async () => {
-  if (approvalStore.loanRequestId) {
-    await dataTableRef.value?.fetchData({ loanRequestId: approvalStore.loanRequestId });
-  }
 });
 
 // get customer
@@ -83,11 +81,12 @@ async function search() {
     };
 
     const response = await api.approval.fetchCustomer(payload);
+    // Set the data to store.customerInfo
+    approvalStore.setCustomerInfo(response.data)
 
     if (response.status === 200 && response.data) {
-      const newLoanRequestId = response.data.id;
-      approvalStore.SET_LOAN_REQUEST_ID(newLoanRequestId);
-      canSubmit.value = true;
+      // Update the items array with the fetched data
+      items.value = [response.data];
     } else {
       error.value = `خطا: ${response.statusText}`;
       showError.value = true;
@@ -101,10 +100,6 @@ async function search() {
   }
 }
 
-// check validation
-const isFormValid = computed(() => {
-  return formData.value.nationalCode?.length >= 10 || formData.value.cif !== null;
-});
 // change search pattern
 const changePattern = async () => {
   try {
@@ -120,15 +115,12 @@ const changePattern = async () => {
 // submit form
 const submitData = async () => {
   try {
-    if (approvalStore.loanRequestId === '') {
-      return Promise.reject('ابتدا مشتری مورد نظر را انتخاب کنید');
+    // The customer data is already in the store from the search function
+    if (!approvalStore.customerInfo) {
+      error.value = 'لطفا ابتدا مشتری را جستجو کنید';
+      showError.value = true;
+      return Promise.reject(error.value);
     }
-    
-    const tableData = dataTableRef.value?.items;
-    if (!tableData || tableData.length === 0) {
-      return Promise.reject('اطلاعات مشتری یافت نشد');
-    }
-    
     return Promise.resolve();
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'خطای ناشناخته';
@@ -136,6 +128,18 @@ const submitData = async () => {
     return Promise.reject(error.value);
   }
 };
+
+watch(
+  () => approvalStore.customerInfo,
+  (newVal) => {
+    if (newVal) {
+      items.value = [newVal];
+    } else {
+      items.value = [];
+    }
+  },
+  { immediate: true }
+);
 
 defineExpose({ submitData });
 </script>
@@ -180,15 +184,13 @@ defineExpose({ submitData });
         <v-divider inset></v-divider>
 
         <v-col cols="12" md="12">
-          <CustomDataTable
-            ref="dataTableRef"
-            :api-resource="'customer-info'"
+          <v-data-table-virtual
+            v-model:search="search"
+            :items="items"
             :headers="headers"
-            :actions="['delete']"
-            :query-params="{ loanRequestId: approvalStore.loanRequestId }"
-            :show-pagination="false"
-            :auto-fetch="false"
-          />
+            no-data-text="رکوردی یافت نشد"
+            :loading="loading"
+          ></v-data-table-virtual>
         </v-col>
       </v-row>
       <v-snackbar v-model="showError" color="error" timeout="5500">

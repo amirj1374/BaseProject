@@ -165,3 +165,9 @@ export interface SummaryDto {
   activityType: string;
   description: string;
 }
+
+export interface RootData {
+  customerInfo: CustomerDto[]
+  summaryRequest: SummaryDto
+  // Add other sections here...
+}

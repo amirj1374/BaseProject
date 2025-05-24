@@ -103,14 +103,13 @@ const currentComponent = computed(() => {
   flex-direction: column;
   justify-content: space-between; /* Space the header, content, and buttons */
   overflow: hidden; /* Prevent content overflow */
-  padding: 20px;
+  padding: 15px;
 }
 
 .stepperHeader {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
   font-size: 16px;
   width: 100%; /* Ensure the header takes the full width */
 }

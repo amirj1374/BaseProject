@@ -12,7 +12,7 @@ import type {
 
 export default (axiosInstance: AxiosInstance) => ({
   fetchCustomer(data: FetchCustomerPayload) {
-    return axiosInstance.post(`/api/v1/loan-requests`, data);
+    return axiosInstance.get(`/api/v1/customer-info/pure`, { params: data });
   },
   getLoanRequestDetail(loanRequestId: string) {
     return axiosInstance.get(`/api/v1/loan-requests`, { params: {loanRequestId},});
