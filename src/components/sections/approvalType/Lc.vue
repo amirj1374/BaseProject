@@ -103,31 +103,39 @@ const { value: day } = useField<number | null>('day');
 const { value: other } = useField<string | null>('other');
 const { value: selectedCollaterals } = useField<Array<{ collateral: CollateralDto; amount: number; percent: number }>>('selectedCollaterals');
 
-const handleSave = handleSubmit((values) => {
-  console.log('Form values:', values);
-  values.requestType = 'LetterOfCredit';
-  
-  const formattedCollaterals = values.selectedCollaterals?.map(sc => ({
-    type: sc.collateral.collateralTypeCode,
-    amount: sc.amount,
-    percent: sc.percent
-  })) || [];
+const handleSave = handleSubmit(
+  (values) => {
+    console.log('Form values:', values);
+    values.requestType = 'LetterOfCredit';
+    
+    const formattedCollaterals = values.selectedCollaterals?.map(sc => ({
+      type: sc.collateral.collateralTypeCode,
+      amount: sc.amount,
+      percent: sc.percent
+    })) || [];
 
-  // Find the selected contract type object from the ContractTypeOption array
-  const selectedContractType = ContractTypeOption.find(ct => ct.value === parseInt(values.contractTypeId || '0'));
+    // Find the selected contract type object from the ContractTypeOption array
+    const selectedContractType = ContractTypeOption.find(ct => ct.value === parseInt(values.contractTypeId || '0'));
+    console.log('Selected contract type:', selectedContractType);
 
-  const submissionData = {
-    ...values,
-    contractType: selectedContractType, // Add the full contract type object
-    facilityId: values.facilityId,
-    collaterals: formattedCollaterals
-  };
-  
-  console.log('Submission data:', submissionData);
-  emit('save', submissionData);
-  valid.value = true;
-  isDialogActive.value = false;
-});
+    const submissionData = {
+      ...values,
+      contractType: selectedContractType, // Add the full contract type object
+      facilityId: values.facilityId,
+      collaterals: formattedCollaterals,
+      amount: values.amount
+    };
+    
+    console.log('Submission data:', submissionData);
+    emit('save', submissionData);
+    valid.value = true;
+    isDialogActive.value = false;
+  },
+  (errors) => {
+    console.log('Validation errors:', errors);
+    error.value = 'لطفا تمام فیلدهای الزامی را پر کنید';
+  }
+);
 
 const onCollateralDialogSave = (data: { collateral: CollateralDto | null; amount: string; percent: string }) => {
   if (!data.collateral) {
@@ -265,7 +273,7 @@ const dayCalculate = async () => {
               v-model="contractTypeId"
               :items="ContractTypeOption"
               :error-messages="errors.contractTypeId"
-              item-title="title"
+              item-title="longTitle"
               item-value="value"
               label="نوع عقد"
               variant="outlined"

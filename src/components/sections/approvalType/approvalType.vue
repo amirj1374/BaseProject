@@ -26,6 +26,7 @@ const headers = ref([
   { title: 'محصول', align: 'center', key: 'facilityId', width: '200px' },
   { title: 'بازپرداخت', align: 'center', key: 'repaymentType', width: '200px' },
   { title: 'مدت', align: 'center', key: 'durationDay', width: '200px' },
+  { title: 'عملیات', align: 'center', key: 'actions', width: '100px' },
 ]);
 
 const error = ref<string | null>(null);
@@ -47,10 +48,54 @@ const getRequestType = (requestType: string): string => {
 onMounted(async () => {
   const currenciesRes = await api.approval.fetchCurrencies();
   currencies.value = currenciesRes.data;
+
+  // Load initial data from store
+  const storeData = approvalStore.loanRequestDetailList;
+  if (storeData && storeData.length > 0) {
+    // Convert store data back to RequestInformationDto format
+    const convertedData = storeData.map(item => ({
+      contractTypeId: item.contractTypeId.toString(),
+      approvalType: item.approvalType,
+      requestType: item.requestType,
+      amount: item.amount,
+      currency: item.currency,
+      facilityId: item.facilityId,
+      year: parseInt(item.year) || undefined,
+      month: parseInt(item.month) || undefined,
+      day: parseInt(item.day) || undefined,
+      repaymentType: item.repaymentType,
+      collaterals: item.collaterals.map(c => ({
+        type: c.type.toString(),
+        amount: c.amount,
+        percent: c.percent
+      })),
+      advancePayment: item.advancePayment,
+      durationDay: item.durationDay,
+      other: item.other
+    }));
+
+    // Update data table and individual data refs
+    dataTable.value = convertedData;
+    
+    // Set individual data refs based on request type
+    convertedData.forEach(item => {
+      switch (item.requestType) {
+        case 'ContractCode':
+          facilitiesData.value = item;
+          break;
+        case 'GuaranteeType':
+          guaranteeData.value = item;
+          break;
+        case 'LetterOfCredit':
+          lcData.value = item;
+          break;
+      }
+    });
+  }
 });
 
 const isDuplicate = (newData: RequestInformationDto): boolean => {
-  return dataTable.value.some(existingItem => 
+  return dataTable.value.some((existingItem: RequestInformationDto) => 
     existingItem.requestType === newData.requestType &&
     existingItem.contractTypeId === newData.contractTypeId &&
     existingItem.facilityId === newData.facilityId
@@ -85,28 +130,67 @@ const saveLcData = (data: RequestInformationDto) => {
   dataTable.value.push(data);
 };
 
+const deleteItem = (item: RequestInformationDto) => {
+  const index = dataTable.value.findIndex(
+    (i) => 
+      i.requestType === item.requestType &&
+      i.contractTypeId === item.contractTypeId &&
+      i.facilityId === item.facilityId
+  );
+  
+  if (index !== -1) {
+    dataTable.value.splice(index, 1);
+    
+    // Also clear the corresponding data ref
+    switch (item.requestType) {
+      case 'ContractCode':
+        facilitiesData.value = null;
+        break;
+      case 'GuaranteeType':
+        guaranteeData.value = null;
+        break;
+      case 'LetterOfCredit':
+        lcData.value = null;
+        break;
+    }
+  }
+};
+
 // API submission method
 const submitData = async (): Promise<{ success: boolean; message: string }> => {
   try {
-    const payload = {
-      loanRequestDetailList: [facilitiesData.value, guaranteeData.value, lcData.value]
-        .filter(Boolean)
-        .map(item => {
-          if (item) {
-            const { contractType, selectedCollaterals, ...rest } = item as any;
-            return rest;
-          }
-          return item;
-        }),
-      loanRequestId: approvalStore.loanRequestId
-    };
-
-    if (payload.loanRequestDetailList.length === 0) {
+    if (dataTable.value.length === 0) {
       return Promise.reject({ success: false, message: 'هیچ داده‌ای برای ارسال وجود ندارد.' });
     }
 
-    const res = await api.approval.saveLoanRequest(payload);
-    return Promise.resolve({ success: true, message: 'درخواست با موفقیت ثبت شد.' });
+    // Convert dataTable items to LoanRequestDetail format and save to store
+    const loanRequestDetails = dataTable.value.map((item: RequestInformationDto) => {
+      const { contractType, selectedCollaterals, ...rest } = item as any;
+      return {
+        advancePayment: item.advancePayment || '',
+        amount: item.amount,
+        approvalType: item.approvalType,
+        collaterals: item.collaterals.map((c: { type: string; amount: number; percent: number }) => ({
+          type: parseInt(c.type),
+          amount: c.amount,
+          percent: c.percent
+        })),
+        contractTypeId: parseInt(item.contractTypeId),
+        currency: item.currency,
+        day: item.day?.toString() || '',
+        durationDay: item.durationDay || 0,
+        facilityId: item.facilityId,
+        month: item.month?.toString() || '',
+        other: item.other || '',
+        repaymentType: item.repaymentType,
+        requestType: item.requestType,
+        year: item.year?.toString() || ''
+      };
+    });
+
+    // Save all items to store
+    approvalStore.setLoanRequestDetailList(loanRequestDetails);
+    return Promise.resolve({ success: true, message: 'اطلاعات با موفقیت ذخیره شد.' });
   } catch (err: any) {
     return Promise.reject({
       success: false,
@@ -169,6 +253,17 @@ defineExpose({ submitData });
                 <!-- Custom display for contract type -->
                 <template #item.contractTypeId="{ item }">
                   {{ item.contractType?.longTitle || '-' }}
+                </template>
+                <!-- Delete button -->
+                <template #item.actions="{ item }">
+                  <v-btn
+                    color=""
+                    size="small"
+                    icon
+                    @click="deleteItem(item)"
+                  >
+                  ❌
+                  </v-btn>
                 </template>
               </v-data-table>
             </div>

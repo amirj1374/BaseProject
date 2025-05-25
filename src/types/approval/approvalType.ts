@@ -76,21 +76,7 @@ export interface FacilitiesDto {
   contractId: number;
 }
 
-export interface RequestInformationDto {
-  contractTypeId: string;
-  contractType?: ContractTypeDto;
-  approvalType: string;
-  requestType: string;
-  amount: string;
-  currency: string;
-  facilityId: string;
-  year?: number;
-  month?: number;
-  day?: number;
-  repaymentType: string;
-  collaterals: [];
-  percentDeposit?: number;
-}
+
 
 export interface InquiryDto {
   value?: string;
@@ -164,6 +150,56 @@ export interface SummaryDto {
   summary: string;
   activityType: string;
   description: string;
+}
+
+export interface Collateral {
+  type: number;
+  amount: number;
+  percent: number;
+}
+
+export interface LoanRequestDetail {
+  advancePayment: string;
+  amount: string;
+  approvalType: string;
+  collaterals: Collateral[];
+  contractTypeId: number;
+  currency: string;
+  day: string;
+  durationDay: number;
+  facilityId: string;
+  month: string;
+  other: string;
+  repaymentType: string;
+  requestType: string;
+  year: string;
+}
+
+export interface LoanRequest {
+  loanRequestDetailList: LoanRequestDetail[];
+}
+
+export interface RequestInformationDto {
+  contractTypeId: string;
+  contractType?: ContractTypeDto;
+  approvalType: string;
+  requestType: string;
+  amount: string;
+  currency: string;
+  facilityId: string;
+  year?: number;
+  month?: number;
+  day?: number;
+  repaymentType: string;
+  collaterals: Array<{
+    type: string;
+    amount: number;
+    percent: number;
+  }>;
+  percentDeposit?: number;
+  advancePayment?: string;
+  durationDay?: number;
+  other?: string;
 }
 
 export interface RootData {

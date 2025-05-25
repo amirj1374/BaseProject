@@ -73,22 +73,3 @@ defineExpose({ submitData });
     </form>
   </v-card>
 </template>
-
-<style scoped>
-.table-scroll {
-  overflow-x: auto;
-  max-width: 100%;
-}
-
-.error {
-  color: red;
-  margin-top: 0.5em;
-}
-
-.radioBtnContainer {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-</style>
