@@ -292,7 +292,6 @@ defineExpose({ submitData });
                 <template #item.actions="{ item }">
                   <div style="display: flex; gap: 8px; justify-content: center">
                     <v-btn
-                      color="primary"
                       size="small"
                       icon
                       @click="editItem(item)"
@@ -300,7 +299,6 @@ defineExpose({ submitData });
                       ✏️
                     </v-btn>
                     <v-btn
-                      color="error"
                       size="small"
                       icon
                       @click="deleteItem(item)"

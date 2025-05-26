@@ -18,10 +18,32 @@ const valid = ref(false);
 
 const handleSave = (data: any) => {
   emit('save', data);
+  valid.value = true;
+};
+
+const handleCancel = () => {
+  valid.value = false;
 };
 
 const openForm = () => {
   formRef.value.isDialogActive = true;
+};
+
+// Define field configuration for Guarantee
+const showFields = {
+  approvalType: true,
+  currency: true,
+  contractType: true,
+  repaymentType: true,
+  facility: true,
+  amount: true,
+  formAmount: false,
+  duration: true,
+  other: true,
+  collateral: true,
+  intermediatePayment: false,
+  advancePayment: false,
+  percentDeposit: true
 };
 
 defineExpose({
@@ -42,8 +64,10 @@ defineExpose({
       ref="formRef"
       :currencies="currencies"
       :initial-data="initialData"
+      :show-fields="showFields"
       request-type="GuaranteeType"
       @save="handleSave"
+      @cancel="handleCancel"
     />
   </div>
 </template>
