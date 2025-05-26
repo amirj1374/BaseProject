@@ -22,11 +22,9 @@ const formSchema = yup.object({
   day: yup.number().nullable(),
   other: yup.string().nullable(),
   percentDeposit: yup
-    .number()
+    .string()
     .nullable()
-    .required('درصد سپرده نقدی الزامی است')
-    .min(1, 'حداقل میزان مجار باید بالا تر از 1 باشد')
-    .max(100, 'حداکثر میزان مجار 100 باشد'),
+    .required('درصد سپرده نقدی الزامی است'),
   selectedCollaterals: yup
     .array()
     .of(
@@ -85,12 +83,18 @@ const { handleSubmit, errors, setFieldValue } = useForm<GuaranteeFormValues>({
 });
 const { value: approvalType } = useField<ApprovalType | null>('approvalType');
 const { value: currency } = useField<string | null>('currency');
-const { value: requestType } = useField<string | "ContractCode">('requestType');
+const { value: requestType } = useField<string | 'ContractCode'>('requestType');
 const { value: contractTypeId } = useField<string | null>('contractTypeId');
 const { value: repaymentType } = useField<RepaymentType | null>('repaymentType');
 const { value: facilityId } = useField<string | null>('facilityId');
 const { value: amount } = useField<string | null>('amount');
-const { value: selectedCollaterals } = useField<Array<{ collateral: CollateralDto; amount: number; percent: number }>>('selectedCollaterals');
+const { value: selectedCollaterals } = useField<
+  Array<{
+    collateral: CollateralDto;
+    amount: number;
+    percent: number;
+  }>
+>('selectedCollaterals');
 const { value: percentDeposit } = useField<number | null>('percentDeposit');
 const { value: durationDay } = useField<number | null>('durationDay');
 const { value: year } = useField<number | null>('year');
@@ -104,22 +108,23 @@ const handleSave = handleSubmit(
   (values) => {
     console.log('Form values before save:', values);
     values.requestType = 'GuaranteeType';
-    
-    const formattedCollaterals = values.selectedCollaterals?.map(sc => ({
-      type: sc.collateral.collateralTypeCode,
-      amount: sc.amount,
-      percent: sc.percent
-    })) || [];
+
+    const formattedCollaterals =
+      values.selectedCollaterals?.map((sc) => ({
+        type: sc.collateral.collateralTypeCode,
+        amount: sc.amount,
+        percent: sc.percent
+      })) || [];
 
     // Find the selected contract type object from the contractTypes array
-    const selectedContractType = contractTypes.value.find(ct => ct.id === parseInt(values.contractTypeId || '0'));
+    const selectedContractType = contractTypes.value.find((ct) => ct.id === parseInt(values.contractTypeId || '0'));
 
     const submissionData = {
       ...values,
       contractType: selectedContractType, // Add the full contract type object
       collaterals: formattedCollaterals
     };
-    
+
     console.log('Submission data:', submissionData);
     emit('save', submissionData);
     valid.value = true;
@@ -345,38 +350,44 @@ watch(facilityId, (id) => {
               color="primary"
               label="مدت"
               readonly
+              suffix="روز"
             ></v-text-field>
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="12" md="3">
-            <VPriceTextField
+            <v-text-field
               v-model="amount"
               label="مبلغ"
+              placeholder="0"
               variant="outlined"
               density="comfortable"
               hide-details="auto"
+              suffix="میلیون ریال"
+              v-money
+              type="text"
             />
           </v-col>
           <v-col cols="12" md="3">
-            <VPriceTextField
+            <v-text-field
               v-model="percentDeposit"
               label="درصد سپرده نقدی"
-              type="number"
               :error-messages="errors.percentDeposit"
-              variant="outlined"
-              density="comfortable"
-              prefix="%"
-            />
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model="other"
-              label="سایر"
+              placeholder="0"
               variant="outlined"
               density="comfortable"
               hide-details="auto"
+              suffix="%"
+              type="number"
+              :rules="[
+                  (v: string) => !v || (Number(v) >= 1 && Number(v) <= 100) || 'درصد باید بین 1 تا 100 باشد'
+                ]"
+              min="1"
+              max="100"
             />
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field v-model="other" label="سایر" variant="outlined" density="comfortable" hide-details="auto" />
           </v-col>
         </v-row>
         <v-row>
@@ -397,7 +408,7 @@ watch(facilityId, (id) => {
           <template v-slot:item.amount="{ item }">
             {{ item.amount.toLocaleString() }}
           </template>
-          <template v-slot:item.percent="{ item }"> {{ item.percent }}% </template>
+          <template v-slot:item.percent="{ item }"> {{ item.percent }}%</template>
           <template v-slot:item.equivalentValue="{ item }">
             {{ item.equivalentValue.toLocaleString() }}
           </template>

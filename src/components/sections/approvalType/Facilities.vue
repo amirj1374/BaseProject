@@ -46,7 +46,11 @@ const formSchema = yup.object({
       yup.object().shape({
         collateral: yup.object().required(),
         amount: yup.number().transform((value) => (isNaN(value) ? undefined : value)),
-        percent: yup.number().transform((value) => (isNaN(value) ? undefined : value)).min(0, 'درصد باید بین 0 تا 100 باشد').max(100, 'درصد باید بین 0 تا 100 باشد')
+        percent: yup
+          .number()
+          .transform((value) => (isNaN(value) ? undefined : value))
+          .min(0, 'درصد باید بین 0 تا 100 باشد')
+          .max(100, 'درصد باید بین 0 تا 100 باشد')
       })
     )
     .nullable()
@@ -114,15 +118,16 @@ const handleSave = handleSubmit(
     console.log('handleSave function called');
     console.log('Form values before save:', currentFormValues);
     console.log('Available contract types:', contractTypes.value);
-    
-    const formattedCollaterals = currentFormValues.selectedCollaterals?.map(sc => ({
-      type: sc.collateral.collateralTypeCode,
-      amount: sc.amount,
-      percent: sc.percent
-    })) || [];
+
+    const formattedCollaterals =
+      currentFormValues.selectedCollaterals?.map((sc) => ({
+        type: sc.collateral.collateralTypeCode,
+        amount: sc.amount,
+        percent: sc.percent
+      })) || [];
 
     // Find the selected contract type object from the contractTypes array
-    const selectedContractType = contractTypes.value.find(ct => ct.id === parseInt(currentFormValues.contractTypeId || '0'));
+    const selectedContractType = contractTypes.value.find((ct) => ct.id === parseInt(currentFormValues.contractTypeId || '0'));
     console.log('Selected contract type:', selectedContractType);
 
     const submissionData = {
@@ -132,7 +137,7 @@ const handleSave = handleSubmit(
       collaterals: formattedCollaterals,
       amount: currentFormValues.amount
     };
-    
+
     emit('save', submissionData);
     valid.value = true;
     isDialogActive.value = false;
@@ -374,8 +379,9 @@ watch(contractTypeId, (id) => {
               density="comfortable"
               variant="outlined"
               color="primary"
-              label="مدت (روز)"
+              label="مدت"
               readonly
+              suffix="روز"
             />
           </v-col>
           <v-col cols="12" md="2">
@@ -391,22 +397,20 @@ watch(contractTypeId, (id) => {
         </v-row>
         <v-row>
           <v-col cols="12" md="6">
-            <v-text-field
-              v-model="other"
-              label="سایر"
-              variant="outlined"
-              density="comfortable"
-              hide-details="auto"
-            />
+            <v-text-field v-model="other" label="سایر" variant="outlined" density="comfortable" hide-details="auto" />
           </v-col>
           <v-col cols="12" md="6">
-            <VPriceTextField
+            <v-text-field
               v-model="formAmount"
               :error-messages="amountError || errors.amount"
               label="مبلغ تسهیلات"
+              placeholder="0"
               variant="outlined"
               density="comfortable"
-              prefix="میلیون ریال"
+              hide-details="auto"
+              suffix="میلیون ریال"
+              v-money
+              type="text"
             />
           </v-col>
         </v-row>
@@ -428,7 +432,7 @@ watch(contractTypeId, (id) => {
           <template v-slot:item.amount="{ item }">
             {{ item.amount.toLocaleString() }}
           </template>
-          <template v-slot:item.percent="{ item }"> {{ item.percent }}% </template>
+          <template v-slot:item.percent="{ item }"> {{ item.percent }}%</template>
           <template v-slot:item.equivalentValue="{ item }">
             {{ item.equivalentValue.toLocaleString() }}
           </template>
@@ -444,7 +448,18 @@ watch(contractTypeId, (id) => {
         </v-data-table>
       </v-card-text>
       <v-card-actions style="display: flex; justify-content: space-evenly; padding: 25px 10px">
-        <v-btn color="primary" variant="elevated" @click="() => { console.log('Save button clicked'); handleSave(); }">ذخیره تسهیلات</v-btn>
+        <v-btn
+          color="primary"
+          variant="elevated"
+          @click="
+            () => {
+              console.log('Save button clicked');
+              handleSave();
+            }
+          "
+        >
+          ذخیره تسهیلات
+        </v-btn>
         <v-btn color="error" variant="elevated" @click="isDialogActive = false">انصراف</v-btn>
       </v-card-actions>
     </v-card>

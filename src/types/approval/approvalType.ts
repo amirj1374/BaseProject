@@ -28,7 +28,6 @@ export interface FetchGuarantorPayload {
   nationalCode?: string | null;
   cif?: string | null;
   guarantorName?: string | null;
-  loanRequestId: string;
 }
 
 
@@ -39,9 +38,17 @@ export interface FetchInquiryPayload {
 }
 
 export interface GuarantorDto {
+  id?: number | null;
   nationalCode?: string | null;
   cif?: string | null;
   guarantorName?: string | null;
+  createdAt?: string | null;
+  customerType?: string | null;
+  existCore?: boolean | null;
+  label?: string | null;
+  value?: string | null;
+  sapInquiryStatus?: boolean | null;
+  loanRequestId?: string | null;
 }
 
 export interface CurrenciesDto {

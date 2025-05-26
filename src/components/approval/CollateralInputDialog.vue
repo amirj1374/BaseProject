@@ -124,7 +124,7 @@ watch(() => props.modelValue, (isVisible) => {
             </v-col>
 
             <v-col cols="12" md="6">
-              <VPriceTextField
+              <v-text-field
                 v-model="amount"
                 label="مبلغ وثیقه"
                 placeholder="0"
@@ -132,6 +132,8 @@ watch(() => props.modelValue, (isVisible) => {
                 density="comfortable"
                 hide-details="auto"
                 suffix="میلیون ریال"
+                v-money
+                type="text"
               />
             </v-col>
 

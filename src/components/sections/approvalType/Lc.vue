@@ -4,13 +4,31 @@ import { ApprovalTypeOptions, type ApprovalType } from '@/constants/enums/approv
 import { ContractTypeOption, type ContractType } from '@/constants/enums/contractType';
 import { RepaymentTypeOptions, type RepaymentType } from '@/constants/enums/repaymentType';
 import { LcProductOption} from '@/constants/enums/lcProductType';
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import { api } from '@/services/api';
 import * as yup from 'yup';
 import { useForm, useField } from 'vee-validate';
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
 import VPriceTextField from '@/components/shared/VPriceTextField.vue';
 import { AlertCircleIcon, SquareRoundedCheckFilledIcon } from 'vue-tabler-icons';
+
+// Add type declaration for window.ethereum
+declare global {
+  interface Window {
+    ethereum?: {
+      on: (event: string, callback: () => void) => void;
+    };
+  }
+}
+
+// Add Web3 initialization check
+onMounted(() => {
+  if (window.ethereum) {
+    window.ethereum.on('chainChanged', () => {
+      window.location.reload();
+    });
+  }
+});
 
 const formSchema = yup.object({
   approvalType: yup.string().nullable().required('نوع مصوبه الزامی است'),
@@ -105,18 +123,17 @@ const { value: selectedCollaterals } = useField<Array<{ collateral: CollateralDt
 
 const handleSave = handleSubmit(
   (values) => {
-    console.log('Form values:', values);
     values.requestType = 'LetterOfCredit';
     
-    const formattedCollaterals = values.selectedCollaterals?.map(sc => ({
-      type: sc.collateral.collateralTypeCode,
-      amount: sc.amount,
-      percent: sc.percent
-    })) || [];
+    const formattedCollaterals = values.selectedCollaterals?.filter(sc => sc && sc.collateral)
+      .map(sc => ({
+        type: sc.collateral?.collateralTypeCode,
+        amount: sc.amount || 0,
+        percent: sc.percent || 0
+      })) || [];
 
     // Find the selected contract type object from the ContractTypeOption array
     const selectedContractType = ContractTypeOption.find(ct => ct.value === parseInt(values.contractTypeId || '0'));
-    console.log('Selected contract type:', selectedContractType);
 
     const submissionData = {
       ...values,
@@ -126,13 +143,11 @@ const handleSave = handleSubmit(
       amount: values.amount
     };
     
-    console.log('Submission data:', submissionData);
     emit('save', submissionData);
     valid.value = true;
     isDialogActive.value = false;
   },
   (errors) => {
-    console.log('Validation errors:', errors);
     error.value = 'لطفا تمام فیلدهای الزامی را پر کنید';
   }
 );
@@ -179,6 +194,7 @@ const processedSelectedCollaterals = computed(() => {
 
 const props = defineProps<{
   currencies: CurrenciesDto[];
+  collateral: CollateralDto[];
 }>();
 
 const getLcCollateral = async () => {
@@ -376,6 +392,7 @@ const dayCalculate = async () => {
               color="primary"
               label="مدت"
               readonly
+              suffix="روز"
             ></v-text-field>
           </v-col>
         </v-row>

@@ -21,7 +21,7 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post(`/api/v1/loan-requests/summary-request`, data);
   },
   fetchGuarantor(data: FetchGuarantorPayload) {
-    return axiosInstance.post(`/api/v1/guarantor`, data);
+    return axiosInstance.get(`/api/v1/guarantor/pure`, { params:data });
   },
   fetchCurrencies() {
     return axiosInstance.post("/api/v1/general/currencies",);

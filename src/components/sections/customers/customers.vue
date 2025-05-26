@@ -11,6 +11,7 @@ type AllowedStatus = 'nationalCode' | 'cif';
 const approvalStore = useApprovalStore();
 const searchParam = ref<AllowedStatus>('cif');
 const customerType = ref<'Real' | 'Legal'>('Real');
+const searchString = ref('');
 const customerTypes = ref<{ title: string; value: 'Real' | 'Legal' }[]>([
   { title: 'حقیقی', value: 'Real' },
   { title: 'حقوقی', value: 'Legal' }
@@ -185,7 +186,7 @@ defineExpose({ submitData });
 
         <v-col cols="12" md="12">
           <v-data-table-virtual
-            v-model:search="search"
+            v-model:search="searchString"
             :items="items"
             :headers="headers"
             no-data-text="رکوردی یافت نشد"
@@ -216,5 +217,19 @@ defineExpose({ submitData });
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+@media (forced-colors: active) {
+  .v-card {
+    forced-color-adjust: none;
+  }
+  
+  .v-btn {
+    forced-color-adjust: none;
+  }
+  
+  .v-text-field {
+    forced-color-adjust: none;
+  }
 }
 </style>
