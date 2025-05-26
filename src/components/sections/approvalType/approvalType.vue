@@ -32,6 +32,10 @@ const headers = ref([
 const error = ref<string | null>(null);
 const valid = ref<boolean | null>(false);
 
+const facilitiesRef = ref();
+const guaranteeRef = ref();
+const lcRef = ref();
+
 const getRequestType = (requestType: string): string => {
   switch (requestType) {
     case 'ContractCode':
@@ -156,6 +160,36 @@ const deleteItem = (item: RequestInformationDto) => {
   }
 };
 
+const editItem = (item: RequestInformationDto) => {
+  // Remove the item from dataTable first
+  const index = dataTable.value.findIndex(
+    (i) => 
+      i.requestType === item.requestType &&
+      i.contractTypeId === item.contractTypeId &&
+      i.facilityId === item.facilityId
+  );
+  
+  if (index !== -1) {
+    dataTable.value.splice(index, 1);
+  }
+
+  // Set the data in the appropriate component and open dialog
+  switch (item.requestType) {
+    case 'ContractCode':
+      facilitiesData.value = item;
+      facilitiesRef.value?.openForm();
+      break;
+    case 'GuaranteeType':
+      guaranteeData.value = item;
+      guaranteeRef.value?.openForm();
+      break;
+    case 'LetterOfCredit':
+      lcData.value = item;
+      lcRef.value?.openForm();
+      break;
+  }
+};
+
 // API submission method
 const submitData = async (): Promise<{ success: boolean; message: string }> => {
   try {
@@ -224,15 +258,15 @@ defineExpose({ submitData });
         <v-row class="mt-5">
           <!-- Facilities Checkbox -->
           <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
-            <Facilities :currencies="currencies" @save="saveFacilitiesData" />
+            <Facilities ref="facilitiesRef" :currencies="currencies" :initial-data="facilitiesData" @save="saveFacilitiesData" />
           </v-col>
           <!-- Guarantee Checkbox -->
           <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
-            <Guarantee :currencies="currencies" @save="saveGuaranteeData" />
+            <Guarantee ref="guaranteeRef" :currencies="currencies" :initial-data="guaranteeData" @save="saveGuaranteeData" />
           </v-col>
           <!-- Lc Checkbox -->
           <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
-            <Lc :collateral="collaterals" :currencies="currencies" @save="saveLcData" />
+            <Lc ref="lcRef" :currencies="currencies" :initial-data="lcData" @save="saveLcData" />
           </v-col>
         </v-row>
         <v-row>
@@ -256,14 +290,24 @@ defineExpose({ submitData });
                 </template>
                 <!-- Delete button -->
                 <template #item.actions="{ item }">
-                  <v-btn
-                    color=""
-                    size="small"
-                    icon
-                    @click="deleteItem(item)"
-                  >
-                  ❌
-                  </v-btn>
+                  <div style="display: flex; gap: 8px; justify-content: center">
+                    <v-btn
+                      color="primary"
+                      size="small"
+                      icon
+                      @click="editItem(item)"
+                    >
+                      ✏️
+                    </v-btn>
+                    <v-btn
+                      color="error"
+                      size="small"
+                      icon
+                      @click="deleteItem(item)"
+                    >
+                      ❌
+                    </v-btn>
+                  </div>
                 </template>
               </v-data-table>
             </div>
