@@ -175,7 +175,7 @@ const submitData = async () => {
     const response = await api.approval.saveGeneral(payload);
 
     if (response.status === 200) {
-      success.value = 'اطلاعات با موفقیت ثبت شد';
+      success.value = response.data.guarantorInfoDTO[0].loanRequest.trackingCode;
       dialog.value = true;
       return Promise.resolve(data.value);
     } else {
@@ -220,7 +220,7 @@ defineExpose({ submitData });
         <v-card prepend-icon="mdi-update" title="پیام سیستم">
           <v-card-text>
             <v-alert v-if="success" type="success" variant="tonal" class="my-4">
-              {{ success }}
+              کد رهگیری: {{ success }}
             </v-alert>
           </v-card-text>
           <v-card-actions>
@@ -264,10 +264,6 @@ defineExpose({ submitData });
           </v-btn>
         </v-col>
       </v-row>
-
-      <v-snackbar v-model="showError" color="error" timeout="5500">
-        {{ error }}
-      </v-snackbar>
     </form>
   </v-card>
 </template>

@@ -37,13 +37,13 @@ const showFields = {
   repaymentType: true,
   facility: true,
   amount: true,
-  formAmount: true,
+  formAmount: false,
   duration: true,
   other: true,
   collateral: true,
   intermediatePayment: false,
   percentDeposit: false,
-  advancePayment:false
+  advancePayment:true
 };
 
 defineExpose({
