@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
-import type { CustomerDto, LoanRequestDetail, SummaryDto } from '@/types/approval/approvalType'
+import type { CustomerDto, LoanRequestDetail, SummaryDto, GuarantorDto } from '@/types/approval/approvalType'
 
 export const useApprovalStore = defineStore('approvalStore', {
   state: () => ({
     customerInfo: {} as CustomerDto,
     summaryRequest: {} as SummaryDto,
     loanRequestDetailList: [] as LoanRequestDetail[], // <-- make this an array
+    guarantor: [] as GuarantorDto[]
   }),
 
   actions: {
@@ -29,6 +30,10 @@ export const useApprovalStore = defineStore('approvalStore', {
       this.customerInfo = {} as CustomerDto
       this.summaryRequest = {} as SummaryDto
       this.loanRequestDetailList = [] // <-- clear the list
+    },
+
+    setGuarantor(payload: GuarantorDto[]) {
+      this.guarantor = payload;
     }
   }
 })

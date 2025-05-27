@@ -214,3 +214,26 @@ export interface RootData {
   summaryRequest: SummaryDto
   // Add other sections here...
 }
+
+// Add interfaces for saveGeneral payload
+export interface LoanRequestDTO {
+  cif: string;
+  summary: string;
+  activityType: string | null;
+  description: string | null;
+}
+
+export interface GuarantorInfoDTO {
+  nationalCode: string;
+  guarantorName: string;
+}
+
+export interface LoanRequestDetailDTO {
+  loanRequestDetailList: LoanRequestDetail[];
+}
+
+export interface SaveGeneralPayload {
+  loanRequestDTO: LoanRequestDTO;
+  loanRequestDetailDTO: LoanRequestDetailDTO;
+  guarantorInfoDTO: GuarantorInfoDTO[];
+}

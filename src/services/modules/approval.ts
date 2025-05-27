@@ -5,6 +5,7 @@ import type {
   FetchCustomerPayload,
   FetchGuarantorPayload,
   FetchInquiryPayload,
+  SaveGeneralPayload,
   SummaryDto,
   UploadFile
 } from '@/types/approval/approvalType';
@@ -49,6 +50,9 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post("/api/v1/loan-request-detail", loanRequestDetailList);
   },
 
+  saveGeneral(data: SaveGeneralPayload) {
+    return axiosInstance.post(`/api/v1/general`, data);
+  },
   getInquiry(payload: FetchInquiryPayload) {
     return axiosInstance.post('/api/v1/sap-inquiry', payload);
   },
