@@ -57,6 +57,7 @@ const formData = ref({
 
 // get customer
 async function search() {
+  approvalStore.resetAll()
   errors.value = {}; // Clear previous errors
   if (searchParam.value === 'nationalCode') {
     const result = nationalCodeRule(formData.value.nationalCode, customerType.value);
@@ -116,17 +117,20 @@ const changePattern = async () => {
 // submit form
 const submitData = async () => {
   try {
-    // The customer data is already in the store from the search function
-    if (!approvalStore.customerInfo) {
-      error.value = 'لطفا ابتدا مشتری را جستجو کنید';
-      showError.value = true;
-      return Promise.reject(error.value);
+    // Check if we have valid data in items
+    if (!items.value || items.value.length === 0 || !items.value[0]) {
+      return Promise.reject('لطفا ابتدا مشتری را جستجو کنید');
     }
+
+    // Check if the first item has required data
+    const firstItem = items.value[0];
+    if (!firstItem.cif && !firstItem.nationalCode) {
+      return Promise.reject('اطلاعات مشتری نامعتبر است');
+    }
+
     return Promise.resolve();
   } catch (err) {
-    error.value = err instanceof Error ? err.message : 'خطای ناشناخته';
-    showError.value = true;
-    return Promise.reject(error.value);
+    return Promise.reject(err instanceof Error ? err.message : 'خطای ناشناخته');
   }
 };
 

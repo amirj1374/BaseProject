@@ -83,7 +83,10 @@ const customButtons = ref([
     onClick: handleUpload
   }
 ]);
-
+const submitData = async () => {
+  return Promise.resolve();
+};
+defineExpose({ submitData });
 const getRelationTypeText = (type: string) => {
   return type === 'ASKER' ? 'متقاضی' : 'ضامن';
 };
@@ -91,7 +94,7 @@ const getRelationTypeText = (type: string) => {
 
 <template>
   <v-card variant="flat">
-    <v-container>
+    <form @submit.prevent="submitData">
       <CustomDataTable
         :headers="headers"
         :items="docs"
@@ -103,7 +106,7 @@ const getRelationTypeText = (type: string) => {
         :custom-buttons="customButtons"
       >
       </CustomDataTable>
-    </v-container>
+    </form>
 
     <v-dialog
       v-model="showUploadDialog"

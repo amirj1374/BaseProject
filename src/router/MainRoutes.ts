@@ -1,7 +1,7 @@
 const MainRoutes = {
   path: '/main',
   meta: {
-    requiresAuth: true
+    requiresAuth: false
   },
   redirect: '/main/approval',
   component: () => import('@/layouts/full/FullLayout.vue'),
@@ -72,19 +72,14 @@ const MainRoutes = {
       component: () => import('@/views/approval/approval.vue')
     },
     {
-      name: 'AccountTransaction',
-      path: '/base/bank/:bankId/account/:accountId/transaction',
-      component: () => import('@/views/base/bank/account/transaction/AccountTransaction.vue')
+      name: 'Cartable',
+      path: '/cartable',
+      component: () => import('@/views/cartable/cartable.vue')
     },
     {
-      name: 'AccountTransaction',
-      path: '/base/bank/:bankId/account/:accountId/transaction',
-      component: () => import('@/views/base/bank/account/transaction/AccountTransaction.vue')
-    },
-    {
-      name: 'AccountTransaction',
-      path: '/base/bank/:bankId/account/:accountId/transaction',
-      component: () => import('@/views/base/bank/account/transaction/AccountTransaction.vue')
+      name: 'CartableDetail',
+      path: '/cartable/:id/detail',
+      component: () => import('@/components/sections/cartable/cartableDetail/cartableDetail.vue')
     },
   ]
 };

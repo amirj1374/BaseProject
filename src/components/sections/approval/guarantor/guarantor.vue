@@ -5,12 +5,9 @@ import type {
   FetchGuarantorPayload, 
   GuarantorDto, 
   SaveGeneralPayload,
-  LoanRequestDTO,
   GuarantorInfoDTO,
-  LoanRequestDetailDTO
 } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
-import { BooleanEnumOptions } from '@/constants/enums/booleanEnum';
 
 const approvalStore = useApprovalStore();
 const loading = ref(false);
@@ -71,7 +68,6 @@ async function search() {
     if (response.status === 200 && response.data) {
       const raw = response.data;
       const guarantorInfo = raw.guarantorInfo || {};
-      dialog.value = true;
 
       // Create new guarantor with default values for null fields
       const newGuarantor: GuarantorDto = {
@@ -175,7 +171,9 @@ const submitData = async () => {
     const response = await api.approval.saveGeneral(payload);
 
     if (response.status === 200) {
-      success.value = response.data.guarantorInfoDTO[0].loanRequest.trackingCode;
+      success.value = response.data.trackingCode;
+      approvalStore.setLoanRequestId(response.data.id);
+      approvalStore.setTrackingCode(response.data.trackingCode);
       dialog.value = true;
       return Promise.resolve(data.value);
     } else {

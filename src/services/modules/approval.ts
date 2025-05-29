@@ -46,19 +46,22 @@ export default (axiosInstance: AxiosInstance) => ({
   getCollateral() {
     return axiosInstance.get("/api/v1/general/collateral");
   },
-  saveLoanRequest(loanRequestDetailList: {}) {
-    return axiosInstance.post("/api/v1/loan-request-detail", loanRequestDetailList);
-  },
 
   saveGeneral(data: SaveGeneralPayload) {
     return axiosInstance.post(`/api/v1/general`, data);
   },
-  getInquiry(payload: FetchInquiryPayload) {
+  getSapInquiry(payload: FetchInquiryPayload) {
     return axiosInstance.post('/api/v1/sap-inquiry', payload);
   },
 
   getInquiryCheque(loanRequestId: string) {
     return axiosInstance.get('/api/v1/inquery/inquiry-cheque', {
+      params: { loanRequestId }
+    });
+  },
+
+  getIndirectObligation(loanRequestId: string) {
+    return axiosInstance.get('/api/v1/general/indirect-obligation', {
       params: { loanRequestId }
     });
   },

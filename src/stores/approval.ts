@@ -5,8 +5,10 @@ export const useApprovalStore = defineStore('approvalStore', {
   state: () => ({
     customerInfo: {} as CustomerDto,
     summaryRequest: {} as SummaryDto,
-    loanRequestDetailList: [] as LoanRequestDetail[], // <-- make this an array
-    guarantor: [] as GuarantorDto[]
+    loanRequestDetailList: [] as LoanRequestDetail[],
+    guarantor: [] as GuarantorDto[],
+    loanRequestId: '' as string,
+    trackingCode: '' as string,
   }),
 
   actions: {
@@ -22,6 +24,14 @@ export const useApprovalStore = defineStore('approvalStore', {
       this.loanRequestDetailList = payload
     },
 
+    setLoanRequestId(payload: string) {
+      this.loanRequestId = payload
+    },
+
+    setTrackingCode(payload: string) {
+      this.trackingCode = payload
+    },
+
     addLoanRequestDetail(payload: LoanRequestDetail) {
       this.loanRequestDetailList.push(payload)
     },
@@ -29,7 +39,10 @@ export const useApprovalStore = defineStore('approvalStore', {
     resetAll() {
       this.customerInfo = {} as CustomerDto
       this.summaryRequest = {} as SummaryDto
-      this.loanRequestDetailList = [] // <-- clear the list
+      this.loanRequestDetailList = []
+      this.guarantor = [] as GuarantorDto[]
+      this.loanRequestId = ''
+      this.trackingCode = ''
     },
 
     setGuarantor(payload: GuarantorDto[]) {

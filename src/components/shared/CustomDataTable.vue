@@ -113,7 +113,8 @@ const fetchData = async (queryParams?: {}) => {
     }
 
     const response = await api.fetch(params);
-    items.value = response.data || [];
+    console.log(response.data.status);
+    items.value = response.data[0] || [];
 
     // Convert dates to Shamsi format
     items.value = items.value.map((item) => {
@@ -368,6 +369,8 @@ const resetFilter = () => {
         hide-default-footer
         class="elevation-1 custom-table"
         no-data-text="رکوردی یافت نشد"
+        hover
+        fixed-header
       >
         <template v-slot:item="{ item, columns }">
           <tr>
@@ -499,23 +502,3 @@ const resetFilter = () => {
     </v-card>
   </v-dialog>
 </template>
-<style scoped>
-/* Make header text bold and styled */
-.custom-table thead th {
-  font-weight: 700;
-  background-color: #f5f5f5; /* Light gray background */
-  color: #333; /* Darker text */
-  padding: 12px;
-}
-
-/* Make all rows have same background and styled text */
-.custom-table tbody tr {
-  background-color: #fafafa;
-}
-
-.custom-table tbody td {
-  color: #444;
-  font-weight: 500;
-  padding: 12px;
-}
-</style>

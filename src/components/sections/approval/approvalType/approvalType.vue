@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
-import Facilities from '@/components/sections/approvalType/Facilities.vue';
+import Facilities from '@/components/sections/approval/approvalType/Facilities.vue';
 import { api } from '@/services/api';
 import type { CollateralDto, ContractTypeDto, CurrenciesDto, CustomerDto, RequestInformationDto } from '@/types/approval/approvalType';
-import Guarantee from '@/components/sections/approvalType/Guarantee.vue';
-import Lc from '@/components/sections/approvalType/Lc.vue';
+import Guarantee from '@/components/sections/approval/approvalType/Guarantee.vue';
+import Lc from '@/components/sections/approval/approvalType/Lc.vue';
 import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import { ApprovalTypeOptions } from '@/constants/enums/approval';
 import { useApprovalStore } from '@/stores/approval';

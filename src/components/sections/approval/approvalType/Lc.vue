@@ -42,8 +42,8 @@ const showFields = {
   other: true,
   collateral: true,
   intermediatePayment: true,
-  advancePayment: true,
-  percentDeposit: false
+  percentDeposit: true,
+  advancePayment: true
 };
 
 defineExpose({

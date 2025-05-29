@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 // sections
-import Customers from '@/components/sections/customers/customers.vue';
-import Summary from '@/components/sections/summary/summary.vue';
-import ApprovalType from '@/components/sections/approvalType/approvalType.vue';
-import Guarantor from '@/components/sections/guarantor/guarantor.vue';
-import Inquiry from '@/components/sections/inquiry/inquiry.vue';
-import Upload from '@/components/sections/upload/upload.vue';
-import Draft from '@/components/sections/draft/draft.vue';
-import Preview from '@/components/sections/preview/preview.vue';
+import Customers from '@/components/sections/approval/customers/customers.vue';
+import Summary from '@/components/sections/approval/summary/summary.vue';
+import ApprovalType from '@/components/sections/approval/approvalType/approvalType.vue';
+import Guarantor from '@/components/sections/approval/guarantor/guarantor.vue';
+import Inquiry from '@/components/sections/approval/inquiry/inquiry.vue';
+import Upload from '@/components/sections/approval/upload/upload.vue';
+import Draft from '@/components/sections/approval/draft/draft.vue';
+import Preview from '@/components/sections/approval/preview/preview.vue';
 import { useRouter } from 'vue-router';
+import { api } from '@/services/api';
+import { useApprovalStore } from '@/stores/approval';
 const router = useRouter();
 // Define your steps with titles and the corresponding component.
 const steps = [
@@ -23,9 +25,10 @@ const steps = [
   { title: 'نمایش فرم', component: Preview },
 ];
 
-const stepper = ref(1); // Current step
+const stepper = ref(8); // Current step
 const totalSteps = steps.length;
 const error = ref<string | null>(null);
+const approvalStore = useApprovalStore();
 
 // This ref will hold the currently active section's component instance.
 const sectionRef = ref<InstanceType<typeof Customers> | null>(null);
@@ -65,6 +68,24 @@ const handleSubmit = async () => {
   }
 };
 
+// handle make cartable
+const handleCartable = async () => {
+
+  try {
+    // Call submitData() method from the child.
+    const res = await api.cartable.saveCartable(approvalStore.trackingCode);
+    if (res.status === 200) {
+      await router.push('/cartable');
+    }
+    // If successful, move to the next step.
+    console.log(res);
+  } catch (err) {
+    error.value = `${err}`;
+  } finally {
+    submitting.value = false;
+  }
+};
+
 // Compute the current component based on the current step.
 const currentComponent = computed(() => {
   return steps[stepper.value - 1].component;
@@ -86,7 +107,8 @@ const currentComponent = computed(() => {
     </transition>
     <!-- Actions for Next and Previous -->
     <div class="actions">
-      <v-btn color="primary" @click="handleSubmit" :loading="submitting"> مرحله بعد </v-btn>
+      <v-btn v-if="stepper <= 7" color="primary" @click="handleSubmit" :loading="submitting"> مرحله بعد </v-btn>
+      <v-btn v-if="stepper === 8" color="primary" @click="handleCartable" :loading="submitting"> ایجاد کارتابل </v-btn>
       <v-btn @click="prevStep" :disabled="stepper === 1"> مرحله قبلی </v-btn>
     </div>
     <v-snackbar v-if="error" v-model="error" color="error" timeout="2500">

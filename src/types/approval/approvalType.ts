@@ -34,7 +34,6 @@ export interface FetchGuarantorPayload {
 export interface FetchInquiryPayload {
   nationalCode?: string | null;
   loanRequestId: string;
-  guarantorInfoId?: string;
 }
 
 export interface GuarantorDto {

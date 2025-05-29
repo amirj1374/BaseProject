@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth';
 import { Form } from 'vee-validate';
 import { useCustomizerStore } from '@/stores/customizer';
 import { useRouter } from 'vue-router';
+import { useApprovalStore } from '@/stores/approval';
 
 const checkbox = ref(false);
 const valid = ref(false);
@@ -12,6 +13,7 @@ const password = ref('admin123');
 const username = ref('info@codedthemes.com');
 const router = useRouter();
 const customizer = useCustomizerStore();
+const approvalStore = useApprovalStore();
 const passwordRules = ref([
   (v: string) => !!v || 'رمز عبور وارد نشده است',
   (v: string) => (v && v.length <= 10) || 'رمز عبور باید کمتر از 10 کاراکتر باشد'
@@ -20,6 +22,7 @@ const passwordRules = ref([
 
 const emailRules = ref([(v: string) => !!v || 'نام کاربری را وارد نمایید', (v: string) => /.+@.+\..+/.test(v) || 'نام کاربری صحیح نمی باشد']);
 function validate(values: any, { setErrors }: any) {
+  approvalStore.resetAll();
   router.push('/approval');
   // const authStore = useAuthStore();
   // return authStore.login(username.value, password.value).catch((error) => setErrors({ apiError: error }));

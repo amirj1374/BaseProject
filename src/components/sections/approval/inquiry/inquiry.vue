@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { api } from '@/services/api';
-import type { InquiryDto } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
 
 const approvalStore = useApprovalStore();
@@ -21,11 +20,18 @@ const getInquiry = async () => {
   sapData.value = null;
 
   try {
+    if (!approvalStore.loanRequestId) {
+      throw new Error('شناسه درخواست نامعتبر است');
+    }
+
     // Cheque inquiry request
-    const chequeRes = await api.approval.getInquiryCheque(approvalStore.getLoanRequestId);
+    const chequeRes = await api.approval.getIndirectObligation(approvalStore.loanRequestId);
     
     // SAP inquiry request
-    const sapRes = await api.approval.getInquiry(approvalStore.getLoanRequestId);
+    const sapRes = await api.approval.getSapInquiry({
+      loanRequestId: approvalStore.loanRequestId,
+      nationalCode: approvalStore.customerInfo.nationalCode
+    });
 
     if (chequeRes.status === 200 && sapRes.status === 200) {
       chequeData.value = chequeRes.data;
