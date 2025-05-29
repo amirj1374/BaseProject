@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import type { CurrenciesDto } from '@/types/approval/approvalType';
 import BaseApprovalForm from './BaseApprovalForm.vue';
-import { AlertCircleIcon, SquareRoundedCheckFilledIcon } from 'vue-tabler-icons';
+import { IconAlertCircle, IconSquareRoundedCheckFilled } from '@tabler/icons-vue';
 
 const props = defineProps<{
   currencies: CurrenciesDto[];
@@ -56,8 +56,8 @@ defineExpose({
   <div>
     <v-btn size="large" :base-color="valid ? 'lightsuccess' : 'lighterror'" @click="openForm">
       تسهیلات
-      <AlertCircleIcon v-if="!valid" style="margin-right: 20px" size="20" />
-      <SquareRoundedCheckFilledIcon v-if="valid" style="margin-right: 20px" size="20" />
+      <IconAlertCircle v-if="!valid" style="margin-right: 20px" size="20" />
+      <IconSquareRoundedCheckFilled v-if="valid" style="margin-right: 20px" size="20" />
     </v-btn>
 
     <BaseApprovalForm

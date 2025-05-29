@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { SettingsIcon, LogoutIcon, UserIcon } from 'vue-tabler-icons';
+import { IconSettings, IconLogout, IconUser } from '@tabler/icons-vue';
 import { useAuthStore } from '@/stores/auth';
 
 const swt1 = ref(true);
@@ -38,7 +38,7 @@ const authStore = useAuthStore();
       <v-list class="mt-3">
         <v-list-item color="secondary" rounded="md">
           <template v-slot:prepend>
-            <SettingsIcon size="20" class="ml-2" />
+            <IconSettings size="20" class="ml-2" />
           </template>
 
           <v-list-item-title class="text-subtitle-2">تنظیمات کاربری</v-list-item-title>
@@ -46,7 +46,7 @@ const authStore = useAuthStore();
 
         <v-list-item color="secondary" rounded="md">
           <template v-slot:prepend>
-            <UserIcon size="20" class="ml-2" />
+            <IconUser size="20" class="ml-2" />
           </template>
 
           <v-list-item-title class="text-subtitle-2"> پروفایل</v-list-item-title>
@@ -58,7 +58,7 @@ const authStore = useAuthStore();
 
         <v-list-item @click="authStore.logout()" color="secondary" rounded="md">
           <template v-slot:prepend>
-            <LogoutIcon size="20" class="ml-2" />
+            <IconLogout size="20" class="ml-2" />
           </template>
 
           <v-list-item-title class="text-subtitle-2"> خروج</v-list-item-title>

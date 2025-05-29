@@ -6,7 +6,6 @@ import vuetify from './plugins/vuetify';
 import '@/scss/style.scss';
 import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';
 import VueApexCharts from 'vue3-apexcharts';
-import VueTablerIcons from 'vue-tabler-icons';
 import DigitLimit from '@/directives/v-digit-limit'
 import MoneyDirective from '@/directives/v-money'
 
@@ -21,7 +20,6 @@ fakeBackend();
 app.use(createPinia());
 app.use(router);
 app.use(PerfectScrollbarPlugin);
-app.use(VueTablerIcons);
 app.use(print);
 app.use(VueApexCharts);
 app.use(vuetify).mount('#app');

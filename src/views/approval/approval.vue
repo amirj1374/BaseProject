@@ -3,7 +3,6 @@ import { ref, computed, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
-
 const router = useRouter();
 const approvalStore = useApprovalStore();
 const submitting = ref(false);
@@ -77,7 +76,6 @@ const currentComponent = computed(() => steps[stepper.value - 1].component);
     <v-card class="stepperHeader" style="padding: 17px 0; margin-bottom: 20px">
           <span v-for="(step, index) in steps" :key="index">
         <span :class="{ active: stepper === index + 1 }">{{ step.title }}</span>
-            <IconArrowBigLeftLines></IconArrowBigLeftLines>
         <span v-if="index < steps.length - 1"> ⟵️ </span>
       </span>
     </v-card>

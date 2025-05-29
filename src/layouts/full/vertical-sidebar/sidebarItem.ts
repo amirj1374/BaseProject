@@ -1,4 +1,11 @@
-import { BookmarkEditIcon, ClipboardDataIcon, DatabaseIcon, FileSymlinkIcon, HomeIcon, PencilPlusIcon } from 'vue-tabler-icons';
+import { 
+  IconBookmarkEdit, 
+  IconClipboardData, 
+  IconDatabase, 
+  IconFileSymlink, 
+  IconHome, 
+  IconPencilPlus 
+} from '@tabler/icons-vue';
 
 export interface menu {
   header?: string;
@@ -19,12 +26,12 @@ export interface menu {
 const sidebarItem: menu[] = [
   // {
   //   title: 'صفحه اصلی',
-  //   icon: HomeIcon,
+  //   icon: IconHome,
   //   to: '/dashboard/default'
   // },
   {
     title: 'اطلاعات پایه',
-    icon: DatabaseIcon
+    icon: IconDatabase
     // children: [
     //   {
     //     title: 'سهام ها',
@@ -50,22 +57,22 @@ const sidebarItem: menu[] = [
   },
   {
     title: 'درخواست مصوبه جدید',
-    icon: PencilPlusIcon,
+    icon: IconPencilPlus,
     to: '/approval'
   },
   {
     title: 'ویرایش درخواست مصوبه',
-    icon: BookmarkEditIcon,
+    icon: IconBookmarkEdit,
     to: '/approval/edit'
   },
   {
     title: 'ارجاع درخواست های جاری',
-    icon: FileSymlinkIcon,
+    icon: IconFileSymlink,
     to: '/cartable/reference'
   },
   {
     title: 'گزارشات',
-    icon: ClipboardDataIcon,
+    icon: IconClipboardData,
     to: '/report'
   }
 ];

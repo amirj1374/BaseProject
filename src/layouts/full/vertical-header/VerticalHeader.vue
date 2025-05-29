@@ -2,7 +2,6 @@
 import { ref } from 'vue';
 import { useCustomizerStore } from '@/stores/customizer';
 // Icon Imports
-import { BellIcon, SettingsIcon, SearchIcon, Menu2Icon } from 'vue-tabler-icons';
 
 // dropdown imports
 import NotificationDD from './NotificationDD.vue';

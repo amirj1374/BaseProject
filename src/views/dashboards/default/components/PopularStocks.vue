@@ -6,7 +6,7 @@ const customizerStore = ref(useCustomizerStore());
 const currentTheme = ref(vuetify.theme.themes.value[customizerStore.value.getActTheme]);
 
 // import icons
-import { ChevronUpIcon, ChevronDownIcon } from 'vue-tabler-icons';
+import { IconChevronUp, IconChevronDown } from '@tabler/icons-vue';
 // Watch for theme changes and update currentTheme dynamically
 watch(() => customizerStore.value.getActTheme, (newTheme) => {
   currentTheme.value = vuetify.theme.themes.value[newTheme];
@@ -140,10 +140,10 @@ const revenues = ref([
                     style="width: 20px; height: 20px"
                     v-if="revenue.price > 145"
                   >
-                    <ChevronUpIcon stroke-width="1.5" width="20" class="text-success" />
+                    <IconChevronUp stroke-width="1.5" width="20" class="text-success" />
                   </div>
                   <div class="bg-lighterror rounded-sm d-flex align-center justify-center ml-3" style="width: 20px; height: 20px" v-else>
-                    <ChevronDownIcon stroke-width="1.5" width="20" class="text-error" />
+                    <IconChevronDown stroke-width="1.5" width="20" class="text-error" />
                   </div>
                 </template>
                 <div class="d-inline-flex align-center justify-space-between w-100">

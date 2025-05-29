@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@mdi/js": "^7.4.47",
+    "@tabler/icons-vue": "^3.33.0",
     "@tiptap/starter-kit": "2.3.2",
     "@tiptap/vue-3": "2.3.2",
     "@tsconfig/node20": "20.1.4",
@@ -36,7 +37,6 @@
     "vite-plugin-vuetify": "2.0.3",
     "vue": "3.4.27",
     "vue-router": "4.3.2",
-    "vue-tabler-icons": "2.21.0",
     "vue3-apexcharts": "1.5.2",
     "vue3-lottie": "^3.3.1",
     "vue3-perfect-scrollbar": "2.0.0",

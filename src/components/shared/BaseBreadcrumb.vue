@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronRightIcon } from 'vue-tabler-icons';
+import { IconChevronRight } from '@tabler/icons-vue';
 
 type Breadcrumb = {
   title: string;
@@ -27,13 +27,13 @@ const props = defineProps({
             <v-breadcrumbs :items="props.breadcrumbs" class="text-h5 justify-md-end pa-1">
               <template v-slot:divider>
                 <div class="d-flex align-center">
-                  <ChevronRightIcon size="17" />
+                  <IconChevronRight size="17" />
                 </div>
               </template>
               <template v-slot:prepend>
                 <v-icon size="small" icon="$home" class="text-secondary ml-2"></v-icon>
                 <div class="d-flex align-center">
-                  <ChevronRightIcon size="17" />
+                  <IconChevronRight size="17" />
                 </div>
               </template>
             </v-breadcrumbs>

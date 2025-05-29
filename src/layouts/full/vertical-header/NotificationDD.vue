@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { BuildingStoreIcon, SendIcon, MailboxIcon, PhotoIcon } from 'vue-tabler-icons';
+import { IconBuildingStore, IconSend, IconMailbox, IconPhoto } from '@tabler/icons-vue';
 
 const notificationDD = ref(['همه اعلان ها', 'جدید', 'خوانده نشده', 'دیگر']);
 const selectNotify = ref<string>('همه اعلان ها');
@@ -45,7 +45,7 @@ const selectNotify = ref<string>('همه اعلان ها');
       <v-list-item value="" color="secondary" class="no-spacer">
         <template v-slot:prepend>
           <v-avatar size="40" variant="flat" color="lightsuccess" class="ml-3 py-2 text-success">
-            <BuildingStoreIcon size="20" />
+            <IconBuildingStore size="20" />
           </v-avatar>
         </template>
         <div class="d-inline-flex align-center justify-space-between w-100">
@@ -62,7 +62,7 @@ const selectNotify = ref<string>('همه اعلان ها');
       <v-list-item value="" color="secondary" class="no-spacer">
         <template v-slot:prepend>
           <v-avatar size="40" variant="flat" color="lightprimary" class="ml-3 py-2 text-primary">
-            <MailboxIcon size="20" />
+            <IconMailbox size="20" />
           </v-avatar>
         </template>
         <div class="d-inline-flex align-center justify-space-between w-100">
@@ -74,7 +74,7 @@ const selectNotify = ref<string>('همه اعلان ها');
         <div class="mt-3">
           <v-btn color="primary" variant="flat">
             <template v-slot:append>
-              <SendIcon size="20" />
+              <IconSend size="20" />
             </template>
             Mail
           </v-btn>
@@ -97,7 +97,7 @@ const selectNotify = ref<string>('همه اعلان ها');
           <span class="font-weight-medium">21 Jan 2020</span>
         </p>
         <div class="mt-3 bg-lightsecondary rounded pa-5 d-flex align-center">
-          <PhotoIcon size="20" stroke-width="1.5" />
+          <IconPhoto size="20" stroke-width="1.5" />
           <span class="ml-2 text-subtitle-1">demo.jpg</span>
         </div>
       </v-list-item>
