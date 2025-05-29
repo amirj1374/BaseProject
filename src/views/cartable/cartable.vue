@@ -21,33 +21,10 @@ const header = ref([
     isDate: true
   },
   {
-    title: 'تاریخ آخرین ویرایش',
-    key: 'updatedAt',
-    sortable: true,
-    editable: true,
-    isDate: true
-  },
-  {
     title: 'ایجاد شده توسط',
     key: 'createdBy',
     sortable: true,
     editable: true
-  },
-  {
-    title: 'ویرایش شده توسط',
-    key: 'updatedBy',
-    sortable: true,
-    editable: true,
-    translate: true,
-    options: BooleanEnumOptions
-  },
-  {
-    title: 'نوع درخواست',
-    key: 'requestType',
-    sortable: true,
-    editable: true,
-    translate: true,
-    options: RequestTypeStatusOptions
   },
   {
     title: 'کد رهگیری',
@@ -64,5 +41,5 @@ const routes = {
 <template>
   <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
   <!-- Custom Data Table Component -->
-  <CustomDataTable :apiResource="`cartable`" :headers="header" :auto-fetch="true" :actions="['edit']" :routes="routes" />
+  <CustomDataTable :apiResource="`cartable`" :headers="header" :auto-fetch="true" :routes="routes" />
 </template>

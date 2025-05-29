@@ -8,4 +8,8 @@ export default (axiosInstance: AxiosInstance) => ({
   saveCartable(trackingCode: string) {
     return axiosInstance.post("/api/v1/cartable", {trackingCode});
   },
+
+  getCartableDetail(id: number) {
+    return axiosInstance.get(`/api/v1/cartable/${id}`);
+  },
 });

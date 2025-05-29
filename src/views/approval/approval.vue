@@ -1,42 +1,34 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
-// sections
-import Customers from '@/components/sections/approval/customers/customers.vue';
-import Summary from '@/components/sections/approval/summary/summary.vue';
-import ApprovalType from '@/components/sections/approval/approvalType/approvalType.vue';
-import Guarantor from '@/components/sections/approval/guarantor/guarantor.vue';
-import Inquiry from '@/components/sections/approval/inquiry/inquiry.vue';
-import Upload from '@/components/sections/approval/upload/upload.vue';
-import Draft from '@/components/sections/approval/draft/draft.vue';
-import Preview from '@/components/sections/approval/preview/preview.vue';
+import { ref, computed, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
+import { IconArrowBigLeftLines } from '@tabler/icons-vue';
+
 const router = useRouter();
-// Define your steps with titles and the corresponding component.
+const approvalStore = useApprovalStore();
+const submitting = ref(false);
+const error = ref<string | null>(null);
+const stepper = ref(1);
+
+// Dynamically import components for better performance
 const steps = [
-  { title: 'ثبت درخواست هویتی مشتری', component: Customers },
-  { title: 'خلاصه درخواست', component: Summary },
-  { title: 'اطلاعات نوع درخواست', component: ApprovalType },
-  { title: 'اطلاعات ضامن / ضامنین', component: Guarantor },
-  { title: 'استعلام', component: Inquiry },
-  { title: 'بارگذاری مدارک', component: Upload },
-  { title: 'پیشنویس', component: Draft },
-  { title: 'نمایش فرم', component: Preview },
+  { title: 'ثبت درخواست هویتی مشتری', component: defineAsyncComponent(() => import('@/components/sections/approval/customers/customers.vue')) },
+  { title: 'خلاصه درخواست', component: defineAsyncComponent(() => import('@/components/sections/approval/summary/summary.vue')) },
+  { title: 'اطلاعات نوع درخواست', component: defineAsyncComponent(() => import('@/components/sections/approval/approvalType/approvalType.vue')) },
+  { title: 'اطلاعات ضامن / ضامنین', component: defineAsyncComponent(() => import('@/components/sections/approval/guarantor/guarantor.vue')) },
+  { title: 'استعلام', component: defineAsyncComponent(() => import('@/components/sections/approval/inquiry/inquiry.vue')) },
+  { title: 'بارگذاری مدارک', component: defineAsyncComponent(() => import('@/components/sections/approval/upload/upload.vue')) },
+  { title: 'پیشنویس', component: defineAsyncComponent(() => import('@/components/sections/approval/draft/draft.vue')) },
+  { title: 'نمایش فرم', component: defineAsyncComponent(() => import('@/components/sections/approval/preview/preview.vue')) },
 ];
 
-const stepper = ref(8); // Current step
 const totalSteps = steps.length;
-const error = ref<string | null>(null);
-const approvalStore = useApprovalStore();
 
-// This ref will hold the currently active section's component instance.
-const sectionRef = ref<InstanceType<typeof Customers> | null>(null);
+// Reference to current section
+const sectionRef = ref<InstanceType<any> | null>(null);
 
-// Parent-level loading state for the Next button.
-const submitting = ref(false);
-
-// Advance to the next step.
+// Navigation handlers
 const nextStep = async () => {
   if (stepper.value < totalSteps) {
     stepper.value++;
@@ -45,22 +37,17 @@ const nextStep = async () => {
   }
 };
 
-// Go to the previous step
 const prevStep = () => {
-  if (stepper.value > 1) {
-    stepper.value--;
-  }
+  if (stepper.value > 1) stepper.value--;
 };
 
-// Handle form submission logic for the current step
+// Form submission
 const handleSubmit = async () => {
   if (!sectionRef.value) return;
   submitting.value = true;
   try {
-    // Call submitData() method from the child.
     await sectionRef.value.submitData();
-    // If successful, move to the next step.
-    await nextStep()
+    await nextStep();
   } catch (err) {
     error.value = `${err}`;
   } finally {
@@ -68,17 +55,14 @@ const handleSubmit = async () => {
   }
 };
 
-// handle make cartable
+// Submit all data to cartable
 const handleCartable = async () => {
-
+  submitting.value = true;
   try {
-    // Call submitData() method from the child.
     const res = await api.cartable.saveCartable(approvalStore.trackingCode);
     if (res.status === 200) {
       await router.push('/cartable');
     }
-    // If successful, move to the next step.
-    console.log(res);
   } catch (err) {
     error.value = `${err}`;
   } finally {
@@ -86,45 +70,50 @@ const handleCartable = async () => {
   }
 };
 
-// Compute the current component based on the current step.
-const currentComponent = computed(() => {
-  return steps[stepper.value - 1].component;
-});
+// Get current component
+const currentComponent = computed(() => steps[stepper.value - 1].component);
 </script>
 
 <template>
-  <v-app class="stepperContainer">
-    <div class="stepperHeader">
-      <span v-for="(step, index) in steps" :key="index">
+    <v-card class="stepperHeader" style="padding: 17px 0; margin-bottom: 20px">
+          <span v-for="(step, index) in steps" :key="index">
         <span :class="{ active: stepper === index + 1 }">{{ step.title }}</span>
-      <span v-if="index < steps.length - 1"> 🢀 </span>
+            <IconArrowBigLeftLines></IconArrowBigLeftLines>
+        <span v-if="index < steps.length - 1"> ⟵️ </span>
       </span>
-    </div>
-    <!-- Add a transition wrapper around the component -->
+    </v-card>
+
     <transition name="fade" mode="out-in">
-      <!-- Dynamically render the active section and bind a ref -->
-      <component style="height: 62vh" :is="currentComponent" ref="sectionRef" />
+      <v-card>
+        <v-card-text style="height: 62vh; overflow-y: auto">
+          <component :is="currentComponent" ref="sectionRef"/>
+        </v-card-text>
+      </v-card>
     </transition>
-    <!-- Actions for Next and Previous -->
+
     <div class="actions">
-      <v-btn v-if="stepper <= 7" color="primary" @click="handleSubmit" :loading="submitting"> مرحله بعد </v-btn>
-      <v-btn v-if="stepper === 8" color="primary" @click="handleCartable" :loading="submitting"> ایجاد کارتابل </v-btn>
-      <v-btn @click="prevStep" :disabled="stepper === 1"> مرحله قبلی </v-btn>
+      <v-btn v-if="stepper < totalSteps" color="secondary" @click="handleSubmit" :loading="submitting">
+        مرحله بعد
+      </v-btn>
+      <v-btn v-else color="secondary" @click="handleCartable" :loading="submitting">
+        ایجاد کارتابل
+      </v-btn>
+      <v-btn @click="prevStep" :disabled="stepper === 1">مرحله قبلی</v-btn>
     </div>
-    <v-snackbar v-if="error" v-model="error" color="error" timeout="2500">
+
+    <v-snackbar v-model="error" color="error" timeout="2500">
       {{ error }}
     </v-snackbar>
-  </v-app>
 </template>
 
 <style scoped>
 .stepperContainer {
-  height: calc(100vh - 130px); /* Set the height to the full viewport height */
-  max-width: 100%; /* Prevent overflow horizontally */
+  height: calc(100vh - 130px);
+  max-width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Space the header, content, and buttons */
-  overflow: hidden; /* Prevent content overflow */
+  justify-content: space-between;
+  overflow: hidden;
   padding: 15px;
 }
 
@@ -133,7 +122,8 @@ const currentComponent = computed(() => {
   justify-content: center;
   align-items: center;
   font-size: 16px;
-  width: 100%; /* Ensure the header takes the full width */
+  flex-wrap: wrap;
+  padding: 0 15px;
 }
 
 .stepperHeader span {
@@ -142,7 +132,7 @@ const currentComponent = computed(() => {
 
 .stepperHeader .active {
   font-weight: bold;
-  color: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-secondary));
 }
 
 .actions {
@@ -154,32 +144,17 @@ const currentComponent = computed(() => {
 
 .v-btn {
   min-width: 100px;
-}
-
-/* Styling for Previous and Next buttons */
-.v-btn {
   text-align: center;
   justify-content: center;
 }
 
-/* Transition effect for step change */
+/* Transition effect */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease-in-out;
 }
-
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
 }
-
-/* Ensure the content takes the full remaining height */
-.v-stepper__content {
-  height: calc(100vh - 100px); /* Adjust the content height for screen */
-  overflow-y: auto; /* Add scrolling if needed */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
 </style>
-

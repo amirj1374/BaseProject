@@ -113,8 +113,7 @@ const fetchData = async (queryParams?: {}) => {
     }
 
     const response = await api.fetch(params);
-    console.log(response.data.status);
-    items.value = response.data[0] || [];
+    items.value = response.data.content || [];
 
     // Convert dates to Shamsi format
     items.value = items.value.map((item) => {

@@ -32,7 +32,7 @@ onBeforeUnmount(() => {
 <template>
   <v-container fluid>
     <v-row justify="center">
-      <v-col cols="12" md="10" lg="8">
+      <v-col cols="12" md="12" lg="8">
           <div class="iframe-container">
             <iframe
               v-if="pdfUrl"
@@ -53,10 +53,9 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .iframe-container {
-  width: 100%;
+  width: 100vw;
   height: 450px;
   overflow: hidden;
-  position: relative;
 }
 
 .pdf-object {

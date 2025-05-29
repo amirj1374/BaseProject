@@ -9,6 +9,7 @@ import { useApprovalStore } from '@/stores/approval';
 
 type AllowedStatus = 'nationalCode' | 'cif';
 const approvalStore = useApprovalStore();
+
 const searchParam = ref<AllowedStatus>('cif');
 const customerType = ref<'Real' | 'Legal'>('Real');
 const searchString = ref('');
@@ -17,28 +18,12 @@ const customerTypes = ref<{ title: string; value: 'Real' | 'Legal' }[]>([
   { title: 'حقوقی', value: 'Legal' }
 ]);
 const errors = ref<{ nationalCode?: string[] }>({});
-const nationalCode = ref('');
 const nationalCodeErrors = ref([]);
 const loading = ref(false);
 const canSubmit = ref(false);
 const error = ref<string | null>(null);
 const showError = ref(false);
-const items = ref<CustomerDto[]>([])
-
-// Load initial data from store
-onMounted(() => {
-  if (approvalStore.customerInfo) {
-    items.value = [approvalStore.customerInfo];
-    // Set form data based on store data
-    if (approvalStore.customerInfo.nationalCode) {
-      searchParam.value = 'nationalCode';
-      formData.value.nationalCode = approvalStore.customerInfo.nationalCode;
-    } else if (approvalStore.customerInfo.cif) {
-      searchParam.value = 'cif';
-      formData.value.cif = approvalStore.customerInfo.cif;
-    }
-  }
-});
+const items = ref<CustomerDto[]>([]);
 
 const headers = ref([
   { title: 'شماره مشتری', key: 'cif', width: 150 },
@@ -49,16 +34,23 @@ const headers = ref([
   { title: 'کدپستی', key: 'postalCode', width: 120 },
   { title: 'آدرس', key: 'address', width: 200 }
 ]);
-// initial data
+
 const formData = ref({
   cif: '',
   nationalCode: ''
 });
 
-// get customer
+onMounted(() => {
+  if (approvalStore.customerInfo) {
+    items.value = [approvalStore.customerInfo];
+    formData.value.nationalCode = approvalStore.customerInfo.nationalCode || '';
+    formData.value.cif = approvalStore.customerInfo.cif || '';
+    searchParam.value = approvalStore.customerInfo.nationalCode ? 'nationalCode' : 'cif';
+  }
+});
+
 async function search() {
-  approvalStore.resetAll()
-  errors.value = {}; // Clear previous errors
+  errors.value = {};
   if (searchParam.value === 'nationalCode') {
     const result = nationalCodeRule(formData.value.nationalCode, customerType.value);
     if (result !== false) {
@@ -83,11 +75,8 @@ async function search() {
     };
 
     const response = await api.approval.fetchCustomer(payload);
-    // Set the data to store.customerInfo
-    approvalStore.setCustomerInfo(response.data)
 
     if (response.status === 200 && response.data) {
-      // Update the items array with the fetched data
       items.value = [response.data];
     } else {
       error.value = `خطا: ${response.statusText}`;
@@ -102,31 +91,25 @@ async function search() {
   }
 }
 
-// change search pattern
 const changePattern = async () => {
-  try {
-    formData.value.cif = '';
-    formData.value.nationalCode = '';
-    error.value = null;
-    showError.value = false;
-  } catch (err) {
-    error.value = 'خطا در تغییر الگوی جستجو';
-    showError.value = true;
-  }
+  formData.value.cif = '';
+  formData.value.nationalCode = '';
+  error.value = null;
+  showError.value = false;
 };
-// submit form
+
 const submitData = async () => {
   try {
-    // Check if we have valid data in items
-    if (!items.value || items.value.length === 0 || !items.value[0]) {
-      return Promise.reject('لطفا ابتدا مشتری را جستجو کنید');
+    if (!items.value.length || !items.value[0]) {
+      return Promise.reject('لطفاً ابتدا مشتری را جستجو کنید');
     }
 
-    // Check if the first item has required data
     const firstItem = items.value[0];
     if (!firstItem.cif && !firstItem.nationalCode) {
       return Promise.reject('اطلاعات مشتری نامعتبر است');
     }
+
+    approvalStore.setCustomerInfo(firstItem);
 
     return Promise.resolve();
   } catch (err) {
@@ -139,8 +122,13 @@ watch(
   (newVal) => {
     if (newVal) {
       items.value = [newVal];
+      formData.value.nationalCode = newVal.nationalCode || '';
+      formData.value.cif = newVal.cif || '';
+      searchParam.value = newVal.nationalCode ? 'nationalCode' : 'cif';
     } else {
       items.value = [];
+      formData.value.nationalCode = '';
+      formData.value.cif = '';
     }
   },
   { immediate: true }
@@ -162,15 +150,13 @@ defineExpose({ submitData });
       </v-row>
       <v-divider inset></v-divider>
       <v-row class="mt-2">
-        <v-col cols="12" md="6" v-if="searchParam === 'nationalCode'">
+        <v-col cols="12" md="3" v-if="searchParam === 'nationalCode'">
           <v-select v-model="customerType" label="نوع مشتری" variant="outlined" density="comfortable" :items="customerTypes" />
         </v-col>
-        <!-- Cif Code Input -->
-        <v-col v-if="searchParam === 'cif'" cols="12" md="6">
+        <v-col v-if="searchParam === 'cif'" cols="12" md="3">
           <v-text-field v-model="formData.cif" label="شماره مشتری" variant="outlined" density="comfortable" />
         </v-col>
-        <!-- National Code Input -->
-        <v-col v-if="searchParam === 'nationalCode'" cols="12" md="6">
+        <v-col v-if="searchParam === 'nationalCode'" cols="12" md="3">
           <v-text-field
             v-model="formData.nationalCode"
             :label="customerType === 'Real' ? 'کد ملی' : 'شناسه ملی'"
@@ -181,7 +167,6 @@ defineExpose({ submitData });
             :error-messages="nationalCodeErrors"
           />
         </v-col>
-        <!-- Person Type Select -->
         <v-col cols="12" md="12" class="text-center">
           <v-btn color="secondary" @click="search" type="primary"> جستجو</v-btn>
         </v-col>
@@ -227,11 +212,11 @@ defineExpose({ submitData });
   .v-card {
     forced-color-adjust: none;
   }
-  
+
   .v-btn {
     forced-color-adjust: none;
   }
-  
+
   .v-text-field {
     forced-color-adjust: none;
   }
