@@ -3,7 +3,6 @@ import { ref, computed, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
-import { IconArrowBigLeftLines } from '@tabler/icons-vue';
 
 const router = useRouter();
 const approvalStore = useApprovalStore();
