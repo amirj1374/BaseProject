@@ -45,7 +45,7 @@ const steps = [
 
 const totalSteps = steps.length;
 
-// Reference to current section
+// reference to current section
 const sectionRef = ref<InstanceType<any> | null>(null);
 
 // Navigation handlers

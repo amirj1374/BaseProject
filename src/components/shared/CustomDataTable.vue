@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, shallowRef } from 'vue';
 import axiosInstance from '@/services/axiosInstance';
 import apiService from '@/services/apiService';
 import { useRouter } from 'vue-router';
@@ -89,7 +89,7 @@ const cleanFilterModel = computed(() => {
 
 const api = apiService(axiosInstance, props.apiResource);
 const customActionDialog = ref(false);
-const customActionComponent = ref<Component | null>(null);
+const customActionComponent = shallowRef<Component | null>(null);
 const customActionItem = ref<any>(null);
 
 const hasFilterComponent = computed(() => {

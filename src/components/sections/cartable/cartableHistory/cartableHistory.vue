@@ -6,14 +6,7 @@ import Reference from '@/components/sections/cartable/Reference/Reference.vue';
 import UploadList from '@/components/sections/cartable/uploadList/uploadList.vue';
 import CartableHistory from '@/components/sections/cartable/cartableHistory/cartableHistory.vue';
 
-const breadcrumbs = ref([
-  {
-    title: 'درخواست ها',
-    disabled: false,
-    href: '#'
-  }
-]);
-const page = ref({ title: 'کارتابل ها' });
+const page = ref({ title: 'تاریخچه کارتابل' });
 const header = ref([
   {
     title: 'تاریخ ایجاد',
@@ -37,16 +30,10 @@ const header = ref([
 </script>
 
 <template>
-  <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
   <!-- Custom Data Table Component -->
   <CustomDataTable
     :apiResource="`cartable`"
     :headers="header"
     :auto-fetch="true"
-    :custom-actions="[
-      { title: 'عملیات', component: Reference },
-      { title: 'لیست مدارک', component: UploadList },
-      { title: 'تاریخچه کارتابل', component: CartableHistory }
-    ]"
   />
 </template>

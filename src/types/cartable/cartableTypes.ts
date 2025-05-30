@@ -10,3 +10,9 @@ export interface CartableDetail {
   branchCode: string
   branchName: string
 }
+
+export interface ValidUserPayload {
+  id: number
+  actionType: string
+  roleCode: string
+}

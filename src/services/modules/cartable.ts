@@ -1,3 +1,4 @@
+import type { ValidUserPayload } from "@/types/cartable/cartableTypes";
 import type { AxiosInstance } from "axios";
 
 export default (axiosInstance: AxiosInstance) => ({
@@ -11,5 +12,13 @@ export default (axiosInstance: AxiosInstance) => ({
 
   getCartableDetail(id: number) {
     return axiosInstance.get(`/api/v1/cartable/${id}`);
+  },
+
+  getValidRoles(id: number) {
+    return axiosInstance.get(`/api/v1/cartable/${id}/get-valid-roles`);
+  },
+
+  getValidUser(payload: ValidUserPayload) {
+    return axiosInstance.get(`/api/v1/cartable/${payload.id}/get-valid-users?actionType=${payload.actionType}&roleCode=${payload.roleCode}`);
   },
 });
