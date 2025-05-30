@@ -71,6 +71,9 @@ const currentPage = ref(1);
 const sortBy = ref<{ key: string; order: 'asc' | 'desc' } | null>(null);
 const filterDialog = ref(false);
 const filterModel = ref<Record<string, any>>({});
+const tableRef = ref<HTMLElement | null>(null);
+const isLoadingMore = ref(false);
+const hasMore = ref(true);
 
 // Add a computed property to clean filter values
 const cleanFilterModel = computed(() => {
@@ -93,30 +96,87 @@ const hasFilterComponent = computed(() => {
   return !!props.filterComponent;
 });
 
+// Add scroll event handler
+const handleScroll = async (event: Event) => {
+  const target = event.target as HTMLElement;
+  const { scrollTop, scrollHeight, clientHeight } = target;
+
+  // Check if we're near the bottom (within 100px)
+  if (scrollHeight - scrollTop - clientHeight < 100 && !isLoadingMore.value && hasMore.value) {
+    await loadMore();
+  }
+};
+
+// Load more data
+const loadMore = async () => {
+  if (isLoadingMore.value || !hasMore.value) return;
+
+  isLoadingMore.value = true;
+  currentPage.value++;
+
+  try {
+    const params = {
+      ...cleanFilterModel.value,
+      ...props.queryParams,
+      page: currentPage.value - 1,
+      size: itemsPerPage.value
+    };
+
+    const response = await api.fetch(params);
+    const newItems = response.data.content || [];
+
+    // Convert dates to Shamsi format
+    const formattedItems = newItems.map((item: Record<string, any>) => {
+      const newItem = { ...item };
+      props.headers.forEach((header) => {
+        if (header.isDate && newItem[header.key]) {
+          try {
+            newItem[header.key] = DateConverter.toShamsi(newItem[header.key]);
+          } catch (error) {
+            console.error(`Error converting date for field ${header.key}:`, error);
+          }
+        }
+      });
+      return newItem;
+    });
+
+    items.value = [...items.value, ...formattedItems];
+    hasMore.value = currentPage.value < response.data.totalPages;
+  } catch (err) {
+    console.error('Error loading more items:', err);
+    currentPage.value--; // Revert page number on error
+  } finally {
+    isLoadingMore.value = false;
+  }
+};
+
+// Modify fetchData to handle pagination correctly
 const fetchData = async (queryParams?: {}) => {
   loading.value = true;
   error.value = null;
-  let params: Record<string, any> = {};
-  if (!queryParams) {
-    params = {
-      ...cleanFilterModel.value,
-      ...props.queryParams
-    };
-  } else {
-    params = queryParams;
-  }
-  try {
-    // Only add pagination if we have items to paginate
-    if (totalSize.value > 0 || currentPage.value > 1) {
-      params.page = currentPage.value - 1;
-      params.size = itemsPerPage.value;
-    }
 
+  let params: Record<string, any> = {
+    ...cleanFilterModel.value,
+    ...props.queryParams
+  };
+
+  if (queryParams) {
+    params = { ...params, ...queryParams };
+  }
+
+  // Add pagination params last
+  params = {
+    ...params,
+    page: currentPage.value - 1,
+    size: itemsPerPage.value
+  };
+
+  try {
     const response = await api.fetch(params);
     items.value = response.data.content || [];
 
     // Convert dates to Shamsi format
-    items.value = items.value.map((item) => {
+    items.value = items.value.map((item: Record<string, any>) => {
       const newItem = { ...item };
       props.headers.forEach((header) => {
         if (header.isDate && newItem[header.key]) {
@@ -132,6 +192,7 @@ const fetchData = async (queryParams?: {}) => {
 
     totalSize.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
+    hasMore.value = currentPage.value < response.data.totalPages;
   } catch (err: any) {
     if (err.response) {
       error.value = `خطای سرور: ${err.response.status} - ${err.response.data.message || 'خطای ناشناخته'}`;
@@ -352,152 +413,207 @@ const resetFilter = () => {
 </script>
 
 <template>
-  <v-snackbar v-model="error" color="error" class="mb-4" timeout="3000">{{ error }}</v-snackbar>
-  <div class="d-flex align-center mb-3">
-    <v-btn v-if="props.actions?.includes('create')" color="green" class="me-2" @click="openDialog()">ایجاد ✅</v-btn>
-    <v-btn v-if="hasFilterComponent" @click="filterDialog = true">فیلتر 🔍</v-btn>
-  </div>
-  <div style="overflow-x: auto; white-space: nowrap">
-    <template v-if="loading">
-      <v-skeleton-loader type="table" :loading="loading" class="mx-auto" max-width="100%" :boilerplate="false" />
-    </template>
-    <template v-else>
-      <v-data-table
-        :headers="[...props.headers, { title: 'عملیات', key: 'actions', sortable: false }]"
-        :items="items"
-        hide-default-footer
-        class="elevation-1 custom-table"
-        no-data-text="رکوردی یافت نشد"
-        hover
-        fixed-header
-      >
-        <template v-slot:item="{ item, columns }">
-          <tr>
-            <td v-for="column in columns" :key="column.key" :style="getColumnStyle(column, item)">
-              <template v-if="column.key === 'actions'">
-                <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
-                  ویرایش ✏️
-                </v-btn>
-                <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="mr-2" @click="openDeleteDialog(item)"
-                  >حذف ❌
-                </v-btn>
-                <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
-                  >🔍 نمایش
-                </v-btn>
-                <template v-for="(route, key) in props.routes" :key="key">
-                  <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(key, item)">
-                    {{ key.toUpperCase() }}
+  <div class="custom-data-table">
+    <v-snackbar v-model="error" color="error" class="mb-4" timeout="3000">{{ error }}</v-snackbar>
+    <div class="d-flex align-center mb-3">
+      <v-btn v-if="props.actions?.includes('create')" color="green" class="me-2" @click="openDialog()">ایجاد ✅</v-btn>
+      <v-btn v-if="hasFilterComponent" @click="filterDialog = true">فیلتر 🔍</v-btn>
+    </div>
+
+    <!-- Table Container with Fixed Height -->
+    <div class="table-container">
+      <template v-if="loading && !isLoadingMore">
+        <v-skeleton-loader type="table" :loading="loading" class="mx-auto" max-width="100%" :boilerplate="false" />
+      </template>
+      <template v-else>
+        <v-data-table
+          :headers="[...props.headers, { title: 'عملیات', key: 'actions', sortable: false }]"
+          :items="items"
+          hide-default-footer
+          class="elevation-1 custom-table"
+          no-data-text="رکوردی یافت نشد"
+          hover
+          fixed-header
+        >
+          <template v-slot:item="{ item, columns }">
+            <tr>
+              <td v-for="column in columns" :key="column.key" :style="getColumnStyle(column, item)">
+                <template v-if="column.key === 'actions'">
+                  <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
+                    ویرایش ✏️
+                  </v-btn>
+                  <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="mr-2" @click="openDeleteDialog(item)"
+                    >حذف ❌
+                  </v-btn>
+                  <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
+                    >🔍 نمایش
+                  </v-btn>
+                  <template v-for="(route, key) in props.routes" :key="key">
+                    <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(key, item)">
+                      {{ key.toUpperCase() }}
+                    </v-btn>
+                  </template>
+                  <v-btn v-for="(link, key) in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
+                    {{ key.toUpperCase() }} ⬇️
+                  </v-btn>
+                  <v-btn
+                    v-for="action in props.customActions"
+                    :key="action.title"
+                    color="orange"
+                    size="small"
+                    class="mr-2"
+                    @click="openCustomActionDialog(action, item)"
+                  >
+                    {{ action.title }}
+                  </v-btn>
+                  <v-btn
+                    v-for="button in props.customButtons"
+                    :key="button.label"
+                    :color="button.color || 'primary'"
+                    size="small"
+                    class="mr-2"
+                    @click="button.onClick(item)"
+                  >
+                    {{ button.label }}
                   </v-btn>
                 </template>
-                <v-btn v-for="(link, key) in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
-                  {{ key.toUpperCase() }} ⬇️
-                </v-btn>
-                <v-btn
-                  v-for="action in props.customActions"
-                  :key="action.title"
-                  color="orange"
-                  size="small"
-                  class="mr-2"
-                  @click="openCustomActionDialog(action, item)"
-                >
-                  {{ action.title }}
-                </v-btn>
-                <v-btn
-                  v-for="button in props.customButtons"
-                  :key="button.label"
-                  :color="button.color || 'primary'"
-                  size="small"
-                  class="mr-2"
-                  @click="button.onClick(item)"
-                >
-                  {{ button.label }}
-                </v-btn>
-              </template>
-              <template v-else>
-                {{ getTranslatedValue(item[column.key], column) }}
-              </template>
-            </td>
-          </tr>
-        </template>
-      </v-data-table>
-    </template>
-  </div>
-  <v-divider />
-  <div v-if="!loading && props.showPagination" class="h-25 d-flex justify-space-between align-center px-4 bg-white">
-    <h5>
-      نمایش {{ (currentPage - 1) * items.length }} تا
-      {{ currentPage * itemsPerPage }}
-      از {{ totalSize }} رکورد
-    </h5>
-    <v-pagination size="small" v-model="currentPage" :length="totalPages" :total-visible="5" />
-  </div>
-  <v-dialog v-model="dialog" max-width="800">
-    <v-card>
-      <v-card-title>{{ isEditing ? 'ویرایش' : 'ایجاد' }}</v-card-title>
-      <v-card-text>
-        <v-container>
-          <component v-if="props.formComponent" :is="props.formComponent" v-model="formModel" />
-          <template v-else>
-            <v-row>
-              <v-col v-for="header in props.headers" :key="header.key" cols="12" md="4">
-                <v-text-field
-                  v-model="formModel[header.key]"
-                  :label="header.title"
-                  variant="outlined"
-                  :disabled="header.editable === false"
-                  v-if="!header.hidden"
-                />
-              </v-col>
-            </v-row>
+                <template v-else>
+                  {{ getTranslatedValue(item[column.key], column) }}
+                </template>
+              </td>
+            </tr>
           </template>
-        </v-container>
-      </v-card-text>
-      <v-card-actions>
-        <v-btn color="grey" @click="dialog = false">انصراف</v-btn>
-        <v-btn color="green" @click="saveItem">{{ isEditing ? 'ذخیره' : 'ایجاد' }}</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+        </v-data-table>
 
-  <v-dialog v-model="deleteDialog" max-width="400">
-    <v-card>
-      <v-card-title>حذف آیتم</v-card-title>
-      <v-card-text> آیا مایل به حذف این رکورد هستید ?</v-card-text>
-      <v-card-actions>
-        <v-btn color="grey" @click="deleteDialog = false">انصراف</v-btn>
-        <v-btn color="red" @click="deleteItem(itemToDelete?.id)">حذف</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+        <!-- Loading indicator for infinite scroll -->
+        <div v-if="isLoadingMore" class="d-flex justify-center align-center pa-4">
+          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+        </div>
 
-  <v-dialog v-model="customActionDialog" max-width="800">
-    <v-card>
-      <v-card-title>
-        {{ props.customActions?.find((a) => a.component === customActionComponent)?.title || '' }}
-      </v-card-title>
-      <v-card-text>
-        <component v-if="customActionComponent" :is="customActionComponent" :item="customActionItem" @close="customActionDialog = false" />
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+        <!-- No more data indicator -->
+        <div v-if="!hasMore && items.length > 0" class="text-center pa-4 text-grey">تمام رکوردها نمایش داده شدند</div>
+      </template>
+    </div>
 
-  <!-- Filter Dialog -->
-  <v-dialog v-model="filterDialog" max-width="800">
-    <v-card>
-      <v-card-title>فیلتر</v-card-title>
-      <v-card-text>
-        <component
-          v-if="props.filterComponent"
-          :is="props.filterComponent"
-          v-model="filterModel"
-          @update:modelValue="filterModel = $event"
-        />
-      </v-card-text>
-      <v-card-actions>
-        <v-btn color="grey" @click="filterDialog = false">انصراف</v-btn>
-        <v-btn color="primary" @click="applyFilter">اعمال فیلتر</v-btn>
-        <v-btn color="error" @click="resetFilter">پاک کردن فیلتر</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+    <!-- Fixed Pagination at Bottom -->
+    <div v-if="props.showPagination" class="pagination-container">
+      <div class="d-flex justify-space-between align-center pa-4 bg-white">
+        <div class="text-subtitle-2">
+          نمایش {{ (currentPage - 1) * itemsPerPage + 1 }} تا {{ Math.min(currentPage * itemsPerPage, totalSize) }} از {{ totalSize }} رکورد
+        </div>
+        <v-pagination v-model="currentPage" :length="totalPages" :total-visible="5" size="small" @update:model-value="fetchData" />
+      </div>
+    </div>
+
+    <v-dialog v-model="dialog" max-width="800">
+      <v-card>
+        <v-card-title>{{ isEditing ? 'ویرایش' : 'ایجاد' }}</v-card-title>
+        <v-card-text>
+          <v-container>
+            <component v-if="props.formComponent" :is="props.formComponent" v-model="formModel" />
+            <template v-else>
+              <v-row>
+                <v-col v-for="header in props.headers" :key="header.key" cols="12" md="4">
+                  <v-text-field
+                    v-model="formModel[header.key]"
+                    :label="header.title"
+                    variant="outlined"
+                    :disabled="header.editable === false"
+                    v-if="!header.hidden"
+                  />
+                </v-col>
+              </v-row>
+            </template>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="grey" @click="dialog = false">انصراف</v-btn>
+          <v-btn color="green" @click="saveItem">{{ isEditing ? 'ذخیره' : 'ایجاد' }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="deleteDialog" max-width="400">
+      <v-card>
+        <v-card-title>حذف آیتم</v-card-title>
+        <v-card-text> آیا مایل به حذف این رکورد هستید ?</v-card-text>
+        <v-card-actions>
+          <v-btn color="grey" @click="deleteDialog = false">انصراف</v-btn>
+          <v-btn color="red" @click="deleteItem(itemToDelete?.id)">حذف</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="customActionDialog" max-width="800">
+      <v-card>
+        <v-card-title>
+          {{ props.customActions?.find((a) => a.component === customActionComponent)?.title || '' }}
+        </v-card-title>
+        <v-card-text>
+          <component
+            v-if="customActionComponent"
+            :is="customActionComponent"
+            :item="customActionItem"
+            @close="customActionDialog = false"
+          />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <!-- Filter Dialog -->
+    <v-dialog v-model="filterDialog" max-width="800">
+      <v-card>
+        <v-card-title>فیلتر</v-card-title>
+        <v-card-text>
+          <component
+            v-if="props.filterComponent"
+            :is="props.filterComponent"
+            v-model="filterModel"
+            @update:modelValue="filterModel = $event"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="grey" @click="filterDialog = false">انصراف</v-btn>
+          <v-btn color="primary" @click="applyFilter">اعمال فیلتر</v-btn>
+          <v-btn color="error" @click="resetFilter">پاک کردن فیلتر</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
+
+<style scoped>
+.custom-data-table {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.table-container {
+  flex: 0;
+  overflow-y: auto;
+  min-height: 400px;
+  max-height: 600px; /* or your preferred value */
+}
+
+.pagination-container {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  z-index: 1;
+}
+
+.custom-table {
+  width: 100%;
+}
+
+/* Ensure table header stays fixed while scrolling */
+:deep(.v-data-table__wrapper) {
+  overflow-y: auto;
+}
+
+:deep(.v-data-table__wrapper table) {
+  width: 100%;
+}
+</style>

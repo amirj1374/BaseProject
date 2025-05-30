@@ -97,15 +97,12 @@ const getRelationTypeText = (type: string) => {
     <form @submit.prevent="submitData">
       <CustomDataTable
         :headers="headers"
-        :items="docs"
-        :loading="loading"
         api-resource="general/get-all-doc"
-        :query-params="{ loanRequestId: approvalStore.loanRequestId }"
+        :query-params="{ loanRequestId: approvalStore.loanRequestId}"
         :auto-fetch="true"
-        :show-pagination="false"
+        :show-pagination="true"
         :custom-buttons="customButtons"
-      >
-      </CustomDataTable>
+      />
     </form>
 
     <v-dialog
@@ -123,42 +120,21 @@ const getRelationTypeText = (type: string) => {
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
-
-        <v-card-text v-if="selectedDoc">
-          <div class="mb-4">
-            <div class="text-subtitle-1 mb-2">اطلاعات مدرک</div>
-            <div class="text-body-2">
-              <div>نام: {{ selectedDoc.fullName }}</div>
-              <div>کد ملی: {{ selectedDoc.nationalCode }}</div>
-              <div>نوع: {{ getRelationTypeText(selectedDoc.relationType) }}</div>
-              <div>عنوان مدرک: {{ selectedDoc.fileTitle }}</div>
-            </div>
-          </div>
-
+        <v-card-text>
           <v-file-input
             v-model="selectedFile"
             label="انتخاب فایل"
             accept=".pdf,.jpg,.jpeg,.png"
-            :rules="[(v: File | null) => !v || v.size < 10 * 1024 * 1024 || 'حجم فایل نباید بیشتر از 10 مگابایت باشد']"
-            prepend-icon="mdi-paperclip"
-            variant="outlined"
-            density="comfortable"
-          ></v-file-input>
+            :loading="uploading"
+            :disabled="uploading"
+          />
         </v-card-text>
-
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="primary"
-            variant="text"
-            @click="showUploadDialog = false"
-          >
-            انصراف
-          </v-btn>
+          <v-spacer />
           <v-btn
             color="primary"
             :loading="uploading"
-            :disabled="!selectedFile"
+            :disabled="!selectedFile || uploading"
             @click="handleFileUpload"
           >
             آپلود

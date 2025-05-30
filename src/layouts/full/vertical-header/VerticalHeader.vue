@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useCustomizerStore } from '@/stores/customizer';
 // Icon Imports
+import { IconMenu2, IconSearch, IconBell, IconSettings } from '@tabler/icons-vue';
 
 // dropdown imports
 import NotificationDD from './NotificationDD.vue';
@@ -26,7 +27,7 @@ function searchbox() {
       @click.stop="customizer.SET_MINI_SIDEBAR(!customizer.mini_sidebar)"
       size="small"
     >
-      <Menu2Icon size="20" stroke-width="1.5" />
+      <IconMenu2 size="20" stroke-width="1.5" />
     </v-btn>
     <v-btn
       class="hidden-lg-and-up text-secondary ms-3"
@@ -37,7 +38,7 @@ function searchbox() {
       @click.stop="customizer.SET_SIDEBAR_DRAWER"
       size="small"
     >
-      <Menu2Icon size="20" stroke-width="1.5" />
+      <IconMenu2 size="20" stroke-width="1.5" />
     </v-btn>
 
     <!-- search mobile -->
@@ -50,7 +51,7 @@ function searchbox() {
       size="small"
       @click="searchbox"
     >
-      <SearchIcon size="17" stroke-width="1.5" />
+      <IconSearch size="17" stroke-width="1.5" />
     </v-btn>
 
     <v-sheet v-if="showSearch" class="search-sheet v-col-12">
@@ -77,7 +78,7 @@ function searchbox() {
     <v-menu :close-on-content-click="false">
       <template v-slot:activator="{ props }">
         <v-btn icon class="text-secondary mx-3" color="lightsecondary" rounded="sm" size="small" variant="flat" v-bind="props">
-          <BellIcon stroke-width="1.5" size="22" />
+          <IconBell stroke-width="1.5" size="22" />
         </v-btn>
       </template>
       <v-sheet rounded="md" width="330" elevation="12">
@@ -94,7 +95,7 @@ function searchbox() {
           <v-avatar size="30" class="ml-2 py-2">
             <img src="@/assets/images/profile/user-round.svg" alt="Julia" />
           </v-avatar>
-          <SettingsIcon stroke-width="1.5" />
+          <IconSettings stroke-width="1.5" />
         </v-btn>
       </template>
       <v-sheet rounded="md" width="330" elevation="12">

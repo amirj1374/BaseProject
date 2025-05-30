@@ -28,4 +28,5 @@ declare module '@tabler/icons-vue' {
   export const IconFileSymlink: DefineComponent
   export const IconHome: DefineComponent
   export const IconPencilPlus: DefineComponent
-} 
+  export const IconTableShare : DefineComponent
+}
