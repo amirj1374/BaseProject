@@ -2,9 +2,9 @@
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import { ref } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import Reference from '@/components/sections/cartable/Reference/Reference.vue';
-import UploadList from '@/components/sections/cartable/uploadList/uploadList.vue';
+import Reference from '@/components/sections/cartable/reference/Reference.vue';
 import CartableHistory from '@/components/sections/cartable/cartableHistory/cartableHistory.vue';
+import UploadList from '@/components/sections/cartable/uploadList/uploadList.vue';
 
 const breadcrumbs = ref([
   {
@@ -39,7 +39,8 @@ const header = ref([
 <template>
   <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
   <!-- Custom Data Table Component -->
-  <CustomDataTable
+  <div class="upload-form">
+    <CustomDataTable
     :apiResource="`cartable`"
     :headers="header"
     :auto-fetch="true"
@@ -49,4 +50,19 @@ const header = ref([
       { title: 'تاریخچه کارتابل', component: CartableHistory }
     ]"
   />
+  </div>
 </template>
+<style scoped>
+.upload-page {
+  height: 100vh; /* or 100% if its parent is also 100% */
+  display: flex;
+  flex-direction: column;
+}
+.upload-form {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+</style>

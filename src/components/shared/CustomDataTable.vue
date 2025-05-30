@@ -413,15 +413,15 @@ const resetFilter = () => {
 </script>
 
 <template>
-  <div class="custom-data-table">
-    <v-snackbar v-model="error" color="error" class="mb-4" timeout="3000">{{ error }}</v-snackbar>
-    <div class="d-flex align-center mb-3">
-      <v-btn v-if="props.actions?.includes('create')" color="green" class="me-2" @click="openDialog()">ایجاد ✅</v-btn>
-      <v-btn v-if="hasFilterComponent" @click="filterDialog = true">فیلتر 🔍</v-btn>
-    </div>
+  <!-- Action Buttons OUTSIDE the table container -->
+  <div class="action-buttons">
+    <v-btn v-if="props.actions?.includes('create')" color="green" class="me-2" @click="openDialog()">ایجاد ✅</v-btn>
+    <v-btn v-if="hasFilterComponent" @click="filterDialog = true">فیلتر 🔍</v-btn>
+  </div>
 
-    <!-- Table Container with Fixed Height -->
-    <div class="table-container">
+  <!-- Data Table Container (fills parent height) -->
+  <div class="data-table-container">
+    <div class="table-wrapper">
       <template v-if="loading && !isLoadingMore">
         <v-skeleton-loader type="table" :loading="loading" class="mx-auto" max-width="100%" :boilerplate="false" />
       </template>
@@ -430,10 +430,11 @@ const resetFilter = () => {
           :headers="[...props.headers, { title: 'عملیات', key: 'actions', sortable: false }]"
           :items="items"
           hide-default-footer
-          class="elevation-1 custom-table"
+          class="elevation-1"
           no-data-text="رکوردی یافت نشد"
           hover
           fixed-header
+          :height="300"
         >
           <template v-slot:item="{ item, columns }">
             <tr>
@@ -489,131 +490,134 @@ const resetFilter = () => {
         <div v-if="isLoadingMore" class="d-flex justify-center align-center pa-4">
           <v-progress-circular indeterminate color="primary"></v-progress-circular>
         </div>
-
-        <!-- No more data indicator -->
-        <div v-if="!hasMore && items.length > 0" class="text-center pa-4 text-grey">تمام رکوردها نمایش داده شدند</div>
       </template>
     </div>
 
-    <!-- Fixed Pagination at Bottom -->
-    <div v-if="props.showPagination" class="pagination-container">
-      <div class="d-flex justify-space-between align-center pa-4 bg-white">
+    <!-- Custom Pagination always visible at the bottom -->
+    <div v-if="props.showPagination" class="pagination-wrapper">
+      <div class="d-flex justify-space-between align-center pa-4">
         <div class="text-subtitle-2">
           نمایش {{ (currentPage - 1) * itemsPerPage + 1 }} تا {{ Math.min(currentPage * itemsPerPage, totalSize) }} از {{ totalSize }} رکورد
         </div>
         <v-pagination v-model="currentPage" :length="totalPages" :total-visible="5" size="small" @update:model-value="fetchData" />
       </div>
     </div>
-
-    <v-dialog v-model="dialog" max-width="800">
-      <v-card>
-        <v-card-title>{{ isEditing ? 'ویرایش' : 'ایجاد' }}</v-card-title>
-        <v-card-text>
-          <v-container>
-            <component v-if="props.formComponent" :is="props.formComponent" v-model="formModel" />
-            <template v-else>
-              <v-row>
-                <v-col v-for="header in props.headers" :key="header.key" cols="12" md="4">
-                  <v-text-field
-                    v-model="formModel[header.key]"
-                    :label="header.title"
-                    variant="outlined"
-                    :disabled="header.editable === false"
-                    v-if="!header.hidden"
-                  />
-                </v-col>
-              </v-row>
-            </template>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn color="grey" @click="dialog = false">انصراف</v-btn>
-          <v-btn color="green" @click="saveItem">{{ isEditing ? 'ذخیره' : 'ایجاد' }}</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="deleteDialog" max-width="400">
-      <v-card>
-        <v-card-title>حذف آیتم</v-card-title>
-        <v-card-text> آیا مایل به حذف این رکورد هستید ?</v-card-text>
-        <v-card-actions>
-          <v-btn color="grey" @click="deleteDialog = false">انصراف</v-btn>
-          <v-btn color="red" @click="deleteItem(itemToDelete?.id)">حذف</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="customActionDialog" max-width="800">
-      <v-card>
-        <v-card-title>
-          {{ props.customActions?.find((a) => a.component === customActionComponent)?.title || '' }}
-        </v-card-title>
-        <v-card-text>
-          <component
-            v-if="customActionComponent"
-            :is="customActionComponent"
-            :item="customActionItem"
-            @close="customActionDialog = false"
-          />
-        </v-card-text>
-      </v-card>
-    </v-dialog>
-
-    <!-- Filter Dialog -->
-    <v-dialog v-model="filterDialog" max-width="800">
-      <v-card>
-        <v-card-title>فیلتر</v-card-title>
-        <v-card-text>
-          <component
-            v-if="props.filterComponent"
-            :is="props.filterComponent"
-            v-model="filterModel"
-            @update:modelValue="filterModel = $event"
-          />
-        </v-card-text>
-        <v-card-actions>
-          <v-btn color="grey" @click="filterDialog = false">انصراف</v-btn>
-          <v-btn color="primary" @click="applyFilter">اعمال فیلتر</v-btn>
-          <v-btn color="error" @click="resetFilter">پاک کردن فیلتر</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </div>
+
+  <v-dialog v-model="dialog" max-width="800">
+    <v-card>
+      <v-card-title>{{ isEditing ? 'ویرایش' : 'ایجاد' }}</v-card-title>
+      <v-card-text>
+        <v-container>
+          <component v-if="props.formComponent" :is="props.formComponent" v-model="formModel" />
+          <template v-else>
+            <v-row>
+              <v-col v-for="header in props.headers" :key="header.key" cols="12" md="4">
+                <v-text-field
+                  v-model="formModel[header.key]"
+                  :label="header.title"
+                  variant="outlined"
+                  :disabled="header.editable === false"
+                  v-if="!header.hidden"
+                />
+              </v-col>
+            </v-row>
+          </template>
+        </v-container>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="grey" @click="dialog = false">انصراف</v-btn>
+        <v-btn color="green" @click="saveItem">{{ isEditing ? 'ذخیره' : 'ایجاد' }}</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="deleteDialog" max-width="400">
+    <v-card>
+      <v-card-title>حذف آیتم</v-card-title>
+      <v-card-text> آیا مایل به حذف این رکورد هستید ?</v-card-text>
+      <v-card-actions>
+        <v-btn color="grey" @click="deleteDialog = false">انصراف</v-btn>
+        <v-btn color="red" @click="deleteItem(itemToDelete?.id)">حذف</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="customActionDialog" max-width="800">
+    <v-card>
+      <v-card-title>
+        {{ props.customActions?.find((a) => a.component === customActionComponent)?.title || '' }}
+      </v-card-title>
+      <v-card-text>
+        <component
+          v-if="customActionComponent"
+          :is="customActionComponent"
+          :item="customActionItem"
+          @close="customActionDialog = false"
+        />
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
+  <!-- Filter Dialog -->
+  <v-dialog v-model="filterDialog" max-width="800">
+    <v-card>
+      <v-card-title>فیلتر</v-card-title>
+      <v-card-text>
+        <component
+          v-if="props.filterComponent"
+          :is="props.filterComponent"
+          v-model="filterModel"
+          @update:modelValue="filterModel = $event"
+        />
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="grey" @click="filterDialog = false">انصراف</v-btn>
+        <v-btn color="primary" @click="applyFilter">اعمال فیلتر</v-btn>
+        <v-btn color="error" @click="resetFilter">پاک کردن فیلتر</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style scoped>
-.custom-data-table {
+.data-table-container {
   display: flex;
   flex-direction: column;
   height: 100%;
-}
-
-.table-container {
-  flex: 0;
-  overflow-y: auto;
-  min-height: 400px;
-  max-height: 600px; /* or your preferred value */
-}
-
-.pagination-container {
-  position: sticky;
-  bottom: 0;
   background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.table-wrapper {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  /* No overflow here, let v-data-table handle scroll */
+}
+
+.pagination-wrapper {
+  flex-shrink: 0;
   border-top: 1px solid rgba(0, 0, 0, 0.12);
-  z-index: 1;
+  background: white;
+  z-index: 2;
 }
 
-.custom-table {
-  width: 100%;
+.action-buttons {
+  margin-bottom: 16px;
+  padding: 0 0 8px 0;
 }
 
-/* Ensure table header stays fixed while scrolling */
 :deep(.v-data-table__wrapper) {
-  overflow-y: auto;
+  overflow: visible;
 }
 
-:deep(.v-data-table__wrapper table) {
-  width: 100%;
+:deep(.v-data-table__wrapper table thead) {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+  box-shadow: 0 2px 4px -2px rgba(0,0,0,0.04);
 }
 </style>

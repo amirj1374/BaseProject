@@ -12,6 +12,10 @@ const stepper = ref(1);
 
 // Dynamically import components for better performance
 const steps = [
+{
+    title: 'بارگذاری مدارک',
+    component: defineAsyncComponent(() => import('@/components/sections/approval/upload/upload.vue'))
+  },
   {
     title: 'ثبت درخواست هویتی مشتری',
     component: defineAsyncComponent(() => import('@/components/sections/approval/customers/customers.vue'))
@@ -32,10 +36,7 @@ const steps = [
     title: 'استعلام',
     component: defineAsyncComponent(() => import('@/components/sections/approval/inquiry/inquiry.vue'))
   },
-  {
-    title: 'بارگذاری مدارک',
-    component: defineAsyncComponent(() => import('@/components/sections/approval/upload/upload.vue'))
-  },
+
   { title: 'پیشنویس', component: defineAsyncComponent(() => import('@/components/sections/approval/draft/draft.vue')) },
   {
     title: 'نمایش فرم',

@@ -93,12 +93,11 @@ const getRelationTypeText = (type: string) => {
 </script>
 
 <template>
-  <v-card variant="flat">
-    <form @submit.prevent="submitData">
+    <form @submit.prevent="submitData" class="upload-form">
       <CustomDataTable
         :headers="headers"
         api-resource="general/get-all-doc"
-        :query-params="{ loanRequestId: approvalStore.loanRequestId}"
+        :query-params="{ loanRequestId: 11558}"
         :auto-fetch="true"
         :show-pagination="true"
         :custom-buttons="customButtons"
@@ -146,5 +145,18 @@ const getRelationTypeText = (type: string) => {
     <v-snackbar v-model="error" color="error" timeout="5500">
       {{ error }}
     </v-snackbar>
-  </v-card>
 </template>
+<style scoped>
+.upload-page {
+  height: 100vh; /* or 100% if its parent is also 100% */
+  display: flex;
+  flex-direction: column;
+}
+.upload-form {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+</style>
