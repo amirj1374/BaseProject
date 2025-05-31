@@ -1,29 +1,59 @@
 <script setup lang="ts">
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import { ref } from 'vue';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import Reference from '@/components/sections/cartable/Reference/Reference.vue';
-import UploadList from '@/components/sections/cartable/uploadList/uploadList.vue';
-import CartableHistory from '@/components/sections/cartable/cartableHistory/cartableHistory.vue';
-
+import { ActionTypeOptions } from '@/types/enums/global';
+const props = defineProps<{
+  item: any;
+  onSuccess?: () => void;
+}>();
+const id = ref(props.item?.id ?? '');
 const page = ref({ title: 'تاریخچه کارتابل' });
 const header = ref([
+  {
+    title: 'عملیات',
+    key: 'action',
+    sortable: true,
+    editable: true,
+    translate: true,
+    options: ActionTypeOptions
+  },
+  {
+    title: 'توضیحات',
+    key: 'comments',
+    sortable: true,
+    editable: true
+  },
+  {
+    title: 'تاریخ تکمیل',
+    key: 'completedAt',
+    sortable: true,
+    isDate: true
+  },
   {
     title: 'تاریخ ایجاد',
     key: 'createdAt',
     sortable: true,
-    editable: true,
     isDate: true
   },
   {
     title: 'ایجاد شده توسط',
     key: 'createdBy',
-    sortable: true,
-    editable: true
+    sortable: true
   },
   {
-    title: 'کد رهگیری',
-    key: 'trackingCode',
+    title: 'نقش',
+    key: 'roleName',
+    sortable: true
+  },
+  {
+    title: 'ویرایش شده توسط',
+    key: 'updatedAt',
+    sortable: true,
+    isDate: true
+  },
+  {
+    title: 'تاریج ویرایش',
+    key: 'updatedBy',
     sortable: true
   }
 ]);
@@ -32,8 +62,9 @@ const header = ref([
 <template>
   <!-- Custom Data Table Component -->
   <CustomDataTable
-    :apiResource="`cartable`"
+    :apiResource="`cartable/${id}/history`"
     :headers="header"
     :auto-fetch="true"
+    :height="300"
   />
 </template>

@@ -45,6 +45,7 @@ interface Props {
   autoFetch?: boolean;
   queryParams?: Record<string, any>;
   showPagination?: boolean;
+  height: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -434,10 +435,10 @@ const resetFilter = () => {
           no-data-text="رکوردی یافت نشد"
           hover
           fixed-header
-          :height="300"
+          :height="props.height"
         >
-          <template v-slot:item="{ item, columns }">
-            <tr>
+          <template v-slot:item="{ item, columns, index }">
+            <tr :style="{ background: index % 2 === 0 ? '#fff' : '#f5f7fa' }">
               <td v-for="column in columns" :key="column.key" :style="getColumnStyle(column, item)">
                 <template v-if="column.key === 'actions'">
                   <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
@@ -543,7 +544,7 @@ const resetFilter = () => {
     </v-card>
   </v-dialog>
 
-  <v-dialog v-model="customActionDialog" max-width="800">
+  <v-dialog v-model="customActionDialog" max-width="1300">
     <v-card>
       <v-card-title>
         {{ props.customActions?.find((a) => a.component === customActionComponent)?.title || '' }}
@@ -619,5 +620,12 @@ const resetFilter = () => {
   background: white;
   z-index: 1;
   box-shadow: 0 2px 4px -2px rgba(0,0,0,0.04);
+}
+
+:deep(.v-data-table__wrapper tbody tr:nth-child(even)) {
+  background: #f5f7fa !important;
+}
+:deep(.v-data-table__wrapper tbody tr:nth-child(odd)) {
+  background: #fff !important;
 }
 </style>

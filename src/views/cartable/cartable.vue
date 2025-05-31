@@ -32,6 +32,11 @@ const header = ref([
     title: 'کد رهگیری',
     key: 'trackingCode',
     sortable: true
+  },
+  {
+    title: 'نقش',
+    key: 'roleName',
+    sortable: true
   }
 ]);
 </script>
@@ -43,6 +48,7 @@ const header = ref([
     <CustomDataTable
     :apiResource="`cartable`"
     :headers="header"
+    :height="400"
     :auto-fetch="true"
     :custom-actions="[
       { title: 'عملیات', component: Reference },

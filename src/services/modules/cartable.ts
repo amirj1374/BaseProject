@@ -1,4 +1,4 @@
-import type { ValidUserPayload } from "@/types/cartable/cartableTypes";
+import type { SubmitReferencePayload, ValidUserPayload } from "@/types/cartable/cartableTypes";
 import type { AxiosInstance } from "axios";
 
 export default (axiosInstance: AxiosInstance) => ({
@@ -21,4 +21,8 @@ export default (axiosInstance: AxiosInstance) => ({
   getValidUser(payload: ValidUserPayload) {
     return axiosInstance.get(`/api/v1/cartable/${payload.id}/get-valid-users?actionType=${payload.actionType}&roleCode=${payload.roleCode}`);
   },
+  submitReference(payload: SubmitReferencePayload) {
+    return axiosInstance.post("/api/v1/cartable/submit", payload);
+  },
+
 });

@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { RelationTypeOptions } from '@/types/enums/global';
 
 interface Document {
   nationalCode: string;
@@ -27,7 +28,7 @@ const uploading = ref(false);
 const headers = [
   { title: 'نام و نام خانوادگی', key: 'fullName' },
   { title: 'کد ملی', key: 'nationalCode' },
-  { title: 'نوع', key: 'relationType' },
+  { title: 'نوع', key: 'relationType', translate: true,options: RelationTypeOptions },
   { title: 'عنوان مدرک', key: 'fileTitle' },
   { title: 'وضعیت', key: 'status' },
 ];
@@ -101,6 +102,7 @@ const getRelationTypeText = (type: string) => {
         :auto-fetch="true"
         :show-pagination="true"
         :custom-buttons="customButtons"
+        :height="300"
       />
     </form>
 
