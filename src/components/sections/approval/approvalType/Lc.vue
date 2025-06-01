@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import type { CurrenciesDto } from '@/types/approval/approvalType';
+import type { CollateralDto, CurrenciesDto } from '@/types/approval/approvalType';
 import BaseApprovalForm from './BaseApprovalForm.vue';
 import { IconAlertCircle, IconSquareRoundedCheckFilled } from '@tabler/icons-vue';
 
 const props = defineProps<{
   currencies: CurrenciesDto[];
+  collateral: CollateralDto[];
   initialData?: any;
 }>();
 

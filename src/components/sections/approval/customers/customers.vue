@@ -43,13 +43,11 @@ const formData = ref({
 onMounted(() => {
   if (approvalStore.customerInfo) {
     items.value = [approvalStore.customerInfo];
-    formData.value.nationalCode = approvalStore.customerInfo.nationalCode || '';
-    formData.value.cif = approvalStore.customerInfo.cif || '';
-    searchParam.value = approvalStore.customerInfo.nationalCode ? 'nationalCode' : 'cif';
   }
 });
 
 async function search() {
+  approvalStore.resetAll()
   errors.value = {};
   if (searchParam.value === 'nationalCode') {
     const result = nationalCodeRule(formData.value.nationalCode, customerType.value);
@@ -122,13 +120,8 @@ watch(
   (newVal) => {
     if (newVal) {
       items.value = [newVal];
-      formData.value.nationalCode = newVal.nationalCode || '';
-      formData.value.cif = newVal.cif || '';
-      searchParam.value = newVal.nationalCode ? 'nationalCode' : 'cif';
     } else {
       items.value = [];
-      formData.value.nationalCode = '';
-      formData.value.cif = '';
     }
   },
   { immediate: true }

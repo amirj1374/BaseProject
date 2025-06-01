@@ -1,12 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, onMounted } from 'vue';
 import { api } from '@/services/api';
-import type { 
-  FetchGuarantorPayload, 
-  GuarantorDto, 
-  SaveGeneralPayload,
-  GuarantorInfoDTO,
-} from '@/types/approval/approvalType';
+import type { FetchGuarantorPayload, GuarantorDto, SaveGeneralPayload, GuarantorInfoDTO } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
 
 const approvalStore = useApprovalStore();
@@ -19,13 +14,16 @@ const success = ref<string | null>(null);
 const data = ref<GuarantorDto[]>([]);
 const showError = ref(false);
 const submitting = ref(false);
+type AllowedStatus = 'nationalCode' | 'cif';
+const searchParam = ref<AllowedStatus>('cif');
 
 const headers = ref([
   { title: 'نام ضامن', key: 'guarantorName', align: 'center' },
   { title: 'کدملی / شناسه ملی', key: 'nationalCode', align: 'left' },
   { title: 'تاریخ', key: 'createdAt', isDate: true },
   { title: 'رتبه', key: 'label' },
-  { title: 'امتیاز مشتری', key: 'value' }
+  { title: 'امتیاز مشتری', key: 'value' },
+  { title: 'عملیات', key: 'actions', align: 'center' }
 ]);
 
 // initial data
@@ -44,10 +42,16 @@ onMounted(() => {
   }
 });
 
-// get customer
-async function search() {
-  if (!isFormValid.value) {
-    error.value = 'لطفا فرم های بالا رو کامل کنید';
+// get guarantor
+async function addGuarantor() {
+  // 1. Validation
+  if (data.value.length >= 3) {
+    error.value = 'حداکثر ۳ ضامن می‌توانید اضافه کنید';
+    showError.value = true;
+    return;
+  }
+  if (!formData.value.nationalCode && !formData.value.cif) {
+    error.value = 'کد ملی یا شماره مشتری را وارد کنید';
     showError.value = true;
     return;
   }
@@ -63,13 +67,14 @@ async function search() {
       guarantorName: formData.value.GuarantorName
     };
 
+    // 2. Call API
     const response = await api.approval.fetchGuarantor(payload);
 
     if (response.status === 200 && response.data) {
       const raw = response.data;
       const guarantorInfo = raw.guarantorInfo || {};
 
-      // Create new guarantor with default values for null fields
+      // 3. Build new Guarantor object
       const newGuarantor: GuarantorDto = {
         id: raw.id || null,
         cif: guarantorInfo.cif ?? raw.cif ?? '-',
@@ -85,28 +90,24 @@ async function search() {
       };
 
       // Check if guarantor already exists in data
-      const isDuplicate = data.value.some((g: GuarantorDto) => 
-        g.nationalCode === newGuarantor.nationalCode && 
-        g.nationalCode !== '-' && 
-        g.nationalCode !== null
+      const isDuplicate = data.value.some(
+        (g: GuarantorDto) => g.nationalCode === newGuarantor.nationalCode && g.nationalCode !== '-' && g.nationalCode !== null
       );
 
       if (!isDuplicate) {
         data.value.push(newGuarantor);
         // Update store with new data
         approvalStore.setGuarantor(data.value);
+        // Clear input fields after successful API call
+        formData.value.nationalCode = null;
+        formData.value.cif = null;
+        formData.value.GuarantorName = null;
+        hideInput.value = false;
+        canSubmit.value = true;
       } else {
         error.value = 'این ضامن با این کد ملی قبلاً اضافه شده است';
         showError.value = true;
       }
-
-      // Clear input fields after successful API call
-      formData.value.nationalCode = null;
-      formData.value.cif = null;
-      formData.value.GuarantorName = null;
-      hideInput.value = false;
-
-      canSubmit.value = true;
     } else {
       error.value = `خطا: ${response.statusText}`;
       showError.value = true;
@@ -144,8 +145,8 @@ const submitData = async () => {
 
     // Create guarantor info payload
     const guarantorInfoDTO: GuarantorInfoDTO[] = data.value
-      .filter(guarantor => guarantor.nationalCode && guarantor.guarantorName)
-      .map(guarantor => ({
+      .filter((guarantor) => guarantor.nationalCode && guarantor.guarantorName)
+      .map((guarantor) => ({
         nationalCode: guarantor.nationalCode!,
         guarantorName: guarantor.guarantorName!
       }));
@@ -190,6 +191,22 @@ const submitData = async () => {
   }
 };
 
+function deleteGuarantor(item: GuarantorDto) {
+  const index = data.value.findIndex((g) => g.nationalCode === item.nationalCode);
+  if (index !== -1) {
+    data.value.splice(index, 1);
+    approvalStore.setGuarantor(data.value);
+    canSubmit.value = data.value.length > 0;
+  }
+}
+
+const changePattern = async () => {
+  formData.value.cif = '';
+  formData.value.nationalCode = '';
+  error.value = null;
+  showError.value = false;
+};
+
 defineExpose({ submitData });
 </script>
 
@@ -197,9 +214,27 @@ defineExpose({ submitData });
   <v-card variant="flat">
     <form @submit.prevent="submitData">
       <v-row class="mt-2">
+        <v-col cols="12" md="12">
+          <v-radio-group inline v-model="searchParam" class="radioBtnContainer" @change="changePattern">
+            <v-radio label="شماره مشتری" value="cif"></v-radio>
+            <v-radio label="کدملی" value="nationalCode"></v-radio>
+          </v-radio-group>
+        </v-col>
+      </v-row>
+      <v-row>
         <!-- National Code Input -->
-        <v-col cols="12" md="4">
-          <v-text-field v-model="formData.nationalCode" label="کد ملی" variant="outlined" v-digit-limit="11" density="comfortable" />
+        <v-col v-if="searchParam === 'cif'" cols="12" md="3">
+          <v-text-field v-model="formData.cif" label="شماره مشتری" variant="outlined" density="comfortable" />
+        </v-col>
+        <v-col v-if="searchParam === 'nationalCode'" cols="12" md="3">
+          <v-text-field
+            v-model="formData.nationalCode"
+            label="کد ملی"
+            variant="outlined"
+            density="comfortable"
+            type="number"
+            v-digit-limit="11"
+          />
         </v-col>
 
         <v-col v-if="hideInput" cols="12" md="4">
@@ -209,7 +244,7 @@ defineExpose({ submitData });
       <!-- Person Type Select -->
       <v-row>
         <v-col cols="12" md="12" class="text-center">
-          <v-btn color="secondary" @click="search" type="button" :loading="loading"> جستجو</v-btn>
+          <v-btn color="secondary" @click="addGuarantor" type="button" :loading="loading"> جستجو</v-btn>
         </v-col>
       </v-row>
 
@@ -217,9 +252,7 @@ defineExpose({ submitData });
       <v-dialog v-model="dialog" max-width="400">
         <v-card prepend-icon="mdi-update" title="پیام سیستم">
           <v-card-text>
-            <v-alert v-if="success" type="success" variant="tonal" class="my-4">
-              کد رهگیری: {{ success }}
-            </v-alert>
+            <v-alert v-if="success" type="success" variant="tonal" class="my-4"> کد رهگیری: {{ success }} </v-alert>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -246,20 +279,16 @@ defineExpose({ submitData });
           <template v-slot:item.createdAt="{ item }">
             {{ new Date(item.createdAt).toLocaleDateString('fa-IR') }}
           </template>
+          <template v-slot:item.actions="{ item }">
+            <v-btn size="small" @click="deleteGuarantor(item)"> ❌حذف </v-btn>
+          </template>
         </v-data-table>
       </v-col>
 
       <!-- Submit Button -->
       <v-row class="mt-4">
         <v-col cols="12" class="text-center">
-          <v-btn
-            color="primary"
-            type="submit"
-            :loading="submitting"
-            :disabled="!canSubmit || data.length === 0"
-          >
-            ثبت ضامن‌ها
-          </v-btn>
+          <v-btn color="primary" type="submit" :loading="submitting" :disabled="!canSubmit || data.length === 0"> ثبت ضامن‌ها </v-btn>
         </v-col>
       </v-row>
     </form>
@@ -288,5 +317,12 @@ defineExpose({ submitData });
 
 .v-data-table :deep(tr:hover) {
   background-color: #f8f8f8;
+}
+
+.radioBtnContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

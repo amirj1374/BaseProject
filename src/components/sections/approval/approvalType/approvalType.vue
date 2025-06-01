@@ -266,7 +266,7 @@ defineExpose({ submitData });
           </v-col>
           <!-- Lc Checkbox -->
           <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
-            <Lc ref="lcRef" :currencies="currencies" :initial-data="lcData" @save="saveLcData" />
+            <Lc ref="lcRef" :currencies="currencies" :collateral="collaterals" :initial-data="lcData" @save="saveLcData" />
           </v-col>
         </v-row>
         <v-row>
