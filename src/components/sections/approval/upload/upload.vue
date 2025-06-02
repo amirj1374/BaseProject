@@ -98,7 +98,7 @@ const getRelationTypeText = (type: string) => {
       <CustomDataTable
         :headers="headers"
         api-resource="general/get-all-doc"
-        :query-params="{ loanRequestId: 11558}"
+        :query-params="{ loanRequestId: approvalStore.loanRequestId}"
         :auto-fetch="true"
         :show-pagination="true"
         :custom-buttons="customButtons"

@@ -15,7 +15,7 @@ const loading = ref(false);
 const fetchAccounts = async () => {
   loading.value = true;
   try {
-    const res = await api.approval.getAllDeposit("5253");
+    const res = await api.approval.getAllDeposit(approvalStore.loanRequestId);
     console.log(res.data);
     if (res.status === 200) {
       items.value = res.data;
@@ -29,8 +29,13 @@ const fetchAccounts = async () => {
 
 const handleSave = async () => {
   loading.value = true;
+  if (!selected.value) {
+    error.value = "لطفاً یک حساب را انتخاب کنید";
+    loading.value = false;
+    return;
+  }
   try {
-    const res = await api.approval.saveDeposit(approvalStore.getLoanRequestId, selected.value );
+    const res = await api.approval.saveDeposit(approvalStore.loanRequestId, selected.value );
     if (res.status === 200) {
       items.value = res.data;
       isDialogActive.value = false;

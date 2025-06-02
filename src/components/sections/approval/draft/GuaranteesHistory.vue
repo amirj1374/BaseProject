@@ -45,7 +45,8 @@ const header = ref([
               :headers="header"
               :actions="['edit']"
               :pagination="false"
-              :queryParams="{ loanRequestId: approvalStore.getLoanRequestId }"
+              :queryParams="{ loanRequestId: approvalStore.loanRequestId }"
+              :height="400"
             />
           </v-col>
         </v-row>

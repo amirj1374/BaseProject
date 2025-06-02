@@ -46,10 +46,11 @@ const header = ref([
           <v-col cols="12" md="12">
             <CustomDataTable
               :apiResource="`loan-info`"
-              :queryParams="{ loanRequestId: approvalStore.getLoanRequestId }"
+              :queryParams="{ loanRequestId: approvalStore.loanRequestId }"
               :headers="header"
               :actions="['edit']"
               :pagination="false"
+              :height="400"
             />
           </v-col>
         </v-row>
