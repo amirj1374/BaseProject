@@ -95,55 +95,49 @@ defineExpose({ submitData });
             <v-row>
               <v-col cols="12" md="6">
                 <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="lg">
-                  <div class="text-subtitle-1 mb-2">استعلام چک</div>
-                  <pre class="text-body-2">{{ JSON.stringify(chequeData, null, 2) }}</pre>
+                  <div class="text-subtitle-1 mb-4 font-weight-bold">استعلام چک</div>
+                  <div class="inquiry-section">
+                    <div class="inquiry-item">
+                      <div class="inquiry-label">اطلاعات چک</div>
+                      <div class="inquiry-value">{{ chequeData?.chequeInfo || 'نامشخص' }}</div>
+                    </div>
+                    <div class="inquiry-item">
+                      <div class="inquiry-label">وضعیت</div>
+                      <div class="inquiry-value">{{ chequeData?.status || 'نامشخص' }}</div>
+                    </div>
+                    <div class="inquiry-item">
+                      <div class="inquiry-label">تاریخ</div>
+                      <div class="inquiry-value">{{ chequeData?.date || 'نامشخص' }}</div>
+                    </div>
+                  </div>
                 </v-card>
               </v-col>
 
               <v-col cols="12" md="6">
                 <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="lg">
-                  <div class="text-subtitle-1 mb-2">استعلام ساپ</div>
-                  <v-list density="compact" class="bg-transparent">
-                    <v-list-item>
-                      <template v-slot:prepend>
-                        <v-icon icon="mdi-calendar" color="primary"></v-icon>
-                      </template>
-                      <v-list-item-title>تاریخ تغییر</v-list-item-title>
-                      <v-list-item-subtitle>{{ sapData?.changeDate || 'نامشخص' }}</v-list-item-subtitle>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <template v-slot:prepend>
-                        <v-icon icon="mdi-shield-check" color="primary"></v-icon>
-                      </template>
-                      <v-list-item-title>وثیقه</v-list-item-title>
-                      <v-list-item-subtitle>{{ sapData?.collateral || 'نامشخص' }}</v-list-item-subtitle>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <template v-slot:prepend>
-                        <v-icon icon="mdi-calendar-clock" color="primary"></v-icon>
-                      </template>
-                      <v-list-item-title>تاریخ ایجاد</v-list-item-title>
-                      <v-list-item-subtitle>{{ sapData?.createdAt || 'نامشخص' }}</v-list-item-subtitle>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <template v-slot:prepend>
-                        <v-icon icon="mdi-tag" color="primary"></v-icon>
-                      </template>
-                      <v-list-item-title>برچسب</v-list-item-title>
-                      <v-list-item-subtitle>{{ sapData?.label || 'نامشخص' }}</v-list-item-subtitle>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <template v-slot:prepend>
-                        <v-icon icon="mdi-currency-usd" color="primary"></v-icon>
-                      </template>
-                      <v-list-item-title>مبلغ</v-list-item-title>
-                      <v-list-item-subtitle>{{ sapData?.value?.toLocaleString() || 'نامشخص' }} ریال</v-list-item-subtitle>
-                    </v-list-item>
-                  </v-list>
+                  <div class="text-subtitle-1 mb-4 font-weight-bold">استعلام ساپ</div>
+                  <div class="inquiry-section">
+                    <div class="inquiry-item">
+                      <div class="inquiry-label">تاریخ تغییر</div>
+                      <div class="inquiry-value">{{ sapData?.changeDate || 'نامشخص' }}</div>
+                    </div>
+                    <div class="inquiry-item">
+                      <div class="inquiry-label">وثیقه</div>
+                      <div class="inquiry-value">{{ sapData?.collateral || 'نامشخص' }}</div>
+                    </div>
+                    <div class="inquiry-item">
+                      <div class="inquiry-label">تاریخ ایجاد</div>
+                      <div class="inquiry-value">{{ sapData?.createdAt || 'نامشخص' }}</div>
+                    </div>
+                    <div class="inquiry-item">
+                      <div class="inquiry-label">برچسب</div>
+                      <div class="inquiry-value">{{ sapData?.label || 'نامشخص' }}</div>
+                    </div>
+                    <div class="inquiry-item">
+                      <div class="inquiry-label">مبلغ</div>
+                      <div class="inquiry-value">{{ sapData?.value?.toLocaleString() || 'نامشخص' }} ریال</div>
+                    </div>
+                  </div>
                 </v-card>
               </v-col>
             </v-row>
@@ -172,5 +166,32 @@ pre {
   word-wrap: break-word;
   margin: 0;
   font-family: inherit;
+}
+
+.inquiry-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.inquiry-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.inquiry-label {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.inquiry-value {
+  color: #333;
+  font-weight: 500;
+  font-size: 1rem;
 }
 </style>

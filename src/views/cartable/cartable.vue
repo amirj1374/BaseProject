@@ -5,6 +5,7 @@ import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import Reference from '@/components/sections/cartable/reference/Reference.vue';
 import CartableHistory from '@/components/sections/cartable/cartableHistory/cartableHistory.vue';
 import UploadList from '@/components/sections/cartable/uploadList/uploadList.vue';
+import LoanRequestHistory from '@/components/sections/cartable/loanRequestHistory/loanRequestHistory.vue';
 
 const breadcrumbs = ref([
   {
@@ -53,7 +54,8 @@ const header = ref([
     :custom-actions="[
       { title: 'عملیات', component: Reference },
       { title: 'لیست مدارک', component: UploadList },
-      { title: 'تاریخچه کارتابل', component: CartableHistory }
+      { title: 'تاریخچه کارتابل', component: CartableHistory },
+      { title: 'تاریخچه درخواست مصوبه', component: LoanRequestHistory }
     ]"
   />
   </div>

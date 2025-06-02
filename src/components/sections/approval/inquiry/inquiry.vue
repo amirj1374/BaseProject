@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
+import { DateConverter } from '@/utils/date-convertor';
 
 const approvalStore = useApprovalStore();
 const value = ref(0);
@@ -35,6 +36,7 @@ const getInquiry = async () => {
 
     if (chequeRes.status === 200 && sapRes.status === 200) {
       chequeData.value = chequeRes.data;
+      console.log(chequeData.value);
       sapData.value = sapRes.data;
       responseStatus.value = 'success';
     } else {
@@ -96,14 +98,22 @@ defineExpose({ submitData });
               <v-col cols="12" md="6">
                 <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="lg">
                   <div class="text-subtitle-1 mb-2">استعلام چک</div>
-                  <pre class="text-body-2">{{ JSON.stringify(chequeData, null, 2) }}</pre>
+                  <div>
+                    <div><b>شرکت : </b> {{ chequeData?.allOfThem || 'نامشخص' }}</div>
+                    <div><b>مبلغ کل : </b> {{ chequeData?.totalAmount || 'نامشخص' }}</div>
+                  </div>
                 </v-card>
               </v-col>
 
               <v-col cols="12" md="6">
                 <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="lg">
                   <div class="text-subtitle-1 mb-2">استعلام ساپ</div>
-                  <pre class="text-body-2">{{ JSON.stringify(sapData, null, 2) }}</pre>
+                  <div>
+                    <div><b>برچسب : </b> {{ sapData?.label || 'نامشخص' }}</div>
+                    <div><b>وثیقه : </b> {{ sapData?.collateral || 'نامشخص' }}</div>
+                    <div><b>مبلغ : </b> {{ sapData?.value?.toLocaleString() || 'نامشخص' }}</div>
+                    <div><b>تاریخ ایجاد : </b> {{ DateConverter.toShamsi(sapData?.createdAt) || 'نامشخص' }}</div>
+                  </div>
                 </v-card>
               </v-col>
             </v-row>
