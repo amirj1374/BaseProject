@@ -13,15 +13,17 @@ const approvalStore = useApprovalStore()
 const collaterals = ref<CollateralDto[]>([]);
 const loading = ref(false);
 const currencies = ref<CurrenciesDto[]>([]);
-const facilitiesData = ref<RequestInformationDto | null>(null);
-const guaranteeData = ref<RequestInformationDto | null>(null);
-const lcData = ref<RequestInformationDto | null>(null);
-const dataTable = ref<RequestInformationDto[]>([]);
+
+// Separate data tables for each type
+const facilitiesData = ref<RequestInformationDto[]>([]);
+const guaranteeData = ref<RequestInformationDto[]>([]);
+const lcData = ref<RequestInformationDto[]>([]);
+
+// Common headers for all tables
 const headers = ref([
   { title: 'ارز', align: 'center', key: 'currency', width: '150px' },
   { title: 'مبلغ', align: 'center', key: 'amount', width: '200px' },
   { title: 'مصوبه', align: 'center', key: 'approvalType', width: '150px' },
-  { title: 'نوع درخواست', align: 'center', key: 'requestType', width: '150px' },
   { title: 'نوع عقد', align: 'center', key: 'contractTypeId', width: '200px' },
   { title: 'محصول', align: 'center', key: 'facilityId', width: '200px' },
   { title: 'بازپرداخت', align: 'center', key: 'repaymentType', width: '200px' },
@@ -36,133 +38,225 @@ const facilitiesRef = ref();
 const guaranteeRef = ref();
 const lcRef = ref();
 
-const getRequestType = (requestType: string): string => {
-  switch (requestType) {
-    case 'ContractCode':
-      return 'تسهیلات';
-    case 'GuaranteeType':
-      return 'ضمانت‌نامه';
-    case 'LetterOfCredit':
-      return 'اعتبار اسنادی';
-    default:
-      return '-';
-  }
-};
+const repaymentTypeMap = RepaymentTypeOptions.reduce((acc, cur) => {
+  acc[cur.value] = cur.title;
+  return acc;
+}, {} as Record<string, string>);
+
+const approvalTypeMap = ApprovalTypeOptions.reduce((acc, cur) => {
+  acc[cur.value] = cur.title;
+  return acc;
+}, {} as Record<string, string>);
+
+// Add these refs for contract types and facilities
+const contractTypes = ref<ContractTypeDto[]>([]);
+const facilities = ref<any[]>([]);
 
 onMounted(async () => {
-  const currenciesRes = await api.approval.fetchCurrencies();
-  currencies.value = currenciesRes.data;
+  try {
+    // Load currencies
+    const currenciesRes = await api.approval.fetchCurrencies();
+    currencies.value = currenciesRes.data;
 
-  // Load initial data from store
-  const storeData = approvalStore.loanRequestDetailList;
-  if (storeData && storeData.length > 0) {
-    // Convert store data back to RequestInformationDto format
-    const convertedData = storeData.map(item => ({
-      contractTypeId: item.contractTypeId.toString(),
-      approvalType: item.approvalType,
-      requestType: item.requestType,
-      amount: item.amount,
-      currency: item.currency,
-      facilityId: item.facilityId,
-      year: parseInt(item.year) || undefined,
-      month: parseInt(item.month) || undefined,
-      day: parseInt(item.day) || undefined,
-      repaymentType: item.repaymentType,
-      collaterals: item.collaterals.map(c => ({
-        type: c.type.toString(),
-        amount: c.amount,
-        percent: c.percent
-      })),
-      advancePayment: item.advancePayment,
-      durationDay: item.durationDay,
-      other: item.other
-    }));
+    // Load initial data from store
+    const storeData = approvalStore.loanRequestDetailList;
+    if (storeData && storeData.length > 0) {
+      // Separate data by request type
+      for (const item of storeData) {
+        const convertedItem = {
+          contractTypeId: item.contractTypeId,
+          approvalType: item.approvalType,
+          requestType: item.requestType,
+          amount: item.amount,
+          currency: item.currency,
+          facilityId: item.facilityId,
+          repaymentType: item.repaymentType,
+          collaterals: item.collaterals.map(c => ({
+            type: c.type.toString(),
+            amount: c.amount,
+            percent: c.percent
+          })),
+          advancePayment: item.advancePayment,
+          durationDay: item.durationDay
+        };
 
-    // Update data table and individual data refs
-    dataTable.value = convertedData;
-    
-    // Set individual data refs based on request type
-    convertedData.forEach(item => {
-      switch (item.requestType) {
-        case 'ContractCode':
-          facilitiesData.value = item;
-          break;
-        case 'GuaranteeType':
-          guaranteeData.value = item;
-          break;
-        case 'LetterOfCredit':
-          lcData.value = item;
-          break;
+        // Load facilities for this contract type
+        const facilitiesRes = await api.approval.getFacilities(convertedItem.contractTypeId, item.requestType);
+        facilities.value = facilitiesRes.data.facilityDtoList || [];
+
+        // Find the matching contract type and facility
+        const contractType = contractTypes.value.find(ct => ct.id === convertedItem.contractTypeId);
+        const facility = facilities.value.find((f: { facilityCode: string }) => f.facilityCode === convertedItem.facilityId.toString());
+
+        // Add the complete objects to the converted item
+        const completeItem = {
+          ...convertedItem,
+          contractType,
+          facility
+        };
+
+        // Add to the appropriate array
+        switch (item.requestType) {
+          case 'ContractCode':
+            facilitiesData.value.push(completeItem);
+            break;
+          case 'GuaranteeType':
+            guaranteeData.value.push(completeItem);
+            break;
+          case 'LetterOfCredit':
+            lcData.value.push(completeItem);
+            break;
+        }
       }
-    });
+    }
+  } catch (err) {
+    console.error('Error loading data:', err);
+    error.value = 'خطا در بارگذاری اطلاعات';
   }
 });
 
-const isDuplicate = (newData: RequestInformationDto): boolean => {
-  return dataTable.value.some((existingItem: RequestInformationDto) => 
-    existingItem.requestType === newData.requestType &&
-    existingItem.contractTypeId === newData.contractTypeId &&
-    existingItem.facilityId === newData.facilityId
-  );
+const editItem = async (item: RequestInformationDto, ref: any) => {
+  // Remove edit functionality
+  console.log('Edit functionality has been removed. Please delete and add new item if needed.');
 };
 
-const saveFacilitiesData = (data: RequestInformationDto) => {
-  if (isDuplicate(data)) {
-    console.warn('Duplicate entry detected');
-    return;
-  }
-  facilitiesData.value = data;
-  dataTable.value.push(data);
-};
-
-const saveGuaranteeData = (data: RequestInformationDto) => {
-  if (isDuplicate(data)) {
-    error.value = 'این نوع ضمانت نامه قبلاً اضافه شده است';
-    return;
-  }
-  guaranteeData.value = data;
-  dataTable.value.push(data);
-  valid.value = true;
-};
-
-const saveLcData = (data: RequestInformationDto) => {
-  if (isDuplicate(data)) {
-    console.warn('Duplicate entry detected');
-    return;
-  }
-  lcData.value = data;
-  dataTable.value.push(data);
-};
-
-const deleteItem = (item: RequestInformationDto) => {
-  const index = dataTable.value.findIndex(
-    (i) => 
-      i.requestType === item.requestType &&
-      i.contractTypeId === item.contractTypeId &&
-      i.facilityId === item.facilityId
-  );
-  
-  if (index !== -1) {
-    dataTable.value.splice(index, 1);
+const saveFacilitiesData = async (data: RequestInformationDto) => {
+  try {
+    console.log('Received data in saveFacilitiesData:', data);
     
-    // Also clear the corresponding data ref
-    switch (item.requestType) {
-      case 'ContractCode':
-        facilitiesData.value = null;
-        break;
-      case 'GuaranteeType':
-        guaranteeData.value = null;
-        break;
-      case 'LetterOfCredit':
-        lcData.value = null;
-        break;
+    const facilitiesRes = await api.approval.getFacilities(data.contractTypeId, 'ContractCode');
+    const currentFacilities = facilitiesRes.data.facilityDtoList || [];
+    
+    const facility = currentFacilities.find((f: { facilityCode: string }) => f.facilityCode === data.facilityId.toString());
+    
+    if (!facility) {
+      console.error('Facility not found:', data.facilityId);
+      return;
     }
+
+    const newItem = {
+      ...data,
+      contractType: {
+        id: parseInt(data.contractTypeId.toString()),
+        longTitle: data.contractType?.longTitle || '',
+        shortTitle: data.contractType?.shortTitle || '',
+        code: data.contractType?.code || '',
+        parentId: data.contractType?.parentId || 0,
+        mainGroup: data.contractType?.mainGroup || '',
+        childOrder: data.contractType?.childOrder || '',
+        activationDate: data.contractType?.activationDate || '',
+        equivalentCode: data.contractType?.equivalentCode || 0,
+        parameterValue: data.contractType?.parameterValue || '',
+        active: data.contractType?.active || '',
+        requestType: 'ContractCode' as const
+      },
+      facility: {
+        facilityId: parseInt(facility.facilityCode),
+        facilityCode: parseInt(facility.facilityCode),
+        facilityName: facility.facilityName,
+        contractId: parseInt(data.contractTypeId.toString())
+      }
+    };
+
+    console.log('Saving facilities data:', newItem);
+    facilitiesData.value.push(newItem);
+  } catch (err) {
+    console.error('Error saving facilities data:', err);
   }
 };
 
-const editItem = (item: RequestInformationDto) => {
-  // Remove the item from dataTable first
-  const index = dataTable.value.findIndex(
+const saveGuaranteeData = async (data: RequestInformationDto) => {
+  try {
+    console.log('Received data in saveGuaranteeData:', data);
+    
+    const facilitiesRes = await api.approval.getFacilities(data.contractTypeId, 'GuaranteeType');
+    const currentFacilities = facilitiesRes.data.facilityDtoList || [];
+    
+    const facility = currentFacilities.find((f: { facilityCode: string }) => f.facilityCode === data.facilityId.toString());
+    
+    if (!facility) {
+      console.error('Facility not found:', data.facilityId);
+      return;
+    }
+
+    const newItem = {
+      ...data,
+      contractType: {
+        id: parseInt(data.contractTypeId.toString()),
+        longTitle: data.contractType?.longTitle || '',
+        shortTitle: data.contractType?.shortTitle || '',
+        code: data.contractType?.code || '',
+        parentId: data.contractType?.parentId || 0,
+        mainGroup: data.contractType?.mainGroup || '',
+        childOrder: data.contractType?.childOrder || '',
+        activationDate: data.contractType?.activationDate || '',
+        equivalentCode: data.contractType?.equivalentCode || 0,
+        parameterValue: data.contractType?.parameterValue || '',
+        active: data.contractType?.active || '',
+        requestType: 'GuaranteeType' as const
+      },
+      facility: {
+        facilityId: parseInt(facility.facilityCode),
+        facilityCode: parseInt(facility.facilityCode),
+        facilityName: facility.facilityName,
+        contractId: parseInt(data.contractTypeId.toString())
+      }
+    };
+
+    console.log('Saving guarantee data:', newItem);
+    guaranteeData.value.push(newItem);
+  } catch (err) {
+    console.error('Error saving guarantee data:', err);
+  }
+};
+
+const saveLcData = async (data: RequestInformationDto) => {
+  try {
+    console.log('Received data in saveLcData:', data);
+    
+    const facilitiesRes = await api.approval.getFacilities(data.contractTypeId, 'LetterOfCredit');
+    const currentFacilities = facilitiesRes.data.facilityDtoList || [];
+    
+    const facility = currentFacilities.find((f: { facilityCode: string }) => f.facilityCode === data.facilityId.toString());
+    
+    if (!facility) {
+      console.error('Facility not found:', data.facilityId);
+      return;
+    }
+
+    const newItem = {
+      ...data,
+      contractType: {
+        id: parseInt(data.contractTypeId.toString()),
+        longTitle: data.contractType?.longTitle || '',
+        shortTitle: data.contractType?.shortTitle || '',
+        code: data.contractType?.code || '',
+        parentId: data.contractType?.parentId || 0,
+        mainGroup: data.contractType?.mainGroup || '',
+        childOrder: data.contractType?.childOrder || '',
+        activationDate: data.contractType?.activationDate || '',
+        equivalentCode: data.contractType?.equivalentCode || 0,
+        parameterValue: data.contractType?.parameterValue || '',
+        active: data.contractType?.active || '',
+        requestType: 'LetterOfCredit' as const
+      },
+      facility: {
+        facilityId: parseInt(facility.facilityCode),
+        facilityCode: parseInt(facility.facilityCode),
+        facilityName: facility.facilityName,
+        contractId: parseInt(data.contractTypeId.toString())
+      }
+    };
+
+    console.log('Saving LC data:', newItem);
+    lcData.value.push(newItem);
+  } catch (err) {
+    console.error('Error saving LC data:', err);
+  }
+};
+
+const deleteItem = (item: RequestInformationDto, dataArray: RequestInformationDto[]) => {
+  const index = dataArray.findIndex(
     (i) => 
       i.requestType === item.requestType &&
       i.contractTypeId === item.contractTypeId &&
@@ -170,36 +264,30 @@ const editItem = (item: RequestInformationDto) => {
   );
   
   if (index !== -1) {
-    dataTable.value.splice(index, 1);
-  }
-
-  // Set the data in the appropriate component and open dialog
-  switch (item.requestType) {
-    case 'ContractCode':
-      facilitiesData.value = item;
-      facilitiesRef.value?.openForm();
-      break;
-    case 'GuaranteeType':
-      guaranteeData.value = item;
-      guaranteeRef.value?.openForm();
-      break;
-    case 'LetterOfCredit':
-      lcData.value = item;
-      lcRef.value?.openForm();
-      break;
+    dataArray.splice(index, 1);
+    // Reset the form in the corresponding component
+    if (item.requestType === 'ContractCode') {
+      facilitiesRef.value?.formRef?.resetFormData();
+    } else if (item.requestType === 'GuaranteeType') {
+      guaranteeRef.value?.formRef?.resetFormData();
+    } else if (item.requestType === 'LetterOfCredit') {
+      lcRef.value?.formRef?.resetFormData();
+    }
   }
 };
 
 // API submission method
 const submitData = async (): Promise<{ success: boolean; message: string }> => {
   try {
-    if (dataTable.value.length === 0) {
+    const allData = [...facilitiesData.value, ...guaranteeData.value, ...lcData.value];
+    
+    if (allData.length === 0) {
       return Promise.reject({ success: false, message: 'هیچ داده‌ای برای ارسال وجود ندارد.' });
     }
 
-    // Convert dataTable items to LoanRequestDetail format and save to store
-    const loanRequestDetails = dataTable.value.map((item: RequestInformationDto) => {
-      const { contractType, selectedCollaterals, ...rest } = item as any;
+    // Convert data to LoanRequestDetail format and save to store
+    const loanRequestDetails = allData.map((item: RequestInformationDto) => {
+      const { contractType, selectedCollaterals, facility, year, month, day, ...rest } = item as any;
       return {
         advancePayment: item.advancePayment || '',
         amount: item.amount,
@@ -209,16 +297,13 @@ const submitData = async (): Promise<{ success: boolean; message: string }> => {
           amount: c.amount,
           percent: c.percent
         })),
-        contractTypeId: parseInt(item.contractTypeId),
+        contractTypeId: item.contractTypeId,
+        contractTypeTitle: item.contractType?.longTitle || '',
         currency: item.currency,
-        day: item.day?.toString() || '',
         durationDay: item.durationDay || 0,
         facilityId: item.facilityId,
-        month: item.month?.toString() || '',
-        other: item.other || '',
         repaymentType: item.repaymentType,
-        requestType: item.requestType,
-        year: item.year?.toString() || ''
+        requestType: item.requestType
       };
     });
 
@@ -233,82 +318,177 @@ const submitData = async (): Promise<{ success: boolean; message: string }> => {
   }
 };
 
-
-const repaymentTypeMap = RepaymentTypeOptions.reduce((acc, cur) => {
-  acc[cur.value] = cur.title;
-  return acc;
-}, {} as Record<string, string>);
-
-const approvalTypeMap = ApprovalTypeOptions.reduce((acc, cur) => {
-  acc[cur.value] = cur.title;
-  return acc;
-}, {} as Record<string, string>);
-
 defineExpose({ submitData });
 </script>
 
 <template>
-  <div>
+  <div class="approval-type-container">
     <template v-if="loading">
       <p>Loading...</p>
     </template>
 
     <template v-else>
       <v-container fluid>
-        <v-row class="mt-5">
-          <!-- Facilities Checkbox -->
-          <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
-            <Facilities ref="facilitiesRef" :currencies="currencies" :initial-data="facilitiesData" @save="saveFacilitiesData" />
-          </v-col>
-          <!-- Guarantee Checkbox -->
-          <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
-            <Guarantee ref="guaranteeRef" :currencies="currencies" :initial-data="guaranteeData" @save="saveGuaranteeData" />
-          </v-col>
-          <!-- Lc Checkbox -->
-          <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
-            <Lc ref="lcRef" :currencies="currencies" :collateral="collaterals" :initial-data="lcData" @save="saveLcData" />
+        <!-- Facilities Section -->
+        <v-row class="mb-6">
+          <v-col cols="12">
+            <v-card class="approval-section">
+              <v-card-title class="d-flex align-center">
+                <span class="text-h2">تسهیلات</span>
+                <v-spacer></v-spacer>
+                <Facilities 
+                  ref="facilitiesRef" 
+                  :currencies="currencies" 
+                  @save="saveFacilitiesData" 
+                  :disabled="facilitiesData.length > 0"
+                />
+              </v-card-title>
+              <v-card-text>
+                <v-data-table
+                  :headers="headers"
+                  :items="facilitiesData"
+                  hide-default-footer
+                  no-data-text="رکوردی وجود ندارد"
+                  class="elevation-1"
+                >
+                  <template #item.repaymentType="{ item }">
+                    {{ repaymentTypeMap[item.repaymentType] || '-' }}
+                  </template>
+                  <template #item.approvalType="{ item }">
+                    {{ approvalTypeMap[item.approvalType] || '-' }}
+                  </template>
+                  <template #item.contractTypeId="{ item }">
+                    {{ item.contractType?.longTitle || item.contractTypeTitle || '-' }}
+                  </template>
+                  <template #item.facilityId="{ item }">
+                    {{ item.facility?.facilityName || '-' }}
+                  </template>
+                  <template #item.currency="{ item }">
+                    {{ currencies.find(c => c.code === item.currency)?.description || '-' }}
+                  </template>
+                  <template #item.actions="{ item }">
+                    <div class="d-flex justify-center gap-2">
+                      <v-btn
+                        size="small"
+                        icon
+                        @click="deleteItem(item, facilitiesData)"
+                      >
+                        ❌
+                      </v-btn>
+                    </div>
+                  </template>
+                </v-data-table>
+              </v-card-text>
+            </v-card>
           </v-col>
         </v-row>
-        <v-row>
-          <v-col cols="12" md="12">
-            <div class="table-scroll" style="margin-top: 25px">
-              <v-data-table :headers="headers" :items="dataTable" hide-default-footer no-data-text="رکوردی وجود ندارد" sticky>
-                <!-- Custom display for approvalType -->
-                <template #item.requestType="{ item }">
-                  {{ getRequestType(item.requestType) }}
-                </template>
-                <template #item.repaymentType="{ item }">
-                  {{ repaymentTypeMap[item.repaymentType] || '-' }}
-                </template>
-                <!-- Custom display for facility -->
-                <template #item.approvalType="{ item }">
-                  {{ approvalTypeMap[item.approvalType] || '-' }}
-                </template>
-                <!-- Custom display for contract type -->
-                <template #item.contractTypeId="{ item }">
-                  {{ item.contractType?.longTitle || '-' }}
-                </template>
-                <!-- Delete button -->
-                <template #item.actions="{ item }">
-                  <div style="display: flex; gap: 8px; justify-content: center">
-                    <v-btn
-                      size="small"
-                      icon
-                      @click="editItem(item)"
-                    >
-                      ✏️
-                    </v-btn>
-                    <v-btn
-                      size="small"
-                      icon
-                      @click="deleteItem(item)"
-                    >
-                      ❌
-                    </v-btn>
-                  </div>
-                </template>
-              </v-data-table>
-            </div>
+
+        <!-- Guarantee Section -->
+        <v-row class="mb-6">
+          <v-col cols="12">
+            <v-card class="approval-section">
+              <v-card-title class="d-flex align-center">
+                <span class="text-h2">ضمانت نامه</span>
+                <v-spacer></v-spacer>
+                <Guarantee 
+                  ref="guaranteeRef" 
+                  :currencies="currencies" 
+                  @save="saveGuaranteeData" 
+                  :disabled="guaranteeData.length > 0"
+                />
+              </v-card-title>
+              <v-card-text>
+                <v-data-table
+                  :headers="headers"
+                  :items="guaranteeData"
+                  hide-default-footer
+                  no-data-text="رکوردی وجود ندارد"
+                  class="elevation-1"
+                >
+                  <template #item.repaymentType="{ item }">
+                    {{ repaymentTypeMap[item.repaymentType] || '-' }}
+                  </template>
+                  <template #item.approvalType="{ item }">
+                    {{ approvalTypeMap[item.approvalType] || '-' }}
+                  </template>
+                  <template #item.contractTypeId="{ item }">
+                    {{ item.contractType?.longTitle || '-' }}
+                  </template>
+                  <template #item.facilityId="{ item }">
+                    {{ item.facility?.facilityName || '-' }}
+                  </template>
+                  <template #item.currency="{ item }">
+                    {{ currencies.find(c => c.code === item.currency)?.description || '-' }}
+                  </template>
+                  <template #item.actions="{ item }">
+                    <div class="d-flex justify-center gap-2">
+                      <v-btn
+                        size="small"
+                        icon
+                        @click="deleteItem(item, guaranteeData)"
+                      >
+                        ❌
+                      </v-btn>
+                    </div>
+                  </template>
+                </v-data-table>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+
+        <!-- LC Section -->
+        <v-row class="mb-6">
+          <v-col cols="12">
+            <v-card class="approval-section">
+              <v-card-title class="d-flex align-center">
+                <span class="text-h2">اعتبار اسنادی</span>
+                <v-spacer></v-spacer>
+                <Lc 
+                  ref="lcRef" 
+                  :currencies="currencies" 
+                  :collateral="collaterals" 
+                  @save="saveLcData" 
+                  :disabled="lcData.length > 0"
+                />
+              </v-card-title>
+              <v-card-text>
+                <v-data-table
+                  :headers="headers"
+                  :items="lcData"
+                  hide-default-footer
+                  no-data-text="رکوردی وجود ندارد"
+                  class="elevation-1"
+                >
+                  <template #item.repaymentType="{ item }">
+                    {{ repaymentTypeMap[item.repaymentType] || '-' }}
+                  </template>
+                  <template #item.approvalType="{ item }">
+                    {{ approvalTypeMap[item.approvalType] || '-' }}
+                  </template>
+                  <template #item.contractTypeId="{ item }">
+                    {{ item.contractType?.longTitle || '-' }}
+                  </template>
+                  <template #item.facilityId="{ item }">
+                    {{ item.facility?.facilityName || '-' }}
+                  </template>
+                  <template #item.currency="{ item }">
+                    {{ currencies.find(c => c.code === item.currency)?.description || '-' }}
+                  </template>
+                  <template #item.actions="{ item }">
+                    <div class="d-flex justify-center gap-2">
+                      <v-btn
+                        size="small"
+                        icon
+                        @click="deleteItem(item, lcData)"
+                      >
+                        ❌
+                      </v-btn>
+                    </div>
+                  </template>
+                </v-data-table>
+              </v-card-text>
+            </v-card>
           </v-col>
         </v-row>
       </v-container>
@@ -317,8 +497,21 @@ defineExpose({ submitData });
 </template>
 
 <style scoped>
-.inputCenter {
-  display: flex;
-  justify-content: center;
+.approval-type-container {
+  padding: 16px;
+}
+
+.approval-section {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.approval-section .v-card-title {
+  padding: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.gap-2 {
+  gap: 8px;
 }
 </style>

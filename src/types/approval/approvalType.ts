@@ -77,7 +77,7 @@ export interface ContractTypeDto {
 
 export interface FacilitiesDto {
   facilityId: number;
-  facilityCode: string;
+  facilityCode: number;
   facilityName: string;
   contractId: number;
 }
@@ -171,14 +171,11 @@ export interface LoanRequestDetail {
   collaterals: Collateral[];
   contractTypeId: number;
   currency: string;
-  day: string;
   durationDay: number;
-  facilityId: string;
-  month: string;
-  other: string;
+  facilityId: number;
+  other?: string;
   repaymentType: string;
   requestType: string;
-  year: string;
 }
 
 export interface LoanRequest {
@@ -186,13 +183,14 @@ export interface LoanRequest {
 }
 
 export interface RequestInformationDto {
-  contractTypeId: string;
+  contractTypeId: number;
   contractType?: ContractTypeDto;
   approvalType: string;
   requestType: string;
   amount: string;
   currency: string;
-  facilityId: string;
+  facilityId: number;
+  facility?: FacilitiesDto;
   year?: number;
   month?: number;
   day?: number;
@@ -205,7 +203,6 @@ export interface RequestInformationDto {
   percentDeposit?: number;
   advancePayment?: string;
   durationDay?: number;
-  other?: string;
 }
 
 export interface RootData {
@@ -216,7 +213,7 @@ export interface RootData {
 
 // Add interfaces for saveGeneral payload
 export interface LoanRequestDTO {
-  cif: string;
+  cif?: string;
   summary: string;
   activityType: string | null;
   description: string | null;

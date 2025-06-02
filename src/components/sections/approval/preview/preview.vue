@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { api } from '@/services/api';
-
+import { useApprovalStore } from '@/stores/approval';
+const approvalStore = useApprovalStore()
 const pdfUrl = ref('');
 let pdfObjectUrl: string | null = null;
 
 onMounted(async () => {
   try {
-    const response = await api.approval.getResult('9803');
+    const response = await api.approval.getResult(approvalStore.loanRequestId);
     const byteCharacters = atob(response.data);
     const byteNumbers = new Uint8Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {

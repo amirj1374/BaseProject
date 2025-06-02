@@ -87,7 +87,7 @@ const formSchema = computed(() => {
     currency: fieldConfig.value.currency ? yup.string().nullable().required('نوع ارز الزامی است') : yup.string().nullable(),
     contractTypeId: fieldConfig.value.contractType ? yup.string().nullable().required('نوع عقد الزامی است') : yup.string().nullable(),
     repaymentType: fieldConfig.value.repaymentType ? yup.string().nullable().required('نحوه بازپرداخت الزامی است') : yup.string().nullable(),
-    facilityId: fieldConfig.value.facility ? yup.string().nullable().required('نوع محصول الزامی است') : yup.string().nullable(),
+    facilityId: fieldConfig.value.facility ? yup.string().nullable() : yup.string().nullable(),
     amount: fieldConfig.value.amount ? yup.string().nullable().required('مبلغ الزامی است') : yup.string().nullable(),
     formAmount: fieldConfig.value.formAmount ? yup.string().nullable().required('مبلغ الزامی است') : yup.string().nullable(),
     durationDay: fieldConfig.value.duration ? yup.number().nullable().required('محاسبه روز الزامی است') : yup.number().nullable(),
@@ -204,9 +204,11 @@ const getFacilities = async (id: string) => {
   try {
     const res = await api.approval.getFacilities(parseInt(id), props.requestType);
     facilities.value = res.data.facilityDtoList || [];
+    console.log('Loaded facilities:', facilities.value); // Debug log
   } catch (err) {
     console.error('Error fetching facilities:', err);
     facilities.value = [];
+    error.value = 'خطا در بارگذاری محصولات';
   }
 };
 
@@ -257,34 +259,90 @@ const removeCollateralItem = (index: number) => {
 
 // Form submission
 const handleSave = handleSubmit(
-  (values) => {
-    const formattedCollaterals =
-      values.selectedCollaterals?.map((sc) => ({
+  async (values) => {
+    try {
+      // Validate facilityId at save time
+      if (fieldConfig.value.facility && !values.facilityId) {
+        throw new Error('نوع محصول الزامی است');
+      }
+
+      console.log('Form values before submission:', values);
+      
+      const formattedCollaterals = values.selectedCollaterals?.map((sc) => ({
         type: sc.collateral.collateralTypeCode,
         amount: sc.amount,
         percent: sc.percent
       })) || [];
 
-    const selectedContractType = contractTypes.value.find((ct) => ct.id === parseInt(values.contractTypeId || '0'));
+      // Find the selected contract type (full object)
+      const selectedContractType = contractTypes.value.find(ct => ct.id.toString() === values.contractTypeId?.toString());
+      console.log('Selected contractType:', selectedContractType, contractTypes.value, values.contractTypeId);
 
-    const submissionData = {
-      ...values,
-      requestType: props.requestType,
-      contractType: selectedContractType,
-      collaterals: formattedCollaterals
-    };
+      const submissionData = {
+        requestType: props.requestType,
+        contractTypeId: values.contractTypeId,
+        contractType: selectedContractType || null,
+        facilityId: values.facilityId,
+        currency: values.currency,
+        approvalType: values.approvalType,
+        repaymentType: values.repaymentType,
+        amount: values.amount,
+        year: values.year,
+        month: values.month,
+        day: values.day,
+        collaterals: formattedCollaterals,
+        advancePayment: values.advancePayment,
+        percentDeposit: values.percentDeposit,
+        intermediatePayment: values.intermediatePayment,
+        durationDay: values.durationDay
+      };
 
-    emit('save', submissionData);
-    valid.value = true;
-    isDialogActive.value = false;
+      console.log('Submitting data:', submissionData);
+      emit('save', submissionData);
+      valid.value = true;
+      isDialogActive.value = false;
+      resetFormData();
+    } catch (err) {
+      console.error('Error saving form:', err);
+      error.value = err instanceof Error ? err.message : 'خطا در ذخیره اطلاعات';
+      showError.value = true;
+    }
   },
   (errors) => {
+    console.log('Validation errors:', errors);
     error.value = 'لطفا تمام فیلدهای الزامی را پر کنید';
     showError.value = true;
   }
 );
 
-// Add reset function
+// Update the watch for isDialogActive
+watch(isDialogActive, async (newValue) => {
+  if (newValue) {
+    // When dialog opens
+    try {
+      // Load contract types for the specific request type
+      const res = await api.approval.getContractType(props.requestType);
+      contractTypes.value = res.data.generalParameterList || [];
+      
+      // Load collaterals
+      await getCollateral();
+      
+      // If we have initial data, load facilities
+      if (props.initialData?.contractTypeId) {
+        await getFacilities(props.initialData.contractTypeId.toString());
+      }
+    } catch (err) {
+      console.error('Error loading form data:', err);
+      error.value = 'خطا در بارگذاری اطلاعات';
+    }
+  } else {
+    // When dialog closes
+    resetFormData();
+    emit('cancel');
+  }
+});
+
+// Update resetFormData method
 const resetFormData = () => {
   resetForm({
     values: {
@@ -308,66 +366,100 @@ const resetFormData = () => {
   });
   valid.value = false;
   amountError.value = null;
+  facilities.value = []; // Clear facilities list
 };
 
-// Watch contractTypeId changes to fetch facilities
-watch(contractTypeId, (newValue, oldValue) => {
-  // Only fetch facilities if the value actually changed and wasn't set by initial data
-  if (newValue && newValue !== oldValue) {
-    getFacilities(newValue);
-  } else if (!newValue) {
-    facilities.value = [];
-  }
-});
-
-// Watch dialog state
-watch(isDialogActive, async (newValue) => {
-  if (!newValue) {
-    // Only reset form and emit cancel if we're not saving
-    if (!valid.value) {
-      resetFormData();
-      emit('cancel');
+// Add watch for contractTypeId changes
+watch(contractTypeId, async (newValue) => {
+  if (newValue) {
+    try {
+      // Clear current facilities
+      facilities.value = [];
+      setFieldValue('facilityId', null);
+      
+      // Load new facilities
+      await getFacilities(newValue.toString());
+    } catch (err) {
+      console.error('Error loading facilities:', err);
+      error.value = 'خطا در بارگذاری محصولات';
+      showError.value = true;
     }
   } else {
-    // Load data when dialog opens
-    try {
-      // Load contract types and collaterals in parallel
-      await Promise.all([
-        getContractType(),
-        getCollateral()
-      ]);
-      
-      // If we have initial data, load facilities for the contract type
-      if (props.initialData?.contractTypeId) {
-        await getFacilities(props.initialData.contractTypeId);
-      }
-    } catch (err) {
-      console.error('Error loading form data:', err);
-      error.value = 'خطا در بارگذاری اطلاعات';
-    }
+    facilities.value = [];
+    setFieldValue('facilityId', null);
   }
 });
 
-// Initialize form with initial data if provided
-watch(
-  () => props.initialData,
-  (newData) => {
-    if (newData) {
-      getContractType().then(() => {
-        const contractType = contractTypes.value.find((ct) => ct.id === parseInt(newData.contractTypeId));
-        
-        const initialFormData = {
-          ...newData,
-          contractType: contractType
-        };
+// Update setInitialData method
+const formData = ref<any>({});
+const selectedContractType = ref<number | null>(null);
+const selectedFacility = ref<string | null>(null);
+const selectedCurrency = ref<string | null>(null);
+const selectedApprovalType = ref<string | null>(null);
+const selectedRepaymentType = ref<string | null>(null);
 
-        resetForm({ values: initialFormData });
-        valid.value = true;
-      });
+const setInitialData = async (data: any) => {
+  try {
+    console.log('Setting initial data:', data);
+    
+    // First load facilities for the selected contract type
+    if (data.contractTypeId) {
+      await getFacilities(data.contractTypeId.toString());
     }
-  },
-  { immediate: true }
-);
+
+    // Reset form first to clear any previous values
+    resetForm();
+
+    // Set form fields using setFieldValue
+    setFieldValue('approvalType', data.approvalType);
+    setFieldValue('currency', data.currency);
+    setFieldValue('contractTypeId', data.contractTypeId);
+    setFieldValue('repaymentType', data.repaymentType);
+    setFieldValue('facilityId', data.facilityId);
+    setFieldValue('amount', data.amount);
+    setFieldValue('year', data.year);
+    setFieldValue('month', data.month);
+    setFieldValue('day', data.day);
+    setFieldValue('durationDay', data.durationDay);
+    setFieldValue('advancePayment', data.advancePayment);
+    setFieldValue('percentDeposit', data.percentDeposit?.toString() || '');
+    setFieldValue('intermediatePayment', data.intermediatePayment);
+    
+    // Set collaterals if they exist
+    if (data.collaterals && Array.isArray(data.collaterals)) {
+      // First get all collaterals
+      await getCollateral();
+      
+      const formattedCollaterals = data.collaterals.map((c: any) => {
+        // Find the matching collateral from collateralList
+        const matchingCollateral = collateralList.value.find(
+          (cl) => cl.collateralTypeCode.toString() === c.type.toString()
+        );
+        
+        if (!matchingCollateral) {
+          console.warn('No matching collateral found for type:', c.type);
+          return null;
+        }
+
+        return {
+          collateral: matchingCollateral,
+          amount: c.amount,
+          percent: c.percent
+        };
+      }).filter(Boolean); // Remove any null entries
+
+      console.log('Formatted collaterals:', formattedCollaterals);
+      setFieldValue('selectedCollaterals', formattedCollaterals);
+    }
+
+    // Reset validation state
+    valid.value = true;
+  } catch (err) {
+    console.error('Error setting initial data:', err);
+    error.value = 'خطا در بارگذاری اطلاعات';
+    showError.value = true;
+  }
+};
 
 // Expose methods and state
 defineExpose({
@@ -379,7 +471,8 @@ defineExpose({
   dayCalculate,
   onCollateralDialogSave,
   removeCollateralItem,
-  resetFormData
+  resetFormData,
+  setInitialData
 });
 </script>
 

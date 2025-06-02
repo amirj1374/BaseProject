@@ -103,7 +103,47 @@ defineExpose({ submitData });
               <v-col cols="12" md="6">
                 <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="lg">
                   <div class="text-subtitle-1 mb-2">استعلام ساپ</div>
-                  <pre class="text-body-2">{{ JSON.stringify(sapData, null, 2) }}</pre>
+                  <v-list density="compact" class="bg-transparent">
+                    <v-list-item>
+                      <template v-slot:prepend>
+                        <v-icon icon="mdi-calendar" color="primary"></v-icon>
+                      </template>
+                      <v-list-item-title>تاریخ تغییر</v-list-item-title>
+                      <v-list-item-subtitle>{{ sapData?.changeDate || 'نامشخص' }}</v-list-item-subtitle>
+                    </v-list-item>
+
+                    <v-list-item>
+                      <template v-slot:prepend>
+                        <v-icon icon="mdi-shield-check" color="primary"></v-icon>
+                      </template>
+                      <v-list-item-title>وثیقه</v-list-item-title>
+                      <v-list-item-subtitle>{{ sapData?.collateral || 'نامشخص' }}</v-list-item-subtitle>
+                    </v-list-item>
+
+                    <v-list-item>
+                      <template v-slot:prepend>
+                        <v-icon icon="mdi-calendar-clock" color="primary"></v-icon>
+                      </template>
+                      <v-list-item-title>تاریخ ایجاد</v-list-item-title>
+                      <v-list-item-subtitle>{{ sapData?.createdAt || 'نامشخص' }}</v-list-item-subtitle>
+                    </v-list-item>
+
+                    <v-list-item>
+                      <template v-slot:prepend>
+                        <v-icon icon="mdi-tag" color="primary"></v-icon>
+                      </template>
+                      <v-list-item-title>برچسب</v-list-item-title>
+                      <v-list-item-subtitle>{{ sapData?.label || 'نامشخص' }}</v-list-item-subtitle>
+                    </v-list-item>
+
+                    <v-list-item>
+                      <template v-slot:prepend>
+                        <v-icon icon="mdi-currency-usd" color="primary"></v-icon>
+                      </template>
+                      <v-list-item-title>مبلغ</v-list-item-title>
+                      <v-list-item-subtitle>{{ sapData?.value?.toLocaleString() || 'نامشخص' }} ریال</v-list-item-subtitle>
+                    </v-list-item>
+                  </v-list>
                 </v-card>
               </v-col>
             </v-row>

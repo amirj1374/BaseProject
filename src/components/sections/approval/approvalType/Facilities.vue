@@ -7,6 +7,7 @@ import { IconAlertCircle, IconSquareRoundedCheckFilled } from '@tabler/icons-vue
 const props = defineProps<{
   currencies: CurrenciesDto[];
   initialData?: any;
+  disabled?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -25,8 +26,19 @@ const handleCancel = () => {
   valid.value = false;
 };
 
-const openForm = () => {
-  formRef.value.isDialogActive = true;
+const openForm = async (initialData?: any) => {
+  console.log('Facilities - openForm called with:', initialData);
+  console.log('Facilities - formRef:', formRef.value);
+  
+  valid.value = false;
+  if (formRef.value) {
+    formRef.value.isDialogActive = true;
+    if (initialData) {
+      await formRef.value.setInitialData(initialData);
+    }
+  } else {
+    console.log('Facilities - formRef is not available');
+  }
 };
 
 // Define field configuration for Facilities
@@ -43,21 +55,29 @@ const showFields = {
   collateral: true,
   intermediatePayment: false,
   percentDeposit: false,
-  advancePayment:true
+  advancePayment: false
 };
 
 defineExpose({
   openForm,
-  valid
+  valid,
+  formRef
 });
 </script>
 
 <template>
   <div>
-    <v-btn size="large" :base-color="valid ? 'lightsuccess' : 'lighterror'" @click="openForm">
-      تسهیلات
-      <IconAlertCircle v-if="!valid" style="margin-right: 20px" size="20" />
-      <IconSquareRoundedCheckFilled v-if="valid" style="margin-right: 20px" size="20" />
+    <v-btn 
+      size="large" 
+      color="primary" 
+      variant="tonal"
+      @click="openForm()"
+      class="add-button"
+      :disabled="disabled"
+    >
+      افزودن تسهیلات
+      <IconAlertCircle v-if="!valid" class="ml-2" size="20" />
+      <IconSquareRoundedCheckFilled v-if="valid" class="ml-2" size="20" />
     </v-btn>
 
     <BaseApprovalForm
@@ -71,3 +91,13 @@ defineExpose({
     />
   </div>
 </template>
+
+<style scoped>
+.add-button {
+  min-width: 160px;
+}
+
+.ml-2 {
+  margin-left: 8px;
+}
+</style>

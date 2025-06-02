@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import { api } from '@/services/api';
 import type { FetchGuarantorPayload, GuarantorDto, SaveGeneralPayload, GuarantorInfoDTO } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
@@ -11,6 +11,7 @@ const hideInput = ref(false);
 const canSubmit = ref(false);
 const error = ref<string | null>(null);
 const success = ref<string | null>(null);
+const snackbar = ref(false);
 const data = ref<GuarantorDto[]>([]);
 const showError = ref(false);
 const submitting = ref(false);
@@ -23,6 +24,7 @@ const headers = ref([
   { title: 'تاریخ', key: 'createdAt', isDate: true },
   { title: 'رتبه', key: 'label' },
   { title: 'امتیاز مشتری', key: 'value' },
+  { title: 'وضعیت استعلام', key: 'sapInquiryStatus' },
   { title: 'عملیات', key: 'actions', align: 'center' }
 ]);
 
@@ -46,13 +48,22 @@ onMounted(() => {
 async function addGuarantor() {
   // 1. Validation
   if (data.value.length >= 3) {
-    error.value = 'حداکثر ۳ ضامن می‌توانید اضافه کنید';
-    showError.value = true;
+    showErrorMessage('حداکثر ۳ ضامن می‌توانید اضافه کنید');
     return;
   }
   if (!formData.value.nationalCode && !formData.value.cif) {
-    error.value = 'کد ملی یا شماره مشتری را وارد کنید';
-    showError.value = true;
+    showErrorMessage('کد ملی یا شماره مشتری را وارد کنید');
+    return;
+  }
+
+  // Check if entered CIF or national code matches customer info
+  if (formData.value.cif && formData.value.cif === approvalStore.customerInfo.cif) {
+    showErrorMessage('مشتری نمیتواند ضامن باشد');
+    return;
+  }
+
+  if (formData.value.nationalCode && formData.value.nationalCode === approvalStore.customerInfo.nationalCode) {
+    showErrorMessage('مشتری نمیتواند ضامن باشد');
     return;
   }
 
@@ -62,8 +73,8 @@ async function addGuarantor() {
 
   try {
     const payload: FetchGuarantorPayload = {
-      nationalCode: formData.value.nationalCode,
-      cif: formData.value.cif,
+      nationalCode: formData.value.nationalCode || null,
+      cif: formData.value.cif || null,
       guarantorName: formData.value.GuarantorName
     };
 
@@ -85,7 +96,7 @@ async function addGuarantor() {
         existCore: raw.existCore || false,
         label: raw.label || '-',
         value: raw.value || '0',
-        sapInquiryStatus: false,
+        sapInquiryStatus: true,
         loanRequestId: raw.loanRequestId || null
       };
 
@@ -113,8 +124,7 @@ async function addGuarantor() {
       showError.value = true;
     }
   } catch (err: any) {
-    error.value = err.response?.data?.message || 'خطای سرور.';
-    showError.value = true;
+    showErrorMessage(err.response?.data?.message || 'خطای سرور.');
     hideInput.value = true;
     canSubmit.value = false;
   } finally {
@@ -140,6 +150,20 @@ const submitData = async () => {
   showError.value = false;
 
   try {
+    // Check if we already have a tracking code
+    if (approvalStore.trackingCode) {
+      success.value = approvalStore.trackingCode;
+      dialog.value = true;
+      return new Promise((resolve) => {
+        const unwatch = watch(dialog, (newValue) => {
+          if (!newValue) { // When dialog is closed
+            unwatch(); // Stop watching
+            resolve(data.value);
+          }
+        });
+      });
+    }
+
     // First save to store
     approvalStore.setGuarantor(data.value);
 
@@ -176,7 +200,16 @@ const submitData = async () => {
       approvalStore.setLoanRequestId(response.data.id);
       approvalStore.setTrackingCode(response.data.trackingCode);
       dialog.value = true;
-      return Promise.resolve(data.value);
+      
+      // Return a new Promise that resolves when dialog is closed
+      return new Promise((resolve, reject) => {
+        const unwatch = watch(dialog, (newValue) => {
+          if (!newValue) { // When dialog is closed
+            unwatch(); // Stop watching
+            resolve(data.value);
+          }
+        });
+      });
     } else {
       error.value = 'خطا در ثبت اطلاعات';
       showError.value = true;
@@ -205,6 +238,13 @@ const changePattern = async () => {
   formData.value.nationalCode = '';
   error.value = null;
   showError.value = false;
+};
+
+// Update error handling function
+const showErrorMessage = (message: string) => {
+  error.value = message;
+  snackbar.value = true;
+  showError.value = true;
 };
 
 defineExpose({ submitData });
@@ -254,6 +294,10 @@ defineExpose({ submitData });
           <v-card-text>
             <v-alert v-if="success" type="success" variant="tonal" class="my-4"> کد رهگیری: {{ success }} </v-alert>
           </v-card-text>
+          
+          <v-card-text>
+            <v-alert v-if="error" type="error" variant="tonal" class="my-4">{{ error}} </v-alert>
+          </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="primary" @click="dialog = false">بستن</v-btn>
@@ -284,15 +328,26 @@ defineExpose({ submitData });
           </template>
         </v-data-table>
       </v-col>
-
-      <!-- Submit Button -->
-      <v-row class="mt-4">
-        <v-col cols="12" class="text-center">
-          <v-btn color="primary" type="submit" :loading="submitting" :disabled="!canSubmit || data.length === 0"> ثبت ضامن‌ها </v-btn>
-        </v-col>
-      </v-row>
     </form>
   </v-card>
+
+  <v-snackbar
+    v-model="snackbar"
+    :color="error ? 'error' : 'success'"
+    :timeout="3000"
+    location="top"
+  >
+    {{ error }}
+    <template v-slot:actions>
+      <v-btn
+        color="white"
+        variant="text"
+        @click="snackbar = false"
+      >
+        بستن
+      </v-btn>
+    </template>
+  </v-snackbar>
 </template>
 
 <style scoped>

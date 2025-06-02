@@ -7,6 +7,7 @@ import { IconAlertCircle, IconSquareRoundedCheckFilled } from '@tabler/icons-vue
 const props = defineProps<{
   currencies: CurrenciesDto[];
   initialData?: any;
+  disabled?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -25,8 +26,14 @@ const handleCancel = () => {
   valid.value = false;
 };
 
-const openForm = () => {
-  formRef.value.isDialogActive = true;
+const openForm = async (initialData?: any) => {
+  valid.value = false;
+  if (formRef.value) {
+    formRef.value.isDialogActive = true;
+    if (initialData) {
+      await formRef.value.setInitialData(initialData);
+    }
+  }
 };
 
 // Define field configuration for Guarantee
@@ -42,8 +49,8 @@ const showFields = {
   other: true,
   collateral: true,
   intermediatePayment: false,
-  advancePayment: false,
-  percentDeposit: true
+  percentDeposit: true,
+  advancePayment: false
 };
 
 defineExpose({
@@ -54,10 +61,17 @@ defineExpose({
 
 <template>
   <div>
-    <v-btn size="large" :base-color="valid ? 'lightsuccess' : 'lighterror'" @click="openForm">
-      ضمانت نامه
-      <IconAlertCircle v-if="!valid" style="margin-right: 20px" size="20" />
-      <IconSquareRoundedCheckFilled v-if="valid" style="margin-right: 20px" size="20" />
+    <v-btn 
+      size="large" 
+      color="primary" 
+      variant="tonal"
+      @click="openForm()"
+      class="add-button"
+      :disabled="disabled"
+    >
+      افزودن ضمانت نامه
+      <IconAlertCircle v-if="!valid" class="ml-2" size="20" />
+      <IconSquareRoundedCheckFilled v-if="valid" class="ml-2" size="20" />
     </v-btn>
 
     <BaseApprovalForm
@@ -71,3 +85,13 @@ defineExpose({
     />
   </div>
 </template>
+
+<style scoped>
+.add-button {
+  min-width: 160px;
+}
+
+.ml-2 {
+  margin-left: 8px;
+}
+</style>

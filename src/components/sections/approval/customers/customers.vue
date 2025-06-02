@@ -106,7 +106,6 @@ const submitData = async () => {
     if (!firstItem.cif && !firstItem.nationalCode) {
       return Promise.reject('اطلاعات مشتری نامعتبر است');
     }
-
     approvalStore.setCustomerInfo(firstItem);
 
     return Promise.resolve();
