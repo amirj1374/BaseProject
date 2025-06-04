@@ -1,0 +1,101 @@
+<script setup lang="ts">
+import { IconCheck, IconClock, IconPencil } from '@tabler/icons-vue';
+import { ref, watch, nextTick, onMounted, defineProps, defineEmits } from 'vue';
+import type { Component, ComponentPublicInstance } from 'vue';
+import '@/scss/components/_VStepper.scss';
+
+const props = defineProps<{
+  steps: { title: string; section: Component }[];
+  modelValue: number;
+  contentMinHeight?: string;
+}>();
+const emit = defineEmits(['update:modelValue', 'step-click']);
+
+const stepperHeaderRef = ref<HTMLElement | null>(null);
+const stepRefs = ref<Array<HTMLElement | null>>([]);
+const currentStepComponentRef = ref();
+
+function setStepRef(el: Element | ComponentPublicInstance | null, index: number) {
+  stepRefs.value[index] = (el instanceof HTMLElement) ? el : null;
+}
+
+// Auto-scroll to active step
+watch(() => props.modelValue, async () => {
+  await nextTick();
+  const activeStepEl = stepRefs.value[props.modelValue - 1];
+  if (activeStepEl) {
+    activeStepEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }
+});
+
+onMounted(() => {
+  nextTick(() => {
+    if (stepperHeaderRef.value) {
+      // RTL: scroll all the way to the right
+      stepperHeaderRef.value.scrollLeft = stepperHeaderRef.value.scrollWidth;
+    }
+  });
+});
+
+function handleStepClick(index: number) {
+  emit('step-click', index + 1);
+  emit('update:modelValue', index + 1);
+}
+
+defineExpose({ currentStepComponentRef });
+</script>
+
+<template>
+  <div class="app-stepper-root" dir="rtl">
+    <div class="app-stepper-header-card">
+      <div ref="stepperHeaderRef" class="app-stepper-header">
+        <span
+          v-for="(step, index) in steps"
+          :key="index"
+          :ref="el => setStepRef(el, index)"
+          class="app-stepper-step"
+          :class="{
+            active: modelValue === index + 1,
+            resolved: modelValue > index + 1,
+            pending: modelValue < index + 1
+          }"
+          @click="handleStepClick(index)"
+        >
+          <span class="app-stepper-badge"
+            :class="{
+              'badge-active': modelValue === index + 1,
+              'badge-resolved': modelValue > index + 1,
+              'badge-pending': modelValue < index + 1
+            }"
+          >
+            <slot name="badge" :status="modelValue > index + 1 ? 'resolved' : modelValue === index + 1 ? 'active' : 'pending'" :index="index">
+              <!-- Default badge icons (parent can override with slot) -->
+              <template v-if="modelValue > index + 1">
+                <IconCheck :size="16" />              </template>
+              <template v-else-if="modelValue === index + 1">
+                <IconPencil :size="16" />
+            </template>
+              <template v-else>
+                <IconClock :size="16" />
+            </template>
+            </slot>
+          </span>
+          <span class="app-stepper-title">{{ step.title }}</span>
+          <span
+            v-if="index < steps.length - 1"
+            :class="[
+              'app-stepper-connector',
+              { 'active': modelValue > index + 1, 'resolved': modelValue > index + 1 }
+            ]"
+          ></span>
+        </span>
+      </div>
+    </div>
+    <div
+      class="app-stepper-content"
+      :style="props.contentMinHeight ? { minHeight: props.contentMinHeight } : undefined"
+    >
+      <component :is="steps[modelValue - 1].section" ref="currentStepComponentRef" />
+    </div>
+  </div>
+</template> 

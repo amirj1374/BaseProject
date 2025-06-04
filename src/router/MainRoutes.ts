@@ -8,8 +8,8 @@ const MainRoutes = {
   children: [
     {
       name: 'Default',
-      path: '/dashboard/default',
-      component: () => import('@/views/dashboards/default/DefaultDashboard.vue')
+      path: '/',
+      component: () => import('@/views/approval_request/index.vue')
     },
     {
       name: 'Approval',
