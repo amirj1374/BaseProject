@@ -163,11 +163,6 @@ $stepper-shadow: 0 2px 8px rgba(0,0,0,0.04);
 .app-stepper-content {
   flex: 1 1 0;
   width: 100%;
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: $stepper-border-radius;
-  box-shadow: $stepper-shadow;
-  padding: 24px 16px;
   overflow-y: auto;
   min-height: 60vh;
 }

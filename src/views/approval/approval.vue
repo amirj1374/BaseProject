@@ -10,6 +10,7 @@ const approvalStore = useApprovalStore();
 const submitting = ref(false);
 const error = ref<string | null>(null);
 const showError = ref(false);
+const showSuccess = ref(false);
 const stepper = ref(1);
 const stepperRef = ref();
 
@@ -78,13 +79,17 @@ const prevStep = () => {
 
 // Form submission
 const handleSubmit = async () => {
-  if (!currentComponent.value) return;
   submitting.value = true;
   try {
-    await currentComponent.value.submitData();
+    // Access the current step's component instance via the stepper ref
+    const currentStepComponent = stepperRef.value?.currentStepComponentRef;
+    if (currentStepComponent && typeof currentStepComponent.submitData === 'function') {
+      await currentStepComponent.submitData();
+    }
     await nextStep();
   } catch (err) {
-    error.value = `لطفا اطلاعات را بررسی کنید`;
+    showSuccess.value = false;
+    error.value = typeof err === 'string' ? err : (err && (err as any).message ? (err as any).message : 'لطفا اطلاعات را بررسی کنید');
     showError.value = true;
   } finally {
     submitting.value = false;

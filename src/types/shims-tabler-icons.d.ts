@@ -32,4 +32,5 @@ declare module '@tabler/icons-vue' {
   export const IconCheck : DefineComponent
   export const IconPencil : DefineComponent
   export const IconClock : DefineComponent
+  export const IconTrash : DefineComponent
 }
