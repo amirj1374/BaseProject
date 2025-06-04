@@ -46,12 +46,15 @@ interface Props {
   queryParams?: Record<string, any>;
   showPagination?: boolean;
   height: number;
+  pagination?: any;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   autoFetch: true,
   showPagination: true
 });
+
+defineOptions({ inheritAttrs: false });
 
 const items = ref<any[]>([]);
 const loading = ref(false);
@@ -421,7 +424,7 @@ const resetFilter = () => {
   </div>
 
   <!-- Data Table Container (fills parent height) -->
-  <div class="data-table-container">
+  <div class="data-table-container" v-bind="$attrs">
     <div class="table-wrapper">
       <template v-if="loading && !isLoadingMore">
         <v-skeleton-loader type="table" :loading="loading" class="mx-auto" max-width="100%" :boilerplate="false" />
@@ -439,7 +442,12 @@ const resetFilter = () => {
         >
           <template v-slot:item="{ item, columns, index }">
             <tr :style="{ background: index % 2 === 0 ? '#fff' : '#f5f7fa' }">
-              <td v-for="column in columns" :key="column.key" :style="getColumnStyle(column, item)">
+              <td v-for="column in columns" :key="column.key"
+                :style="{
+                  ...getColumnStyle(column, item),
+                  ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
+                }"
+              >
                 <template v-if="column.key === 'actions'">
                   <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
                     ویرایش ✏️
@@ -595,7 +603,8 @@ const resetFilter = () => {
   flex: 1 1 auto;
   min-height: 0;
   position: relative;
-  /* No overflow here, let v-data-table handle scroll */
+  max-height: 600px; /* Set your desired max height */
+  overflow-y: auto;
 }
 
 .pagination-wrapper {

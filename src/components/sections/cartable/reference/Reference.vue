@@ -2,7 +2,7 @@
 import { api } from '@/services/api';
 import type { ActionData, SubmitReferencePayload, ValidRole } from '@/types/cartable/cartableTypes';
 import { onMounted, ref, watch, computed } from 'vue';
-
+const tableRef = ref();
 const emit = defineEmits(['close']);
 
 const actionsData = ref<ActionData[]>([]);

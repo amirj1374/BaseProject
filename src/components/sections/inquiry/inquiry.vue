@@ -11,48 +11,51 @@ const responseStatus = ref<'idle' | 'success' | 'error' | 'empty'>('idle');
 const chequeData = ref<any>(null);
 const sapData = ref<any>(null);
 const canSubmit = ref(false);
+const chequeLoading = ref(false);
+const chequeError = ref<string | null>(null);
+const sapLoading = ref(false);
+const sapError = ref<string | null>(null);
 
 const getInquiry = async () => {
-  value.value = 0;
-  isLoading.value = true;
-  responseStatus.value = 'idle';
   chequeData.value = null;
   sapData.value = null;
+  chequeError.value = null;
+  sapError.value = null;
+  chequeLoading.value = true;
+  sapLoading.value = true;
+  canSubmit.value = false;
 
+  // SAP inquiry first
   try {
-    if (!approvalStore.loanRequestId) {
-      throw new Error('شناسه درخواست نامعتبر است');
-    }
-
-    // Cheque inquiry request
-    const chequeRes = await api.approval.getIndirectObligation(approvalStore.loanRequestId);
-    
-    // SAP inquiry request
     const sapRes = await api.approval.getSapInquiry({
       loanRequestId: approvalStore.loanRequestId,
       nationalCode: approvalStore.customerInfo.nationalCode
     });
-
-    if (chequeRes.status === 200 && sapRes.status === 200) {
-      chequeData.value = chequeRes.data;
+    if (sapRes.status === 200) {
       sapData.value = sapRes.data;
-      responseStatus.value = 'success';
     } else {
-      responseStatus.value = 'empty';
+      sapError.value = 'دریافت اطلاعات ساپ با خطا مواجه شد.';
     }
-  } catch (err) {
-    responseStatus.value = 'error';
+  } catch {
+    sapError.value = 'دریافت اطلاعات ساپ با خطا مواجه شد.';
+  } finally {
+    sapLoading.value = false;
+    // Always proceed to Cheque inquiry, even if SAP fails
+    try {
+      const chequeRes = await api.approval.getIndirectObligation(approvalStore.loanRequestId);
+      if (chequeRes.status === 200) {
+        chequeData.value = chequeRes.data;
+      } else {
+        chequeError.value = 'دریافت اطلاعات چک با خطا مواجه شد.';
+      }
+    } catch {
+      chequeError.value = 'دریافت اطلاعات چک با خطا مواجه شد.';
+    } finally {
+      chequeLoading.value = false;
+    }
   }
 
-  interval.value = setInterval(() => {
-    if (value.value >= 100) {
-      clearInterval(interval.value!);
-      isLoading.value = false;
-      canSubmit.value = true;
-    } else {
-      value.value += 10;
-    }
-  }, 100);
+  canSubmit.value = !!chequeData.value || !!sapData.value;
 };
 
 onMounted(() => {
@@ -96,19 +99,28 @@ defineExpose({ submitData });
               <v-col cols="12" md="6">
                 <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="lg">
                   <div class="text-subtitle-1 mb-4 font-weight-bold">استعلام چک</div>
-                  <div class="inquiry-section">
-                    <div class="inquiry-item">
-                      <div class="inquiry-label">اطلاعات چک</div>
-                      <div class="inquiry-value">{{ chequeData?.chequeInfo || 'نامشخص' }}</div>
+                  <div v-if="chequeLoading">در حال دریافت اطلاعات چک...</div>
+                  <div v-else-if="chequeError">
+                    <v-alert type="error" class="my-2">{{ chequeError }}</v-alert>
+                  </div>
+                  <div v-else-if="chequeData">
+                    <div class="inquiry-section">
+                      <div class="inquiry-item">
+                        <div class="inquiry-label">اطلاعات چک</div>
+                        <div class="inquiry-value">{{ chequeData?.chequeInfo || 'نامشخص' }}</div>
+                      </div>
+                      <div class="inquiry-item">
+                        <div class="inquiry-label">وضعیت</div>
+                        <div class="inquiry-value">{{ chequeData?.status || 'نامشخص' }}</div>
+                      </div>
+                      <div class="inquiry-item">
+                        <div class="inquiry-label">تاریخ</div>
+                        <div class="inquiry-value">{{ chequeData?.date || 'نامشخص' }}</div>
+                      </div>
                     </div>
-                    <div class="inquiry-item">
-                      <div class="inquiry-label">وضعیت</div>
-                      <div class="inquiry-value">{{ chequeData?.status || 'نامشخص' }}</div>
-                    </div>
-                    <div class="inquiry-item">
-                      <div class="inquiry-label">تاریخ</div>
-                      <div class="inquiry-value">{{ chequeData?.date || 'نامشخص' }}</div>
-                    </div>
+                  </div>
+                  <div v-else>
+                    <v-alert type="warning" class="my-2">داده‌ای برای چک یافت نشد.</v-alert>
                   </div>
                 </v-card>
               </v-col>
@@ -116,27 +128,36 @@ defineExpose({ submitData });
               <v-col cols="12" md="6">
                 <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="lg">
                   <div class="text-subtitle-1 mb-4 font-weight-bold">استعلام ساپ</div>
-                  <div class="inquiry-section">
-                    <div class="inquiry-item">
-                      <div class="inquiry-label">تاریخ تغییر</div>
-                      <div class="inquiry-value">{{ sapData?.changeDate || 'نامشخص' }}</div>
+                  <div v-if="sapLoading">در حال دریافت اطلاعات ساپ...</div>
+                  <div v-else-if="sapError">
+                    <v-alert type="error" class="my-2">{{ sapError }}</v-alert>
+                  </div>
+                  <div v-else-if="sapData">
+                    <div class="inquiry-section">
+                      <div class="inquiry-item">
+                        <div class="inquiry-label">تاریخ تغییر</div>
+                        <div class="inquiry-value">{{ sapData?.changeDate || 'نامشخص' }}</div>
+                      </div>
+                      <div class="inquiry-item">
+                        <div class="inquiry-label">وثیقه</div>
+                        <div class="inquiry-value">{{ sapData?.collateral || 'نامشخص' }}</div>
+                      </div>
+                      <div class="inquiry-item">
+                        <div class="inquiry-label">تاریخ ایجاد</div>
+                        <div class="inquiry-value">{{ sapData?.createdAt || 'نامشخص' }}</div>
+                      </div>
+                      <div class="inquiry-item">
+                        <div class="inquiry-label">برچسب</div>
+                        <div class="inquiry-value">{{ sapData?.label || 'نامشخص' }}</div>
+                      </div>
+                      <div class="inquiry-item">
+                        <div class="inquiry-label">مبلغ</div>
+                        <div class="inquiry-value">{{ sapData?.value?.toLocaleString() || 'نامشخص' }} ریال</div>
+                      </div>
                     </div>
-                    <div class="inquiry-item">
-                      <div class="inquiry-label">وثیقه</div>
-                      <div class="inquiry-value">{{ sapData?.collateral || 'نامشخص' }}</div>
-                    </div>
-                    <div class="inquiry-item">
-                      <div class="inquiry-label">تاریخ ایجاد</div>
-                      <div class="inquiry-value">{{ sapData?.createdAt || 'نامشخص' }}</div>
-                    </div>
-                    <div class="inquiry-item">
-                      <div class="inquiry-label">برچسب</div>
-                      <div class="inquiry-value">{{ sapData?.label || 'نامشخص' }}</div>
-                    </div>
-                    <div class="inquiry-item">
-                      <div class="inquiry-label">مبلغ</div>
-                      <div class="inquiry-value">{{ sapData?.value?.toLocaleString() || 'نامشخص' }} ریال</div>
-                    </div>
+                  </div>
+                  <div v-else>
+                    <v-alert type="warning" class="my-2">داده‌ای برای ساپ یافت نشد.</v-alert>
                   </div>
                 </v-card>
               </v-col>

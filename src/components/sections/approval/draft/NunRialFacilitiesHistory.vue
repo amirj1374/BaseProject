@@ -36,17 +36,17 @@ const header = ref([
 
 <template>
   <v-btn size="large" :base-color="valid ? 'lightsuccess' : 'lighterror'" @click="isDialogActive = true">
-    سوابق تسهیلات ریالی
-    <v-icon v-if="!valid" color="error" style="margin-right: 20px" size="20">mdi-alert-circle</v-icon>
-    <v-icon v-if="valid" color="success" style="margin-right: 20px" size="20">mdi-checkbox-marked-circle</v-icon>
+    سوابق تسهیلات غیر ریالی
+    <AlertCircleIcon v-if="!valid" style="margin-right: 20px" size="20" />
+    <SquareRoundedCheckFilledIcon v-if="valid" style="margin-right: 20px" size="20" />
   </v-btn>
   <v-dialog max-width="full" min-height="full" v-model="isDialogActive">
-    <v-card title="سوابق تسهیلات ریالی">
+    <v-card title="سوابق تسهیلات غیر ریالی">
       <v-card-text>
         <v-row>
           <v-col cols="12" md="12">
             <CustomDataTable
-              :apiResource="`loan-info`"
+              :apiResource="`loan-info-non-rial`"
               :queryParams="{ loanRequestId: approvalStore.loanRequestId }"
               :headers="header"
               :actions="['edit']"

@@ -137,7 +137,6 @@ export interface ConsiderationPayload {
   approvedFacilitiesAmount : number | null,
   approvalDate: string | null
   creditLimitDate: string | null
-  loanRequestId : number | null,
   atBranchLevel : boolean,
   notUsed : boolean,
   previousLoanAppropriate : boolean,

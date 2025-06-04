@@ -28,7 +28,10 @@ const createAxiosInstance = (): AxiosInstance => {
 
   // Interceptors for responses
   instance.interceptors.response.use(
-    (response) => response,
+    (response) => {
+      console.log(response);
+      return response;
+    },
     (error) => {
       // Handle response errors globally
       if (error.response?.status === 401) {

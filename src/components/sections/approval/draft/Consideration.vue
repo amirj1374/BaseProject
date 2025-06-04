@@ -1,13 +1,16 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { api } from '@/services/api';
 import type { ConsiderationPayload } from '@/types/approval/approvalType';
+import { useApprovalStore } from '@/stores/approval';
 
 const isDialogActive = ref(false);
 const loading = ref(false);
 const valid = ref(false);
 const canSubmit = ref(false);
 const error = ref<string | null>(null);
+const approvalStore = useApprovalStore()
+
 // initial data
 const formData = ref({
   havePromissoryNote: false,
@@ -24,6 +27,13 @@ const formData = ref({
   atBranchLevel: false,
   notUsed: false,
   previousLoanAppropriate: false
+});
+
+onMounted(async () => {
+  const response = await api.approval.getConsideration(approvalStore.loanRequestId);
+  if (response.status === 200 && response.data) {
+    formData.value = response.data;
+  }
 });
 
 // get customer
@@ -43,13 +53,12 @@ async function save() {
       approvedFacilitiesAmount: formData.value.approvedFacilitiesAmount,
       approvalDate: formData.value.approvalDate,
       creditLimitDate: formData.value.creditLimitDate,
-      loanRequestId: formData.value.loanRequestId,
       atBranchLevel: formData.value.atBranchLevel,
       notUsed: formData.value.notUsed,
       previousLoanAppropriate: formData.value.previousLoanAppropriate
     };
 
-    const response = await api.approval.saveConsideration(payload, '5253');
+    const response = await api.approval.saveConsideration(payload, approvalStore.loanRequestId);
 
     if (response.status === 200 && response.data) {
       const raw = response.data;

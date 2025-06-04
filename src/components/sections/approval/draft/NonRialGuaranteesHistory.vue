@@ -31,7 +31,7 @@ const header = ref([
 
 <template>
   <v-btn size="large" :base-color="valid ? 'lightsuccess' : 'lighterror'" @click="isDialogActive = true">
-    سوابق ضمانت نامه ریالی
+    سوابق ضمانت نامه غیر ریالی
     <AlertCircleIcon v-if="!valid" style="margin-right: 20px" size="20" />
     <SquareRoundedCheckFilledIcon v-if="valid" style="margin-right: 20px" size="20" />
   </v-btn>
@@ -41,7 +41,7 @@ const header = ref([
         <v-row>
           <v-col cols="12" md="12">
             <CustomDataTable
-              :apiResource="`bank-guarantee`"
+              :apiResource="`bank-guarantee-non-rial`"
               :headers="header"
               :actions="['edit']"
               :pagination="false"

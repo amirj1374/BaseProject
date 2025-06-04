@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 import Facilities from '@/components/sections/approval/draft/FacilitiesHistory.vue';
+import NunRialFacilitiesHistory from '@/components/sections/approval/draft/NunRialFacilitiesHistory.vue';
 import { api } from '@/services/api';
 import type { CurrenciesDto,RequestInformationDto } from '@/types/approval/approvalType';
 import Guarantee from '@/components/sections/approval/draft/GuaranteesHistory.vue';
+import NonRialGuarantee from '@/components/sections/approval/draft/NonRialGuaranteesHistory.vue';
 import Lc from '@/components/sections/approval/draft/LcHistory.vue';
 import Deposit from '@/components/sections/approval/draft/Deposit.vue';
 import Consideration from '@/components/sections/approval/draft/Consideration.vue';
@@ -62,6 +64,15 @@ defineExpose({ submitData });
           </v-col>
         </v-row>
         <v-row class="mt-5">
+          <!-- NonRial-facilities Checkbox -->
+
+          <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
+            <NunRialFacilitiesHistory :currencies="currencies"/>
+          </v-col>
+          <!-- NonRial-Guarantee Checkbox -->
+          <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
+            <NonRialGuarantee :currencies="currencies"/>
+          </v-col>
           <!-- deposit Checkbox -->
           <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
             <Deposit/>

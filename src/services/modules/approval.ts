@@ -53,30 +53,35 @@ export default (axiosInstance: AxiosInstance) => ({
   getSapInquiry(payload: FetchInquiryPayload) {
     return axiosInstance.post('/api/v1/sap-inquiry', payload);
   },
-
-  getInquiryCheque(loanRequestId: string) {
-    return axiosInstance.get('/api/v1/inquery/inquiry-cheque', {
-      params: { loanRequestId }
-    });
-  },
-
   getIndirectObligation(loanRequestId: string) {
     return axiosInstance.get('/api/v1/general/indirect-obligation', {
       params: { loanRequestId }
     });
   },
 
+  getInquiryCheque(loanRequestId: string) {
+    return axiosInstance.get('api/v1/inquery/inquiry-cheque', {
+      params: { loanRequestId }
+    });
+  },
+
   getAllDeposit(loanRequestId: string) {
-    return axiosInstance.post('/api/v1/deposit-info/get-all-deposit', { loanRequestId });
+    return axiosInstance.get('/api/v1/deposit-info/get-all-deposit', {params: {loanRequestId}});
   },
 
   saveDeposit(loanRequestId: string, depositList: DepositAccount) {
     return axiosInstance.post('/api/v1/deposit-info/save-selected-deposit', { loanRequestId, depositList });
   },
 
-  saveConsideration(payload: ConsiderationPayload, loanRequestId: string) {
-    return axiosInstance.post('/api/v1/deposit-info/save-selected-deposit',{payload,loanRequestId});
+  getConsideration(loanRequestId: string) {
+    return axiosInstance.get('/api/v1/consideration', {
+      params: { loanRequestId }
+    });
   },
+
+    saveConsideration(payload: ConsiderationPayload, loanRequestId: string) {
+      return axiosInstance.post('/api/v1/consideration',{payload,loanRequestId});
+    },
 
   uploadExcel(payload: UploadFile) {
     return axiosInstance.post(`/api/v1/general/save-doc`, payload, {

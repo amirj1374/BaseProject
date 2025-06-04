@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import { ref } from 'vue';
+import { ref, h } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import Reference from '@/components/sections/cartable/reference/Reference.vue';
 import CartableHistory from '@/components/sections/cartable/cartableHistory/cartableHistory.vue';
@@ -40,6 +40,12 @@ const header = ref([
     sortable: true
   }
 ]);
+
+const tableRef = ref();
+
+function handleReferenceSuccess() {
+  tableRef.value?.fetchData();
+}
 </script>
 
 <template>
@@ -47,17 +53,18 @@ const header = ref([
   <!-- Custom Data Table Component -->
   <div class="upload-form">
     <CustomDataTable
-    :apiResource="`cartable`"
-    :headers="header"
-    :height="400"
-    :auto-fetch="true"
-    :custom-actions="[
-      { title: 'عملیات', component: Reference },
-      { title: 'لیست مدارک', component: UploadList },
-      { title: 'تاریخچه کارتابل', component: CartableHistory },
-      { title: 'تاریخچه درخواست مصوبه', component: LoanRequestHistory }
-    ]"
-  />
+      ref="tableRef"
+      :apiResource="`cartable`"
+      :headers="header"
+      :height="400"
+      :auto-fetch="true"
+      :custom-actions="[
+        { title: 'عملیات', component: (props) => h(Reference, { ...props, onSuccess: handleReferenceSuccess }) },
+        { title: 'لیست مدارک', component: UploadList },
+        { title: 'تاریخچه کارتابل', component: CartableHistory },
+        { title: 'تاریخچه درخواست مصوبه', component: LoanRequestHistory }
+      ]"
+    />
   </div>
 </template>
 <style scoped>

@@ -10,6 +10,7 @@ const interval = ref<any | null>(null);
 const isLoading = ref(false);
 const responseStatus = ref<'idle' | 'success' | 'error' | 'empty'>('idle');
 const chequeData = ref<any>(null);
+const IndirectObligationData = ref<any>(null);
 const sapData = ref<any>(null);
 const canSubmit = ref(false);
 
@@ -26,18 +27,20 @@ const getInquiry = async () => {
     }
 
     // Cheque inquiry request
-    const chequeRes = await api.approval.getIndirectObligation(approvalStore.loanRequestId);
-    
+    const chequeRes = await api.approval.getInquiryCheque(approvalStore.loanRequestId);
+    const IndirectObligation = await api.approval.getIndirectObligation(approvalStore.loanRequestId);
+
     // SAP inquiry request
     const sapRes = await api.approval.getSapInquiry({
       loanRequestId: approvalStore.loanRequestId,
       nationalCode: approvalStore.customerInfo.nationalCode
     });
 
-    if (chequeRes.status === 200 && sapRes.status === 200) {
+    if (chequeRes.status === 200 && sapRes.status === 200 && IndirectObligation.status === 200) {
+      IndirectObligationData.value = IndirectObligation.data;
       chequeData.value = chequeRes.data;
-      console.log(chequeData.value);
       sapData.value = sapRes.data;
+      console.log(chequeData.value);
       responseStatus.value = 'success';
     } else {
       responseStatus.value = 'empty';
@@ -97,10 +100,21 @@ defineExpose({ submitData });
             <v-row>
               <v-col cols="12" md="6">
                 <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="lg">
-                  <div class="text-subtitle-1 mb-2">استعلام چک</div>
+                  <div class="text-subtitle-1 mb-2">استعلام چک های برگشتی</div>
                   <div>
-                    <div><b>شرکت : </b> {{ chequeData?.allOfThem || 'نامشخص' }}</div>
-                    <div><b>مبلغ کل : </b> {{ chequeData?.totalAmount || 'نامشخص' }}</div>
+                    <div><b>چک برگشتی دارد؟ </b> {{ chequeData?.bouncedCheque || 'ندارد' }}</div>
+                    <div><b>تعداد : </b> {{ chequeData?.count || '0' }}</div>
+                    <div><b>مبلغ کل : </b> {{ chequeData?.amount || '0' }}</div>
+                  </div>
+                </v-card>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="lg">
+                  <div class="text-subtitle-1 mb-2">استعلام تعهدات غیر مستقیم</div>
+                  <div>
+                    <div><b>شرکت : </b> {{ IndirectObligationData?.allOfThem || 'نامشخص' }}</div>
+                    <div><b>مبلغ کل : </b> {{ IndirectObligationData?.totalAmount || 'نامشخص' }}</div>
                   </div>
                 </v-card>
               </v-col>
