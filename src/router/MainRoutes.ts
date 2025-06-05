@@ -7,13 +7,8 @@ const MainRoutes = {
   component: () => import('@/layouts/full/FullLayout.vue'),
   children: [
     {
-      name: 'Default',
-      path: '/',
-      component: () => import('@/views/approval_request/index.vue')
-    },
-    {
       name: 'Approval',
-      path: '/approval',
+      path: '/',
       component: () => import('@/views/approval/approval.vue')
     },
     {

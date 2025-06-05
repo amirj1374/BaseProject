@@ -1,19 +1,26 @@
 <script lang="ts" setup>
-import { ref, computed, defineAsyncComponent } from 'vue';
+import { ref, computed, defineAsyncComponent, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import AppStepper from '@/components/common/AppStepper.vue';
+import { useBaseStore } from '@/stores/base';
 
 const router = useRouter();
 const approvalStore = useApprovalStore();
+const baseStore = useBaseStore();
 const submitting = ref(false);
 const error = ref<string | null>(null);
 const showError = ref(false);
 const showSuccess = ref(false);
 const stepper = ref(1);
 const stepperRef = ref();
-
+onMounted(async () => {
+  const res = await api.approval.fetchCurrencies();
+  if (res.status === 200) {
+    baseStore.setCurrencyList(res.data);
+  }
+});
 // Steps array for AppStepper
 const steps = [
   {

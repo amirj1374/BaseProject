@@ -55,6 +55,7 @@ const headers = ref([
 ]);
 
 const dataTableRef = ref();
+const facilitiesRef = ref();
 
 onMounted(() => {
   if (approvalStore.customerInfo) {
@@ -131,7 +132,10 @@ const submitData = async () => {
     return Promise.reject(error.value);
   }
   try {
-    approvalStore.setCustomerInfo(firstItem);
+    approvalStore.setCustomerInfo({
+    ...firstItem,
+    facilities: facilitiesRef.value?.facilities || []
+  });
     return Promise.resolve();
   } catch (err) {
     error.value = 'خطای ناشناخته در ثبت اطلاعات مشتری';
@@ -152,7 +156,6 @@ watch(
       items.value = [newVal];
       isValid.value = true;
     } else {
-      items.value = [];
       isValid.value = false;
     }
   },
@@ -271,13 +274,14 @@ defineExpose({ submitData });
   <div class="customer-section">
     <h3 class="group-title">درخواست مشتری</h3>
     <Facilities
+      ref="facilitiesRef"
       :loading="loading"
       @save="handleSaveFacility"
       @delete="handleDeleteFacility"
     />
   </div>
 
-  <div class="customer-section">
+  <!-- <div class="customer-section">
     <LetterOfCredit
       :loading="loading"
       @save="handleSaveLC"
@@ -291,7 +295,7 @@ defineExpose({ submitData });
       @save="handleSaveGuarantee"
       @delete="handleDeleteGuarantee"
     />
-  </div>
+  </div> -->
 
   <v-snackbar v-model="showError" color="error" timeout="5500">
     {{ error }}

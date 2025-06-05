@@ -17,6 +17,19 @@ export interface CustomerDto {
   phoneNo?: number;
   branchName?: string;
   clientgroupname?: string;
+  facilities?: Facility[];
+}
+
+interface Facility {
+  id: number;
+  approvalType: string;
+  currency: string;
+  amount: string;
+  repaymentType: string;
+  year?: string;
+  month?: string;
+  day?: string;
+  durationDay?: string;
 }
 
 export interface FetchCustomerPayload {

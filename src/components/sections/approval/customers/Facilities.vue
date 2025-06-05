@@ -2,14 +2,7 @@
   <div class="facilities-section">
     <div class="section-header">
       <h4 class="section-title">تسهیلات</h4>
-      <v-btn
-        color="primary"
-        @click="openDialog"
-        :disabled="loading"
-      >
-        افزودن تسهیلات
-      </v-btn>
-    </div>
+      <v-btn color="secondary" @click="openDialog" :disabled="loading || facilities.length >= 1"> افزودن تسهیلات</v-btn>    </div>
 
     <v-data-table-virtual
       :headers="headers"
@@ -21,61 +14,58 @@
       hide-default-footer
       class="facilities-table elevation-1"
     >
+    <template #item.approvalType="{ item }">
+    {{ ApprovalTypeOptions.find(opt => opt.value === item.approvalType)?.title || '-' }}
+  </template>
+  <template #item.currency="{ item }">
+    {{ baseStore.currency.find(cur => cur.code === item.currency)?.description || '-' }}
+  </template>
+  <template #item.repaymentType="{ item }">
+    {{ RepaymentTypeOptions.find(opt => opt.value === item.repaymentType)?.title || '-' }}
+  </template>
       <template #item.actions="{ item }">
         <div class="d-flex gap-2">
-          <v-btn
-            size="small"
-            icon
-            @click="editItem(item)"
-          >
-            <IconPencil size="20" />
+          <v-btn size="small" variant="text" @click="editItem(item)">
+            <IconPencil color="blue" size="20" />
           </v-btn>
-          <v-btn
-            size="small"
-            icon
-            @click="deleteItem(item)"
-          >
-            <IconTrash size="20" />
+          <v-btn size="small" variant="text" @click="deleteItem(item)">
+            <IconTrash color="red" size="20" />
           </v-btn>
         </div>
       </template>
     </v-data-table-virtual>
 
-    <v-dialog
-      v-model="dialog"
-      max-width="800px"
-    >
+    <v-dialog v-model="dialog" max-width="800px">
       <v-card>
-        <v-card-title class="d-flex align-center">
-          <span class="text-h6">{{ isEditing ? 'ویرایش تسهیلات' : 'افزودن تسهیلات' }}</span>
+        <v-card-title class="d-flex align-center py-5 px-5">
+          <span class="text-h3">{{ isEditing ? 'ویرایش تسهیلات' : 'افزودن تسهیلات' }}</span>
           <v-spacer></v-spacer>
-          <v-btn
-            icon
-            @click="closeDialog"
-          >
-            <IconX size="20" />
+          <v-btn icon size="small" variant="text" @click="closeDialog">
+            <IconX color="red" size="20" />
           </v-btn>
         </v-card-title>
         <v-card-text>
           <v-form ref="form" v-model="isFormValid">
             <v-row>
               <v-col cols="12" md="4">
-                <v-text-field
-                  v-model="formData.amount"
-                  label="مبلغ تسهیلات"
+                <v-select
+                  v-model="formData.approvalType"
+                  :items="ApprovalTypeOptions || []"
+                  label="نوع مصوبه"
                   variant="outlined"
                   density="comfortable"
-                  :rules="[(v: string) => !!v || 'مبلغ تسهیلات الزامی است']"
                 />
               </v-col>
               <v-col cols="12" md="4">
-                <v-select
-                  v-model="formData.type"
-                  label="نوع تسهیلات"
+                <v-autocomplete
+                  v-model="formData.currency"
+                  label="نوع ارز"
                   variant="outlined"
+                  clearable
                   density="comfortable"
-                  :items="facilityTypes"
-                  :rules="[(v: string) => !!v || 'نوع تسهیلات الزامی است']"
+                  item-title="description"
+                  item-value="code"
+                  :items="baseStore.currency"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -84,30 +74,80 @@
                   label="نحوه بازپرداخت"
                   variant="outlined"
                   density="comfortable"
-                  :items="repaymentTypes"
-                  :rules="[(v: string) => !!v || 'نحوه بازپرداخت الزامی است']"
+                  :items="RepaymentTypeOptions || []"
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="2">
+                <v-text-field
+                  v-model="formData.year"
+                  density="comfortable"
+                  hide-details="auto"
+                  variant="outlined"
+                  color="primary"
+                  label="سال"
+                  type="number"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="2">
+                <v-text-field
+                  v-model="formData.month"
+                  density="comfortable"
+                  hide-details="auto"
+                  variant="outlined"
+                  color="primary"
+                  label="ماه"
+                  type="number"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="2">
+                <v-text-field
+                  v-model="formData.day"
+                  density="comfortable"
+                  hide-details="auto"
+                  variant="outlined"
+                  color="primary"
+                  label="روز"
+                  type="number"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="2">
+                <v-btn size="x-large" color="secondary" variant="outlined" @click="dayCalculate"> محاسبه</v-btn>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-text-field
+                  v-model="formData.durationDay"
+                  density="comfortable"
+                  variant="outlined"
+                  color="primary"
+                  label="مدت"
+                  readonly
+                  suffix="روز"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="4">
+                <MoneyInput
+                  v-model="formData.amount"
+                  label="مبلغ"
+                  placeholder="0"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details="auto"
+                  suffix="میلیون ریال"
                 />
               </v-col>
             </v-row>
           </v-form>
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="d-flex item-center gap-2 px-5 py-5">
           <v-spacer></v-spacer>
-          <v-btn
-            color="primary"
-            @click="saveFacility"
-            :loading="loading"
-            :disabled="!isFormValid"
-          >
+          <v-btn color="primary" @click="saveFacility" :loading="loading" :disabled="!isFormValid">
             {{ isEditing ? 'ویرایش' : 'ذخیره' }}
           </v-btn>
-          <v-btn
-            color="error"
-            variant="text"
-            @click="closeDialog"
-          >
-            انصراف
-          </v-btn>
+          <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -115,14 +155,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { IconTrash, IconX, IconPencil } from '@tabler/icons-vue';
+import { ApprovalTypeOptions } from '@/constants/enums/approval';
+import { useBaseStore } from '@/stores/base';
+import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
+import { api } from '@/services/api';
+import MoneyInput from '@/components/shared/MoneyInput.vue';
+import { useApprovalStore } from '@/stores/approval';
+
+const baseStore = useBaseStore();
+const approvalStore = useApprovalStore();
 
 interface Facility {
   id: number;
-  type: string;
+  approvalType: string;
+  currency: string;
   amount: string;
   repaymentType: string;
+  year?: string;
+  month?: string;
+  day?: string;
+  durationDay?: string;
 }
 
 const props = defineProps<{
@@ -141,30 +195,43 @@ const isFormValid = ref(false);
 const facilities = ref<Facility[]>([]);
 const isEditing = ref(false);
 const editingId = ref<number | null>(null);
-
+const error = ref('');
 const formData = reactive({
-  type: '',
-  amount: '',
-  repaymentType: ''
+  approvalType: '',
+  currency: '',
+  repaymentType: '',
+  year: '',
+  month: '',
+  day: '',
+  durationDay: '',
+  amount: ''
 });
 
-const facilityTypes = [
-  { title: 'تسهیلات 1', value: 'facility1' },
-  { title: 'تسهیلات 2', value: 'facility2' },
-  { title: 'تسهیلات 3', value: 'facility3' }
-];
-
-const repaymentTypes = [
-  { title: 'اقساط ماهانه', value: 'monthly' },
-  { title: 'یکجا', value: 'lump' }
-];
-
 const headers = [
-  { title: 'نوع تسهیلات', key: 'type', width: '160px' },
-  { title: 'مبلغ', key: 'amount', width: '120px' },
-  { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '140px' },
+  { title: 'نوع مصوبه', key: 'approvalType', width: '100px' },
+  { title: 'نوع ارز', key: 'currency', width: '100px' },
+  { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '100px' },
+  { title: 'مدت', key: 'durationDay', width: '100px' },
+  { title: 'مبلغ', key: 'amount', width: '150px' },
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
 ];
+onMounted(() => {
+  if (approvalStore.customerInfo?.facilities) {
+    facilities.value = [...approvalStore.customerInfo.facilities];
+  }
+});
+const dayCalculate = async () => {
+  if (formData.year === null && formData.month === null && formData.day === null) {
+    error.value = 'لطفا مقادیر تاریخ را وارد کنید';
+    return;
+  }
+  try {
+    const res = await api.approval.getCalculatedDay(Number(formData.year), Number(formData.month), Number(formData.day));
+    formData.durationDay = res.data;
+  } catch (err) {
+    console.error('Error calculating days:', err);
+  }
+};
 
 function openDialog() {
   isEditing.value = false;
@@ -178,18 +245,22 @@ function closeDialog() {
 }
 
 function resetForm() {
-  formData.type = '';
   formData.amount = '';
   formData.repaymentType = '';
   form.value?.reset();
 }
 
 function editItem(item: Facility) {
-  isEditing.value = true;
+    isEditing.value = true;
   editingId.value = item.id;
-  formData.type = item.type;
+  formData.approvalType = item.approvalType;
+  formData.currency = item.currency;
   formData.amount = item.amount;
   formData.repaymentType = item.repaymentType;
+  formData.year = item.year || '';
+  formData.month = item.month || '';
+  formData.day = item.day || '';
+  formData.durationDay = item.durationDay || '';
   dialog.value = true;
 }
 
@@ -202,7 +273,7 @@ function saveFacility() {
   };
 
   if (isEditing.value) {
-    const index = facilities.value.findIndex(f => f.id === editingId.value);
+    const index = facilities.value.findIndex((f) => f.id === editingId.value);
     if (index !== -1) {
       facilities.value[index] = facilityData;
       emit('edit', facilityData);
@@ -211,17 +282,19 @@ function saveFacility() {
     facilities.value.push(facilityData);
     emit('save', facilityData);
   }
-  
+
   closeDialog();
 }
 
 function deleteItem(item: Facility) {
-  const index = facilities.value.findIndex(f => f.id === item.id);
+  const index = facilities.value.findIndex((f) => f.id === item.id);
   if (index !== -1) {
     facilities.value.splice(index, 1);
     emit('delete', item);
   }
 }
+// Expose facilities for parent access
+defineExpose({ facilities });
 </script>
 
 <style lang="scss" scoped>
@@ -257,10 +330,12 @@ function deleteItem(item: Facility) {
       background-color: var(--v-theme-secondary);
       color: #fff;
     }
+
     :deep(.v-data-table-header th) {
       background-color: var(--v-theme-secondary) !important;
       color: #fff;
     }
+
     :deep(.v-data-table-header tr) {
       background-color: var(--v-theme-secondary) !important;
       color: #fff;
@@ -276,4 +351,4 @@ function deleteItem(item: Facility) {
   background-color: #f5f5f5 !important;
   font-weight: 600;
 }
-</style> 
+</style>
