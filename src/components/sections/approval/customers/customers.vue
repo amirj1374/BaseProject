@@ -7,6 +7,9 @@ import { nationalCodeRule } from '@/validators/nationalCodeRule';
 import type { CustomerDto, FetchCustomerPayload } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
 import { IconTrash } from '@tabler/icons-vue';
+import Facilities from './Facilities.vue';
+import LetterOfCredit from './LetterOfCredit.vue';
+import Guarantee from './Guarantee.vue';
 
 type AllowedStatus = 'nationalCode' | 'cif';
 const approvalStore = useApprovalStore();
@@ -41,14 +44,14 @@ const formData = ref({
 });
 
 const headers = ref([
-  { title: 'شماره مشتری', key: 'cif' },
-  { title: 'کدملی / شناسه ملی', align: 'center', key: 'nationalCode' },
-  { title: 'نام مشتری', key: 'customerName' },
-  { title: 'گروه مشتری', key: 'clientGroupName' },
-  { title: 'نام شعبه', key: 'branchName' },
-  { title: 'کدپستی', key: 'postalCode' },
-  { title: 'آدرس', key: 'address' },
-  { title: 'عملیات', key: 'actions', align: 'center' }
+  { title: 'شماره مشتری', key: 'cif', width: '200px' },
+  { title: 'کدملی / شناسه ملی', align: 'center', key: 'nationalCode', width: '250px' },
+  { title: 'نام مشتری', key: 'customerName', width: '160px' },
+  { title: 'گروه مشتری', key: 'clientGroupName', width: '140px' },
+  { title: 'نام شعبه', key: 'branchName', width: '140px' },
+  { title: 'کدپستی', key: 'postalCode', width: '120px' },
+  { title: 'آدرس', key: 'address', width: '200px' },
+  { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
 ]);
 
 const dataTableRef = ref();
@@ -156,13 +159,42 @@ watch(
   { immediate: true }
 );
 
+function handleSaveFacility(data: any) {
+  // Handle saving facility data
+  console.log('Saving facility:', data);
+}
+
+function handleDeleteFacility(item: any) {
+  // Handle deleting facility
+  console.log('Deleting facility:', item);
+}
+
+function handleSaveLC(data: any) {
+  // Handle saving LC data
+  console.log('Saving LC:', data);
+}
+
+function handleDeleteLC(item: any) {
+  // Handle deleting LC
+  console.log('Deleting LC:', item);
+}
+
+function handleSaveGuarantee(data: any) {
+  // Handle saving guarantee data
+  console.log('Saving guarantee:', data);
+}
+
+function handleDeleteGuarantee(item: any) {
+  // Handle deleting guarantee
+  console.log('Deleting guarantee:', item);
+}
+
 defineExpose({ submitData });
 </script>
 
 <template>
-
   <div class="customer-section">
-    <h4 class="section-title">انتخاب مشتری</h4>
+    <h3 class="group-title">انتخاب مشتری</h3>
     <!-- Search Section -->
     <form @submit.prevent="search" class="customer-form">
       <v-row class="mt-2">
@@ -209,7 +241,7 @@ defineExpose({ submitData });
             :disabled="loading"
           />
         </v-col>
-          <v-col cols="12" md="12" class="customer-search-btn">
+        <v-col cols="12" md="12" class="customer-search-btn">
           <v-btn color="secondary" @click="search" type="button" :loading="loading" :disabled="loading"> جستجو </v-btn>
         </v-col>
         <v-col cols="12" md="12">
@@ -234,11 +266,36 @@ defineExpose({ submitData });
         </v-col>
       </v-row>
     </form>
-    <v-snackbar v-model="showError" color="error" timeout="5500">
-      {{ error }}
-    </v-snackbar>
   </div>
-  
+
+  <div class="customer-section">
+    <h3 class="group-title">درخواست مشتری</h3>
+    <Facilities
+      :loading="loading"
+      @save="handleSaveFacility"
+      @delete="handleDeleteFacility"
+    />
+  </div>
+
+  <div class="customer-section">
+    <LetterOfCredit
+      :loading="loading"
+      @save="handleSaveLC"
+      @delete="handleDeleteLC"
+    />
+  </div>
+
+  <div class="customer-section">
+    <Guarantee
+      :loading="loading"
+      @save="handleSaveGuarantee"
+      @delete="handleDeleteGuarantee"
+    />
+  </div>
+
+  <v-snackbar v-model="showError" color="error" timeout="5500">
+    {{ error }}
+  </v-snackbar>
 </template>
 
 <style lang="scss" scoped>
@@ -249,6 +306,19 @@ defineExpose({ submitData });
   margin-bottom: 10px;
   width: 100%;
   max-width: 100%;
+
+  .group-title {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--v-theme-primary);
+    border-right: 6px solid var(--v-theme-primary);
+    padding-right: 18px;
+    margin-bottom: 2.5rem;
+    background: linear-gradient(90deg, #f5f7fa 0%, #E2EAEA 100%);
+    border-radius: 8px;
+    display: inline-block;
+    line-height: 1.2;
+  }
 
   .section-title {
     font-size: 1.25rem;
