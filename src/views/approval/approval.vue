@@ -137,10 +137,4 @@ const currentComponent = computed(() => steps[stepper.value - 1].section);
   margin-top: 20px;
   flex-direction: row-reverse;
 }
-
-.v-btn {
-  min-width: 100px;
-  text-align: center;
-  justify-content: center;
-}
 </style>
