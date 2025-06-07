@@ -1,14 +1,24 @@
 <script setup lang="ts">
 import { IconCheck, IconClock, IconPencil } from '@tabler/icons-vue';
-import { ref, watch, nextTick, onMounted, defineProps, defineEmits } from 'vue';
+import { ref, watch, nextTick, onMounted, onBeforeUnmount, defineEmits } from 'vue';
 import type { Component, ComponentPublicInstance } from 'vue';
 import '@/scss/components/_VStepper.scss';
 
-const props = defineProps<{
-  steps: { title: string; section: Component }[];
-  modelValue: number;
-  contentMinHeight?: string;
-}>();
+const props = defineProps({
+  steps: {
+    type: Array as () => { title: string; section: Component }[],
+    required: true
+  },
+  modelValue: {
+    type: Number,
+    required: true
+  },
+  contentMinHeight: {
+    type: String,
+    default: undefined
+  }
+});
+
 const emit = defineEmits(['update:modelValue', 'step-click']);
 
 const stepperHeaderRef = ref<HTMLElement | null>(null);
@@ -19,8 +29,8 @@ function setStepRef(el: Element | ComponentPublicInstance | null, index: number)
   stepRefs.value[index] = (el instanceof HTMLElement) ? el : null;
 }
 
-// Auto-scroll to active step
-watch(() => props.modelValue, async () => {
+// Auto-scroll to active step with cleanup
+const stopWatch = watch(() => props.modelValue, async () => {
   await nextTick();
   const activeStepEl = stepRefs.value[props.modelValue - 1];
   if (activeStepEl) {
@@ -37,10 +47,15 @@ onMounted(() => {
   });
 });
 
-function handleStepClick(index: number) {
+// Cleanup watcher
+onBeforeUnmount(() => {
+  stopWatch();
+});
+
+const handleStepClick = (index: number) => {
   emit('step-click', index + 1);
   emit('update:modelValue', index + 1);
-}
+};
 
 defineExpose({ currentStepComponentRef });
 </script>
@@ -62,22 +77,22 @@ defineExpose({ currentStepComponentRef });
           @click="handleStepClick(index)"
         >
           <span class="app-stepper-badge"
-            :class="{
+                :class="{
               'badge-active': modelValue === index + 1,
               'badge-resolved': modelValue > index + 1,
               'badge-pending': modelValue < index + 1
             }"
           >
             <slot name="badge" :status="modelValue > index + 1 ? 'resolved' : modelValue === index + 1 ? 'active' : 'pending'" :index="index">
-              <!-- Default badge icons (parent can override with slot) -->
               <template v-if="modelValue > index + 1">
-                <IconCheck :size="16" />              </template>
+                <IconCheck :size="16" />
+              </template>
               <template v-else-if="modelValue === index + 1">
                 <IconPencil :size="16" />
-            </template>
+              </template>
               <template v-else>
                 <IconClock :size="16" />
-            </template>
+              </template>
             </slot>
           </span>
           <span class="app-stepper-title">{{ step.title }}</span>

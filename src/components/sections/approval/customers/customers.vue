@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue';
 import { api } from '@/services/api';
+import { useDebounceFn } from '@vueuse/core';
 //utils
 import { nationalCodeRule } from '@/validators/nationalCodeRule';
 //type
@@ -51,7 +52,7 @@ const headers = ref([
   { title: 'نام شعبه', key: 'branchName', width: '140px' },
   { title: 'کدپستی', key: 'postalCode', width: '120px' },
   { title: 'آدرس', key: 'address', width: '200px' },
-  { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
+  { title: 'عملیات', key: 'actions', width: '100px' }
 ]);
 
 const dataTableRef = ref();
@@ -64,7 +65,8 @@ onMounted(() => {
   }
 });
 
-async function search() {
+// Add debounced search function
+const debouncedSearch = useDebounceFn(async () => {
   approvalStore.resetAll();
   errors.value = {};
   isValid.value = false;
@@ -102,12 +104,17 @@ async function search() {
       error.value = `خطا: ${response.statusText}`;
       showError.value = true;
     }
-  } catch (err: any) {
-    error.value = err.message || 'خطای سرور.';
+  } catch (err) {
+    error.value = 'خطا در دریافت اطلاعات';
     showError.value = true;
   } finally {
     loading.value = false;
   }
+}, 500); // 500ms delay
+
+// Replace the existing search function with the debounced version
+async function search() {
+  await debouncedSearch();
 }
 
 const changePattern = () => {
@@ -260,7 +267,7 @@ defineExpose({ submitData });
             class="customer-table elevation-1"
             ref="dataTableRef"
           >
-            <template #item.actions>
+            <template #item.actions="{ item }">
               <v-btn variant="text" color="error" @click="deleteCustomer()">
                 <IconTrash size="20" />
               </v-btn>
@@ -280,23 +287,22 @@ defineExpose({ submitData });
       @delete="handleDeleteFacility"
     />
   </div>
-
-  <!-- <div class="customer-section">
+  <div class="customer-section">
+    <h3 class="group-title">درخواست مشتری</h3>
+    <Guarantee
+      :loading="loading"
+      @save="handleSaveGuarantee"
+      @delete="handleDeleteGuarantee"
+    />
+  </div>
+  <div class="customer-section">
+    <h3 class="group-title">درخواست مشتری</h3>
     <LetterOfCredit
       :loading="loading"
       @save="handleSaveLC"
       @delete="handleDeleteLC"
     />
   </div>
-
-  <div class="customer-section">
-    <Guarantee
-      :loading="loading"
-      @save="handleSaveGuarantee"
-      @delete="handleDeleteGuarantee"
-    />
-  </div> -->
-
   <v-snackbar v-model="showError" color="error" timeout="5500">
     {{ error }}
   </v-snackbar>

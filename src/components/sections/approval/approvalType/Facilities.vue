@@ -16,6 +16,10 @@ const emit = defineEmits<{
 
 const formRef = ref();
 const valid = ref(false);
+const showDeleteConfirm = ref(false);
+const collateralToDelete = ref<number | null>(null);
+const error = ref<string | null>(null);
+const showError = ref(false);
 
 const handleSave = (data: any) => {
   emit('save', data);
@@ -41,6 +45,41 @@ const openForm = async (initialData?: any) => {
   }
 };
 
+const removeCollateralItem = (index: number) => {
+  collateralToDelete.value = index;
+  showDeleteConfirm.value = true;
+};
+
+const confirmDeleteCollateral = () => {
+  if (collateralToDelete.value === null || !formRef.value) return;
+  
+  try {
+    const currentCollaterals = formRef.value.selectedCollaterals?.value || [];
+    const deletedCollateral = currentCollaterals[collateralToDelete.value];
+    
+    // Remove the collateral
+    const updatedCollaterals = [...currentCollaterals];
+    updatedCollaterals.splice(collateralToDelete.value, 1);
+    formRef.value.setFieldValue('selectedCollaterals', updatedCollaterals);
+    
+    // Show success message
+    error.value = `وثیقه ${deletedCollateral.collateral.description} با موفقیت حذف شد`;
+    showError.value = true;
+  } catch (err) {
+    error.value = 'خطا در حذف وثیقه';
+    showError.value = true;
+  } finally {
+    // Reset the state
+    collateralToDelete.value = null;
+    showDeleteConfirm.value = false;
+  }
+};
+
+const cancelDeleteCollateral = () => {
+  collateralToDelete.value = null;
+  showDeleteConfirm.value = false;
+};
+
 // Define field configuration for Facilities
 const showFields = {
   approvalType: true,
@@ -61,7 +100,8 @@ const showFields = {
 defineExpose({
   openForm,
   valid,
-  formRef
+  formRef,
+  removeCollateralItem
 });
 </script>
 
@@ -89,6 +129,40 @@ defineExpose({
       @save="handleSave"
       @cancel="handleCancel"
     />
+
+    <!-- Confirmation Dialog -->
+    <v-dialog v-model="showDeleteConfirm" max-width="400">
+      <v-card>
+        <v-card-title class="text-h5">
+          حذف وثیقه
+        </v-card-title>
+        <v-card-text>
+          آیا از حذف این وثیقه اطمینان دارید؟
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="error"
+            variant="text"
+            @click="confirmDeleteCollateral"
+          >
+            حذف
+          </v-btn>
+          <v-btn
+            color="primary"
+            variant="text"
+            @click="cancelDeleteCollateral"
+          >
+            انصراف
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Error Snackbar -->
+    <v-snackbar v-model="showError" color="error" timeout="3000">
+      {{ error }}
+    </v-snackbar>
   </div>
 </template>
 

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch, shallowRef } from 'vue';
+import { computed, onMounted, ref, watch, shallowRef, onBeforeUnmount } from 'vue';
 import axiosInstance from '@/services/axiosInstance';
 import apiService from '@/services/apiService';
 import { useRouter } from 'vue-router';
 import type { Component } from 'vue';
 import { DateConverter } from '@/utils/date-convertor';
+import { useDebounceFn } from '@vueuse/core';
 
 interface Header {
   title: string;
@@ -79,80 +80,20 @@ const tableRef = ref<HTMLElement | null>(null);
 const isLoadingMore = ref(false);
 const hasMore = ref(true);
 
-// Add a computed property to clean filter values
+// Memoize computed properties
 const cleanFilterModel = computed(() => {
-  const cleaned: Record<string, any> = {};
-  Object.entries(filterModel.value).forEach(([key, value]) => {
-    // Check if value is not null, undefined, empty string, or empty array
-    if (value !== null && value !== undefined && value !== '' && !(Array.isArray(value) && value.length === 0)) {
-      cleaned[key] = value;
+  const model = { ...filterModel.value };
+  Object.keys(model).forEach(key => {
+    if (model[key] === null || model[key] === undefined || model[key] === '') {
+      delete model[key];
     }
   });
-  return cleaned;
+  return model;
 });
-
-const api = apiService(axiosInstance, props.apiResource);
-const customActionDialog = ref(false);
-const customActionComponent = shallowRef<Component | null>(null);
-const customActionItem = ref<any>(null);
 
 const hasFilterComponent = computed(() => {
   return !!props.filterComponent;
 });
-
-// Add scroll event handler
-const handleScroll = async (event: Event) => {
-  const target = event.target as HTMLElement;
-  const { scrollTop, scrollHeight, clientHeight } = target;
-
-  // Check if we're near the bottom (within 100px)
-  if (scrollHeight - scrollTop - clientHeight < 100 && !isLoadingMore.value && hasMore.value) {
-    await loadMore();
-  }
-};
-
-// Load more data
-const loadMore = async () => {
-  if (isLoadingMore.value || !hasMore.value) return;
-
-  isLoadingMore.value = true;
-  currentPage.value++;
-
-  try {
-    const params = {
-      ...cleanFilterModel.value,
-      ...props.queryParams,
-      page: currentPage.value - 1,
-      size: itemsPerPage.value
-    };
-
-    const response = await api.fetch(params);
-    const newItems = response.data.content || [];
-
-    // Convert dates to Shamsi format
-    const formattedItems = newItems.map((item: Record<string, any>) => {
-      const newItem = { ...item };
-      props.headers.forEach((header) => {
-        if (header.isDate && newItem[header.key]) {
-          try {
-            newItem[header.key] = DateConverter.toShamsi(newItem[header.key]);
-          } catch (error) {
-            console.error(`Error converting date for field ${header.key}:`, error);
-          }
-        }
-      });
-      return newItem;
-    });
-
-    items.value = [...items.value, ...formattedItems];
-    hasMore.value = currentPage.value < response.data.totalPages;
-  } catch (err) {
-    console.error('Error loading more items:', err);
-    currentPage.value--; // Revert page number on error
-  } finally {
-    isLoadingMore.value = false;
-  }
-};
 
 // Modify fetchData to handle pagination correctly
 const fetchData = async (queryParams?: {}) => {
@@ -208,6 +149,78 @@ const fetchData = async (queryParams?: {}) => {
     console.error(err);
   } finally {
     loading.value = false;
+  }
+};
+
+// Add debounced version after fetchData definition
+const debouncedFetchData = useDebounceFn(fetchData, 300);
+
+// Update watcher to use debounced function
+watch([currentPage, cleanFilterModel], () => {
+  debouncedFetchData();
+}, { deep: true });
+
+// Cleanup on component unmount
+onBeforeUnmount(() => {
+  // Remove cancel call as it's not supported
+});
+
+const api = apiService(axiosInstance, props.apiResource);
+const customActionDialog = ref(false);
+const customActionComponent = shallowRef<Component | null>(null);
+const customActionItem = ref<any>(null);
+
+// Add scroll event handler
+const handleScroll = async (event: Event) => {
+  const target = event.target as HTMLElement;
+  const { scrollTop, scrollHeight, clientHeight } = target;
+
+  // Check if we're near the bottom (within 100px)
+  if (scrollHeight - scrollTop - clientHeight < 100 && !isLoadingMore.value && hasMore.value) {
+    await loadMore();
+  }
+};
+
+// Load more data
+const loadMore = async () => {
+  if (isLoadingMore.value || !hasMore.value) return;
+
+  isLoadingMore.value = true;
+  currentPage.value++;
+
+  try {
+    const params = {
+      ...cleanFilterModel.value,
+      ...props.queryParams,
+      page: currentPage.value - 1,
+      size: itemsPerPage.value
+    };
+
+    const response = await api.fetch(params);
+    const newItems = response.data.content || [];
+
+    // Convert dates to Shamsi format
+    const formattedItems = newItems.map((item: Record<string, any>) => {
+      const newItem = { ...item };
+      props.headers.forEach((header) => {
+        if (header.isDate && newItem[header.key]) {
+          try {
+            newItem[header.key] = DateConverter.toShamsi(newItem[header.key]);
+          } catch (error) {
+            console.error(`Error converting date for field ${header.key}:`, error);
+          }
+        }
+      });
+      return newItem;
+    });
+
+    items.value = [...items.value, ...formattedItems];
+    hasMore.value = currentPage.value < response.data.totalPages;
+  } catch (err) {
+    console.error('Error loading more items:', err);
+    currentPage.value--; // Revert page number on error
+  } finally {
+    isLoadingMore.value = false;
   }
 };
 
@@ -443,7 +456,7 @@ const resetFilter = () => {
           <template v-slot:item="{ item, columns, index }">
             <tr :style="{ background: index % 2 === 0 ? '#fff' : '#f5f7fa' }">
               <td v-for="column in columns" :key="column.key"
-                :style="{
+                  :style="{
                   ...getColumnStyle(column, item),
                   ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
                 }"
@@ -453,10 +466,10 @@ const resetFilter = () => {
                     ویرایش ✏️
                   </v-btn>
                   <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="mr-2" @click="openDeleteDialog(item)"
-                    >حذف ❌
+                  >حذف ❌
                   </v-btn>
                   <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
-                    >🔍 نمایش
+                  >🔍 نمایش
                   </v-btn>
                   <template v-for="(route, key) in props.routes" :key="key">
                     <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(key, item)">

@@ -30,7 +30,24 @@ export default defineConfig({
     }
   },
   build: {
-    chunkSizeWarningLimit: 1024 * 1024 // Set the limit to 1 MB
+    chunkSizeWarningLimit: 1024 * 1024, // Set the limit to 1 MB
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['vue', 'vue-router', 'pinia'],
+          'vuetify': ['vuetify'],
+          'charts': ['apexcharts', 'vue3-apexcharts'],
+          'editor': ['@tiptap/starter-kit', '@tiptap/vue-3']
+        }
+      }
+    },
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
+    }
   },
   optimizeDeps: {
     exclude: ['vuetify'],

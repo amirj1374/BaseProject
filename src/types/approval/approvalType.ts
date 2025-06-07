@@ -20,7 +20,7 @@ export interface CustomerDto {
   facilities?: Facility[];
 }
 
-interface Facility {
+export interface Facility {
   id: number;
   approvalType: string;
   currency: string;
@@ -30,6 +30,13 @@ interface Facility {
   month?: string;
   day?: string;
   durationDay?: string;
+  collaterals:Collaterals[]
+}
+
+export interface Collaterals {
+  collateral: { description: string; collateralTypeCode: string };
+  amount: number;
+  percent: number;
 }
 
 export interface FetchCustomerPayload {
