@@ -152,8 +152,8 @@
                 </v-btn>
               </v-col>
             </v-row>
-            <v-data-table
-              v-if="selectedCollaterals?.length > 0"
+            <v-data-table-virtual
+              v-if="collateralTableItems.length > 0"
               :headers="[
                 { title: 'نوع وثیقه', key: 'collateral.description', sortable: true },
                 { title: 'مبلغ وثیقه', key: 'amount', sortable: true, align: 'end' },
@@ -161,12 +161,7 @@
                 { title: 'ارزش معادل وثیقه', key: 'equivalentValue', sortable: true, align: 'end' },
                 { title: 'عملیات', key: 'actions', sortable: false, align: 'center' }
               ]"
-              :items="
-                selectedCollaterals.map((item) => ({
-                  ...item,
-                  equivalentValue: (item.amount * item.percent) / 100
-                }))
-              "
+              :items="collateralTableItems"
               density="compact"
               class="elevation-1 mb-4"
               hide-default-footer
@@ -197,7 +192,7 @@
                   </template>
                 </v-tooltip>
               </template>
-            </v-data-table>
+            </v-data-table-virtual>
           </v-form>
         </v-card-text>
         <v-card-actions>
@@ -255,7 +250,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { IconTrash, IconX, IconPencil } from '@tabler/icons-vue';
 import { ApprovalTypeOptions } from '@/constants/enums/approval';
 import { useBaseStore } from '@/stores/base';
@@ -263,12 +258,17 @@ import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import { api } from '@/services/api';
 import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { useApprovalStore } from '@/stores/approval';
-import { useField, useForm } from 'vee-validate';
 import type { CollateralDto, Facility } from '@/types/approval/approvalType';
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
 
 const baseStore = useBaseStore();
 const approvalStore = useApprovalStore();
+const dialog = ref(false);
+const form = ref();
+const isFormValid = ref(false);
+const facilities = ref<Facility[]>([]);
+const isEditing = ref(false);
+const editingId = ref<number | null>(null);
 const showCollateralInputDialog = ref(false);
 const showDeleteConfirm = ref(false);
 const collateralToDelete = ref<number | null>(null);
@@ -279,24 +279,22 @@ const selectedCollaterals = ref<Array<{
   amount: number;
   percent: number;
 }>>([]);
-
+const collateralList = ref<CollateralDto[]>([]);
+const collateralTableItems = computed(() =>
+  selectedCollaterals.value.map(item => ({
+    ...item,
+    equivalentValue: (item.amount * item.percent) / 100
+  }))
+);
 
 const props = defineProps<{
   loading?: boolean;
 }>();
-
 const emit = defineEmits<{
   (e: 'save', data: Facility): void;
   (e: 'delete', item: Facility): void;
   (e: 'edit', item: Facility): void;
 }>();
-
-const dialog = ref(false);
-const form = ref();
-const isFormValid = ref(false);
-const facilities = ref<Facility[]>([]);
-const isEditing = ref(false);
-const editingId = ref<number | null>(null);
 
 const formData = reactive({
   approvalType: '',
@@ -319,11 +317,6 @@ const headers = [
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
 ];
 
-// Add collateral list
-const collateralList = ref<CollateralDto[]>([]);
-
-
-// Add function to load collaterals
 const loadCollaterals = async () => {
   try {
     const res = await api.approval.getCollateral();
@@ -334,33 +327,18 @@ const loadCollaterals = async () => {
   }
 };
 
-// Update the collateral save handler
 const onCollateralDialogSave = (data: { collateral: CollateralDto | null; amount: string; percent: string }) => {
   if (!data.collateral) {
     error.value = 'نوع وثیقه الزامی است';
     showError.value = true;
     return;
   }
-
   try {
     const amountValue = parseFloat(data.amount.replace(/,/g, ''));
     const percentValue = parseFloat(data.percent);
-
-    if (isNaN(amountValue) || amountValue <= 0) {
-      throw new Error('مبلغ وثیقه باید عدد مثبت باشد');
-    }
-
-    if (isNaN(percentValue) || percentValue < 0 || percentValue > 100) {
-      throw new Error('درصد ارزش گذاری باید بین 0 تا 100 باشد');
-    }
-
-    const newCollateralEntry = {
-      collateral: data.collateral,
-      amount: amountValue,
-      percent: percentValue
-    };
-
-    // Update the selectedCollaterals ref directly
+    if (isNaN(amountValue) || amountValue <= 0) throw new Error('مبلغ وثیقه باید عدد مثبت باشد');
+    if (isNaN(percentValue) || percentValue < 0 || percentValue > 100) throw new Error('درصد ارزش گذاری باید بین 0 تا 100 باشد');
+    const newCollateralEntry = { collateral: data.collateral, amount: amountValue, percent: percentValue };
     selectedCollaterals.value = [...selectedCollaterals.value, newCollateralEntry];
     showCollateralInputDialog.value = false;
   } catch (err) {
@@ -369,14 +347,6 @@ const onCollateralDialogSave = (data: { collateral: CollateralDto | null; amount
   }
 };
 
-onMounted(() => {
-  loadCollaterals();
-  if (approvalStore.customerInfo?.facilities) {
-    facilities.value = [...approvalStore.customerInfo.facilities];
-  }
-});
-
-// Update the remove collateral handler
 const removeCollateralItem = (index: number) => {
   collateralToDelete.value = index;
   showDeleteConfirm.value = true;
@@ -384,21 +354,15 @@ const removeCollateralItem = (index: number) => {
 
 const confirmDeleteCollateral = () => {
   if (collateralToDelete.value === null) return;
-  
   try {
     const deletedCollateral = selectedCollaterals.value[collateralToDelete.value];
-    
-    // Remove the collateral directly from the ref
     selectedCollaterals.value = selectedCollaterals.value.filter((_, i) => i !== collateralToDelete.value);
-    
-    // Show success message
     error.value = `وثیقه ${deletedCollateral.collateral.description} با موفقیت حذف شد`;
     showError.value = true;
   } catch (err) {
     error.value = 'خطا در حذف وثیقه';
     showError.value = true;
   } finally {
-    // Reset the state
     collateralToDelete.value = null;
     showDeleteConfirm.value = false;
   }
@@ -436,7 +400,7 @@ function closeDialog() {
 function resetForm() {
   formData.amount = '';
   formData.repaymentType = '';
-  selectedCollaterals.value = []; // Clear collaterals
+  selectedCollaterals.value = [];
   form.value?.reset();
 }
 
@@ -451,26 +415,17 @@ function editItem(item: Facility) {
   formData.month = item.month || '';
   formData.day = item.day || '';
   formData.durationDay = item.durationDay || '';
-  
-  // Set collaterals if they exist in the item
-  if (item.collaterals) {
-    selectedCollaterals.value = item.collaterals;
-  } else {
-    selectedCollaterals.value = [];
-  }
-  
+  selectedCollaterals.value = item.collaterals ? item.collaterals : [];
   dialog.value = true;
 }
 
 function saveFacility() {
   if (!isFormValid.value) return;
-
   const facilityData: Facility = {
     id: editingId.value || Date.now(),
     ...formData,
-    collaterals: selectedCollaterals.value // Include collaterals in the saved data
+    collaterals: selectedCollaterals.value
   };
-
   if (isEditing.value) {
     const index = facilities.value.findIndex((f) => f.id === editingId.value);
     if (index !== -1) {
@@ -481,7 +436,6 @@ function saveFacility() {
     facilities.value.push(facilityData);
     emit('save', facilityData);
   }
-
   closeDialog();
 }
 
@@ -492,7 +446,14 @@ function deleteItem(item: Facility) {
     emit('delete', item);
   }
 }
-// Expose facilities for parent access
+
+onMounted(() => {
+  loadCollaterals();
+  if (approvalStore.customerInfo?.facilities) {
+    facilities.value = [...approvalStore.customerInfo.facilities];
+  }
+});
+
 defineExpose({ facilities });
 </script>
 
