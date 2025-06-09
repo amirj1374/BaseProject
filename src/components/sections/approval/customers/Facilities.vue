@@ -23,6 +23,9 @@
   <template #item.repaymentType="{ item }">
     {{ RepaymentTypeOptions.find(opt => opt.value === item.repaymentType)?.title || '-' }}
   </template>
+  <template #item.amount="{ item }">
+    {{ formatNumberWithCommas(item.amount) }}
+  </template>
       <template #item.actions="{ item }">
         <div class="d-flex gap-2">
           <v-btn size="small" variant="text" @click="editItem(item)">
@@ -40,7 +43,7 @@
         <v-card-title class="d-flex align-center py-5 px-5">
           <span class="text-h3">{{ isEditing ? 'ویرایش تسهیلات' : 'افزودن تسهیلات' }}</span>
           <v-spacer></v-spacer>
-          <v-btn icon size="small" variant="text" @click="closeDialog">
+          <v-btn size="small" variant="text" @click="closeDialog">
             <IconX color="red" size="20" />
           </v-btn>
         </v-card-title>
@@ -168,7 +171,7 @@
               no-data-text="هیچ وثیقه ای اضافه نشده است."
             >
               <template v-slot:item.amount="{ item }">
-                {{ item.amount.toLocaleString() }}
+                {{ formatNumberWithCommas(item.amount) }}
               </template>
               <template v-slot:item.percent="{ item }"> 
                 {{ item.percent }}% 
@@ -180,8 +183,7 @@
                 <v-tooltip location="top" text="حذف وثیقه">
                   <template v-slot:activator="{ props: tooltipProps }">
                     <v-btn 
-                      icon 
-                      variant="text" 
+                      variant="text"
                       size="small" 
                       color="error" 
                       v-bind="tooltipProps" 
@@ -198,7 +200,7 @@
         <v-card-actions>
           <div style="display: flex; justify-content: space-evenly; width: 100%;">
             <v-btn color="primary" @click="saveFacility" :loading="loading" :disabled="!isFormValid">
-            {{ isEditing ? 'ویرایش' : 'ذخیره' }}
+            {{ 'ذخیره' }}
           </v-btn>
           <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
           </div>
@@ -209,7 +211,7 @@
     <!-- CollateralInputDialog component -->
     <CollateralInputDialog 
       v-model="showCollateralInputDialog" 
-      :collateral-options="collateralList" 
+      :collateral-options="baseStore.collateral"
       @save="onCollateralDialogSave" 
     />
 
@@ -250,7 +252,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { IconTrash, IconX, IconPencil } from '@tabler/icons-vue';
 import { ApprovalTypeOptions } from '@/constants/enums/approval';
 import { useBaseStore } from '@/stores/base';
@@ -260,6 +262,7 @@ import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { useApprovalStore } from '@/stores/approval';
 import type { CollateralDto, Facility } from '@/types/approval/approvalType';
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
+import { formatNumberWithCommas } from '@/utils/number-formatter';
 
 const baseStore = useBaseStore();
 const approvalStore = useApprovalStore();
@@ -294,6 +297,7 @@ const emit = defineEmits<{
   (e: 'save', data: Facility): void;
   (e: 'delete', item: Facility): void;
   (e: 'edit', item: Facility): void;
+  (e: 'update:facilities', facilities: Facility[]): void;
 }>();
 
 const formData = reactive({
@@ -316,16 +320,6 @@ const headers = [
   { title: 'مبلغ', key: 'amount', width: '150px' },
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
 ];
-
-const loadCollaterals = async () => {
-  try {
-    const res = await api.approval.getCollateral();
-    collateralList.value = res.data || [];
-  } catch (err) {
-    console.error('Error fetching collaterals:', err);
-    collateralList.value = [];
-  }
-};
 
 const onCollateralDialogSave = (data: { collateral: CollateralDto | null; amount: string; percent: string }) => {
   if (!data.collateral) {
@@ -448,11 +442,14 @@ function deleteItem(item: Facility) {
 }
 
 onMounted(() => {
-  loadCollaterals();
   if (approvalStore.customerInfo?.facilities) {
     facilities.value = [...approvalStore.customerInfo.facilities];
   }
 });
+
+watch(facilities, (newVal) => {
+  emit('update:facilities', newVal);
+}, { deep: true });
 
 defineExpose({ facilities });
 </script>

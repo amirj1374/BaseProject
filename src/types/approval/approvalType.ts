@@ -18,9 +18,37 @@ export interface CustomerDto {
   branchName?: string;
   clientgroupname?: string;
   facilities?: Facility[];
+  guarantee?: Guarantee[];
+  lc?: Lc[];
 }
 
 export interface Facility {
+  id: number;
+  approvalType: string;
+  currency: string;
+  amount: string;
+  repaymentType: string;
+  year?: string;
+  month?: string;
+  day?: string;
+  durationDay?: string;
+  collaterals:Collaterals[]
+}
+
+export interface Guarantee {
+  id: number;
+  approvalType: string;
+  currency: string;
+  amount: string;
+  repaymentType: string;
+  year?: string;
+  month?: string;
+  day?: string;
+  durationDay?: string;
+  collaterals:Collaterals[]
+}
+
+export interface Lc {
   id: number;
   approvalType: string;
   currency: string;

@@ -1,22 +1,23 @@
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, defineAsyncComponent, computed } from 'vue';
 import { api } from '@/services/api';
 import { useDebounceFn } from '@vueuse/core';
 //utils
 import { nationalCodeRule } from '@/validators/nationalCodeRule';
 //type
-import type { CustomerDto, FetchCustomerPayload } from '@/types/approval/approvalType';
+import type { CustomerDto, FetchCustomerPayload, Facility, Guarantee, Lc } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
 import { IconTrash } from '@tabler/icons-vue';
-import Facilities from './Facilities.vue';
-import LetterOfCredit from './LetterOfCredit.vue';
-import Guarantee from './Guarantee.vue';
+// Use dynamic imports for heavy components
+const Facilities = defineAsyncComponent(() => import('./Facilities.vue'));
+const LetterOfCredit = defineAsyncComponent(() => import('./LetterOfCredit.vue'));
+const Guarantee = defineAsyncComponent(() => import('./Guarantee.vue'));
 
 type AllowedStatus = 'nationalCode' | 'cif';
 const approvalStore = useApprovalStore();
 
 // Tab Management
-const activeTab = ref('search');
+const activeTab = ref('facilities');
 
 // Search Section State
 const searchParam = ref<AllowedStatus>('cif');
@@ -45,18 +46,28 @@ const formData = ref({
 });
 
 const headers = ref([
-  { title: 'شماره مشتری', key: 'cif', width: '200px' },
-  { title: 'کدملی / شناسه ملی', align: 'center', key: 'nationalCode', width: '250px' },
-  { title: 'نام مشتری', key: 'customerName', width: '160px' },
-  { title: 'گروه مشتری', key: 'clientGroupName', width: '140px' },
-  { title: 'نام شعبه', key: 'branchName', width: '140px' },
-  { title: 'کدپستی', key: 'postalCode', width: '120px' },
-  { title: 'آدرس', key: 'address', width: '200px' },
-  { title: 'عملیات', key: 'actions', width: '100px' }
+  { title: 'شماره مشتری', key: 'cif', width: '200px', sortable: true },
+  { title: 'کدملی / شناسه ملی', align: 'center', key: 'nationalCode', width: '250px', sortable: true },
+  { title: 'نام مشتری', key: 'customerName', width: '160px', sortable: true },
+  { title: 'گروه مشتری', key: 'clientGroupName', width: '140px', sortable: true },
+  { title: 'نام شعبه', key: 'branchName', width: '140px', sortable: true },
+  { title: 'کدپستی', key: 'postalCode', width: '120px', sortable: true },
+  { title: 'آدرس', key: 'address', width: '200px', sortable: true },
+  { title: 'عملیات', key: 'actions', width: '100px', sortable: false }
 ]);
 
 const dataTableRef = ref();
 const facilitiesRef = ref();
+const guaranteeRef = ref();
+
+// Add pagination state
+const page = ref(1);
+const itemsPerPage = ref(10);
+const totalItems = computed(() => items.value.length);
+
+const facilitiesData = ref<Facility[]>([]);
+const guaranteeData = ref<Guarantee[]>([]);
+const lcData = ref<Lc[]>([]);
 
 onMounted(() => {
   if (approvalStore.customerInfo) {
@@ -140,9 +151,11 @@ const submitData = async () => {
   }
   try {
     approvalStore.setCustomerInfo({
-    ...firstItem,
-    facilities: facilitiesRef.value?.facilities || []
-  });
+      ...firstItem,
+      facilities: facilitiesData.value,
+      guarantee: guaranteeData.value,
+      lc: lcData.value
+    });
     return Promise.resolve();
   } catch (err) {
     error.value = 'خطای ناشناخته در ثبت اطلاعات مشتری';
@@ -252,23 +265,25 @@ defineExpose({ submitData });
           />
         </v-col>
         <v-col cols="12" md="12" class="customer-search-btn">
-          <v-btn color="secondary" @click="search" type="button" :loading="loading" :disabled="loading"> جستجو </v-btn>
+          <v-btn color="secondary" @click="search" type="button" :loading="loading" :disabled="loading"> جستجو</v-btn>
         </v-col>
         <v-col cols="12" md="12">
           <v-data-table-virtual
             v-model:search="searchString"
             :items="items"
             :headers="headers"
-            no-data-text="رکوردی یافت نشد"
             :loading="loading"
+            :items-per-page="itemsPerPage"
+            :page="page"
+            :items-length="totalItems"
+            no-data-text="رکوردی یافت نشد"
             density="comfortable"
             hover
-            hide-default-footer
             class="customer-table elevation-1"
             ref="dataTableRef"
           >
             <template #item.actions="{ item }">
-              <v-btn variant="text" color="error" @click="deleteCustomer()">
+              <v-btn v-if="item && Object.keys(item).length > 0" variant="text" color="error" @click="deleteCustomer()">
                 <IconTrash size="20" />
               </v-btn>
             </template>
@@ -277,31 +292,17 @@ defineExpose({ submitData });
       </v-row>
     </form>
   </div>
-
+  <!-- Render only the active tab's component -->
   <div class="customer-section">
     <h3 class="group-title">درخواست مشتری</h3>
-    <Facilities
-      ref="facilitiesRef"
-      :loading="loading"
-      @save="handleSaveFacility"
-      @delete="handleDeleteFacility"
-    />
-  </div>
-  <div class="customer-section">
-    <h3 class="group-title">درخواست مشتری</h3>
-    <Guarantee
-      :loading="loading"
-      @save="handleSaveGuarantee"
-      @delete="handleDeleteGuarantee"
-    />
-  </div>
-  <div class="customer-section">
-    <h3 class="group-title">درخواست مشتری</h3>
-    <LetterOfCredit
-      :loading="loading"
-      @save="handleSaveLC"
-      @delete="handleDeleteLC"
-    />
+    <v-tabs v-model="activeTab" class="mb-2">
+      <v-tab value="facilities">تسهیلات</v-tab>
+      <v-tab value="guarantee">ضمانت‌نامه</v-tab>
+      <v-tab value="lc">اعتبار اسنادی</v-tab>
+    </v-tabs>
+    <Facilities ref="facilitiesRef" v-show="activeTab === 'facilities'" :loading="loading" @save="handleSaveFacility" @delete="handleDeleteFacility" @update:facilities="facilitiesData = $event" />
+    <Guarantee ref="guaranteeRef" :loading="loading" v-show="activeTab === 'guarantee'" @save="handleSaveGuarantee" @delete="handleDeleteGuarantee" @update:guarantee="guaranteeData = $event" />
+    <LetterOfCredit ref="lcRef" :loading="loading" v-show="activeTab === 'lc'" @save="handleSaveLC" @delete="handleDeleteLC" @update:lc="lcData = $event" />
   </div>
   <v-snackbar v-model="showError" color="error" timeout="5500">
     {{ error }}
@@ -324,7 +325,7 @@ defineExpose({ submitData });
     border-right: 6px solid var(--v-theme-primary);
     padding-right: 18px;
     margin-bottom: 2.5rem;
-    background: linear-gradient(90deg, #f5f7fa 0%, #E2EAEA 100%);
+    background: linear-gradient(90deg, #f5f7fa 0%, #e2eaea 100%);
     border-radius: 8px;
     display: inline-block;
     line-height: 1.2;
@@ -332,8 +333,7 @@ defineExpose({ submitData });
 
   .section-title {
     font-size: 1.25rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
+    font-weight: 600;
     color: #333;
   }
 
@@ -347,18 +347,24 @@ defineExpose({ submitData });
     border-radius: 10px;
     padding: 15px;
 
-    // Set background color for the entire header row
     :deep(.v-data-table-header) {
       background-color: var(--v-theme-secondary);
       color: #fff;
     }
+
     :deep(.v-data-table-header th) {
       background-color: var(--v-theme-secondary) !important;
       color: #fff;
     }
+
     :deep(.v-data-table-header tr) {
       background-color: var(--v-theme-secondary) !important;
       color: #fff;
+    }
+
+    :deep(.v-data-table-footer) {
+      border-top: 1px solid rgba(0, 0, 0, 0.12);
+      padding: 8px 16px;
     }
   }
 }

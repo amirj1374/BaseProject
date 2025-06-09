@@ -5,7 +5,7 @@ html {
 }
 
 .v-row + .v-row {
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 .v-divider {
@@ -51,4 +51,13 @@ html {
 
 .v-table > .v-table__wrapper > table > tbody > tr > td, .v-table > .v-table__wrapper > table > thead > tr > td, .v-table > .v-table__wrapper > table > tfoot > tr > td {
   height: 36px;
+}
+
+.v-slide-group__content {
+  display: flex;
+  flex: 1 0 auto;
+  position: relative;
+  transition: 0.2s all cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  justify-content: space-evenly!important;
 }

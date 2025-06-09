@@ -20,6 +20,10 @@ onMounted(async () => {
   if (res.status === 200) {
     baseStore.setCurrencyList(res.data);
   }
+  const res2 = await api.approval.getCollateral();
+  if (res2.status === 200) {
+    baseStore.setCollateralList(res2.data);
+  }
 });
 // Steps array for AppStepper
 const steps = [

@@ -2,11 +2,11 @@
   <div class="facilities-section">
     <div class="section-header">
       <h4 class="section-title">ضمانت نامه</h4>
-      <v-btn color="secondary" @click="openDialog" :disabled="loading || facilities.length >= 1"> افزودن ضمانت نامه</v-btn>    </div>
+      <v-btn color="secondary" @click="openDialog" :disabled="loading || guarantee.length >= 1"> افزودن ضمانت نامه</v-btn>    </div>
 
     <v-data-table-virtual
       :headers="headers"
-      :items="facilities"
+      :items="guarantee"
       :loading="loading"
       no-data-text="رکوردی یافت نشد"
       density="comfortable"
@@ -14,15 +14,18 @@
       hide-default-footer
       class="facilities-table elevation-1"
     >
-    <template #item.approvalType="{ item }">
-    {{ ApprovalTypeOptions.find(opt => opt.value === item.approvalType)?.title || '-' }}
-  </template>
-  <template #item.currency="{ item }">
-    {{ baseStore.currency.find(cur => cur.code === item.currency)?.description || '-' }}
-  </template>
-  <template #item.repaymentType="{ item }">
-    {{ RepaymentTypeOptions.find(opt => opt.value === item.repaymentType)?.title || '-' }}
-  </template>
+      <template #item.approvalType="{ item }">
+        {{ ApprovalTypeOptions.find(opt => opt.value === item.approvalType)?.title || '-' }}
+      </template>
+      <template #item.currency="{ item }">
+        {{ baseStore.currency.find(cur => cur.code === item.currency)?.description || '-' }}
+      </template>
+      <template #item.repaymentType="{ item }">
+        {{ RepaymentTypeOptions.find(opt => opt.value === item.repaymentType)?.title || '-' }}
+      </template>
+      <template #item.amount="{ item }">
+        {{ formatNumberWithCommas(item.amount) }}
+      </template>
       <template #item.actions="{ item }">
         <div class="d-flex gap-2">
           <v-btn size="small" variant="text" @click="editItem(item)">
@@ -140,22 +143,117 @@
                 />
               </v-col>
             </v-row>
+            <v-row>
+              <v-col cols="12">
+                <v-btn
+                  color="primary"
+                  variant="tonal"
+                  @click="showCollateralInputDialog = true"
+                  class="mb-4"
+                >
+                  افزودن وثیقه
+                </v-btn>
+              </v-col>
+            </v-row>
+            <v-data-table-virtual
+              v-if="collateralTableItems.length > 0"
+              :headers="[
+                { title: 'نوع وثیقه', key: 'collateral.description', sortable: true },
+                { title: 'مبلغ وثیقه', key: 'amount', sortable: true, align: 'end' },
+                { title: 'درصد ارزش گذاری', key: 'percent', sortable: true, align: 'end' },
+                { title: 'ارزش معادل وثیقه', key: 'equivalentValue', sortable: true, align: 'end' },
+                { title: 'عملیات', key: 'actions', sortable: false, align: 'center' }
+              ]"
+              :items="collateralTableItems"
+              density="compact"
+              class="elevation-1 mb-4"
+              hide-default-footer
+              no-data-text="هیچ وثیقه ای اضافه نشده است."
+            >
+              <template v-slot:item.amount="{ item }">
+                {{ formatNumberWithCommas(item.amount) }}
+              </template>
+              <template v-slot:item.percent="{ item }">
+                {{ item.percent }}%
+              </template>
+              <template v-slot:item.equivalentValue="{ item }">
+                {{ item.equivalentValue.toLocaleString() }}
+              </template>
+              <template v-slot:item.actions="{ index }">
+                <v-tooltip location="top" text="حذف وثیقه">
+                  <template v-slot:activator="{ props: tooltipProps }">
+                    <v-btn
+                      icon
+                      variant="text"
+                      size="small"
+                      color="error"
+                      v-bind="tooltipProps"
+                      @click="removeCollateralItem(index)"
+                    >
+                      ❌
+                    </v-btn>
+                  </template>
+                </v-tooltip>
+              </template>
+            </v-data-table-virtual>
           </v-form>
         </v-card-text>
-        <v-card-actions class="d-flex item-center gap-2 px-5 py-5">
-          <v-spacer></v-spacer>
-          <v-btn color="primary" @click="saveFacility" :loading="loading" :disabled="!isFormValid">
-            {{ isEditing ? 'ویرایش' : 'ذخیره' }}
-          </v-btn>
-          <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
+        <v-card-actions>
+          <div style="display: flex; justify-content: space-evenly; width: 100%;">
+            <v-btn color="primary" @click="saveGuarantee" :loading="loading" :disabled="!isFormValid">
+              {{ 'ذخیره' }}
+            </v-btn>
+            <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
+          </div>
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- CollateralInputDialog component -->
+    <CollateralInputDialog
+      v-model="showCollateralInputDialog"
+      :collateral-options="baseStore.collateral"
+      @save="onCollateralDialogSave"
+    />
+
+    <!-- Confirmation Dialog -->
+    <v-dialog v-model="showDeleteConfirm" max-width="400">
+      <v-card>
+        <v-card-title class="text-h5">
+          حذف وثیقه
+        </v-card-title>
+        <v-card-text>
+          آیا از حذف این وثیقه اطمینان دارید؟
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="error"
+            variant="text"
+            @click="confirmDeleteCollateral"
+          >
+            حذف
+          </v-btn>
+          <v-btn
+            color="primary"
+            variant="text"
+            @click="cancelDeleteCollateral"
+          >
+            انصراف
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Error Snackbar -->
+    <v-snackbar v-model="showError" color="error" timeout="3000">
+      {{ error }}
+    </v-snackbar>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { IconTrash, IconX, IconPencil } from '@tabler/icons-vue';
 import { ApprovalTypeOptions } from '@/constants/enums/approval';
 import { useBaseStore } from '@/stores/base';
@@ -163,39 +261,46 @@ import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import { api } from '@/services/api';
 import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { useApprovalStore } from '@/stores/approval';
+import type { CollateralDto, Guarantee } from '@/types/approval/approvalType';
+import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
+import { formatNumberWithCommas } from '@/utils/number-formatter';
 
 const baseStore = useBaseStore();
 const approvalStore = useApprovalStore();
-
-interface Facility {
-  id: number;
-  approvalType: string;
-  currency: string;
-  amount: string;
-  repaymentType: string;
-  year?: string;
-  month?: string;
-  day?: string;
-  durationDay?: string;
-}
+const dialog = ref(false);
+const form = ref();
+const isFormValid = ref(false);
+const guarantee = ref<Guarantee[]>([]);
+const isEditing = ref(false);
+const editingId = ref<number | null>(null);
+const showCollateralInputDialog = ref(false);
+const showDeleteConfirm = ref(false);
+const collateralToDelete = ref<number | null>(null);
+const error = ref('');
+const showError = ref(false);
+const selectedCollaterals = ref<Array<{
+  collateral: CollateralDto;
+  amount: number;
+  percent: number;
+}>>([]);
+const collateralList = ref<CollateralDto[]>([]);
+const collateralTableItems = computed(() =>
+  selectedCollaterals.value.map(item => ({
+    ...item,
+    equivalentValue: (item.amount * item.percent) / 100
+  }))
+);
 
 const props = defineProps<{
   loading?: boolean;
 }>();
-
 const emit = defineEmits<{
-  (e: 'save', data: Facility): void;
-  (e: 'delete', item: Facility): void;
-  (e: 'edit', item: Facility): void;
+  (e: 'save', data: Guarantee): void;
+  (e: 'delete', item: Guarantee): void;
+  (e: 'edit', item: Guarantee): void;
+  (e: 'update:guarantee', data: Guarantee[]): void;
 }>();
 
-const dialog = ref(false);
-const form = ref();
-const isFormValid = ref(false);
-const facilities = ref<Facility[]>([]);
-const isEditing = ref(false);
-const editingId = ref<number | null>(null);
-const error = ref('');
 const formData = reactive({
   approvalType: '',
   currency: '',
@@ -204,7 +309,8 @@ const formData = reactive({
   month: '',
   day: '',
   durationDay: '',
-  amount: ''
+  amount: '',
+  collateral: true,
 });
 
 const headers = [
@@ -215,11 +321,53 @@ const headers = [
   { title: 'مبلغ', key: 'amount', width: '150px' },
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
 ];
-onMounted(() => {
-  if (approvalStore.customerInfo?.facilities) {
-    facilities.value = [...approvalStore.customerInfo.facilities];
+
+const onCollateralDialogSave = (data: { collateral: CollateralDto | null; amount: string; percent: string }) => {
+  if (!data.collateral) {
+    error.value = 'نوع وثیقه الزامی است';
+    showError.value = true;
+    return;
   }
-});
+  try {
+    const amountValue = parseFloat(data.amount.replace(/,/g, ''));
+    const percentValue = parseFloat(data.percent);
+    if (isNaN(amountValue) || amountValue <= 0) throw new Error('مبلغ وثیقه باید عدد مثبت باشد');
+    if (isNaN(percentValue) || percentValue < 0 || percentValue > 100) throw new Error('درصد ارزش گذاری باید بین 0 تا 100 باشد');
+    const newCollateralEntry = { collateral: data.collateral, amount: amountValue, percent: percentValue };
+    selectedCollaterals.value = [...selectedCollaterals.value, newCollateralEntry];
+    showCollateralInputDialog.value = false;
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'خطا در افزودن وثیقه';
+    showError.value = true;
+  }
+};
+
+const removeCollateralItem = (index: number) => {
+  collateralToDelete.value = index;
+  showDeleteConfirm.value = true;
+};
+
+const confirmDeleteCollateral = () => {
+  if (collateralToDelete.value === null) return;
+  try {
+    const deletedCollateral = selectedCollaterals.value[collateralToDelete.value];
+    selectedCollaterals.value = selectedCollaterals.value.filter((_, i) => i !== collateralToDelete.value);
+    error.value = `وثیقه ${deletedCollateral.collateral.description} با موفقیت حذف شد`;
+    showError.value = true;
+  } catch (err) {
+    error.value = 'خطا در حذف وثیقه';
+    showError.value = true;
+  } finally {
+    collateralToDelete.value = null;
+    showDeleteConfirm.value = false;
+  }
+};
+
+const cancelDeleteCollateral = () => {
+  collateralToDelete.value = null;
+  showDeleteConfirm.value = false;
+};
+
 const dayCalculate = async () => {
   if (formData.year === null && formData.month === null && formData.day === null) {
     error.value = 'لطفا مقادیر تاریخ را وارد کنید';
@@ -247,11 +395,12 @@ function closeDialog() {
 function resetForm() {
   formData.amount = '';
   formData.repaymentType = '';
+  selectedCollaterals.value = [];
   form.value?.reset();
 }
 
-function editItem(item: Facility) {
-    isEditing.value = true;
+function editItem(item: Guarantee) {
+  isEditing.value = true;
   editingId.value = item.id;
   formData.approvalType = item.approvalType;
   formData.currency = item.currency;
@@ -261,40 +410,49 @@ function editItem(item: Facility) {
   formData.month = item.month || '';
   formData.day = item.day || '';
   formData.durationDay = item.durationDay || '';
+  selectedCollaterals.value = item.collaterals ? item.collaterals : [];
   dialog.value = true;
 }
 
-function saveFacility() {
+function saveGuarantee() {
   if (!isFormValid.value) return;
-
-  const facilityData: Facility = {
+  const saveGuaranteeData: Guarantee = {
     id: editingId.value || Date.now(),
-    ...formData
+    ...formData,
+    collaterals: selectedCollaterals.value
   };
-
   if (isEditing.value) {
-    const index = facilities.value.findIndex((f) => f.id === editingId.value);
+    const index = guarantee.value.findIndex((f) => f.id === editingId.value);
     if (index !== -1) {
-      facilities.value[index] = facilityData;
-      emit('edit', facilityData);
+      guarantee.value[index] = saveGuaranteeData;
+      emit('edit', saveGuaranteeData);
     }
   } else {
-    facilities.value.push(facilityData);
-    emit('save', facilityData);
+    guarantee.value.push(saveGuaranteeData);
+    emit('save', saveGuaranteeData);
   }
-
   closeDialog();
 }
 
-function deleteItem(item: Facility) {
-  const index = facilities.value.findIndex((f) => f.id === item.id);
+function deleteItem(item: Guarantee) {
+  const index = guarantee.value.findIndex((f) => f.id === item.id);
   if (index !== -1) {
-    facilities.value.splice(index, 1);
+    guarantee.value.splice(index, 1);
     emit('delete', item);
   }
 }
-// Expose facilities for parent access
-defineExpose({ facilities });
+
+onMounted(() => {
+  if (approvalStore.customerInfo?.guarantee) {
+    guarantee.value = [...approvalStore.customerInfo.guarantee];
+  }
+});
+
+watch(guarantee, (newVal) => {
+  emit('update:guarantee', newVal);
+}, { deep: true });
+
+defineExpose({ guarantee });
 </script>
 
 <style lang="scss" scoped>

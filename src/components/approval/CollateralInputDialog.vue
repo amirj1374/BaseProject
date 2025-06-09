@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, type PropType, watch } from 'vue';
-import VPriceTextField from '@/components/shared/VPriceTextField.vue'; // Assuming this path
 import type { CollateralDto } from '@/types/approval/approvalType'; // Import your CollateralDto
+import MoneyInput from '@/components/shared/MoneyInput.vue';
 
 // Interface for the structure of emitted data
 interface EmittedCollateralData {
@@ -124,7 +124,7 @@ watch(() => props.modelValue, (isVisible) => {
             </v-col>
 
             <v-col cols="12" md="6">
-              <v-text-field
+              <MoneyInput
                 v-model="amount"
                 label="مبلغ وثیقه"
                 placeholder="0"
@@ -132,7 +132,6 @@ watch(() => props.modelValue, (isVisible) => {
                 density="comfortable"
                 hide-details="auto"
                 suffix="میلیون ریال"
-                v-money
                 type="text"
               />
             </v-col>
