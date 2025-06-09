@@ -32,7 +32,7 @@ export interface Facility {
   month?: string;
   day?: string;
   durationDay?: string;
-  collaterals:Collaterals[]
+  collaterals: Collaterals[];
 }
 
 export interface Guarantee {
@@ -45,7 +45,9 @@ export interface Guarantee {
   month?: string;
   day?: string;
   durationDay?: string;
-  collaterals:Collaterals[]
+  collaterals: Collaterals[];
+  preferentialRate: string;
+  preReceiving: string;
 }
 
 export interface Lc {
@@ -58,7 +60,9 @@ export interface Lc {
   month?: string;
   day?: string;
   durationDay?: string;
-  collaterals:Collaterals[]
+  collaterals: Collaterals[];
+  preferentialRate: string;
+  preReceiving: string;
 }
 
 export interface Collaterals {
@@ -77,7 +81,6 @@ export interface FetchGuarantorPayload {
   cif?: string | null;
   guarantorName?: string | null;
 }
-
 
 export interface FetchInquiryPayload {
   nationalCode?: string | null;
@@ -130,14 +133,11 @@ export interface FacilitiesDto {
   contractId: number;
 }
 
-
-
 export interface InquiryDto {
   value?: string;
   label?: string;
   collateral?: string;
 }
-
 
 export interface DepositAccount {
   createdAt: string | null;
@@ -175,34 +175,27 @@ export interface DepositListResponse {
 }
 
 export interface ConsiderationPayload {
-  havePromissoryNote : boolean,
-  signatory : string | null,
-  beneficiaryCustomer : string | null,
-  relatedName : string | null,
-  unrelatedObligationsAmount : number | null,
-  currentOffersAmount : number | null,
-  approvalNumber : number | null,
-  approvedFacilitiesAmount : number | null,
-  approvalDate: string | null
-  creditLimitDate: string | null
-  atBranchLevel : boolean,
-  notUsed : boolean,
-  previousLoanAppropriate : boolean,
+  havePromissoryNote: boolean;
+  signatory: string | null;
+  beneficiaryCustomer: string | null;
+  relatedName: string | null;
+  unrelatedObligationsAmount: number | null;
+  currentOffersAmount: number | null;
+  approvalNumber: number | null;
+  approvedFacilitiesAmount: number | null;
+  approvalDate: string | null;
+  creditLimitDate: string | null;
+  atBranchLevel: boolean;
+  notUsed: boolean;
+  previousLoanAppropriate: boolean;
 }
 
 export interface UploadFile {
-customerNumber?: string | null;
-customerCode?: string | null ;
-docTypeCode: string ;
-file: File ;
-description?: string
-}
-
-export interface SummaryDto {
-  id: string;
-  summary: string;
-  activityType: string;
-  description: string;
+  customerNumber?: string | null;
+  customerCode?: string | null;
+  docTypeCode: string;
+  file: File;
+  description?: string;
 }
 
 export interface Collateral {
@@ -212,17 +205,88 @@ export interface Collateral {
 }
 
 export interface LoanRequestDetail {
-  advancePayment: string;
-  amount: string;
+  summaryRequest: SummaryDto;
+  facilities: FacilitiesRequest;
+  guarantee: GuaranteeRequest;
+  lc: LcRequest;
+}
+
+export interface FacilitiesRequest {
+  id: number;
   approvalType: string;
-  collaterals: Collateral[];
-  contractTypeId: number;
   currency: string;
-  durationDay: number;
-  facilityId: number;
-  other?: string;
+  amount: string;
   repaymentType: string;
-  requestType: string;
+  year?: string;
+  month?: string;
+  day?: string;
+  durationDay?: string;
+  collaterals: Collaterals[];
+  preferentialRate: string;
+  preReceiving: string;
+  contractType?: ContractType;
+  facility?: FacilityDto;
+}
+
+export interface ContractType {
+  activationDate: string;
+  active: string;
+  childOrder: string;
+  code: string;
+  equivalentCode: string;
+  id: number;
+  longTitle: string;
+  mainGroup: string;
+  parameterValue: string;
+  parentId: number;
+  shortTitle: string;
+}
+
+export interface FacilityDto {
+  contractId: number;
+  facilityCode: string;
+  facilityId: number;
+  facilityName: string;
+}
+
+export interface GuaranteeRequest {
+  id: number;
+  approvalType: string;
+  currency: string;
+  amount: string;
+  repaymentType: string;
+  year?: string;
+  month?: string;
+  day?: string;
+  durationDay?: string;
+  collaterals: Collaterals[];
+  preferentialRate: string;
+  preReceiving: string;
+  contractType?: ContractType;
+  facility?: FacilityDto;
+}
+
+export interface LcRequest {
+  id: number;
+  approvalType: string;
+  currency: string;
+  amount: string;
+  repaymentType: string;
+  year?: string;
+  month?: string;
+  day?: string;
+  durationDay?: string;
+  collaterals: Collaterals[];
+  preferentialRate: string;
+  preReceiving: string;
+  contractType?: ContractType;
+  facility?: FacilityDto;
+}
+
+export interface SummaryDto {
+  summary: string;
+  activityType: string;
+  description: string;
 }
 
 export interface LoanRequest {
@@ -253,8 +317,8 @@ export interface RequestInformationDto {
 }
 
 export interface RootData {
-  customerInfo: CustomerDto[]
-  summaryRequest: SummaryDto
+  customerInfo: CustomerDto[];
+  summaryRequest: SummaryDto;
   // Add other sections here...
 }
 

@@ -59,15 +59,16 @@ const headers = ref([
 const dataTableRef = ref();
 const facilitiesRef = ref();
 const guaranteeRef = ref();
+const lcRef = ref();
 
+const lcData = ref<Lc[]>([]);
 // Add pagination state
 const page = ref(1);
 const itemsPerPage = ref(10);
-const totalItems = computed(() => items.value.length);
 
+const totalItems = computed(() => items.value.length);
 const facilitiesData = ref<Facility[]>([]);
 const guaranteeData = ref<Guarantee[]>([]);
-const lcData = ref<Lc[]>([]);
 
 onMounted(() => {
   if (approvalStore.customerInfo) {

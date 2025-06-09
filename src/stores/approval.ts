@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia'
-import type { CustomerDto, LoanRequestDetail, SummaryDto, GuarantorDto } from '@/types/approval/approvalType'
+import type { CustomerDto, LoanRequestDetail, SummaryDto, GuarantorDto, Facility, Guarantee, Lc, FacilitiesRequest, GuaranteeRequest, LcRequest } from '@/types/approval/approvalType'
 
 export const useApprovalStore = defineStore('approvalStore', {
   state: () => ({
     customerInfo: {} as CustomerDto,
-    summaryRequest: {} as SummaryDto,
-    loanRequestDetailList: [] as LoanRequestDetail[],
+    loanRequestDetailList: null as LoanRequestDetail | null,
     guarantor: [] as GuarantorDto[],
     loanRequestId: '' as string,
     trackingCode: '' as string,
@@ -16,11 +15,7 @@ export const useApprovalStore = defineStore('approvalStore', {
       this.customerInfo = { ...this.customerInfo, ...payload }
     },
 
-    setSummaryRequest(payload: Partial<SummaryDto>) {
-      this.summaryRequest = { ...this.summaryRequest, ...payload }
-    },
-
-    setLoanRequestDetailList(payload: LoanRequestDetail[]) {
+    setLoanRequestDetailList(payload: LoanRequestDetail) {
       this.loanRequestDetailList = payload
     },
 
@@ -32,21 +27,68 @@ export const useApprovalStore = defineStore('approvalStore', {
       this.trackingCode = payload
     },
 
-    addLoanRequestDetail(payload: LoanRequestDetail) {
-      this.loanRequestDetailList.push(payload)
+    updateSummaryRequest(summary: SummaryDto) {
+      if (!this.loanRequestDetailList) {
+        this.loanRequestDetailList = {
+          summaryRequest: summary,
+          facilities: {} as FacilitiesRequest,
+          guarantee: {} as GuaranteeRequest,
+          lc: {} as LcRequest
+        }
+      } else {
+        this.loanRequestDetailList.summaryRequest = summary
+      }
+    },
+
+    updateFacilities(facilities: FacilitiesRequest) {
+      if (!this.loanRequestDetailList) {
+        this.loanRequestDetailList = {
+          summaryRequest: {} as SummaryDto,
+          facilities: {} as FacilitiesRequest,
+          guarantee: {} as GuaranteeRequest,
+          lc: {} as LcRequest
+        }
+      } else {
+        this.loanRequestDetailList.facilities = facilities
+      }
+    },
+
+    updateGuarantee(guarantee: Guarantee) {
+      if (!this.loanRequestDetailList) {
+        this.loanRequestDetailList = {
+          summaryRequest: {} as SummaryDto,
+          facilities: {} as FacilitiesRequest,
+          guarantee: {} as GuaranteeRequest,
+          lc: {} as LcRequest
+        }
+      } else {
+        this.loanRequestDetailList.guarantee = guarantee
+      }
+    },
+
+    updateLc(lc: Lc) {
+      if (!this.loanRequestDetailList) {
+        this.loanRequestDetailList = {
+          summaryRequest: {} as SummaryDto,
+          facilities: {} as FacilitiesRequest,
+          guarantee: {} as GuaranteeRequest,
+          lc: {} as LcRequest
+        }
+      } else {
+        this.loanRequestDetailList.lc = lc
+      }
     },
 
     resetAll() {
       this.customerInfo = {} as CustomerDto
-      this.summaryRequest = {} as SummaryDto
-      this.loanRequestDetailList = []
+      this.loanRequestDetailList = null
       this.guarantor = [] as GuarantorDto[]
       this.loanRequestId = ''
       this.trackingCode = ''
     },
 
     setGuarantor(payload: GuarantorDto[]) {
-      this.guarantor = payload;
+      this.guarantor = payload
     }
   }
 })

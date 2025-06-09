@@ -32,10 +32,6 @@ const steps = [
     section: defineAsyncComponent(() => import('@/components/sections/approval/customers/customers.vue'))
   },
   {
-    title: 'خلاصه درخواست',
-    section: defineAsyncComponent(() => import('@/components/sections/approval/summary/summary.vue'))
-  },
-  {
     title: 'اطلاعات نوع درخواست',
     section: defineAsyncComponent(() => import('@/components/sections/approval/approvalType/approvalType.vue'))
   },

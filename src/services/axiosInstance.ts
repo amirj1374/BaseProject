@@ -29,7 +29,6 @@ const createAxiosInstance = (): AxiosInstance => {
   // Interceptors for responses
   instance.interceptors.response.use(
     (response) => {
-      console.log(response);
       return response;
     },
     (error) => {

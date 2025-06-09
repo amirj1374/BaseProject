@@ -1,517 +1,261 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
-import Facilities from '@/components/sections/approval/approvalType/Facilities.vue';
-import { api } from '@/services/api';
-import type { CollateralDto, ContractTypeDto, CurrenciesDto, CustomerDto, RequestInformationDto } from '@/types/approval/approvalType';
-import Guarantee from '@/components/sections/approval/approvalType/Guarantee.vue';
-import Lc from '@/components/sections/approval/approvalType/Lc.vue';
-import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
-import { ApprovalTypeOptions } from '@/constants/enums/approval';
+import { onMounted, ref, watch, defineAsyncComponent, computed } from 'vue';
+//utils
+//type
+import type { CustomerDto,FacilitiesRequest,Facility, Guarantee, Lc } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
+// Use dynamic imports for heavy components
+const Facilities = defineAsyncComponent(() => import('./Facilities.vue'));
+const LetterOfCredit = defineAsyncComponent(() => import('./LetterOfCredit.vue'));
+const Guarantee = defineAsyncComponent(() => import('./Guarantee.vue'));
+const approvalStore = useApprovalStore();
+// Tab Management
+const activeTab = ref('facilities');
 
-const approvalStore = useApprovalStore()
-const collaterals = ref<CollateralDto[]>([]);
+// Search Section State
 const loading = ref(false);
-const currencies = ref<CurrenciesDto[]>([]);
-
-// Separate data tables for each type
-const facilitiesData = ref<RequestInformationDto[]>([]);
-const guaranteeData = ref<RequestInformationDto[]>([]);
-const lcData = ref<RequestInformationDto[]>([]);
-
-// Common headers for all tables
-const headers = ref([
-  { title: 'ارز', align: 'center', key: 'currency', width: '150px' },
-  { title: 'مبلغ', align: 'center', key: 'amount', width: '200px' },
-  { title: 'مصوبه', align: 'center', key: 'approvalType', width: '150px' },
-  { title: 'نوع عقد', align: 'center', key: 'contractTypeId', width: '200px' },
-  { title: 'محصول', align: 'center', key: 'facilityId', width: '200px' },
-  { title: 'بازپرداخت', align: 'center', key: 'repaymentType', width: '200px' },
-  { title: 'مدت', align: 'center', key: 'durationDay', width: '200px' },
-  { title: 'عملیات', align: 'center', key: 'actions', width: '100px' },
-]);
-
 const error = ref<string | null>(null);
-const valid = ref<boolean | null>(false);
+const showError = ref(false);
+const items = ref<CustomerDto[]>([]);
+const isValid = ref(false);
+
+// Data Entry Section State
+const formData = ref({
+  summary: '',
+  activityType: '',
+  description: ''
+});
 
 const facilitiesRef = ref();
 const guaranteeRef = ref();
-const lcRef = ref();
 
-const repaymentTypeMap = RepaymentTypeOptions.reduce((acc, cur) => {
-  acc[cur.value] = cur.title;
-  return acc;
-}, {} as Record<string, string>);
+const facilitiesData = ref<FacilitiesRequest[]>([]);
+const guaranteeData = ref<Guarantee[]>([]);
+const lcData = ref<Lc[]>([]);
 
-const approvalTypeMap = ApprovalTypeOptions.reduce((acc, cur) => {
-  acc[cur.value] = cur.title;
-  return acc;
-}, {} as Record<string, string>);
-
-// Add these refs for contract types and facilities
-const contractTypes = ref<ContractTypeDto[]>([]);
-const facilities = ref<any[]>([]);
-
-onMounted(async () => {
-  try {
-    // Load currencies
-    const currenciesRes = await api.approval.fetchCurrencies();
-    currencies.value = currenciesRes.data;
-
-    // Load initial data from store
-    const storeData = approvalStore.loanRequestDetailList;
-    if (storeData && storeData.length > 0) {
-      // Separate data by request type
-      for (const item of storeData) {
-        const convertedItem = {
-          contractTypeId: item.contractTypeId,
-          approvalType: item.approvalType,
-          requestType: item.requestType,
-          amount: item.amount,
-          currency: item.currency,
-          facilityId: item.facilityId,
-          repaymentType: item.repaymentType,
-          collaterals: item.collaterals.map(c => ({
-            type: c.type.toString(),
-            amount: c.amount,
-            percent: c.percent
-          })),
-          advancePayment: item.advancePayment,
-          durationDay: item.durationDay
-        };
-
-        // Load facilities for this contract type
-        const facilitiesRes = await api.approval.getFacilities(convertedItem.contractTypeId, item.requestType);
-        facilities.value = facilitiesRes.data.facilityDtoList || [];
-
-        // Find the matching contract type and facility
-        const contractType = contractTypes.value.find(ct => ct.id === convertedItem.contractTypeId);
-        const facility = facilities.value.find((f: { facilityCode: string }) => f.facilityCode === convertedItem.facilityId.toString());
-
-        // Add the complete objects to the converted item
-        const completeItem = {
-          ...convertedItem,
-          contractType,
-          facility
-        };
-
-        // Add to the appropriate array
-        switch (item.requestType) {
-          case 'ContractCode':
-            facilitiesData.value.push(completeItem);
-            break;
-          case 'GuaranteeType':
-            guaranteeData.value.push(completeItem);
-            break;
-          case 'LetterOfCredit':
-            lcData.value.push(completeItem);
-            break;
-        }
-      }
+onMounted(() => {
+  if (approvalStore.loanRequestDetailList) {
+    isValid.value = true;
+    if (approvalStore.loanRequestDetailList.summaryRequest) {
+      formData.value = {
+        summary: approvalStore.loanRequestDetailList.summaryRequest.summary,
+        activityType: approvalStore.loanRequestDetailList.summaryRequest.activityType,
+        description: approvalStore.loanRequestDetailList.summaryRequest.description
+      };
     }
-  } catch (err) {
-    console.error('Error loading data:', err);
-    error.value = 'خطا در بارگذاری اطلاعات';
   }
 });
 
-const editItem = async (item: RequestInformationDto, ref: any) => {
-  // Remove edit functionality
-  console.log('Edit functionality has been removed. Please delete and add new item if needed.');
-};
-
-const saveFacilitiesData = async (data: RequestInformationDto) => {
+const submitData = async () => {
+  // if (!items.value.length || !items.value[0]) {
+  //   error.value = 'هیچ مشتری‌ای یافت نشد. لطفاً جستجو کنید.';
+  //   showError.value = true;
+  //   return Promise.reject(error.value);
+  // }
+  // const firstItem = items.value[0];
+  // if (!firstItem.cif && !firstItem.nationalCode) {
+  //   error.value = 'اطلاعات مشتری نامعتبر است';
+  //   showError.value = true;
+  //   return Promise.reject(error.value);
+  // }
   try {
-    console.log('Received data in saveFacilitiesData:', data);
-    
-    const facilitiesRes = await api.approval.getFacilities(data.contractTypeId, 'ContractCode');
-    const currentFacilities = facilitiesRes.data.facilityDtoList || [];
-    
-    const facility = currentFacilities.find((f: { facilityCode: string }) => f.facilityCode === data.facilityId.toString());
-    
-    if (!facility) {
-      console.error('Facility not found:', data.facilityId);
-      return;
+    if (facilitiesData.value.length || guaranteeData.value.length || lcData.value.length) {
+      approvalStore.setLoanRequestDetailList({
+        summaryRequest: {
+          summary: formData.value.summary,
+          activityType: formData.value.activityType,
+          description: formData.value.description
+        },
+        facilities: facilitiesData.value[0] || {} as FacilitiesRequest,
+        guarantee: guaranteeData.value[0] || {} as Guarantee,
+        lc: lcData.value[0] || {} as Lc
+      });
     }
-
-    const newItem = {
-      ...data,
-      contractType: {
-        id: parseInt(data.contractTypeId.toString()),
-        longTitle: data.contractType?.longTitle || '',
-        shortTitle: data.contractType?.shortTitle || '',
-        code: data.contractType?.code || '',
-        parentId: data.contractType?.parentId || 0,
-        mainGroup: data.contractType?.mainGroup || '',
-        childOrder: data.contractType?.childOrder || '',
-        activationDate: data.contractType?.activationDate || '',
-        equivalentCode: data.contractType?.equivalentCode || 0,
-        parameterValue: data.contractType?.parameterValue || '',
-        active: data.contractType?.active || '',
-        requestType: 'ContractCode' as const
-      },
-      facility: {
-        facilityId: parseInt(facility.facilityCode),
-        facilityCode: parseInt(facility.facilityCode),
-        facilityName: facility.facilityName,
-        contractId: parseInt(data.contractTypeId.toString())
-      }
-    };
-
-    console.log('Saving facilities data:', newItem);
-    facilitiesData.value.push(newItem);
+    else {
+      return Promise.reject('لطفا درخواست مصوبه را ثبت کنید');
+    }
+    return Promise.resolve();
   } catch (err) {
-    console.error('Error saving facilities data:', err);
+    error.value = 'خطای ناشناخته در ثبت اطلاعات مشتری';
+    showError.value = true;
+    return Promise.reject(error.value);
   }
 };
 
-const saveGuaranteeData = async (data: RequestInformationDto) => {
-  try {
-    console.log('Received data in saveGuaranteeData:', data);
-    
-    const facilitiesRes = await api.approval.getFacilities(data.contractTypeId, 'GuaranteeType');
-    const currentFacilities = facilitiesRes.data.facilityDtoList || [];
-    
-    const facility = currentFacilities.find((f: { facilityCode: string }) => f.facilityCode === data.facilityId.toString());
-    
-    if (!facility) {
-      console.error('Facility not found:', data.facilityId);
-      return;
-    }
+function handleSaveFacility(data: FacilitiesRequest) {
+  facilitiesData.value = [data];
+  approvalStore.updateFacilities(data);
+}
 
-    const newItem = {
-      ...data,
-      contractType: {
-        id: parseInt(data.contractTypeId.toString()),
-        longTitle: data.contractType?.longTitle || '',
-        shortTitle: data.contractType?.shortTitle || '',
-        code: data.contractType?.code || '',
-        parentId: data.contractType?.parentId || 0,
-        mainGroup: data.contractType?.mainGroup || '',
-        childOrder: data.contractType?.childOrder || '',
-        activationDate: data.contractType?.activationDate || '',
-        equivalentCode: data.contractType?.equivalentCode || 0,
-        parameterValue: data.contractType?.parameterValue || '',
-        active: data.contractType?.active || '',
-        requestType: 'GuaranteeType' as const
-      },
-      facility: {
-        facilityId: parseInt(facility.facilityCode),
-        facilityCode: parseInt(facility.facilityCode),
-        facilityName: facility.facilityName,
-        contractId: parseInt(data.contractTypeId.toString())
-      }
-    };
+function handleDeleteFacility(item: FacilitiesRequest) {
+  facilitiesData.value = [];
+  approvalStore.updateFacilities({} as FacilitiesRequest);
+}
 
-    console.log('Saving guarantee data:', newItem);
-    guaranteeData.value.push(newItem);
-  } catch (err) {
-    console.error('Error saving guarantee data:', err);
+// Add watch to load data when editing
+watch(() => approvalStore.loanRequestDetailList?.facilities, (newFacilities) => {
+  if (newFacilities && !isObjectEmpty(newFacilities)) {
+    facilitiesData.value = [newFacilities];
   }
-};
+}, { immediate: true });
 
-const saveLcData = async (data: RequestInformationDto) => {
-  try {
-    console.log('Received data in saveLcData:', data);
-    
-    const facilitiesRes = await api.approval.getFacilities(data.contractTypeId, 'LetterOfCredit');
-    const currentFacilities = facilitiesRes.data.facilityDtoList || [];
-    
-    const facility = currentFacilities.find((f: { facilityCode: string }) => f.facilityCode === data.facilityId.toString());
-    
-    if (!facility) {
-      console.error('Facility not found:', data.facilityId);
-      return;
-    }
+function isObjectEmpty(obj: any): boolean {
+  if (!obj) return true;
+  return Object.values(obj).every((v) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0));
+}
 
-    const newItem = {
-      ...data,
-      contractType: {
-        id: parseInt(data.contractTypeId.toString()),
-        longTitle: data.contractType?.longTitle || '',
-        shortTitle: data.contractType?.shortTitle || '',
-        code: data.contractType?.code || '',
-        parentId: data.contractType?.parentId || 0,
-        mainGroup: data.contractType?.mainGroup || '',
-        childOrder: data.contractType?.childOrder || '',
-        activationDate: data.contractType?.activationDate || '',
-        equivalentCode: data.contractType?.equivalentCode || 0,
-        parameterValue: data.contractType?.parameterValue || '',
-        active: data.contractType?.active || '',
-        requestType: 'LetterOfCredit' as const
-      },
-      facility: {
-        facilityId: parseInt(facility.facilityCode),
-        facilityCode: parseInt(facility.facilityCode),
-        facilityName: facility.facilityName,
-        contractId: parseInt(data.contractTypeId.toString())
-      }
-    };
+function handleSaveLC(data: any) {
+  // Handle saving LC data
+  console.log('Saving LC:', data);
+}
 
-    console.log('Saving LC data:', newItem);
-    lcData.value.push(newItem);
-  } catch (err) {
-    console.error('Error saving LC data:', err);
-  }
-};
+function handleDeleteLC(item: any) {
+  // Handle deleting LC
+  console.log('Deleting LC:', item);
+}
 
-const deleteItem = (item: RequestInformationDto, dataArray: RequestInformationDto[]) => {
-  const index = dataArray.findIndex(
-    (i) => 
-      i.requestType === item.requestType &&
-      i.contractTypeId === item.contractTypeId &&
-      i.facilityId === item.facilityId
-  );
-  
-  if (index !== -1) {
-    dataArray.splice(index, 1);
-    // Reset the form in the corresponding component
-    if (item.requestType === 'ContractCode') {
-      facilitiesRef.value?.formRef?.resetFormData();
-    } else if (item.requestType === 'GuaranteeType') {
-      guaranteeRef.value?.formRef?.resetFormData();
-    } else if (item.requestType === 'LetterOfCredit') {
-      lcRef.value?.formRef?.resetFormData();
-    }
-  }
-};
+function handleSaveGuarantee(data: any) {
+  // Handle saving guarantee data
+  console.log('Saving guarantee:', data);
+}
 
-// API submission method
-const submitData = async (): Promise<{ success: boolean; message: string }> => {
-  try {
-    const allData = [...facilitiesData.value, ...guaranteeData.value, ...lcData.value];
-    
-    if (allData.length === 0) {
-      return Promise.reject({ success: false, message: 'هیچ داده‌ای برای ارسال وجود ندارد.' });
-    }
-
-    // Convert data to LoanRequestDetail format and save to store
-    const loanRequestDetails = allData.map((item: RequestInformationDto) => {
-      const { contractType, selectedCollaterals, facility, year, month, day, ...rest } = item as any;
-      return {
-        advancePayment: item.advancePayment || '',
-        amount: item.amount,
-        approvalType: item.approvalType,
-        collaterals: item.collaterals.map((c: { type: string; amount: number; percent: number }) => ({
-          type: parseInt(c.type),
-          amount: c.amount,
-          percent: c.percent
-        })),
-        contractTypeId: item.contractTypeId,
-        contractTypeTitle: item.contractType?.longTitle || '',
-        currency: item.currency,
-        durationDay: item.durationDay || 0,
-        facilityId: item.facilityId,
-        repaymentType: item.repaymentType,
-        requestType: item.requestType
-      };
-    });
-
-    // Save all items to store
-    approvalStore.setLoanRequestDetailList(loanRequestDetails);
-    return Promise.resolve({ success: true, message: 'اطلاعات با موفقیت ذخیره شد.' });
-  } catch (err: any) {
-    return Promise.reject({
-      success: false,
-      message: err
-    });
-  }
-};
+function handleDeleteGuarantee(item: any) {
+  // Handle deleting guarantee
+  console.log('Deleting guarantee:', item);
+}
 
 defineExpose({ submitData });
 </script>
 
 <template>
-  <div class="approval-type-container">
-    <template v-if="loading">
-      <p>Loading...</p>
-    </template>
-
-    <template v-else>
-      <v-container fluid>
-        <!-- Facilities Section -->
-        <v-row class="mb-6">
-          <v-col cols="12">
-            <v-card class="approval-section">
-              <v-card-title class="d-flex align-center">
-                <span class="text-h2">تسهیلات</span>
-                <v-spacer></v-spacer>
-                <Facilities 
-                  ref="facilitiesRef" 
-                  :currencies="currencies" 
-                  @save="saveFacilitiesData" 
-                  :disabled="facilitiesData.length > 0"
-                />
-              </v-card-title>
-              <v-card-text>
-                <v-data-table
-                  :headers="headers"
-                  :items="facilitiesData"
-                  hide-default-footer
-                  no-data-text="رکوردی وجود ندارد"
-                  class="elevation-1"
-                >
-                  <template #item.repaymentType="{ item }">
-                    {{ repaymentTypeMap[item.repaymentType] || '-' }}
-                  </template>
-                  <template #item.approvalType="{ item }">
-                    {{ approvalTypeMap[item.approvalType] || '-' }}
-                  </template>
-                  <template #item.contractTypeId="{ item }">
-                    {{ item.contractType?.longTitle || item.contractTypeTitle || '-' }}
-                  </template>
-                  <template #item.facilityId="{ item }">
-                    {{ item.facility?.facilityName || '-' }}
-                  </template>
-                  <template #item.currency="{ item }">
-                    {{ currencies.find(c => c.code === item.currency)?.description || '-' }}
-                  </template>
-                  <template #item.actions="{ item }">
-                    <div class="d-flex justify-center gap-2">
-                      <v-btn
-                        size="small"
-                        icon
-                        @click="deleteItem(item, facilitiesData)"
-                      >
-                        ❌
-                      </v-btn>
-                    </div>
-                  </template>
-                </v-data-table>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-
-        <!-- Guarantee Section -->
-        <v-row class="mb-6">
-          <v-col cols="12">
-            <v-card class="approval-section">
-              <v-card-title class="d-flex align-center">
-                <span class="text-h2">ضمانت نامه</span>
-                <v-spacer></v-spacer>
-                <Guarantee 
-                  ref="guaranteeRef" 
-                  :currencies="currencies" 
-                  @save="saveGuaranteeData" 
-                  :disabled="guaranteeData.length > 0"
-                />
-              </v-card-title>
-              <v-card-text>
-                <v-data-table
-                  :headers="headers"
-                  :items="guaranteeData"
-                  hide-default-footer
-                  no-data-text="رکوردی وجود ندارد"
-                  class="elevation-1"
-                >
-                  <template #item.repaymentType="{ item }">
-                    {{ repaymentTypeMap[item.repaymentType] || '-' }}
-                  </template>
-                  <template #item.approvalType="{ item }">
-                    {{ approvalTypeMap[item.approvalType] || '-' }}
-                  </template>
-                  <template #item.contractTypeId="{ item }">
-                    {{ item.contractType?.longTitle || '-' }}
-                  </template>
-                  <template #item.facilityId="{ item }">
-                    {{ item.facility?.facilityName || '-' }}
-                  </template>
-                  <template #item.currency="{ item }">
-                    {{ currencies.find(c => c.code === item.currency)?.description || '-' }}
-                  </template>
-                  <template #item.actions="{ item }">
-                    <div class="d-flex justify-center gap-2">
-                      <v-btn
-                        size="small"
-                        icon
-                        @click="deleteItem(item, guaranteeData)"
-                      >
-                        ❌
-                      </v-btn>
-                    </div>
-                  </template>
-                </v-data-table>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-
-        <!-- LC Section -->
-        <v-row class="mb-6">
-          <v-col cols="12">
-            <v-card class="approval-section">
-              <v-card-title class="d-flex align-center">
-                <span class="text-h2">اعتبار اسنادی</span>
-                <v-spacer></v-spacer>
-                <Lc 
-                  ref="lcRef" 
-                  :currencies="currencies" 
-                  :collateral="collaterals" 
-                  @save="saveLcData" 
-                  :disabled="lcData.length > 0"
-                />
-              </v-card-title>
-              <v-card-text>
-                <v-data-table
-                  :headers="headers"
-                  :items="lcData"
-                  hide-default-footer
-                  no-data-text="رکوردی وجود ندارد"
-                  class="elevation-1"
-                >
-                  <template #item.repaymentType="{ item }">
-                    {{ repaymentTypeMap[item.repaymentType] || '-' }}
-                  </template>
-                  <template #item.approvalType="{ item }">
-                    {{ approvalTypeMap[item.approvalType] || '-' }}
-                  </template>
-                  <template #item.contractTypeId="{ item }">
-                    {{ item.contractType?.longTitle || '-' }}
-                  </template>
-                  <template #item.facilityId="{ item }">
-                    {{ item.facility?.facilityName || '-' }}
-                  </template>
-                  <template #item.currency="{ item }">
-                    {{ currencies.find(c => c.code === item.currency)?.description || '-' }}
-                  </template>
-                  <template #item.actions="{ item }">
-                    <div class="d-flex justify-center gap-2">
-                      <v-btn
-                        size="small"
-                        icon
-                        @click="deleteItem(item, lcData)"
-                      >
-                        ❌
-                      </v-btn>
-                    </div>
-                  </template>
-                </v-data-table>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
-    </template>
+  <div class="customer-section">
+    <h3 class="group-title">خلاصه درخواست مشتری</h3>
+    <form class="customer-form">
+      <v-row class="mt-2">
+        <v-col cols="12" md="6">
+          <v-text-field
+            v-model="formData.summary"
+            label="خلاصه درخواست"
+            variant="outlined"
+            density="comfortable" />
+        </v-col>
+        <!-- National Code Input -->
+        <v-col cols="12" md="6">
+          <v-text-field
+            v-model="formData.activityType"
+            label="نوع فعالیت"
+            variant="outlined"
+            density="comfortable"
+          />
+        </v-col>
+        <v-col cols="12" md="12">
+          <v-textarea
+            v-model="formData.description"
+            label="توضیحات"
+            variant="outlined"
+            density="comfortable"
+            rows="2"
+          />
+        </v-col>
+        <v-divider inset></v-divider>
+      </v-row>
+    </form>
   </div>
+  <!-- Render only the active tab's component -->
+  <div class="customer-section">
+    <h3 class="group-title">درخواست مصوبه</h3>
+    <v-tabs v-model="activeTab" class="mb-2">
+      <v-tab value="facilities">تسهیلات</v-tab>
+      <v-tab value="guarantee">ضمانت‌نامه</v-tab>
+      <v-tab value="lc">اعتبار اسنادی</v-tab>
+    </v-tabs>
+    <Facilities ref="facilitiesRef" v-show="activeTab === 'facilities'" :loading="loading" @save="handleSaveFacility" @delete="handleDeleteFacility" @update:facilities="facilitiesData = $event" />
+    <Guarantee ref="guaranteeRef" :loading="loading" v-show="activeTab === 'guarantee'" @save="handleSaveGuarantee" @delete="handleDeleteGuarantee" @update:guarantee="guaranteeData = $event" />
+    <LetterOfCredit ref="lcRef" :loading="loading" v-show="activeTab === 'lc'" @save="handleSaveLC" @delete="handleDeleteLC" @update:lc="lcData = $event" />
+  </div>
+  <v-snackbar v-model="showError" color="error" timeout="5500">
+    {{ error }}
+  </v-snackbar>
 </template>
 
-<style scoped>
-.approval-type-container {
-  padding: 16px;
+<style lang="scss" scoped>
+.customer-section {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 25px 15px;
+  margin-bottom: 10px;
+  width: 100%;
+  max-width: 100%;
+
+  .group-title {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--v-theme-primary);
+    border-right: 6px solid var(--v-theme-primary);
+    padding-right: 18px;
+    margin-bottom: 2.5rem;
+    background: linear-gradient(90deg, #f5f7fa 0%, #e2eaea 100%);
+    border-radius: 8px;
+    display: inline-block;
+    line-height: 1.2;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .section-content {
+    min-height: 300px;
+  }
+
+  .customer-table {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 10px;
+    padding: 15px;
+
+    :deep(.v-data-table-header) {
+      background-color: var(--v-theme-secondary);
+      color: #fff;
+    }
+
+    :deep(.v-data-table-header th) {
+      background-color: var(--v-theme-secondary) !important;
+      color: #fff;
+    }
+
+    :deep(.v-data-table-header tr) {
+      background-color: var(--v-theme-secondary) !important;
+      color: #fff;
+    }
+
+    :deep(.v-data-table-footer) {
+      border-top: 1px solid rgba(0, 0, 0, 0.12);
+      padding: 8px 16px;
+    }
+  }
 }
 
-.approval-section {
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.customer-search-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.approval-section .v-card-title {
-  padding: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+@media (forced-colors: active) {
+  .v-btn {
+    forced-color-adjust: none;
+  }
+
+  .v-text-field {
+    forced-color-adjust: none;
+  }
 }
 
-.gap-2 {
-  gap: 8px;
+.v-data-table :deep(th) {
+  background-color: #f5f5f5 !important;
+  font-weight: 600;
 }
 </style>

@@ -1,13 +1,13 @@
 <template>
   <div class="facilities-section">
     <div class="section-header">
-      <h4 class="section-title">تسهیلات</h4>
-      <v-btn color="secondary" @click="openDialog" :disabled="loading || facilities.length >= 1"> افزودن تسهیلات</v-btn>
+      <h4 class="section-title">اعتبار اسنادی</h4>
+      <v-btn color="secondary" @click="openDialog" :disabled="loading || lc.length >= 1"> افزودن اعتبار اسنادی</v-btn>
     </div>
 
     <v-data-table-virtual
       :headers="headers"
-      :items="facilities"
+      :items="lc"
       :loading="loading"
       no-data-text="رکوردی یافت نشد"
       density="comfortable"
@@ -48,7 +48,7 @@
     <v-dialog v-model="dialog" max-width="800px">
       <v-card>
         <v-card-title class="d-flex align-center py-5 px-5">
-          <span class="text-h3">{{ isEditing ? 'ویرایش تسهیلات' : 'افزودن تسهیلات' }}</span>
+          <span class="text-h3">{{ isEditing ? 'ویرایش اعتبار اسنادی' : 'افزودن اعتبار اسنادی' }}</span>
           <v-spacer></v-spacer>
           <v-btn size="small" variant="text" @click="closeDialog">
             <IconX color="red" size="20" />
@@ -251,7 +251,7 @@
         </v-card-text>
         <v-card-actions>
           <div style="display: flex; justify-content: space-evenly; width: 100%">
-            <v-btn color="primary" @click="saveFacility" :loading="loading" :disabled="!isFormValid || !collateralRequired">
+            <v-btn color="primary" @click="saveLc" :loading="loading" :disabled="!isFormValid || !collateralRequired">
               {{ 'ذخیره' }}
             </v-btn>
             <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
@@ -292,7 +292,7 @@ import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import { api } from '@/services/api';
 import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { useApprovalStore } from '@/stores/approval';
-import type { CollateralDto, ContractType, FacilitiesRequest, Facility, FacilityDto } from '@/types/approval/approvalType';
+import type { CollateralDto, ContractType, FacilitiesRequest, Facility, FacilityDto, LcRequest } from '@/types/approval/approvalType';
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
 
@@ -301,7 +301,7 @@ const approvalStore = useApprovalStore();
 const dialog = ref(false);
 const form = ref();
 const isFormValid = ref(false);
-const facilities = ref<FacilitiesRequest[]>([]);
+const lc = ref<LcRequest[]>([]);
 const isEditing = ref(false);
 const editingId = ref<number | null>(null);
 const showCollateralInputDialog = ref(false);
@@ -331,10 +331,10 @@ const props = defineProps<{
   loading?: boolean;
 }>();
 const emit = defineEmits<{
-  (e: 'save', data: FacilitiesRequest): void;
-  (e: 'delete', item: FacilitiesRequest): void;
-  (e: 'edit', item: FacilitiesRequest): void;
-  (e: 'update:facilities', facilities: FacilitiesRequest[]): void;
+  (e: 'save', data: LcRequest): void;
+  (e: 'delete', item: LcRequest): void;
+  (e: 'edit', item: LcRequest): void;
+  (e: 'update:lc', lc: LcRequest[]): void;
 }>();
 const collateralRequired = computed(() => selectedCollaterals.value.length > 0);
 const formData = reactive({
@@ -426,7 +426,7 @@ const dayCalculate = async () => {
 async function openDialog() {
   isEditing.value = false;
   editingId.value = null;
-  const res = await api.approval.getContractType('ContractCode');
+  const res = await api.approval.getContractType('LetterOfCredit');
   contractTypes.value = res.data.generalParameterList || [];
   dialog.value = true;
 }
@@ -443,7 +443,7 @@ function resetForm() {
   form.value?.reset();
 }
 
-function editItem(item: FacilitiesRequest) {
+function editItem(item: LcRequest) {
   isEditing.value = true;
   editingId.value = item.id;
   formData.approvalType = item.approvalType;
@@ -462,9 +462,9 @@ function editItem(item: FacilitiesRequest) {
   dialog.value = true;
 }
 
-function saveFacility() {
+function saveLc() {
   if (!isFormValid.value) return;
-  const facilityData: FacilitiesRequest = {
+  const facilityData: LcRequest = {
     id: editingId.value || Date.now(),
     ...formData,
     contractType: formData.contractType || ({} as ContractType),
@@ -472,28 +472,28 @@ function saveFacility() {
     collaterals: selectedCollaterals.value
   };
   if (isEditing.value) {
-    const index = facilities.value.findIndex((f) => f.id === editingId.value);
+    const index = lc.value.findIndex((f) => f.id === editingId.value);
     if (index !== -1) {
-      facilities.value[index] = facilityData;
+      lc.value[index] = facilityData;
       emit('edit', facilityData);
     }
   } else {
-    facilities.value.push(facilityData);
+    lc.value.push(facilityData);
     emit('save', facilityData);
   }
   closeDialog();
 }
 
-function deleteItem(item: FacilitiesRequest) {
-  const index = facilities.value.findIndex((f) => f.id === item.id);
+function deleteItem(item: LcRequest) {
+  const index = lc.value.findIndex((f) => f.id === item.id);
   if (index !== -1) {
-    facilities.value.splice(index, 1);
+    lc.value.splice(index, 1);
     emit('delete', item);
   }
 }
 
 async function fetchFacilities(newContractType: ContractType | null) {
-  const res = await api.approval.getFacilities(newContractType?.id || 0, 'ContractCode');
+  const res = await api.approval.getFacilities(newContractType?.id || 0, 'LetterOfCredit');
   facilityList.value = res.data.facilityDtoList || [];
 }
 
@@ -503,15 +503,15 @@ function isObjectEmpty(obj: any): boolean {
 }
 
 onMounted(async () => {
-  if (approvalStore.loanRequestDetailList?.facilities && !isObjectEmpty(approvalStore.loanRequestDetailList.facilities)) {
-    facilities.value = [approvalStore.loanRequestDetailList.facilities];
+  if (approvalStore.loanRequestDetailList?.lc && !isObjectEmpty(approvalStore.loanRequestDetailList.lc)) {
+    lc.value = [approvalStore.loanRequestDetailList.lc];
   }
 });
 
 watch(
-  facilities,
+  lc,
   (newVal) => {
-    emit('update:facilities', newVal);
+    emit('update:lc', newVal);
   },
   { deep: true }
 );
@@ -523,7 +523,7 @@ watch(
   }
 );
 
-defineExpose({ facilities });
+defineExpose({ lc });
 </script>
 
 <style lang="scss" scoped>
