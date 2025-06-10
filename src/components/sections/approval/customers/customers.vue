@@ -326,14 +326,11 @@ defineExpose({ submitData });
   </v-snackbar>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
+@import '@/assets/scss/components/approval-sections';
+
 .customer-section {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 25px 15px;
-  margin-bottom: 10px;
-  width: 100%;
-  max-width: 100%;
+  @extend .approval-section;
 
   .group-title {
     font-size: 1.7rem;
@@ -359,30 +356,7 @@ defineExpose({ submitData });
   }
 
   .customer-table {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 10px;
-    padding: 15px;
-
-    :deep(.v-data-table-header) {
-      background-color: var(--v-theme-secondary);
-      color: #fff;
-    }
-
-    :deep(.v-data-table-header th) {
-      background-color: var(--v-theme-secondary) !important;
-      color: #fff;
-    }
-
-    :deep(.v-data-table-header tr) {
-      background-color: var(--v-theme-secondary) !important;
-      color: #fff;
-    }
-
-    :deep(.v-data-table-footer) {
-      border-top: 1px solid rgba(0, 0, 0, 0.12);
-      padding: 8px 16px;
-    }
+    @extend .approval-table;
   }
 }
 
@@ -402,7 +376,7 @@ defineExpose({ submitData });
   }
 }
 
-.v-data-table :deep(th) {
+:deep(th) {
   background-color: #f5f5f5 !important;
   font-weight: 600;
 }

@@ -532,49 +532,14 @@ watch(
 defineExpose({ facilities });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+@import '@/assets/scss/components/approval-sections';
+
 .facilities-section {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 25px 15px;
-  margin-bottom: 10px;
-  width: 100%;
-  max-width: 100%;
-
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .section-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #333;
-    margin: 0;
-  }
-
+  @extend .approval-section;
+  
   .facilities-table {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 10px;
-    padding: 15px;
-
-    :deep(.v-data-table-header) {
-      background-color: var(--v-theme-secondary);
-      color: #fff;
-    }
-
-    :deep(.v-data-table-header th) {
-      background-color: var(--v-theme-secondary) !important;
-      color: #fff;
-    }
-
-    :deep(.v-data-table-header tr) {
-      background-color: var(--v-theme-secondary) !important;
-      color: #fff;
-    }
+    @extend .approval-table;
   }
 }
 
