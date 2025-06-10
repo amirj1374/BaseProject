@@ -92,36 +92,6 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="12" md="4">
-                <v-autocomplete
-                  v-model="formData.contractType"
-                  :items="contractTypes"
-                  item-title="longTitle"
-                  item-value="id"
-                  label="نوع عقد"
-                  variant="outlined"
-                  no-data-text="دیتا یافت نشد"
-                  clearable
-                  return-object
-                  :rules="[required]"
-                ></v-autocomplete>
-              </v-col>
-              <v-col cols="12" md="8">
-                <v-autocomplete
-                  :items="facilityList"
-                  v-model="formData.facility"
-                  item-title="facilityName"
-                  item-value="facilityCode"
-                  no-data-text="لطفا ابتدا نوع عقد رو انتخاب کنید"
-                  label="نوع محصول"
-                  variant="outlined"
-                  clearable
-                  return-object
-                  :rules="[required]"
-                ></v-autocomplete>
-              </v-col>
-            </v-row>
-            <v-row>
               <v-col cols="12" md="2">
                 <v-text-field
                   v-model="formData.year"
@@ -185,30 +155,53 @@
                 />
               </v-col>
               <v-col cols="12" md="4">
-                <MoneyInput
-                  v-model="formData.preferentialRate"
-                  label="نرخ ترجیحی"
-                  placeholder="0"
-                  variant="outlined"
-                  density="comfortable"
-                  hide-details="auto"
-                  suffix="میلیون ریال"
-                  :rules="[required]"
-                />
-              </v-col>
-              <v-col cols="12" md="4">
                 <v-text-field
                   v-model="formData.preReceiving"
                   label="پیش دریافت"
                   placeholder="0"
                   variant="outlined"
                   density="comfortable"
-                  hide-details="auto"
                   suffix="%"
                   type="number"
                   :rules="[percentRule]"
                   min="1"
                   max="100"
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-text-field
+                  v-model="formData.betweenReceiving"
+                  label="میان دریافت"
+                  placeholder="0"
+                  variant="outlined"
+                  density="comfortable"
+                  suffix="%"
+                  type="number"
+                  :rules="[percentRule]"
+                  min="1"
+                  max="100"
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="4">
+                <v-select
+                  v-model="formData.creditType"
+                  label="نوع اعتبار"
+                  variant="outlined"
+                  density="comfortable"
+                  :items="CreditTypeOptions || []"
+                  :rules="[required]"
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-select
+                  v-model="formData.lcType"
+                  label="نوع اعتبار اسنادی"
+                  variant="outlined"
+                  density="comfortable"
+                  :items="LcTypeOptions || []"
+                  :rules="[required]"
                 />
               </v-col>
             </v-row>
@@ -295,6 +288,7 @@ import { useApprovalStore } from '@/stores/approval';
 import type { CollateralDto, ContractType, FacilitiesRequest, Facility, FacilityDto, LcRequest } from '@/types/approval/approvalType';
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
+import { CreditTypeOptions, LcTypeOptions } from '@/types/enums/global';
 
 const baseStore = useBaseStore();
 const approvalStore = useApprovalStore();
@@ -347,19 +341,21 @@ const formData = reactive({
   durationDay: '',
   amount: '',
   collateral: true,
-  preferentialRate: '',
+  betweenReceiving: '',
   preReceiving: '',
-  contractType: null as ContractType | null,
-  facility: null as FacilityDto | null
+  creditType: '',
+  lcType: ''
 });
 
 const headers = [
-  { title: 'نوع مصوبه', key: 'approvalType', width: '100px' },
-  { title: 'نوع ارز', key: 'currency', width: '100px' },
-  { title: 'نوع عقد', key: 'contractType', width: '100px' },
-  { title: 'نوع محصول', key: 'facility', width: '100px' },
-  { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '100px' },
-  { title: 'مدت', key: 'durationDay', width: '100px' },
+  { title: 'نوع مصوبه', key: 'approvalType', width: '200px' },
+  { title: 'نوع ارز', key: 'currency', width: '200px' },
+  { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '200px' },
+  { title: 'مدت', key: 'durationDay', width: '200px' },
+  { title: 'نوع اعتبار', key: 'creditType', width: '250px' },
+  { title: 'نوع اعتبار اسنادی', key: 'lcType', width: '250px' },
+  { title: 'میان دریافت', key: 'betweenReceiving', width: '200px' },
+  { title: 'پیش دریافت', key: 'preReceiving', width: '200px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
 ];
@@ -426,8 +422,6 @@ const dayCalculate = async () => {
 async function openDialog() {
   isEditing.value = false;
   editingId.value = null;
-  const res = await api.approval.getContractType('LetterOfCredit');
-  contractTypes.value = res.data.generalParameterList || [];
   dialog.value = true;
 }
 
@@ -455,10 +449,10 @@ function editItem(item: LcRequest) {
   formData.day = item.day || '';
   formData.durationDay = item.durationDay || '';
   selectedCollaterals.value = item.collaterals ? item.collaterals : [];
-  formData.contractType = item.contractType || null;
-  formData.facility = item.facility || null;
-  formData.preferentialRate = item.preferentialRate;
+  formData.betweenReceiving = item.betweenReceiving;
   formData.preReceiving = item.preReceiving;
+  formData.creditType = item.creditType;
+  formData.lcType = item.lcType;
   dialog.value = true;
 }
 
@@ -467,8 +461,6 @@ function saveLc() {
   const facilityData: LcRequest = {
     id: editingId.value || Date.now(),
     ...formData,
-    contractType: formData.contractType || ({} as ContractType),
-    facility: formData.facility || ({} as FacilityDto),
     collaterals: selectedCollaterals.value
   };
   if (isEditing.value) {
@@ -493,7 +485,8 @@ function deleteItem(item: LcRequest) {
 }
 
 async function fetchFacilities(newContractType: ContractType | null) {
-  const res = await api.approval.getFacilities(newContractType?.id || 0, 'LetterOfCredit');
+  if (!newContractType) return;
+  const res = await api.approval.getFacilities(newContractType.id, 'LetterOfCredit');
   facilityList.value = res.data.facilityDtoList || [];
 }
 
@@ -503,6 +496,8 @@ function isObjectEmpty(obj: any): boolean {
 }
 
 onMounted(async () => {
+  const res = await api.approval.getContractType('LetterOfCredit');
+  contractTypes.value = res.data.generalParameterList || [];
   if (approvalStore.loanRequestDetailList?.lc && !isObjectEmpty(approvalStore.loanRequestDetailList.lc)) {
     lc.value = [approvalStore.loanRequestDetailList.lc];
   }
@@ -514,13 +509,6 @@ watch(
     emit('update:lc', newVal);
   },
   { deep: true }
-);
-
-watch(
-  () => formData.contractType,
-  (newVal) => {
-    fetchFacilities(newVal);
-  }
 );
 
 defineExpose({ lc });

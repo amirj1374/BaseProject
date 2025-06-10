@@ -1,7 +1,7 @@
 <template>
   <div class="facilities-section">
     <div class="section-header">
-      <h4 class="section-title">تسهیلات</h4>
+      <h4 class="section-title">ضمانت‌نامه</h4>
       <v-btn color="secondary" @click="openDialog" :disabled="loading || guarantee.length >= 1"> افزودن ضمانت‌نامه</v-btn>
     </div>
 
@@ -98,7 +98,7 @@
                   :items="contractTypes"
                   item-title="longTitle"
                   item-value="id"
-                  label="نوع عقد"
+                  label="نوع ضمانت نامه"
                   variant="outlined"
                   no-data-text="دیتا یافت نشد"
                   clearable
@@ -185,21 +185,9 @@
                 />
               </v-col>
               <v-col cols="12" md="4">
-                <MoneyInput
-                  v-model="formData.preferentialRate"
-                  label="نرخ ترجیحی"
-                  placeholder="0"
-                  variant="outlined"
-                  density="comfortable"
-                  hide-details="auto"
-                  suffix="میلیون ریال"
-                  :rules="[required]"
-                />
-              </v-col>
-              <v-col cols="12" md="4">
                 <v-text-field
-                  v-model="formData.preReceiving"
-                  label="پیش دریافت"
+                  v-model="formData.percentageDeposits"
+                  label="درصد سپرده نقدی"
                   placeholder="0"
                   variant="outlined"
                   density="comfortable"
@@ -347,18 +335,18 @@ const formData = reactive({
   durationDay: '',
   amount: '',
   collateral: true,
-  preferentialRate: '',
-  preReceiving: '',
+  percentageDeposits: '',
   contractType: null as ContractType | null,
   facility: null as FacilityDto | null
 });
 
 const headers = [
-  { title: 'نوع مصوبه', key: 'approvalType', width: '100px' },
-  { title: 'نوع ارز', key: 'currency', width: '100px' },
-  { title: 'نوع عقد', key: 'contractType', width: '100px' },
-  { title: 'نوع محصول', key: 'facility', width: '100px' },
-  { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '100px' },
+  { title: 'نوع مصوبه', key: 'approvalType', width: '150px' },
+  { title: 'نوع ارز', key: 'currency', width: '150px' },
+  { title: 'نوع عقد', key: 'contractType', width: '150px' },
+  { title: 'نوع محصول', key: 'facility', width: '150px' },
+  { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '150px' },
+  { title: 'درصد سپرده نقدی', key: 'percentageDeposits', width: '200px' },
   { title: 'مدت', key: 'durationDay', width: '100px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
@@ -426,8 +414,6 @@ const dayCalculate = async () => {
 async function openDialog() {
   isEditing.value = false;
   editingId.value = null;
-  const res = await api.approval.getContractType('GuaranteeType');
-  contractTypes.value = res.data.generalParameterList || [];
   dialog.value = true;
 }
 
@@ -457,8 +443,7 @@ function editItem(item: GuaranteeRequest) {
   selectedCollaterals.value = item.collaterals ? item.collaterals : [];
   formData.contractType = item.contractType || null;
   formData.facility = item.facility || null;
-  formData.preferentialRate = item.preferentialRate;
-  formData.preReceiving = item.preReceiving;
+  formData.percentageDeposits = item.percentageDeposits;
   dialog.value = true;
 }
 
@@ -493,7 +478,8 @@ function deleteItem(item: GuaranteeRequest) {
 }
 
 async function fetchFacilities(newContractType: ContractType | null) {
-  const res = await api.approval.getFacilities(newContractType?.id || 0, 'GuaranteeType');
+  if (!newContractType) return;
+  const res = await api.approval.getFacilities(newContractType.id, 'GuaranteeType');
   facilityList.value = res.data.facilityDtoList || [];
 }
 
@@ -503,6 +489,8 @@ function isObjectEmpty(obj: any): boolean {
 }
 
 onMounted(async () => {
+  const res = await api.approval.getContractType('GuaranteeType');
+  contractTypes.value = res.data.generalParameterList || [];
   if (approvalStore.loanRequestDetailList?.guarantee && !isObjectEmpty(approvalStore.loanRequestDetailList.guarantee)) {
     guarantee.value = [approvalStore.loanRequestDetailList.guarantee];
   }

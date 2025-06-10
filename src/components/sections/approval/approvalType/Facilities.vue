@@ -185,15 +185,18 @@
                 />
               </v-col>
               <v-col cols="12" md="4">
-                <MoneyInput
+                <v-text-field
                   v-model="formData.preferentialRate"
                   label="نرخ ترجیحی"
                   placeholder="0"
                   variant="outlined"
                   density="comfortable"
                   hide-details="auto"
-                  suffix="میلیون ریال"
-                  :rules="[required]"
+                  suffix="%"
+                  type="number"
+                  :rules="[percentRule]"
+                  min="1"
+                  max="100"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -354,13 +357,15 @@ const formData = reactive({
 });
 
 const headers = [
-  { title: 'نوع مصوبه', key: 'approvalType', width: '100px' },
-  { title: 'نوع ارز', key: 'currency', width: '100px' },
-  { title: 'نوع عقد', key: 'contractType', width: '100px' },
-  { title: 'نوع محصول', key: 'facility', width: '100px' },
-  { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '100px' },
-  { title: 'مدت', key: 'durationDay', width: '100px' },
-  { title: 'مبلغ', key: 'amount', width: '150px' },
+  { title: 'نوع مصوبه', key: 'approvalType', width: '200px' },
+  { title: 'نوع ارز', key: 'currency', width: '200px' },
+  { title: 'نوع عقد', key: 'contractType', width: '200px' },
+  { title: 'نوع محصول', key: 'facility', width: '200px' },
+  { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '200' },
+  { title: 'نرخ ترجیحی', key: 'preferentialRate', width: '200px' },
+  { title: 'پیش دریافت', key: 'preReceiving', width: '200px' },
+  { title: 'مدت', key: 'durationDay', width: '200px' },
+  { title: 'مبلغ', key: 'amount', width: '200px' },
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
 ];
 
@@ -426,8 +431,6 @@ const dayCalculate = async () => {
 async function openDialog() {
   isEditing.value = false;
   editingId.value = null;
-  const res = await api.approval.getContractType('ContractCode');
-  contractTypes.value = res.data.generalParameterList || [];
   dialog.value = true;
 }
 
@@ -493,7 +496,8 @@ function deleteItem(item: FacilitiesRequest) {
 }
 
 async function fetchFacilities(newContractType: ContractType | null) {
-  const res = await api.approval.getFacilities(newContractType?.id || 0, 'ContractCode');
+  if (!newContractType) return;
+  const res = await api.approval.getFacilities(newContractType.id, 'ContractCode');
   facilityList.value = res.data.facilityDtoList || [];
 }
 
@@ -503,6 +507,8 @@ function isObjectEmpty(obj: any): boolean {
 }
 
 onMounted(async () => {
+  const res = await api.approval.getContractType('ContractCode');
+  contractTypes.value = res.data.generalParameterList || [];
   if (approvalStore.loanRequestDetailList?.facilities && !isObjectEmpty(approvalStore.loanRequestDetailList.facilities)) {
     facilities.value = [approvalStore.loanRequestDetailList.facilities];
   }

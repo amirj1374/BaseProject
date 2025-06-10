@@ -224,10 +224,42 @@ export interface FacilitiesRequest {
   collaterals: Collaterals[];
   preferentialRate: string;
   preReceiving: string;
-  contractType?: ContractType;
+  contractType: ContractType;
   facility?: FacilityDto;
 }
 
+export interface GuaranteeRequest {
+  id: number;
+  approvalType: string;
+  currency: string;
+  amount: string;
+  repaymentType: string;
+  year?: string;
+  month?: string;
+  day?: string;
+  durationDay?: string;
+  collaterals: Collaterals[];
+  percentageDeposits: string;
+  contractType: ContractType;
+  facility?: FacilityDto;
+}
+
+export interface LcRequest {
+  id: number;
+  approvalType: string;
+  currency: string;
+  amount: string;
+  repaymentType: string;
+  year?: string;
+  month?: string;
+  day?: string;
+  creditType: string;
+  durationDay?: string;
+  collaterals: Collaterals[];
+  betweenReceiving: string;
+  preReceiving: string;
+  lcType: string;
+}
 export interface ContractType {
   activationDate: string;
   active: string;
@@ -247,40 +279,6 @@ export interface FacilityDto {
   facilityCode: string;
   facilityId: number;
   facilityName: string;
-}
-
-export interface GuaranteeRequest {
-  id: number;
-  approvalType: string;
-  currency: string;
-  amount: string;
-  repaymentType: string;
-  year?: string;
-  month?: string;
-  day?: string;
-  durationDay?: string;
-  collaterals: Collaterals[];
-  preferentialRate: string;
-  preReceiving: string;
-  contractType?: ContractType;
-  facility?: FacilityDto;
-}
-
-export interface LcRequest {
-  id: number;
-  approvalType: string;
-  currency: string;
-  amount: string;
-  repaymentType: string;
-  year?: string;
-  month?: string;
-  day?: string;
-  durationDay?: string;
-  collaterals: Collaterals[];
-  preferentialRate: string;
-  preReceiving: string;
-  contractType?: ContractType;
-  facility?: FacilityDto;
 }
 
 export interface SummaryDto {

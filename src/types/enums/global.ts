@@ -90,4 +90,30 @@ export const FileTypeOptions = [
   { title: 'تاییده پست', value: FileTypeEnum.CONFIRM_POST_OFFICE },
 ];
 
+// credit type
 
+export const CreditTypeEnum = {
+  VISUAL: 'VISUAL',
+  LONG: 'LONG'
+} as const;
+
+export type CreditType = (typeof CreditTypeEnum)[keyof typeof CreditTypeEnum];
+
+export const CreditTypeOptions = [
+  { title: 'دیداری', value: CreditTypeEnum.VISUAL },
+  { title: 'مدت دار', value: CreditTypeEnum.LONG },
+];
+
+// lc type
+
+export const LcTypeEnum = {
+  INTERNAL: 'INTERNAL',
+  IMPORT: 'IMPORT'
+} as const;
+
+export type LcType = (typeof LcTypeEnum)[keyof typeof LcTypeEnum];
+
+export const LcTypeOptions = [
+  { title: 'داخلی', value: LcTypeEnum.INTERNAL },
+  { title: 'وارداتی', value: LcTypeEnum.IMPORT },
+];
