@@ -309,6 +309,8 @@ const formData = reactive({
   month: '',
   day: '',
   durationDay: '',
+  preferentialRate: '',
+  preReceiving: '',
   amount: '',
   collateral: true,
 });

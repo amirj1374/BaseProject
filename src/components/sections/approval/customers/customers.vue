@@ -5,13 +5,14 @@ import { useDebounceFn } from '@vueuse/core';
 //utils
 import { nationalCodeRule } from '@/validators/nationalCodeRule';
 //type
-import type { CustomerDto, FetchCustomerPayload, Facility, Guarantee, Lc } from '@/types/approval/approvalType';
+import type { CustomerDto, FetchCustomerPayload, Facility, Guarantee, Lc, GreenLicense } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
 import { IconTrash } from '@tabler/icons-vue';
 // Use dynamic imports for heavy components
 const Facilities = defineAsyncComponent(() => import('./Facilities.vue'));
 const LetterOfCredit = defineAsyncComponent(() => import('./LetterOfCredit.vue'));
 const Guarantee = defineAsyncComponent(() => import('./Guarantee.vue'));
+const GreenLicense = defineAsyncComponent(() => import('./guaranteeLicense.vue'));
 
 type AllowedStatus = 'nationalCode' | 'cif';
 const approvalStore = useApprovalStore();
@@ -60,8 +61,10 @@ const dataTableRef = ref();
 const facilitiesRef = ref();
 const guaranteeRef = ref();
 const lcRef = ref();
+const greenLicenseRef = ref();
 
 const lcData = ref<Lc[]>([]);
+const greenLicenseData = ref<GreenLicense[]>([]);
 // Add pagination state
 const page = ref(1);
 const itemsPerPage = ref(10);
@@ -155,7 +158,8 @@ const submitData = async () => {
       ...firstItem,
       facilities: facilitiesData.value,
       guarantee: guaranteeData.value,
-      lc: lcData.value
+      lc: lcData.value,
+      greenLicense: greenLicenseData.value
     });
     return Promise.resolve();
   } catch (err) {
@@ -211,6 +215,16 @@ function handleSaveGuarantee(data: any) {
 function handleDeleteGuarantee(item: any) {
   // Handle deleting guarantee
   console.log('Deleting guarantee:', item);
+}
+
+function handleSaveGreenLicense(data: any) {
+  // Handle saving green license data
+  console.log('Saving green license:', data);
+}
+
+function handleDeleteGreenLicense(item: any) {
+  // Handle deleting green license
+  console.log('Deleting green license:', item);
 }
 
 defineExpose({ submitData });
@@ -300,10 +314,12 @@ defineExpose({ submitData });
       <v-tab value="facilities">تسهیلات</v-tab>
       <v-tab value="guarantee">ضمانت‌نامه</v-tab>
       <v-tab value="lc">اعتبار اسنادی</v-tab>
+      <v-tab value="greenLicense">تضامین جواز سبز</v-tab>
     </v-tabs>
     <Facilities ref="facilitiesRef" v-show="activeTab === 'facilities'" :loading="loading" @save="handleSaveFacility" @delete="handleDeleteFacility" @update:facilities="facilitiesData = $event" />
     <Guarantee ref="guaranteeRef" :loading="loading" v-show="activeTab === 'guarantee'" @save="handleSaveGuarantee" @delete="handleDeleteGuarantee" @update:guarantee="guaranteeData = $event" />
     <LetterOfCredit ref="lcRef" :loading="loading" v-show="activeTab === 'lc'" @save="handleSaveLC" @delete="handleDeleteLC" @update:lc="lcData = $event" />
+    <GreenLicense ref="greenLicenseRef" :loading="loading" v-show="activeTab === 'greenLicense'" @save="handleSaveGreenLicense" @delete="handleDeleteGreenLicense" @update:greenLicense="greenLicenseData = $event" />
   </div>
   <v-snackbar v-model="showError" color="error" timeout="5500">
     {{ error }}

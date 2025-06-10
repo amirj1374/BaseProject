@@ -2,12 +2,13 @@
 import { onMounted, ref, watch, defineAsyncComponent, computed } from 'vue';
 //utils
 //type
-import type { CustomerDto,FacilitiesRequest,Facility, Guarantee, Lc } from '@/types/approval/approvalType';
+import type { CustomerDto, FacilitiesRequest, Facility, GuaranteeRequest, LcRequest, GreenLicense } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
 // Use dynamic imports for heavy components
 const Facilities = defineAsyncComponent(() => import('./Facilities.vue'));
 const LetterOfCredit = defineAsyncComponent(() => import('./LetterOfCredit.vue'));
 const Guarantee = defineAsyncComponent(() => import('./Guarantee.vue'));
+const GreenLicense = defineAsyncComponent(() => import('./approvalGuaranteeLicense.vue'));
 const approvalStore = useApprovalStore();
 // Tab Management
 const activeTab = ref('facilities');
@@ -28,10 +29,13 @@ const formData = ref({
 
 const facilitiesRef = ref();
 const guaranteeRef = ref();
+const lcRef = ref();
+const greenLicenseRef = ref();
 
 const facilitiesData = ref<FacilitiesRequest[]>([]);
-const guaranteeData = ref<Guarantee[]>([]);
-const lcData = ref<Lc[]>([]);
+const guaranteeData = ref<GuaranteeRequest[]>([]);
+const lcData = ref<LcRequest[]>([]);
+const greenLicenseData = ref<GreenLicense[]>([]);
 
 onMounted(() => {
   if (approvalStore.loanRequestDetailList) {
@@ -47,19 +51,8 @@ onMounted(() => {
 });
 
 const submitData = async () => {
-  // if (!items.value.length || !items.value[0]) {
-  //   error.value = 'هیچ مشتری‌ای یافت نشد. لطفاً جستجو کنید.';
-  //   showError.value = true;
-  //   return Promise.reject(error.value);
-  // }
-  // const firstItem = items.value[0];
-  // if (!firstItem.cif && !firstItem.nationalCode) {
-  //   error.value = 'اطلاعات مشتری نامعتبر است';
-  //   showError.value = true;
-  //   return Promise.reject(error.value);
-  // }
   try {
-    if (facilitiesData.value.length || guaranteeData.value.length || lcData.value.length) {
+    if (facilitiesData.value.length || guaranteeData.value.length || lcData.value.length || greenLicenseData.value.length) {
       approvalStore.setLoanRequestDetailList({
         summaryRequest: {
           summary: formData.value.summary,
@@ -67,8 +60,9 @@ const submitData = async () => {
           description: formData.value.description
         },
         facilities: facilitiesData.value[0] || {} as FacilitiesRequest,
-        guarantee: guaranteeData.value[0] || {} as Guarantee,
-        lc: lcData.value[0] || {} as Lc
+        guarantee: guaranteeData.value[0] || {} as GuaranteeRequest,
+        lc: lcData.value[0] || {} as LcRequest,
+        greenLicense: greenLicenseData.value[0] || {} as GreenLicense
       });
     }
     else {
@@ -82,16 +76,6 @@ const submitData = async () => {
   }
 };
 
-function handleSaveFacility(data: FacilitiesRequest) {
-  facilitiesData.value = [data];
-  approvalStore.updateFacilities(data);
-}
-
-function handleDeleteFacility(item: FacilitiesRequest) {
-  facilitiesData.value = [];
-  approvalStore.updateFacilities({} as FacilitiesRequest);
-}
-
 // Add watch to load data when editing
 watch(() => approvalStore.loanRequestDetailList?.facilities, (newFacilities) => {
   if (newFacilities && !isObjectEmpty(newFacilities)) {
@@ -104,24 +88,44 @@ function isObjectEmpty(obj: any): boolean {
   return Object.values(obj).every((v) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0));
 }
 
-function handleSaveLC(data: any) {
-  // Handle saving LC data
-  console.log('Saving LC:', data);
+function handleSaveFacility(data: FacilitiesRequest) {
+  facilitiesData.value = [data];
+  approvalStore.updateFacilities(data);
 }
 
-function handleDeleteLC(item: any) {
-  // Handle deleting LC
-  console.log('Deleting LC:', item);
+function handleDeleteFacility(item: FacilitiesRequest) {
+  facilitiesData.value = [];
+  approvalStore.updateFacilities({} as FacilitiesRequest);
 }
 
-function handleSaveGuarantee(data: any) {
-  // Handle saving guarantee data
-  console.log('Saving guarantee:', data);
+function handleSaveLC(data: LcRequest) {
+  lcData.value = [data];
+  approvalStore.updateLc(data);
 }
 
-function handleDeleteGuarantee(item: any) {
-  // Handle deleting guarantee
-  console.log('Deleting guarantee:', item);
+function handleDeleteLC(item: LcRequest) {
+  lcData.value = [];
+  approvalStore.updateLc({} as LcRequest);
+}
+
+function handleSaveGuarantee(data: GuaranteeRequest) {
+  guaranteeData.value = [data];
+  approvalStore.updateGuarantee(data);
+}
+
+function handleDeleteGuarantee(item: GuaranteeRequest) {
+  guaranteeData.value = [];
+  approvalStore.updateGuarantee({} as GuaranteeRequest);
+}
+
+function handleSaveGreenLicense(data: GreenLicense) {
+  greenLicenseData.value = [data];
+  approvalStore.updateGreenLicense(data);
+}
+
+function handleDeleteGreenLicense(item: GreenLicense) {
+  greenLicenseData.value = [];
+  approvalStore.updateGreenLicense({} as GreenLicense);
 }
 
 defineExpose({ submitData });
@@ -168,10 +172,12 @@ defineExpose({ submitData });
       <v-tab value="facilities">تسهیلات</v-tab>
       <v-tab value="guarantee">ضمانت‌نامه</v-tab>
       <v-tab value="lc">اعتبار اسنادی</v-tab>
+      <v-tab value="greenLicense">تضامین جواز سبز</v-tab>
     </v-tabs>
     <Facilities ref="facilitiesRef" v-show="activeTab === 'facilities'" :loading="loading" @save="handleSaveFacility" @delete="handleDeleteFacility" @update:facilities="facilitiesData = $event" />
     <Guarantee ref="guaranteeRef" :loading="loading" v-show="activeTab === 'guarantee'" @save="handleSaveGuarantee" @delete="handleDeleteGuarantee" @update:guarantee="guaranteeData = $event" />
     <LetterOfCredit ref="lcRef" :loading="loading" v-show="activeTab === 'lc'" @save="handleSaveLC" @delete="handleDeleteLC" @update:lc="lcData = $event" />
+    <GreenLicense ref="greenLicenseRef" :loading="loading" v-show="activeTab === 'greenLicense'" @save="handleSaveGreenLicense" @delete="handleDeleteGreenLicense" @update:greenLicense="greenLicenseData = $event" />
   </div>
   <v-snackbar v-model="showError" color="error" timeout="5500">
     {{ error }}

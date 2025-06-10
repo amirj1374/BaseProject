@@ -20,6 +20,7 @@ export interface CustomerDto {
   facilities?: Facility[];
   guarantee?: Guarantee[];
   lc?: Lc[];
+  greenLicense?: GreenLicense[];
 }
 
 export interface Facility {
@@ -46,8 +47,6 @@ export interface Guarantee {
   day?: string;
   durationDay?: string;
   collaterals: Collaterals[];
-  preferentialRate: string;
-  preReceiving: string;
 }
 
 export interface Lc {
@@ -63,6 +62,14 @@ export interface Lc {
   collaterals: Collaterals[];
   preferentialRate: string;
   preReceiving: string;
+}
+
+export interface GreenLicense {
+  id: number;
+  approvalType: string;
+  currency: string;
+  amount: string;
+  collaterals: Collaterals[];
 }
 
 export interface Collaterals {
@@ -209,6 +216,7 @@ export interface LoanRequestDetail {
   facilities: FacilitiesRequest;
   guarantee: GuaranteeRequest;
   lc: LcRequest;
+  greenLicense: GreenLicense;
 }
 
 export interface FacilitiesRequest {

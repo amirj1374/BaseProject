@@ -2,7 +2,7 @@
     <div class="facilities-section">
       <div class="section-header">
         <h4 class="section-title">تضامین جواز سبز</h4>
-        <v-btn color="secondary" @click="openDialog" :disabled="loading || greenLicense.length >= 1"> افزودن تضامین جواز سبز</v-btn>    </div>
+        <v-btn color="secondary" @click="openDialog" :disabled="loading"> افزودن تضامین جواز سبز</v-btn>    </div>
   
       <v-data-table-virtual
         :headers="headers"
@@ -238,11 +238,6 @@
   const formData = reactive({
     approvalType: '',
     currency: '',
-    repaymentType: '',
-    year: '',
-    month: '',
-    day: '',
-    durationDay: '',
     amount: '',
     collateral: true,
   });
@@ -313,7 +308,6 @@
   
   function resetForm() {
     formData.amount = '';
-    formData.repaymentType = '';
     selectedCollaterals.value = [];
     form.value?.reset();
   }
@@ -336,29 +330,29 @@
       collaterals: selectedCollaterals.value
     };
     if (isEditing.value) {
-      const index = greenLicense.value.findIndex((f) => f.id === editingId.value);
+      const index = greenLicense.value.findIndex(item => item.id === editingId.value);
       if (index !== -1) {
         greenLicense.value[index] = facilityData;
-        emit('edit', facilityData);
       }
+      emit('edit', facilityData);
     } else {
-      greenLicense.value.push(facilityData);
+      greenLicense.value = [...greenLicense.value, facilityData];
       emit('save', facilityData);
     }
+    emit('update:greenLicense', greenLicense.value);
     closeDialog();
   }
   
   function deleteItem(item: GreenLicense) {
-    const index = greenLicense.value.findIndex((f) => f.id === item.id);
-    if (index !== -1) {
-      greenLicense.value.splice(index, 1);
-      emit('delete', item);
-    }
+    greenLicense.value = greenLicense.value.filter(i => i.id !== item.id);
+    emit('delete', item);
+    emit('update:greenLicense', greenLicense.value);
   }
-  
+
   onMounted(() => {
-    if (approvalStore.customerInfo?.greenLicense) {
-      greenLicense.value = [...approvalStore.customerInfo.greenLicense];
+    if (approvalStore.loanRequestDetailList?.greenLicense) {
+      greenLicense.value = [approvalStore.loanRequestDetailList.greenLicense];
+      emit('update:greenLicense', greenLicense.value);
     }
   });
   
