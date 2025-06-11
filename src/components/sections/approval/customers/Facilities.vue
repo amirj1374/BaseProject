@@ -1,5 +1,5 @@
 <template>
-  <div class="facilities-section">
+  <div class="facility-container">
     <div class="section-header">
       <h4 class="section-title">تسهیلات</h4>
       <v-btn color="secondary" @click="openDialog" :disabled="loading || facilities.length >= 1"> افزودن تسهیلات</v-btn>    </div>
@@ -12,7 +12,7 @@
       density="comfortable"
       hover
       hide-default-footer
-      class="facilities-table elevation-1"
+      class="facility-table elevation-1"
     >
     <template #item.approvalType="{ item }">
     {{ ApprovalTypeOptions.find(opt => opt.value === item.approvalType)?.title || '-' }}
@@ -27,7 +27,7 @@
     {{ formatNumberWithCommas(item.amount) }}
   </template>
       <template #item.actions="{ item }">
-        <div class="d-flex gap-2">
+        <div class="action-buttons">
           <v-btn size="small" variant="text" @click="editItem(item)">
             <IconPencil color="blue" size="20" />
           </v-btn>
@@ -455,17 +455,17 @@ defineExpose({ facilities });
 </script>
 
 <style lang="scss">
-@import '@/assets/scss/components/approval-sections';
+@import '@/scss/components/approval';
 
-.facilities-section {
+.facility-container {
   @extend .approval-section;
   
-  .facilities-table {
+  .facility-table {
     @extend .approval-table;
   }
 }
 
-.gap-2 {
+.action-buttons {
   gap: 8px;
 }
 

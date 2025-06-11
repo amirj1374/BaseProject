@@ -1,5 +1,5 @@
 <template>
-    <div class="facilities-section">
+    <div class="green-license-container">
       <div class="section-header">
         <h4 class="section-title">تضامین جواز سبز</h4>
         <v-btn color="secondary" @click="openDialog" :disabled="loading || greenLicense.length >= 1"> افزودن تضامین جواز سبز</v-btn>    </div>
@@ -12,7 +12,7 @@
         density="comfortable"
         hover
         hide-default-footer
-        class="facilities-table elevation-1"
+        class="green-license-table elevation-1"
       >
       <template #item.approvalType="{ item }">
       {{ ApprovalTypeOptions.find(opt => opt.value === item.approvalType)?.title || '-' }}
@@ -24,7 +24,7 @@
       {{ formatNumberWithCommas(item.amount) }}
     </template>
         <template #item.actions="{ item }">
-          <div class="d-flex gap-2">
+          <div class="action-buttons">
             <v-btn size="small" variant="text" @click="editItem(item)">
               <IconPencil color="blue" size="20" />
             </v-btn>
@@ -370,17 +370,17 @@
   </script>
   
   <style lang="scss">
-  @import '@/assets/scss/components/approval-sections';
+  @import '@/scss/components/approval';
   
-  .facilities-section {
+  .green-license-container {
     @extend .approval-section;
     
-    .facilities-table {
+    .green-license-table {
       @extend .approval-table;
     }
   }
   
-  .gap-2 {
+  .action-buttons {
     gap: 8px;
   }
   

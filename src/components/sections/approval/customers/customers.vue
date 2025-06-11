@@ -231,7 +231,7 @@ defineExpose({ submitData });
 </script>
 
 <template>
-  <div class="customer-section">
+  <div class="customer-container">
     <h3 class="group-title">انتخاب مشتری</h3>
     <!-- Search Section -->
     <form @submit.prevent="search" class="customer-form">
@@ -308,7 +308,7 @@ defineExpose({ submitData });
     </form>
   </div>
   <!-- Render only the active tab's component -->
-  <div class="customer-section">
+  <div class="customer-container">
     <h3 class="group-title">درخواست مشتری</h3>
     <v-tabs v-model="activeTab" class="mb-2">
       <v-tab value="facilities">تسهیلات</v-tab>
@@ -327,33 +327,10 @@ defineExpose({ submitData });
 </template>
 
 <style lang="scss">
-@import '@/assets/scss/components/approval-sections';
+@import '@/scss/components/approval';
 
-.customer-section {
+.customer-container {
   @extend .approval-section;
-
-  .group-title {
-    font-size: 1.7rem;
-    font-weight: 800;
-    color: var(--v-theme-primary);
-    border-right: 6px solid var(--v-theme-primary);
-    padding-right: 18px;
-    margin-bottom: 2.5rem;
-    background: linear-gradient(90deg, #f5f7fa 0%, #e2eaea 100%);
-    border-radius: 8px;
-    display: inline-block;
-    line-height: 1.2;
-  }
-
-  .section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #333;
-  }
-
-  .section-content {
-    min-height: 300px;
-  }
 
   .customer-table {
     @extend .approval-table;

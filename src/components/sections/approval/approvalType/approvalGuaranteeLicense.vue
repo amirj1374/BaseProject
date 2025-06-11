@@ -372,6 +372,7 @@
     .facilities-table {
       @extend .approval-table;
     }
+    
   }
   </style>
   

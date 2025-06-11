@@ -1,5 +1,5 @@
 <template>
-  <div class="facilities-section">
+  <div class="letter-of-credit-container">
     <div class="section-header">
       <h4 class="section-title">اعتبار اسنادی</h4>
       <v-btn color="secondary" @click="openDialog" :disabled="loading || lc.length >= 1"> افزودن اعتبار اسنادی</v-btn>    </div>
@@ -12,7 +12,7 @@
       density="comfortable"
       hover
       hide-default-footer
-      class="facilities-table elevation-1"
+      class="letter-of-credit-table elevation-1"
     >
       <template #item.approvalType="{ item }">
         {{ ApprovalTypeOptions.find(opt => opt.value === item.approvalType)?.title || '-' }}
@@ -20,14 +20,11 @@
       <template #item.currency="{ item }">
         {{ baseStore.currency.find(cur => cur.code === item.currency)?.description || '-' }}
       </template>
-      <template #item.repaymentType="{ item }">
-        {{ RepaymentTypeOptions.find(opt => opt.value === item.repaymentType)?.title || '-' }}
-      </template>
       <template #item.amount="{ item }">
         {{ formatNumberWithCommas(item.amount) }}
       </template>
       <template #item.actions="{ item }">
-        <div class="d-flex gap-2">
+        <div class="action-buttons">
           <v-btn size="small" variant="text" @click="editItem(item)">
             <IconPencil color="blue" size="20" />
           </v-btn>
@@ -458,17 +455,17 @@ defineExpose({ lc });
 </script>
 
 <style lang="scss">
-@import '@/assets/scss/components/approval-sections';
+@import '@/scss/components/approval';
 
-.facilities-section {
+.letter-of-credit-container {
   @extend .approval-section;
   
-  .facilities-table {
+  .letter-of-credit-table {
     @extend .approval-table;
   }
 }
 
-.gap-2 {
+.action-buttons {
   gap: 8px;
 }
 

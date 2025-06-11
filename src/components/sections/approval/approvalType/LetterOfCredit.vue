@@ -30,6 +30,12 @@
       <template #item.contractType="{ item }">
         {{ item.contractType?.longTitle || '-' }}
       </template>
+      <template #item.lcType="{ item }">
+        {{ LcTypeOptions.find((opt) => opt.value === item.lcType)?.title || '-' }}
+      </template>
+      <template #item.creditType="{ item }">
+        {{ CreditTypeOptions.find((opt) => opt.value === item.creditType)?.title || '-' }}
+      </template>
       <template #item.amount="{ item }">
         {{ formatNumberWithCommas(item.amount) }}
       </template>
@@ -82,11 +88,11 @@
               </v-col>
               <v-col cols="12" md="4">
                 <v-select
-                  v-model="formData.repaymentType"
-                  label="نحوه بازپرداخت"
+                  v-model="formData.lcType"
+                  label="نوع اعتبار اسنادی"
                   variant="outlined"
                   density="comfortable"
-                  :items="RepaymentTypeOptions || []"
+                  :items="LcTypeOptions || []"
                   :rules="[required]"
                 />
               </v-col>
@@ -191,16 +197,6 @@
                   variant="outlined"
                   density="comfortable"
                   :items="CreditTypeOptions || []"
-                  :rules="[required]"
-                />
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-select
-                  v-model="formData.lcType"
-                  label="نوع اعتبار اسنادی"
-                  variant="outlined"
-                  density="comfortable"
-                  :items="LcTypeOptions || []"
                   :rules="[required]"
                 />
               </v-col>
@@ -334,7 +330,6 @@ const collateralRequired = computed(() => selectedCollaterals.value.length > 0);
 const formData = reactive({
   approvalType: '',
   currency: '',
-  repaymentType: '',
   year: '',
   month: '',
   day: '',
@@ -350,7 +345,6 @@ const formData = reactive({
 const headers = [
   { title: 'نوع مصوبه', key: 'approvalType', width: '200px' },
   { title: 'نوع ارز', key: 'currency', width: '200px' },
-  { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '200px' },
   { title: 'مدت', key: 'durationDay', width: '200px' },
   { title: 'نوع اعتبار', key: 'creditType', width: '250px' },
   { title: 'نوع اعتبار اسنادی', key: 'lcType', width: '250px' },
@@ -432,7 +426,6 @@ function closeDialog() {
 
 function resetForm() {
   formData.amount = '';
-  formData.repaymentType = '';
   selectedCollaterals.value = [];
   form.value?.reset();
 }
@@ -443,7 +436,6 @@ function editItem(item: LcRequest) {
   formData.approvalType = item.approvalType;
   formData.currency = item.currency;
   formData.amount = item.amount;
-  formData.repaymentType = item.repaymentType;
   formData.year = item.year || '';
   formData.month = item.month || '';
   formData.day = item.day || '';
