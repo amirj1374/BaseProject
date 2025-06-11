@@ -1,5 +1,5 @@
 <template>
-  <div class="facility-container">
+  <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">تسهیلات</h4>
       <v-btn color="secondary" @click="openDialog" :disabled="loading || facilities.length >= 1"> افزودن تسهیلات</v-btn>    </div>
@@ -12,7 +12,7 @@
       density="comfortable"
       hover
       hide-default-footer
-      class="facility-table elevation-1"
+      class="approval-table elevation-1"
     >
     <template #item.approvalType="{ item }">
     {{ ApprovalTypeOptions.find(opt => opt.value === item.approvalType)?.title || '-' }}
@@ -454,23 +454,14 @@ watch(facilities, (newVal) => {
 defineExpose({ facilities });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '@/scss/components/approval';
 
-.facility-container {
-  @extend .approval-section;
-  
-  .facility-table {
-    @extend .approval-table;
-  }
+:deep(th) {
+  background-color: #E2EAEA !important;
+  font-weight: 600;
 }
-
 .action-buttons {
   gap: 8px;
-}
-
-:deep(th) {
-  background-color: #f5f5f5 !important;
-  font-weight: 600;
 }
 </style>

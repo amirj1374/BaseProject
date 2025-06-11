@@ -1,5 +1,5 @@
 <template>
-    <div class="facilities-section">
+    <div class="approval-section">
       <div class="section-header">
         <h4 class="section-title">تضامین جواز سبز</h4>
         <v-btn color="secondary" @click="openDialog" :disabled="loading"> افزودن تضامین جواز سبز</v-btn>    </div>
@@ -12,7 +12,7 @@
         density="comfortable"
         hover
         hide-default-footer
-        class="facilities-table elevation-1"
+        class="approval-table elevation-1"
       >
       <template #item.approvalType="{ item }">
       {{ ApprovalTypeOptions.find(opt => opt.value === item.approvalType)?.title || '-' }}
@@ -363,16 +363,12 @@
   defineExpose({ greenLicense });
   </script>
   
-  <style lang="scss">
-  @import '@/assets/scss/components/approval-sections';
+  <style lang="scss" scoped>
+  @import '@/scss/components/approval';
 
-  .facilities-section {
-    @extend .approval-section;
-    
-    .facilities-table {
-      @extend .approval-table;
-    }
-    
-  }
+  :deep(th) {
+  background-color: #E2EAEA !important;
+  font-weight: 600;
+}
   </style>
   

@@ -231,7 +231,7 @@ defineExpose({ submitData });
 </script>
 
 <template>
-  <div class="customer-container">
+  <div class="approval-section">
     <h3 class="group-title">انتخاب مشتری</h3>
     <!-- Search Section -->
     <form @submit.prevent="search" class="customer-form">
@@ -288,13 +288,11 @@ defineExpose({ submitData });
             :items="items"
             :headers="headers"
             :loading="loading"
-            :items-per-page="itemsPerPage"
-            :page="page"
             :items-length="totalItems"
             no-data-text="رکوردی یافت نشد"
             density="comfortable"
             hover
-            class="customer-table elevation-1"
+            class="approval-table elevation-1"
             ref="dataTableRef"
           >
             <template #item.actions="{ item }">
@@ -308,7 +306,7 @@ defineExpose({ submitData });
     </form>
   </div>
   <!-- Render only the active tab's component -->
-  <div class="customer-container">
+  <div class="approval-section">
     <h3 class="group-title">درخواست مشتری</h3>
     <v-tabs v-model="activeTab" class="mb-2">
       <v-tab value="facilities">تسهیلات</v-tab>
@@ -326,15 +324,12 @@ defineExpose({ submitData });
   </v-snackbar>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '@/scss/components/approval';
 
-.customer-container {
-  @extend .approval-section;
-
-  .customer-table {
-    @extend .approval-table;
-  }
+:deep(th) {
+  background-color: #E2EAEA !important;
+  font-weight: 600;
 }
 
 .customer-search-btn {
@@ -351,10 +346,5 @@ defineExpose({ submitData });
   .v-text-field {
     forced-color-adjust: none;
   }
-}
-
-:deep(th) {
-  background-color: #f5f5f5 !important;
-  font-weight: 600;
 }
 </style>

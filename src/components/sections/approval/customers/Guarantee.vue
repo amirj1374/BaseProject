@@ -1,5 +1,5 @@
 <template>
-  <div class="guarantee-container">
+  <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">ضمانت نامه</h4>
       <v-btn color="secondary" @click="openDialog" :disabled="loading || guarantee.length >= 1"> افزودن ضمانت نامه</v-btn>    </div>
@@ -12,7 +12,7 @@
       density="comfortable"
       hover
       hide-default-footer
-      class="guarantee-table elevation-1"
+      class="approval-table elevation-1"
     >
       <template #item.approvalType="{ item }">
         {{ ApprovalTypeOptions.find(opt => opt.value === item.approvalType)?.title || '-' }}
@@ -455,23 +455,15 @@ watch(guarantee, (newVal) => {
 defineExpose({ guarantee });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '@/scss/components/approval';
 
-.guarantee-container {
-  @extend .approval-section;
-  
-  .guarantee-table {
-    @extend .approval-table;
-  }
+:deep(th) {
+  background-color: #E2EAEA !important;
+  font-weight: 600;
 }
 
 .action-buttons {
   gap: 8px;
-}
-
-:deep(th) {
-  background-color: #f5f5f5 !important;
-  font-weight: 600;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="facilities-section">
+  <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">تسهیلات</h4>
       <v-btn color="secondary" @click="openDialog" :disabled="loading || facilities.length >= 1"> افزودن تسهیلات</v-btn>
@@ -13,7 +13,7 @@
       density="comfortable"
       hover
       hide-default-footer
-      class="facilities-table elevation-1"
+      class="approval-table elevation-1"
     >
       <template #item.approvalType="{ item }">
         {{ ApprovalTypeOptions.find((opt) => opt.value === item.approvalType)?.title || '-' }}
@@ -361,9 +361,9 @@ const headers = [
   { title: 'نوع ارز', key: 'currency', width: '200px' },
   { title: 'نوع عقد', key: 'contractType', width: '200px' },
   { title: 'نوع محصول', key: 'facility', width: '200px' },
-  { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '200' },
+  { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '250px' },
   { title: 'نرخ ترجیحی', key: 'preferentialRate', width: '200px' },
-  { title: 'پیش دریافت', key: 'preReceiving', width: '200px' },
+  { title: 'پیش دریافت', key: 'preReceiving', width: '250px' },
   { title: 'مدت', key: 'durationDay', width: '200px' },
   { title: 'مبلغ', key: 'amount', width: '200px' },
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
@@ -532,23 +532,11 @@ watch(
 defineExpose({ facilities });
 </script>
 
-<style lang="scss">
-@import '@/assets/scss/components/approval-sections';
-
-.facilities-section {
-  @extend .approval-section;
-  
-  .facilities-table {
-    @extend .approval-table;
-  }
-}
-
-.gap-2 {
-  gap: 8px;
-}
+<style lang="scss" scoped>
+@import '@/scss/components/approval';
 
 :deep(th) {
-  background-color: #f5f5f5 !important;
+  background-color: #E2EAEA !important;
   font-weight: 600;
 }
 </style>

@@ -16,6 +16,10 @@ const props = defineProps({
   contentMinHeight: {
     type: String,
     default: undefined
+  },
+  disableClick: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -52,11 +56,6 @@ onBeforeUnmount(() => {
   stopWatch();
 });
 
-const handleStepClick = (index: number) => {
-  emit('step-click', index + 1);
-  emit('update:modelValue', index + 1);
-};
-
 defineExpose({ currentStepComponentRef });
 </script>
 
@@ -72,9 +71,9 @@ defineExpose({ currentStepComponentRef });
           :class="{
             active: modelValue === index + 1,
             resolved: modelValue > index + 1,
-            pending: modelValue < index + 1
+            pending: modelValue < index + 1,
+            'no-click': disableClick
           }"
-          @click="handleStepClick(index)"
         >
           <span class="app-stepper-badge"
                 :class="{
@@ -113,4 +112,24 @@ defineExpose({ currentStepComponentRef });
       <component :is="steps[modelValue - 1].section" ref="currentStepComponentRef" />
     </div>
   </div>
-</template> 
+</template>
+
+<style lang="scss" scoped>
+.app-stepper-step {
+  &.no-click {
+    pointer-events: none !important;
+    cursor: default !important;
+    opacity: 0.8;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+}
+
+.app-stepper-header {
+  &.no-click {
+    pointer-events: none !important;
+  }
+}
+</style> 

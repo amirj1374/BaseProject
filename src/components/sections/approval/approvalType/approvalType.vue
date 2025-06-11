@@ -132,7 +132,7 @@ defineExpose({ submitData });
 </script>
 
 <template>
-  <div class="customer-section">
+  <div class="approval-section">
     <h3 class="group-title">خلاصه درخواست مشتری</h3>
     <form class="customer-form">
       <v-row class="mt-2">
@@ -166,7 +166,7 @@ defineExpose({ submitData });
     </form>
   </div>
   <!-- Render only the active tab's component -->
-  <div class="customer-section">
+  <div class="approval-section">
     <h3 class="group-title">درخواست مصوبه</h3>
     <v-tabs v-model="activeTab" class="mb-2">
       <v-tab value="facilities">تسهیلات</v-tab>
@@ -185,83 +185,5 @@ defineExpose({ submitData });
 </template>
 
 <style lang="scss" scoped>
-.customer-section {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 25px 15px;
-  margin-bottom: 10px;
-  width: 100%;
-  max-width: 100%;
-
-  .group-title {
-    font-size: 1.7rem;
-    font-weight: 800;
-    color: var(--v-theme-primary);
-    border-right: 6px solid var(--v-theme-primary);
-    padding-right: 18px;
-    margin-bottom: 2.5rem;
-    background: linear-gradient(90deg, #f5f7fa 0%, #e2eaea 100%);
-    border-radius: 8px;
-    display: inline-block;
-    line-height: 1.2;
-  }
-
-  .section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #333;
-  }
-
-  .section-content {
-    min-height: 300px;
-  }
-
-  .customer-table {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 10px;
-    padding: 15px;
-
-    :deep(.v-data-table-header) {
-      background-color: var(--v-theme-secondary);
-      color: #fff;
-    }
-
-    :deep(.v-data-table-header th) {
-      background-color: var(--v-theme-secondary) !important;
-      color: #fff;
-    }
-
-    :deep(.v-data-table-header tr) {
-      background-color: var(--v-theme-secondary) !important;
-      color: #fff;
-    }
-
-    :deep(.v-data-table-footer) {
-      border-top: 1px solid rgba(0, 0, 0, 0.12);
-      padding: 8px 16px;
-    }
-  }
-}
-
-.customer-search-btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-@media (forced-colors: active) {
-  .v-btn {
-    forced-color-adjust: none;
-  }
-
-  .v-text-field {
-    forced-color-adjust: none;
-  }
-}
-
-.v-data-table :deep(th) {
-  background-color: #f5f5f5 !important;
-  font-weight: 600;
-}
+@import '@/scss/components/approval';
 </style>

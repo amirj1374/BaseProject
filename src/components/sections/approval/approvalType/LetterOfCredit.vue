@@ -1,5 +1,5 @@
 <template>
-  <div class="facilities-section">
+  <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">اعتبار اسنادی</h4>
       <v-btn color="secondary" @click="openDialog" :disabled="loading || lc.length >= 1"> افزودن اعتبار اسنادی</v-btn>
@@ -13,7 +13,7 @@
       density="comfortable"
       hover
       hide-default-footer
-      class="facilities-table elevation-1"
+      class="approval-table elevation-1"
     >
       <template #item.approvalType="{ item }">
         {{ ApprovalTypeOptions.find((opt) => opt.value === item.approvalType)?.title || '-' }}
@@ -507,57 +507,14 @@ defineExpose({ lc });
 </script>
 
 <style lang="scss" scoped>
-.facilities-section {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 25px 15px;
-  margin-bottom: 10px;
-  width: 100%;
-  max-width: 100%;
-
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .section-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #333;
-    margin: 0;
-  }
-
-  .facilities-table {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 10px;
-    padding: 15px;
-
-    :deep(.v-data-table-header) {
-      background-color: var(--v-theme-secondary);
-      color: #fff;
-    }
-
-    :deep(.v-data-table-header th) {
-      background-color: var(--v-theme-secondary) !important;
-      color: #fff;
-    }
-
-    :deep(.v-data-table-header tr) {
-      background-color: var(--v-theme-secondary) !important;
-      color: #fff;
-    }
-  }
-}
+@import '@/scss/components/approval';
 
 .gap-2 {
   gap: 8px;
 }
 
 :deep(th) {
-  background-color: #f5f5f5 !important;
+  background-color: #E2EAEA !important;
   font-weight: 600;
 }
 </style>
