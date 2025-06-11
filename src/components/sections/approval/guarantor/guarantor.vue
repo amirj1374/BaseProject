@@ -17,7 +17,10 @@ const showError = ref(false);
 const submitting = ref(false);
 type AllowedStatus = 'nationalCode' | 'cif';
 const searchParam = ref<AllowedStatus>('cif');
-
+const searchTypes = ref<{ title: string; value: AllowedStatus }[]>([
+  { title: 'شماره مشتری', value: 'cif' },
+  { title: 'کدملی', value: 'nationalCode' }
+]);
 const headers = ref([
   { title: 'نام ضامن', key: 'guarantorName', align: 'center' },
   { title: 'کدملی / شناسه ملی', key: 'nationalCode', align: 'left' },
@@ -156,7 +159,8 @@ const submitData = async () => {
       dialog.value = true;
       return new Promise((resolve) => {
         const unwatch = watch(dialog, (newValue) => {
-          if (!newValue) { // When dialog is closed
+          if (!newValue) {
+            // When dialog is closed
             unwatch(); // Stop watching
             resolve(data.value);
           }
@@ -200,11 +204,12 @@ const submitData = async () => {
       approvalStore.setLoanRequestId(response.data.id);
       approvalStore.setTrackingCode(response.data.trackingCode);
       dialog.value = true;
-      
+
       // Return a new Promise that resolves when dialog is closed
       return new Promise((resolve, reject) => {
         const unwatch = watch(dialog, (newValue) => {
-          if (!newValue) { // When dialog is closed
+          if (!newValue) {
+            // When dialog is closed
             unwatch(); // Stop watching
             resolve(data.value);
           }
@@ -251,18 +256,21 @@ defineExpose({ submitData });
 </script>
 
 <template>
-  <v-card variant="flat">
+  <div class="approval-section">
+    <h3 class="group-title">ضامن</h3>
     <form @submit.prevent="submitData">
       <v-row class="mt-2">
-        <v-col cols="12" md="12">
-          <v-radio-group inline v-model="searchParam" class="radioBtnContainer" @change="changePattern">
-            <v-radio label="شماره مشتری" value="cif"></v-radio>
-            <v-radio label="کدملی" value="nationalCode"></v-radio>
-          </v-radio-group>
+        <v-col cols="12" md="3">
+          <v-select
+            v-model="searchParam"
+            :items="searchTypes"
+            label="نوع جستجو"
+            variant="outlined"
+            density="comfortable"
+            :disabled="loading"
+            @update:model-value="changePattern"
+          />
         </v-col>
-      </v-row>
-      <v-row>
-        <!-- National Code Input -->
         <v-col v-if="searchParam === 'cif'" cols="12" md="3">
           <v-text-field v-model="formData.cif" label="شماره مشتری" variant="outlined" density="comfortable" />
         </v-col>
@@ -280,104 +288,79 @@ defineExpose({ submitData });
         <v-col v-if="hideInput" cols="12" md="4">
           <v-text-field v-model="formData.GuarantorName" label="نام و نام خانوادگی" variant="outlined" density="comfortable" />
         </v-col>
-      </v-row>
-      <!-- Person Type Select -->
-      <v-row>
         <v-col cols="12" md="12" class="text-center">
           <v-btn color="secondary" @click="addGuarantor" type="button" :loading="loading"> جستجو</v-btn>
         </v-col>
+        <v-col cols="12" md="12">
+          <v-data-table
+            :headers="headers"
+            :items="data"
+            :loading="loading"
+            class="elevation-1"
+            density="comfortable"
+            hover
+            hide-default-footer
+            no-data-text="اطلاعاتی برای نمایش وجود ندارد"
+          >
+            <template v-slot:item.sapInquiryStatus="{ item }">
+              <v-chip :color="item.sapInquiryStatus ? 'success' : 'error'" size="small">
+                {{ item.sapInquiryStatus ? 'بله' : 'خیر' }}
+              </v-chip>
+            </template>
+            <template v-slot:item.createdAt="{ item }">
+              {{ new Date(item.createdAt).toLocaleDateString('fa-IR') }}
+            </template>
+            <template v-slot:item.actions="{ item }">
+              <v-btn size="x-small" @click="deleteGuarantor(item)"> ❌حذف</v-btn>
+            </template>
+          </v-data-table>
+        </v-col>
+        <v-dialog v-model="dialog" max-width="400">
+          <v-card prepend-icon="mdi-update" title="پیام سیستم">
+            <v-card-text>
+              <v-alert v-if="success" type="success" variant="tonal" class="my-4"> کد رهگیری: {{ success }}</v-alert>
+            </v-card-text>
+
+            <v-card-text>
+              <v-alert v-if="error" type="error" variant="tonal" class="my-4">{{ error }}</v-alert>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" @click="dialog = false">بستن</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-row>
-
-      <v-divider inset></v-divider>
-      <v-dialog v-model="dialog" max-width="400">
-        <v-card prepend-icon="mdi-update" title="پیام سیستم">
-          <v-card-text>
-            <v-alert v-if="success" type="success" variant="tonal" class="my-4"> کد رهگیری: {{ success }} </v-alert>
-          </v-card-text>
-          
-          <v-card-text>
-            <v-alert v-if="error" type="error" variant="tonal" class="my-4">{{ error}} </v-alert>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="primary" @click="dialog = false">بستن</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-col cols="12" md="12">
-        <v-data-table
-          :headers="headers"
-          :items="data"
-          :loading="loading"
-          class="elevation-1"
-          density="comfortable"
-          hover
-          hide-default-footer
-          no-data-text="اطلاعاتی برای نمایش وجود ندارد"
-        >
-          <template v-slot:item.sapInquiryStatus="{ item }">
-            <v-chip :color="item.sapInquiryStatus ? 'success' : 'error'" size="small">
-              {{ item.sapInquiryStatus ? 'بله' : 'خیر' }}
-            </v-chip>
-          </template>
-          <template v-slot:item.createdAt="{ item }">
-            {{ new Date(item.createdAt).toLocaleDateString('fa-IR') }}
-          </template>
-          <template v-slot:item.actions="{ item }">
-            <v-btn size="small" @click="deleteGuarantor(item)"> ❌حذف </v-btn>
-          </template>
-        </v-data-table>
-      </v-col>
+      <v-snackbar v-model="snackbar" :color="error ? 'error' : 'success'" :timeout="3000" location="top">
+        {{ error }}
+        <template v-slot:actions>
+          <v-btn color="white" variant="text" @click="snackbar = false"> بستن </v-btn>
+        </template>
+      </v-snackbar>
     </form>
-  </v-card>
-
-  <v-snackbar
-    v-model="snackbar"
-    :color="error ? 'error' : 'success'"
-    :timeout="3000"
-    location="top"
-  >
-    {{ error }}
-    <template v-slot:actions>
-      <v-btn
-        color="white"
-        variant="text"
-        @click="snackbar = false"
-      >
-        بستن
-      </v-btn>
-    </template>
-  </v-snackbar>
+  </div>
 </template>
+<style lang="scss" scoped>
+@import '@/scss/components/approval';
 
-<style scoped>
-.table-scroll {
-  overflow-x: auto;
-  max-width: 100%;
-}
-
-.v-data-table {
-  width: 100%;
-  border-radius: 8px;
-}
-
-.v-data-table :deep(th) {
-  background-color: #f5f5f5 !important;
+:deep(th) {
+  background-color: rgb(var(--v-theme-containerBg)) !important;
   font-weight: 600;
 }
 
-.v-data-table :deep(td) {
-  padding: 12px 16px;
-}
-
-.v-data-table :deep(tr:hover) {
-  background-color: #f8f8f8;
-}
-
-.radioBtnContainer {
-  width: 100%;
+.customer-search-btn {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+@media (forced-colors: active) {
+  .v-btn {
+    forced-color-adjust: none;
+  }
+
+  .v-text-field {
+    forced-color-adjust: none;
+  }
 }
 </style>

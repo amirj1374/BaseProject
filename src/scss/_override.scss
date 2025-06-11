@@ -61,3 +61,12 @@ html {
   white-space: nowrap;
   justify-content: space-evenly!important;
 }
+
+.v-tab.v-tab.v-btn {
+  height: var(--v-tabs-height);
+  border-radius: 0;
+  min-width: 90px;
+  background-color: rgb(var(--v-theme-containerBg));
+  color: rgb(var(--v-theme-secondary));
+  border-radius: 10px 10px 0 0;
+}

@@ -522,7 +522,7 @@ defineExpose({ guarantee });
 }
 
 :deep(th) {
-  background-color: #E2EAEA !important;
+  background-color: rgb(var(--v-theme-containerBg)) !important;
   font-weight: 600;
 }
 </style>
