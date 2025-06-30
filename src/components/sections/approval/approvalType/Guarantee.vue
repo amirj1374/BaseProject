@@ -81,13 +81,18 @@
                 />
               </v-col>
               <v-col cols="12" md="4">
-                <v-select
-                  v-model="formData.repaymentType"
-                  label="نحوه بازپرداخت"
+                <v-text-field
+                  v-model="formData.percentageDeposits"
+                  label="درصد سپرده نقدی"
+                  placeholder="0"
                   variant="outlined"
                   density="comfortable"
-                  :items="RepaymentTypeOptions || []"
-                  :rules="[required]"
+                  hide-details="auto"
+                  suffix="%"
+                  type="number"
+                  :rules="[percentRule]"
+                  min="1"
+                  max="100"
                 />
               </v-col>
             </v-row>
@@ -104,6 +109,10 @@
                   clearable
                   return-object
                   :rules="[required]"
+                  @update:model-value="(val: ContractType | null) => {
+                    formData.facility = null;
+                    fetchFacilities(val);
+                  }"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="12" md="8">
@@ -182,21 +191,6 @@
                   hide-details="auto"
                   suffix="میلیون ریال"
                   :rules="[required]"
-                />
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-text-field
-                  v-model="formData.percentageDeposits"
-                  label="درصد سپرده نقدی"
-                  placeholder="0"
-                  variant="outlined"
-                  density="comfortable"
-                  hide-details="auto"
-                  suffix="%"
-                  type="number"
-                  :rules="[percentRule]"
-                  min="1"
-                  max="100"
                 />
               </v-col>
             </v-row>
@@ -328,7 +322,6 @@ const collateralRequired = computed(() => selectedCollaterals.value.length > 0);
 const formData = reactive({
   approvalType: '',
   currency: '',
-  repaymentType: '',
   year: '',
   month: '',
   day: '',
@@ -343,9 +336,8 @@ const formData = reactive({
 const headers = [
   { title: 'نوع مصوبه', key: 'approvalType', width: '150px' },
   { title: 'نوع ارز', key: 'currency', width: '150px' },
-  { title: 'نوع عقد', key: 'contractType', width: '150px' },
+  { title: 'نوع ضمانت نامه', key: 'contractType', width: '150px' },
   { title: 'نوع محصول', key: 'facility', width: '150px' },
-  { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '150px' },
   { title: 'درصد سپرده نقدی', key: 'percentageDeposits', width: '200px' },
   { title: 'مدت', key: 'durationDay', width: '100px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
@@ -424,7 +416,6 @@ function closeDialog() {
 
 function resetForm() {
   formData.amount = '';
-  formData.repaymentType = '';
   selectedCollaterals.value = [];
   form.value?.reset();
 }
@@ -435,7 +426,6 @@ function editItem(item: GuaranteeRequest) {
   formData.approvalType = item.approvalType;
   formData.currency = item.currency;
   formData.amount = item.amount;
-  formData.repaymentType = item.repaymentType;
   formData.year = item.year || '';
   formData.month = item.month || '';
   formData.day = item.day || '';
@@ -495,21 +485,6 @@ onMounted(async () => {
     guarantee.value = [approvalStore.loanRequestDetailList.guarantee];
   }
 });
-
-watch(
-  guarantee,
-  (newVal) => {
-    emit('update:guarantee', newVal);
-  },
-  { deep: true }
-);
-
-watch(
-  () => formData.contractType,
-  (newVal) => {
-    fetchFacilities(newVal);
-  }
-);
 
 defineExpose({ guarantee });
 </script>

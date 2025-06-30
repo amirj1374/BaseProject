@@ -54,6 +54,7 @@
                     label="نوع مصوبه"
                     variant="outlined"
                     density="comfortable"
+                    :rules="[required]"
                   />
                 </v-col>
                 <v-col cols="12" md="4">
@@ -66,6 +67,7 @@
                     item-title="description"
                     item-value="code"
                     :items="baseStore.currency"
+                    :rules="[required]"
                   />
                 </v-col>
                 <v-col cols="12" md="4">
@@ -77,6 +79,7 @@
                     density="comfortable"
                     hide-details="auto"
                     suffix="میلیون ریال"
+                    :rules="[required]"
                   />
                 </v-col>
               </v-row>
@@ -136,7 +139,7 @@
           </v-card-text>
           <v-card-actions>
             <div style="display: flex; justify-content: space-evenly; width: 100%;">
-              <v-btn color="primary" @click="saveGreenLicense" :loading="loading" :disabled="!isFormValid">
+              <v-btn color="primary" @click="saveGreenLicense" :loading="loading" :disabled="!isFormValid || !collateralRequired">
               {{ 'ذخیره' }}
             </v-btn>
             <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
@@ -224,6 +227,9 @@
       equivalentValue: (item.amount * item.percent) / 100
     }))
   );
+  
+  const required = (v: any) => !!v || 'این فیلد الزامی است';
+  const collateralRequired = computed(() => selectedCollaterals.value.length > 0);
   
   const props = defineProps<{
     loading?: boolean;

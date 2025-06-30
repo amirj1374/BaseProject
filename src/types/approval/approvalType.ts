@@ -241,7 +241,6 @@ export interface GuaranteeRequest {
   approvalType: string;
   currency: string;
   amount: string;
-  repaymentType: string;
   year?: string;
   month?: string;
   day?: string;

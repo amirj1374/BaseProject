@@ -104,6 +104,10 @@
                   clearable
                   return-object
                   :rules="[required]"
+                  @update:model-value="(val: ContractType | null) => {
+                    formData.facility = null;
+                    fetchFacilities(val);
+                  }"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="12" md="8">
@@ -520,13 +524,6 @@ watch(
     emit('update:facilities', newVal);
   },
   { deep: true }
-);
-
-watch(
-  () => formData.contractType,
-  (newVal) => {
-    fetchFacilities(newVal);
-  }
 );
 
 defineExpose({ facilities });
