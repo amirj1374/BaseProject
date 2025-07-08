@@ -184,12 +184,6 @@ const submitData = async () => {
 
     // Create the complete payload
     const payload: SaveGeneralPayload = {
-      loanRequestDTO: {
-        cif: approvalStore.customerInfo.cif || '',
-        summary: approvalStore.loanRequestDetailList?.summaryRequest?.summary || '',
-        activityType: approvalStore.loanRequestDetailList?.summaryRequest?.activityType || null,
-        description: approvalStore.loanRequestDetailList?.summaryRequest?.description || null
-      },
       loanRequestDetailDTO: {
         loanRequestDetailList: loanRequestDetailList ? [loanRequestDetailList] : []
       },

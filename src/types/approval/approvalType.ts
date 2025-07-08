@@ -344,7 +344,6 @@ export interface LoanRequestDetailDTO {
 }
 
 export interface SaveGeneralPayload {
-  loanRequestDTO: LoanRequestDTO;
   loanRequestDetailDTO: LoanRequestDetailDTO;
   guarantorInfoDTO: GuarantorInfoDTO[];
 }
