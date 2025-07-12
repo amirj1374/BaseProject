@@ -443,7 +443,7 @@ function deleteItem(item: Guarantee) {
 
 onMounted(() => {
   if (approvalStore.customerInfo?.guarantee) {
-    guarantee.value = [...approvalStore.customerInfo.guarantee];
+    guarantee.value = [approvalStore.customerInfo.guarantee];
   }
 });
 

@@ -184,10 +184,13 @@ const submitData = async () => {
 
     // Create the complete payload
     const payload: SaveGeneralPayload = {
+      customerInfoDTO: approvalStore.customerInfo,
       loanRequestDetailDTO: {
         loanRequestDetailList: loanRequestDetailList ? [loanRequestDetailList] : []
       },
-      guarantorInfoDTO: guarantorInfoDTO
+      guarantorInfoDTO: guarantorInfoDTO,
+      loanRequestId: approvalStore.loanRequestId,
+      trackingCode: approvalStore.trackingCode
     };
 
     // Call API to send data

@@ -443,7 +443,7 @@ function deleteItem(item: Lc) {
 
 onMounted(() => {
   if (approvalStore.customerInfo?.lc) {
-    lc.value = [...approvalStore.customerInfo.lc];
+    lc.value = [approvalStore.customerInfo.lc];
   }
 });
 

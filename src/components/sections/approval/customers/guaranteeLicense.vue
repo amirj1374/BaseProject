@@ -358,7 +358,7 @@
   
   onMounted(() => {
     if (approvalStore.customerInfo?.greenLicense) {
-      greenLicense.value = [...approvalStore.customerInfo.greenLicense];
+      greenLicense.value = [approvalStore.customerInfo.greenLicense];
     }
   });
   

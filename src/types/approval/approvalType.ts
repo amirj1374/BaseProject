@@ -17,10 +17,10 @@ export interface CustomerDto {
   phoneNo?: number;
   branchName?: string;
   clientgroupname?: string;
-  facilities?: Facility[];
-  guarantee?: Guarantee[];
-  lc?: Lc[];
-  greenLicense?: GreenLicense[];
+  facilities?: Facility;
+  guarantee?: Guarantee;
+  lc?: Lc;
+  greenLicense?: GreenLicense;
 }
 
 export interface Facility {
@@ -344,6 +344,9 @@ export interface LoanRequestDetailDTO {
 }
 
 export interface SaveGeneralPayload {
+  customerInfoDTO: CustomerDto;
   loanRequestDetailDTO: LoanRequestDetailDTO;
   guarantorInfoDTO: GuarantorInfoDTO[];
+  loanRequestId: string;
+  trackingCode: string;
 }

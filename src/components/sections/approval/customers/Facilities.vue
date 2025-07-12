@@ -443,7 +443,7 @@ function deleteItem(item: Facility) {
 
 onMounted(() => {
   if (approvalStore.customerInfo?.facilities) {
-    facilities.value = [...approvalStore.customerInfo.facilities];
+    facilities.value = [approvalStore.customerInfo.facilities];
   }
 });
 

@@ -156,10 +156,10 @@ const submitData = async () => {
   try {
     approvalStore.setCustomerInfo({
       ...firstItem,
-      facilities: facilitiesData.value,
-      guarantee: guaranteeData.value,
-      lc: lcData.value,
-      greenLicense: greenLicenseData.value
+      facilities: facilitiesData.value[0] || {} as Facility,
+      guarantee: guaranteeData.value[0] || {} as Guarantee,
+      lc: lcData.value[0] || {} as Lc,
+      greenLicense: greenLicenseData.value[0] || {} as GreenLicense
     });
     return Promise.resolve();
   } catch (err) {
