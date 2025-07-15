@@ -61,7 +61,8 @@ export default (axiosInstance: AxiosInstance) => ({
 
   getInquiryCheque(loanRequestId: string) {
     return axiosInstance.get('api/v1/inquery/inquiry-cheque', {
-      params: { loanRequestId }
+      params: { loanRequestId },
+      timeout: 400000
     });
   },
 

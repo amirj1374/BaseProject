@@ -97,7 +97,7 @@
                   v-model="formData.contractType"
                   :items="contractTypes"
                   item-title="longTitle"
-                  item-value="id"
+                  item-value="coreId"
                   label="نوع عقد"
                   variant="outlined"
                   no-data-text="دیتا یافت نشد"
@@ -501,7 +501,7 @@ function deleteItem(item: FacilitiesRequest) {
 
 async function fetchFacilities(newContractType: ContractType | null) {
   if (!newContractType) return;
-  const res = await api.approval.getFacilities(newContractType.id, 'ContractCode');
+  const res = await api.approval.getFacilities(newContractType.coreId, 'ContractCode');
   facilityList.value = res.data.facilityDtoList || [];
 }
 

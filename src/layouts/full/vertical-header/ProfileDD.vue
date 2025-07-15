@@ -17,9 +17,9 @@ const authStore = useAuthStore();
     <span class="text-subtitle-2 text-medium-emphasis">frontend developer</span>
 
     <v-text-field persistent-placeholder placeholder="جستجو" class="my-3" color="primary" variant="outlined" hide-details>
-      <template v-slot:prepend-inner>
-        <SearchIcon stroke-width="1.5" size="20" class="text-lightText SearchIcon" />
-      </template>
+<!--      <template v-slot:prepend-inner>-->
+<!--        <SearchIcon stroke-width="1.5" size="20" class="text-lightText SearchIcon" />-->
+<!--      </template>-->
     </v-text-field>
 
     <v-divider></v-divider>

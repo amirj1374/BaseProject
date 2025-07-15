@@ -267,6 +267,7 @@ export interface LcRequest {
   lcType: string;
 }
 export interface ContractType {
+  coreId: number;
   activationDate: string;
   active: string;
   childOrder: string;

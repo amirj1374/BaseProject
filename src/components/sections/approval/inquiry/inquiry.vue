@@ -74,7 +74,8 @@ defineExpose({ submitData });
 </script>
 
 <template>
-  <v-container class="py-10" fluid>
+  <div class="approval-section">
+    <h3 class="group-title">استعلام</h3>
     <v-row justify="center">
       <v-col cols="12" md="8" lg="6" class="text-center">
         <v-card class="pa-6" elevation="2">
@@ -147,7 +148,7 @@ defineExpose({ submitData });
         </v-card>
       </v-col>
     </v-row>
-  </v-container>
+  </div>
 </template>
 
 <style scoped>

@@ -478,7 +478,7 @@ function deleteItem(item: LcRequest) {
 
 async function fetchFacilities(newContractType: ContractType | null) {
   if (!newContractType) return;
-  const res = await api.approval.getFacilities(newContractType.id, 'LetterOfCredit');
+  const res = await api.approval.getFacilities(newContractType.coreId, 'LetterOfCredit');
   facilityList.value = res.data.facilityDtoList || [];
 }
 

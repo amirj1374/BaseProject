@@ -148,26 +148,17 @@ const submitData = async () => {
     return Promise.reject(error.value);
   }
 
+  // Prevent submission if tracking code already exists
+  if (approvalStore.trackingCode) {
+    // Optionally, you can show a message or just return silently
+    return;
+  }
+
   submitting.value = true;
   error.value = null;
   showError.value = false;
 
   try {
-    // Check if we already have a tracking code
-    if (approvalStore.trackingCode) {
-      success.value = approvalStore.trackingCode;
-      dialog.value = true;
-      return new Promise((resolve) => {
-        const unwatch = watch(dialog, (newValue) => {
-          if (!newValue) {
-            // When dialog is closed
-            unwatch(); // Stop watching
-            resolve(data.value);
-          }
-        });
-      });
-    }
-
     // First save to store
     approvalStore.setGuarantor(data.value);
 
@@ -198,7 +189,8 @@ const submitData = async () => {
 
     if (response.status === 200) {
       success.value = response.data.trackingCode;
-      approvalStore.setLoanRequestId(response.data.id);
+      console.log('response.data.loanRequestId', response.data.loanRequestId);
+      approvalStore.setLoanRequestId(response.data.loanRequestId);
       approvalStore.setTrackingCode(response.data.trackingCode);
       dialog.value = true;
 
