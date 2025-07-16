@@ -352,7 +352,7 @@ const formData = reactive({
   month: '',
   day: '',
   durationDay: '',
-  amount: '',
+  amount: 0,
   collateral: true,
   preferentialRate: '',
   preReceiving: '',
@@ -444,7 +444,7 @@ function closeDialog() {
 }
 
 function resetForm() {
-  formData.amount = '';
+  formData.amount = 0;
   formData.repaymentType = '';
   selectedCollaterals.value = [];
   form.value?.reset();

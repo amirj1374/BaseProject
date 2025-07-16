@@ -326,7 +326,7 @@ const formData = reactive({
   month: '',
   day: '',
   durationDay: '',
-  amount: '',
+  amount: 0,
   collateral: true,
   percentageDeposits: '',
   contractType: null as ContractType | null,
@@ -415,7 +415,7 @@ function closeDialog() {
 }
 
 function resetForm() {
-  formData.amount = '';
+  formData.amount = 0;
   selectedCollaterals.value = [];
   form.value?.reset();
 }

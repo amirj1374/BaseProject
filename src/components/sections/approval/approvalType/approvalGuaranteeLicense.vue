@@ -244,7 +244,7 @@
   const formData = reactive({
     approvalType: '',
     currency: '',
-    amount: '',
+    amount: 0,
     collateral: true,
   });
   
@@ -313,7 +313,7 @@
   }
   
   function resetForm() {
-    formData.amount = '';
+    formData.amount = 0;
     selectedCollaterals.value = [];
     form.value?.reset();
   }

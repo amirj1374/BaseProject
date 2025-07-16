@@ -72,12 +72,14 @@
                 />
               </v-col>
               <v-col cols="12" md="4">
-                <v-select
-                  v-model="formData.repaymentType"
-                  label="نحوه بازپرداخت"
+                <MoneyInput
+                  v-model="formData.amount"
+                  label="مبلغ"
+                  placeholder="0"
                   variant="outlined"
                   density="comfortable"
-                  :items="RepaymentTypeOptions || []"
+                  hide-details="auto"
+                  suffix="میلیون ریال"
                 />
               </v-col>
             </v-row>
@@ -128,19 +130,6 @@
                   readonly
                   suffix="روز"
                 ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" md="4">
-                <MoneyInput
-                  v-model="formData.amount"
-                  label="مبلغ"
-                  placeholder="0"
-                  variant="outlined"
-                  density="comfortable"
-                  hide-details="auto"
-                  suffix="میلیون ریال"
-                />
               </v-col>
             </v-row>
             <v-row>
@@ -304,7 +293,6 @@ const emit = defineEmits<{
 const formData = reactive({
   approvalType: '',
   currency: '',
-  repaymentType: '',
   year: '',
   month: '',
   day: '',
@@ -400,7 +388,6 @@ function closeDialog() {
 
 function resetForm() {
   formData.amount = 0;
-  formData.repaymentType = '';
   selectedCollaterals.value = [];
   form.value?.reset();
 }
@@ -411,7 +398,6 @@ function editItem(item: Guarantee) {
   formData.approvalType = item.approvalType;
   formData.currency = item.currency;
   formData.amount = item.amount;
-  formData.repaymentType = item.repaymentType;
   formData.year = item.year || '';
   formData.month = item.month || '';
   formData.day = item.day || '';

@@ -23,6 +23,9 @@
       <template #item.amount="{ item }">
         {{ formatNumberWithCommas(item.amount) }}
       </template>
+      <template #item.creditType="{ item }">
+        {{ CreditTypeOptions.find((opt) => opt.value === item.creditType)?.title || '-' }}
+      </template>
       <template #item.actions="{ item }">
         <div class="action-buttons">
           <v-btn size="small" variant="text" @click="editItem(item)">
@@ -70,11 +73,11 @@
               </v-col>
               <v-col cols="12" md="4">
                 <v-select
-                  v-model="formData.repaymentType"
-                  label="نحوه بازپرداخت"
+                  v-model="formData.creditType"
+                  label="نوع اعتبار"
                   variant="outlined"
                   density="comfortable"
-                  :items="RepaymentTypeOptions || []"
+                  :items="CreditTypeOptions || []"
                 />
               </v-col>
             </v-row>
@@ -261,6 +264,7 @@ import { useApprovalStore } from '@/stores/approval';
 import type { CollateralDto, Guarantee, Lc } from '@/types/approval/approvalType';
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
+import { CreditTypeOptions } from '@/types/enums/global';
 
 const baseStore = useBaseStore();
 const approvalStore = useApprovalStore();
@@ -311,7 +315,6 @@ const emit = defineEmits<{
 const formData = reactive({
   approvalType: '',
   currency: '',
-  repaymentType: '',
   year: '',
   month: '',
   day: '',
@@ -319,13 +322,14 @@ const formData = reactive({
   preferentialRate: '',
   preReceiving: '',
   amount: '',
+  creditType: '',
   collateral: true,
 });
 
 const headers = [
   { title: 'نوع مصوبه', key: 'approvalType', width: '100px' },
   { title: 'نوع ارز', key: 'currency', width: '100px' },
-  { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '100px' },
+  { title: 'نوع اعتبار اسنادی', key: 'creditType', width: '100px' },
   { title: 'مدت', key: 'durationDay', width: '100px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
@@ -409,7 +413,7 @@ function closeDialog() {
 
 function resetForm() {
   formData.amount = '';
-  formData.repaymentType = '';
+  formData.creditType = '';
   selectedCollaterals.value = [];
   form.value?.reset();
 }
@@ -420,7 +424,7 @@ function editItem(item: Lc) {
   formData.approvalType = item.approvalType;
   formData.currency = item.currency;
   formData.amount = item.amount !== undefined && item.amount !== null ? item.amount.toString() : '';
-  formData.repaymentType = item.repaymentType;
+  formData.creditType = item.creditType;
   formData.year = item.year || '';
   formData.month = item.month || '';
   formData.day = item.day || '';

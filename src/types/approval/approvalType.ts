@@ -41,7 +41,6 @@ export interface Guarantee {
   approvalType: string;
   currency: string;
   amount: number;
-  repaymentType: string;
   year?: string;
   month?: string;
   day?: string;
@@ -54,7 +53,7 @@ export interface Lc {
   approvalType: string;
   currency: string;
   amount: number;
-  repaymentType: string;
+  creditType: string;
   year?: string;
   month?: string;
   day?: string;
@@ -223,7 +222,7 @@ export interface FacilitiesRequest {
   id: number;
   approvalType: string;
   currency: string;
-  amount: string;
+  amount: number;
   repaymentType: string;
   year?: string;
   month?: string;
@@ -240,7 +239,7 @@ export interface GuaranteeRequest {
   id: number;
   approvalType: string;
   currency: string;
-  amount: string;
+  amount: number;
   year?: string;
   month?: string;
   day?: string;
@@ -255,7 +254,7 @@ export interface LcRequest {
   id: number;
   approvalType: string;
   currency: string;
-  amount: string;
+  amount: number;
   year?: string;
   month?: string;
   day?: string;

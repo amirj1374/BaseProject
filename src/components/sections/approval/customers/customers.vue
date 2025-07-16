@@ -137,6 +137,10 @@ const changePattern = () => {
   items.value = [];
 };
 
+const changeCustomerType = () => {
+  formData.value.nationalCode = '';
+};
+
 const submitData = async () => {
   if (!items.value.length || !items.value[0]) {
     error.value = 'هیچ مشتری‌ای یافت نشد. لطفاً جستجو کنید.';
@@ -251,6 +255,7 @@ defineExpose({ submitData });
             density="comfortable"
             :items="customerTypes"
             :disabled="loading"
+            @update:model-value="changeCustomerType"
           />
         </v-col>
         <v-col v-if="searchParam === 'cif'" cols="12" md="3">
@@ -273,6 +278,7 @@ defineExpose({ submitData });
             v-digit-limit="11"
             :error-messages="errors.nationalCode"
             :disabled="loading"
+
           />
         </v-col>
         <v-col cols="12" md="12" class="customer-search-btn">
