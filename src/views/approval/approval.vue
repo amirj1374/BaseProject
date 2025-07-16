@@ -124,7 +124,7 @@ const currentComponent = computed(() => steps[stepper.value - 1].section);
 </script>
 
 <template>
-  <AppStepper v-model="stepper" :steps="steps" contentMinHeight="60vh" ref="stepperRef" />
+  <AppStepper v-model="stepper" :steps="steps" contentMinHeight="70vh" ref="stepperRef" />
 
   <div class="actions">
     <v-btn v-if="stepper < totalSteps" color="secondary" @click="handleSubmit" :loading="submitting"> مرحله بعد</v-btn>

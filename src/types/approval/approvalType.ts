@@ -27,7 +27,7 @@ export interface Facility {
   id: number;
   approvalType: string;
   currency: string;
-  amount: string;
+  amount: number;
   repaymentType: string;
   year?: string;
   month?: string;
@@ -40,7 +40,7 @@ export interface Guarantee {
   id: number;
   approvalType: string;
   currency: string;
-  amount: string;
+  amount: number;
   repaymentType: string;
   year?: string;
   month?: string;
@@ -53,7 +53,7 @@ export interface Lc {
   id: number;
   approvalType: string;
   currency: string;
-  amount: string;
+  amount: number;
   repaymentType: string;
   year?: string;
   month?: string;
@@ -68,7 +68,7 @@ export interface GreenLicense {
   id: number;
   approvalType: string;
   currency: string;
-  amount: string;
+  amount: number;
   collaterals: Collaterals[];
 }
 

@@ -199,7 +199,7 @@
         </v-card-text>
         <v-card-actions>
           <div style="display: flex; justify-content: space-evenly; width: 100%;">
-            <v-btn color="primary" @click="saveFacility" :loading="loading" :disabled="!isFormValid">
+            <v-btn color="primary" @click="saveFacility" :loading="loading" :disabled="!isDirty">
             {{ 'ذخیره' }}
           </v-btn>
           <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
@@ -264,6 +264,7 @@ import type { CollateralDto, Facility } from '@/types/approval/approvalType';
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
 
+const initialFormData = ref({});
 const baseStore = useBaseStore();
 const approvalStore = useApprovalStore();
 const dialog = ref(false);
@@ -308,7 +309,7 @@ const formData = reactive({
   month: '',
   day: '',
   durationDay: '',
-  amount: '',
+  amount: 0,
   collateral: true,
 });
 
@@ -383,6 +384,7 @@ const dayCalculate = async () => {
 function openDialog() {
   isEditing.value = false;
   editingId.value = null;
+  initialFormData.value = JSON.parse(JSON.stringify(formData));
   dialog.value = true;
 }
 
@@ -392,7 +394,7 @@ function closeDialog() {
 }
 
 function resetForm() {
-  formData.amount = '';
+  formData.amount = 0;
   formData.repaymentType = '';
   selectedCollaterals.value = [];
   form.value?.reset();
@@ -401,6 +403,7 @@ function resetForm() {
 function editItem(item: Facility) {
   isEditing.value = true;
   editingId.value = item.id;
+  initialFormData.value = JSON.parse(JSON.stringify(formData));
   formData.approvalType = item.approvalType;
   formData.currency = item.currency;
   formData.amount = item.amount;
@@ -440,6 +443,12 @@ function deleteItem(item: Facility) {
     emit('delete', item);
   }
 }
+
+function deepEqual(a: any, b: any): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+const isDirty = computed(() => !deepEqual(formData, initialFormData.value));
 
 onMounted(() => {
   if (approvalStore.customerInfo?.facilities) {

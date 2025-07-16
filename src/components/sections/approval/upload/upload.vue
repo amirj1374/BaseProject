@@ -52,7 +52,7 @@ const handleFileUpload = async () => {
     formData.append('file', selectedFile.value);
     formData.append('customerNumber', selectedDoc.value.nationalCode);
     formData.append('docTypeCode', selectedDoc.value.fileType);
-    formData.append('description', selectedDoc.value.description || '');
+    formData.append('description', selectedDoc.value.description || 'asdasdasd');
     formData.append('loanRequestId', selectedDoc.value.loanRequestId.toString());
 
     const response = await api.approval.saveDoc(formData);

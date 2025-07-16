@@ -2,14 +2,9 @@
 import { onMounted, ref } from 'vue';
 import { api } from '@/services/api';
 //type
-import type { CustomerDto, SummaryDto } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
 
-type AllowedStatus = 'nationalCode' | 'cif';
 const approvalStore = useApprovalStore();
-const errors = ref<{ nationalCode?: string[] }>({});
-const loading = ref(false);
-const canSubmit = ref(false);
 const error = ref<string | null>(null);
 // initial data
 const formData = ref({
@@ -19,15 +14,19 @@ const formData = ref({
 });
 onMounted(async () => {
   formData.value = {
-    summary: approvalStore.summaryRequest.summary || '',
-    activityType: approvalStore.summaryRequest.activityType || '',
-    description: approvalStore.summaryRequest.description || ''
+    summary: approvalStore.loanRequestDetailList?.summaryRequest.summary || '',
+    activityType: approvalStore.loanRequestDetailList?.summaryRequest.activityType || '',
+    description: approvalStore.loanRequestDetailList?.summaryRequest.description || ''
   };
 });
 
 // submit form
 const submitData = async () => {
-  approvalStore.setSummaryRequest(formData.value);
+  approvalStore.updateSummaryRequest({
+    summary: formData.value.summary,
+    activityType: formData.value.activityType,
+    description: formData.value.description
+  });
   return Promise.resolve();
 };
 

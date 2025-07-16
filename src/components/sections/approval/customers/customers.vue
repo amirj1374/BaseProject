@@ -12,7 +12,7 @@ import { IconTrash } from '@tabler/icons-vue';
 const Facilities = defineAsyncComponent(() => import('./Facilities.vue'));
 const LetterOfCredit = defineAsyncComponent(() => import('./LetterOfCredit.vue'));
 const Guarantee = defineAsyncComponent(() => import('./Guarantee.vue'));
-const GreenLicense = defineAsyncComponent(() => import('./guaranteeLicense.vue'));
+const GreenLicense = defineAsyncComponent(() => import('./GreenLicense.vue'));
 
 type AllowedStatus = 'nationalCode' | 'cif';
 const approvalStore = useApprovalStore();
@@ -65,10 +65,6 @@ const greenLicenseRef = ref();
 
 const lcData = ref<Lc[]>([]);
 const greenLicenseData = ref<GreenLicense[]>([]);
-// Add pagination state
-const page = ref(1);
-const itemsPerPage = ref(10);
-
 const totalItems = computed(() => items.value.length);
 const facilitiesData = ref<Facility[]>([]);
 const guaranteeData = ref<Guarantee[]>([]);

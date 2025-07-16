@@ -136,7 +136,7 @@
           </v-card-text>
           <v-card-actions>
             <div style="display: flex; justify-content: space-evenly; width: 100%;">
-              <v-btn color="primary" @click="saveGreenLicense" :loading="loading" :disabled="!isFormValid">
+              <v-btn color="primary" @click="saveGreenLicense" :loading="loading" :disabled="!isDirty">
               {{ 'ذخیره' }}
             </v-btn>
             <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
@@ -224,7 +224,7 @@
       equivalentValue: (item.amount * item.percent) / 100
     }))
   );
-  
+  const initialFormData = ref({});
   const props = defineProps<{
     loading?: boolean;
   }>();
@@ -243,7 +243,7 @@
     month: '',
     day: '',
     durationDay: '',
-    amount: '',
+    amount: 0,
     collateral: true,
   });
   
@@ -303,6 +303,7 @@
   function openDialog() {
     isEditing.value = false;
     editingId.value = null;
+    initialFormData.value = JSON.parse(JSON.stringify(formData));
     dialog.value = true;
   }
   
@@ -312,7 +313,7 @@
   }
   
   function resetForm() {
-    formData.amount = '';
+    formData.amount = 0;
     formData.repaymentType = '';
     selectedCollaterals.value = [];
     form.value?.reset();
@@ -325,6 +326,7 @@
     formData.currency = item.currency;
     formData.amount = item.amount;
     selectedCollaterals.value = item.collaterals ? item.collaterals : [];
+    initialFormData.value = JSON.parse(JSON.stringify(formData));
     dialog.value = true;
   }
   
@@ -366,7 +368,12 @@
     emit('update:greenLicense', newVal);
   }, { deep: true });
   
-  defineExpose({ greenLicense });
+  function deepEqual(a: any, b: any): boolean {
+    return JSON.stringify(a) === JSON.stringify(b);
+  }
+  const isDirty = computed(() => !deepEqual(formData, initialFormData.value));
+
+  defineExpose({ greenLicense, isDirty });
   </script>
   
   <style lang="scss" scoped>

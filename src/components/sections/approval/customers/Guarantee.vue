@@ -200,7 +200,7 @@
         </v-card-text>
         <v-card-actions>
           <div style="display: flex; justify-content: space-evenly; width: 100%;">
-            <v-btn color="primary" @click="saveGuarantee" :loading="loading" :disabled="!isFormValid">
+            <v-btn color="primary" @click="saveGuarantee" :loading="loading" :disabled="!isDirty">
               {{ 'ذخیره' }}
             </v-btn>
             <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
@@ -309,9 +309,15 @@ const formData = reactive({
   month: '',
   day: '',
   durationDay: '',
-  amount: '',
+  amount: 0,
   collateral: true,
 });
+
+const initialFormData = ref({});
+function deepEqual(a: any, b: any): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+const isDirty = computed(() => !deepEqual(formData, initialFormData.value));
 
 const headers = [
   { title: 'نوع مصوبه', key: 'approvalType', width: '100px' },
@@ -383,6 +389,7 @@ const dayCalculate = async () => {
 function openDialog() {
   isEditing.value = false;
   editingId.value = null;
+  initialFormData.value = JSON.parse(JSON.stringify(formData));
   dialog.value = true;
 }
 
@@ -392,7 +399,7 @@ function closeDialog() {
 }
 
 function resetForm() {
-  formData.amount = '';
+  formData.amount = 0;
   formData.repaymentType = '';
   selectedCollaterals.value = [];
   form.value?.reset();
@@ -410,6 +417,7 @@ function editItem(item: Guarantee) {
   formData.day = item.day || '';
   formData.durationDay = item.durationDay || '';
   selectedCollaterals.value = item.collaterals ? item.collaterals : [];
+  initialFormData.value = JSON.parse(JSON.stringify(formData));
   dialog.value = true;
 }
 

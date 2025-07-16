@@ -130,7 +130,7 @@
             <v-row>
               <v-col cols="12" md="4">
                 <MoneyInput
-                  v-model="formData.amount"
+                  v-model="amountNumber"
                   label="مبلغ"
                   placeholder="0"
                   variant="outlined"
@@ -197,7 +197,7 @@
         </v-card-text>
         <v-card-actions>
           <div style="display: flex; justify-content: space-evenly; width: 100%;">
-            <v-btn color="primary" @click="saveLc" :loading="loading" :disabled="!isFormValid">
+            <v-btn color="primary" @click="saveLc" :loading="loading" :disabled="!isDirty">
               {{ 'ذخیره' }}
             </v-btn>
             <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
@@ -287,6 +287,16 @@ const collateralTableItems = computed(() =>
     equivalentValue: (item.amount * item.percent) / 100
   }))
 );
+
+const initialFormData = ref({});
+const amountNumber = computed({
+  get() {
+    return formData.amount ? Number(formData.amount) : 0;
+  },
+  set(val: number) {
+    formData.amount = val ? val.toString() : '';
+  }
+});
 
 const props = defineProps<{
   loading?: boolean;
@@ -380,9 +390,15 @@ const dayCalculate = async () => {
   }
 };
 
+function deepEqual(a: any, b: any): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+const isDirty = computed(() => !deepEqual(formData, initialFormData.value));
+
 function openDialog() {
   isEditing.value = false;
   editingId.value = null;
+  initialFormData.value = JSON.parse(JSON.stringify(formData));
   dialog.value = true;
 }
 
@@ -398,18 +414,19 @@ function resetForm() {
   form.value?.reset();
 }
 
-function editItem(item: Guarantee) {
+function editItem(item: Lc) {
   isEditing.value = true;
   editingId.value = item.id;
   formData.approvalType = item.approvalType;
   formData.currency = item.currency;
-  formData.amount = item.amount;
+  formData.amount = item.amount !== undefined && item.amount !== null ? item.amount.toString() : '';
   formData.repaymentType = item.repaymentType;
   formData.year = item.year || '';
   formData.month = item.month || '';
   formData.day = item.day || '';
   formData.durationDay = item.durationDay || '';
   selectedCollaterals.value = item.collaterals ? item.collaterals : [];
+  initialFormData.value = JSON.parse(JSON.stringify(formData));
   dialog.value = true;
 }
 
@@ -418,6 +435,7 @@ function saveLc() {
   const saveLcData: Lc = {
     id: editingId.value || Date.now(),
     ...formData,
+    amount: amountNumber.value,
     collaterals: selectedCollaterals.value
   };
   if (isEditing.value) {

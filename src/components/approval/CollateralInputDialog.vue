@@ -35,7 +35,7 @@ const emit = defineEmits<{
 }>();
 
 const selectedCollateralDto = ref<CollateralDto | null>(null);
-const amount = ref<string>('');
+const amount = ref<number>(0);
 const percent = ref<string>(''); // Changed from price to percent to match Facilities.vue
 
 const errorMessage = ref<string>('');
@@ -60,7 +60,7 @@ const closeDialog = () => {
 
 const resetForm = () => {
   selectedCollateralDto.value = null;
-  amount.value = '';
+  amount.value = 0;
   percent.value = '';
   errorMessage.value = '';
 };
@@ -74,8 +74,8 @@ const handleSave = () => {
 
   emit('save', {
     collateral: selectedCollateralDto.value,
-    amount: amount.value, // Emitting raw string from VPriceTextField
-    percent: percent.value // Emitting raw string from VPriceTextField
+    amount: amount.value !== undefined && amount.value !== null ? amount.value.toString() : '0',
+    percent: percent.value
   });
   closeDialog();
 };

@@ -3,7 +3,7 @@ import { computed, defineEmits, ref } from 'vue';
 
 const props = defineProps({
   modelValue: {
-    type: [String, Number],
+    type: Number,
     required: true,
     validator: (value) => value === null || value === undefined || typeof value === 'string' || typeof value === 'number'
   },
@@ -61,23 +61,23 @@ const lastFormattedValue = ref<string>('');
 
 const displayValue = computed({
   get() {
-    const val = props.modelValue ?? '';
-    if (val === lastProcessedValue.value) return lastFormattedValue.value;
-
-    const stringValue = val.toString().replace(/,/g, '');
-    if (stringValue === '') return '';
-
-    const formatted = stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    lastProcessedValue.value = val;
-    lastFormattedValue.value = formatted;
-    return formatted;
+    // Format with commas for display
+    const val = props.modelValue;
+    if (val === undefined || val === null) return '';
+    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   },
   set(val: string | null | undefined) {
-    const safeVal = (val ?? '').toString();
-    const raw = safeVal.replace(/[^\d]/g, '');
-    emit('update:modelValue', raw);
+    // Remove all non-digit characters and emit as number
+    const safeVal = (val ?? '').replace(/[^\d]/g, '');
+    emit('update:modelValue', safeVal === '' ? 0 : Number(safeVal));
   }
 });
+
+function onKeyPress(event: KeyboardEvent) {
+  if (!/[0-9]/.test(event.key)) {
+    event.preventDefault();
+  }
+}
 </script>
 
 <template>
@@ -93,7 +93,9 @@ const displayValue = computed({
     :suffix="props.suffix"
     :prefix="props.prefix"
     inputmode="numeric"
-    pattern="[0-9,]*"
+    pattern="[0-9]*"
+    type="text"
+    @keypress="onKeyPress"
   >
     <template v-for="(_, slot) in $slots" #[slot]="scope">
       <slot :name="slot" v-bind="scope || {}" />

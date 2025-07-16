@@ -37,7 +37,6 @@ export default defineConfig({
           'vendor': ['vue', 'vue-router', 'pinia'],
           'vuetify': ['vuetify'],
           'charts': ['apexcharts', 'vue3-apexcharts'],
-          'editor': ['@tiptap/starter-kit', '@tiptap/vue-3']
         }
       }
     },

@@ -51,18 +51,28 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post(`/api/v1/general`, data);
   },
   getSapInquiry(payload: FetchInquiryPayload) {
-    return axiosInstance.post('/api/v1/sap-inquiry', payload);
+    return axiosInstance.post('/api/v1/sap-inquiry', payload, {
+      timeout: 100000
+    });
   },
   getIndirectObligation(loanRequestId: string) {
     return axiosInstance.get('/api/v1/general/indirect-obligation', {
-      params: { loanRequestId }
+      params: { loanRequestId },
+      timeout: 100000
+    });
+  },
+
+  getDirectObligation(loanRequestId: string) {
+    return axiosInstance.get('/api/v1/general/direct-obligation', {
+      params: { loanRequestId },
+      timeout: 100000
     });
   },
 
   getInquiryCheque(loanRequestId: string) {
     return axiosInstance.get('api/v1/inquery/inquiry-cheque', {
       params: { loanRequestId },
-      timeout: 400000
+      timeout: 100000
     });
   },
 
