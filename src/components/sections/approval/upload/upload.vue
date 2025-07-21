@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
@@ -88,9 +88,6 @@ const submitData = async () => {
   return Promise.resolve();
 };
 defineExpose({ submitData });
-const getRelationTypeText = (type: string) => {
-  return type === 'ASKER' ? 'متقاضی' : 'ضامن';
-};
 </script>
 
 <template>
@@ -102,7 +99,7 @@ const getRelationTypeText = (type: string) => {
         :auto-fetch="true"
         :show-pagination="true"
         :custom-buttons="customButtons"
-        :height="300"
+        :height="500"
       />
     </form>
 
@@ -114,7 +111,6 @@ const getRelationTypeText = (type: string) => {
         <v-card-title class="d-flex justify-space-between align-center">
           <span>آپلود مدرک</span>
           <v-btn
-            icon
             variant="text"
             @click="showUploadDialog = false"
           >
@@ -149,11 +145,6 @@ const getRelationTypeText = (type: string) => {
     </v-snackbar>
 </template>
 <style scoped>
-.upload-page {
-  height: 100vh; /* or 100% if its parent is also 100% */
-  display: flex;
-  flex-direction: column;
-}
 .upload-form {
   flex: 1 1 auto;
   display: flex;

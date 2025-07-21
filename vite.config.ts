@@ -1,4 +1,3 @@
-import { fileURLToPath, URL } from 'url';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vuetify from 'vite-plugin-vuetify';
@@ -54,6 +53,6 @@ export default defineConfig({
   },
   server: {
     host: 'localhost', // Bind to a specific IP
-    port: 8585,              // Set the desired port
+    port: 5050,              // Set the desired port
   },
 });

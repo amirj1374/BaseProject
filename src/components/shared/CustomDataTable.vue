@@ -135,9 +135,9 @@ const fetchData = async (queryParams?: {}) => {
       return newItem;
     });
 
-    totalSize.value = response.data.totalElements;
-    totalPages.value = response.data.totalPages;
-    hasMore.value = currentPage.value < response.data.totalPages;
+    totalSize.value = response.data.page.totalElements;
+    totalPages.value = response.data.page.totalPages;
+    hasMore.value = currentPage.value < response.data.page.totalPages;
   } catch (err: any) {
     if (err.response) {
       error.value = `خطای سرور: ${err.response.status} - ${err.response.data.message || 'خطای ناشناخته'}`;
@@ -471,12 +471,12 @@ const resetFilter = () => {
                   <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
                   >🔍 نمایش
                   </v-btn>
-                  <template v-for="(route, key) in props.routes" :key="key">
+                  <template v-for="(key) in props.routes" :key="key">
                     <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(key, item)">
                       {{ key.toUpperCase() }}
                     </v-btn>
                   </template>
-                  <v-btn v-for="(link, key) in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
+                  <v-btn v-for="(key) in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
                     {{ key.toUpperCase() }} ⬇️
                   </v-btn>
                   <v-btn
@@ -630,10 +630,6 @@ const resetFilter = () => {
 .action-buttons {
   margin-bottom: 16px;
   padding: 0 0 8px 0;
-}
-
-:deep(.v-data-table__wrapper) {
-  overflow: visible;
 }
 
 :deep(.v-data-table__wrapper table thead) {

@@ -2,7 +2,6 @@
 import { ref, onMounted } from 'vue';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
-import { DateConverter } from '@/utils/date-convertor';
 
 const approvalStore = useApprovalStore();
 const value = ref(0);
@@ -120,28 +119,28 @@ defineExpose({ submitData });
     <h3 class="group-title">استعلام</h3>
     <v-row justify="center">
       <!-- تعهدات مستقیم -->
-      <v-col cols="12" md="12">
+      <v-col cols="12" md="6">
         <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="sm" variant="outlined">
           <h3 class="text-4 text-secondary text-center mb-2">استعلام تعهدات مستقیم</h3>
           <div class="inquiry-result-container">
-            <div v-if="isLoadingDirect" class="text-center">
+            <div v-if="isLoadingDirect" class="text-center loading-container">
               <v-progress-circular indeterminate color="primary" />
               <div>در حال استعلام تعهدات مستقیم...</div>
             </div>
             <template v-else>
-              <div><b>شرکت : </b> {{ DirectObligationData?.allOfThem || 'نامشخص' }}</div>
-              <div><b>مبلغ کل : </b> {{ DirectObligationData?.totalAmount || 'نامشخص' }}</div>
+              <div><b>شرکت : </b> {{ DirectObligationData?.allOfThem || 'استعلام نا موفق' }}</div>
+              <div><b>مبلغ کل : </b> {{ DirectObligationData?.totalAmount || 'استعلام نا موفق' }}</div>
             </template>
           </div>
         </v-card>
       </v-col>
 
       <!-- تعهدات غیر مستقیم -->
-      <v-col cols="12" md="12">
-        <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="sm">
+      <v-col cols="12" md="6">
+        <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="sm" variant="outlined">
           <h3 class="text-4 text-secondary text-center mb-2">استعلام تعهدات غیر مستقیم</h3>
           <div class="inquiry-result-container">
-            <div v-if="isLoadingIndirect" class="text-center">
+            <div v-if="isLoadingIndirect" class="text-center loading-container">
               <v-progress-circular indeterminate color="primary" />
               <div>در حال استعلام تعهدات غیر مستقیم...</div>
             </div>
@@ -154,12 +153,12 @@ defineExpose({ submitData });
       </v-col>
 
       <!-- چک‌های برگشتی با انیمیشن چرخشی -->
-      <v-col cols="12" md="12">
+      <v-col cols="12" md="6">
         <div class="inquiry-card-wrapper">
           <v-card color="grey-lighten-4" class="pa-4 text-start mb-4" rounded="sm" variant="outlined">
             <h3 class="text-4 text-secondary text-center mb-2">استعلام چک های برگشتی</h3>
             <div class="inquiry-result-container">
-              <div v-if="isLoadingCheque" class="text-center">
+              <div v-if="isLoadingCheque" class="text-center loading-container">
                 <v-progress-circular indeterminate color="primary" />
                 <div>در حال استعلام چک های برگشتی...</div>
               </div>
@@ -175,11 +174,11 @@ defineExpose({ submitData });
       </v-col>
 
       <!-- ساپ -->
-      <v-col cols="12" md="12">
-        <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="sm">
+      <v-col cols="12" md="6">
+        <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="sm" variant="outlined">
           <h3 class="text-4 text-secondary text-center mb-2">استعلام ساپ</h3>
           <div class="inquiry-result-container">
-            <div v-if="isLoadingSap" class="text-center">
+            <div v-if="isLoadingSap" class="text-center loading-container">
               <v-progress-circular indeterminate color="primary" />
               <div>در حال استعلام ساپ...</div>
             </div>
@@ -207,28 +206,10 @@ defineExpose({ submitData });
   position: relative;
   border-radius: 12px;
 }
-
-.spinner-overlay {
-  position: absolute;
-  top: -3px;
-  left: -3px;
-  right: -3px;
-  bottom: -3px;
-  border-radius: 12px;
-  border: 3px solid transparent;
-  border-top-color: #1976d2;
-  animation: spin 1s linear infinite;
-  pointer-events: none;
-  z-index: 10;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+.loading-container{
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
 }
 </style>
 

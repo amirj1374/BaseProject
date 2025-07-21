@@ -32,9 +32,11 @@ const createAxiosInstance = (): AxiosInstance => {
       return response;
     },
     (error) => {
-      // Handle response errors globally
+      console.log("FULL ERROR:", error);
+      console.log("error.response:", error.response);
       if (error.response?.status === 401) {
         // Example: Redirect to login if unauthorized
+        window.location.href = "back/oauth2/authorization/master"
         console.error("Unauthorized, redirecting to login...");
       }
       return Promise.reject(error);

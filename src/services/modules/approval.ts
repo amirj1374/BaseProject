@@ -52,27 +52,27 @@ export default (axiosInstance: AxiosInstance) => ({
   },
   getSapInquiry(payload: FetchInquiryPayload) {
     return axiosInstance.post('/api/v1/sap-inquiry', payload, {
-      timeout: 100000
+      timeout: 50000
     });
   },
   getIndirectObligation(loanRequestId: string) {
     return axiosInstance.get('/api/v1/general/indirect-obligation', {
       params: { loanRequestId },
-      timeout: 100000
+      timeout: 50000
     });
   },
 
   getDirectObligation(loanRequestId: string) {
     return axiosInstance.get('/api/v1/general/direct-obligation', {
       params: { loanRequestId },
-      timeout: 100000
+      timeout: 50000
     });
   },
 
   getInquiryCheque(loanRequestId: string) {
     return axiosInstance.get('api/v1/inquery/inquiry-cheque', {
       params: { loanRequestId },
-      timeout: 100000
+      timeout: 50000
     });
   },
 
@@ -127,5 +127,8 @@ export default (axiosInstance: AxiosInstance) => ({
       params: {loanRequestId},
       responseType: 'text', // 👈 Required for binary data like PDFs
     },);
+  },
+  logout() {
+    return axiosInstance.get("logout");
   },
 });

@@ -47,7 +47,7 @@ const formData = ref({
 });
 
 const headers = ref([
-  { title: 'شماره مشتری', key: 'cif', width: '200px', sortable: true },
+  { title: 'شسیشسی', key: 'cif', width: '200px', sortable: true },
   { title: 'کدملی / شناسه ملی', align: 'center', key: 'nationalCode', width: '250px', sortable: true },
   { title: 'نام مشتری', key: 'customerName', width: '160px', sortable: true },
   { title: 'گروه مشتری', key: 'clientGroupName', width: '140px', sortable: true },

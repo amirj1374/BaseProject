@@ -93,15 +93,15 @@ export const FileTypeOptions = [
 // credit type
 
 export const CreditTypeEnum = {
-  VISUAL: 'VISUAL',
-  LONG: 'LONG'
+  SIGHT_PAYMENT: 'SIGHT_PAYMENT',
+  DEFERRED_PAYMENT: 'LODEFERRED_PAYMENTNG'
 } as const;
 
 export type CreditType = (typeof CreditTypeEnum)[keyof typeof CreditTypeEnum];
 
 export const CreditTypeOptions = [
-  { title: 'دیداری', value: CreditTypeEnum.VISUAL },
-  { title: 'مدت دار', value: CreditTypeEnum.LONG },
+  { title: 'دیداری', value: CreditTypeEnum.SIGHT_PAYMENT },
+  { title: 'مدت دار', value: CreditTypeEnum.DEFERRED_PAYMENT },
 ];
 
 // lc type
