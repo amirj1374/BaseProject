@@ -128,7 +128,6 @@ defineExpose({ submitData });
               <div>در حال استعلام تعهدات مستقیم...</div>
             </div>
             <template v-else>
-              <div><b>شرکت : </b> {{ DirectObligationData?.allOfThem || 'استعلام نا موفق' }}</div>
               <div><b>مبلغ کل : </b> {{ DirectObligationData?.totalAmount || 'استعلام نا موفق' }}</div>
             </template>
           </div>
@@ -145,7 +144,7 @@ defineExpose({ submitData });
               <div>در حال استعلام تعهدات غیر مستقیم...</div>
             </div>
             <template v-else>
-              <div><b>شرکت : </b> {{ IndirectObligationData?.allOfThem || 'نامشخص' }}</div>
+              <div><b>نام : </b> {{ IndirectObligationData?.allOfThem || 'نامشخص' }}</div>
               <div><b>مبلغ کل : </b> {{ IndirectObligationData?.totalAmount || 'نامشخص' }}</div>
             </template>
           </div>

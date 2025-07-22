@@ -32,8 +32,6 @@ const createAxiosInstance = (): AxiosInstance => {
       return response;
     },
     (error) => {
-      console.log("FULL ERROR:", error);
-      console.log("error.response:", error.response);
       if (error.response?.status === 401) {
         // Example: Redirect to login if unauthorized
         window.location.href = "back/oauth2/authorization/master"

@@ -8,7 +8,7 @@ let pdfObjectUrl: string | null = null;
 
 onMounted(async () => {
   try {
-    const response = await api.approval.getResult(approvalStore.loanRequestId);
+    const response = await api.approval.getResult(22905);
     const byteCharacters = atob(response.data);
     const byteNumbers = new Uint8Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
@@ -31,9 +31,10 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <v-container fluid>
-    <v-row justify="center">
-      <v-col cols="12" md="12" lg="8">
+  <div class="approval-section">
+    <v-container fluid>
+      <v-row justify="center">
+        <v-col cols="12" md="12" lg="8">
           <div class="iframe-container">
             <iframe
               v-if="pdfUrl"
@@ -43,19 +44,18 @@ onBeforeUnmount(() => {
             >
               <p>Your browser does not support PDFs. Please download the PDF to view it.</p>
             </iframe>
-            <div v-else class="d-flex justify-center align-center" style="height: 100%">
+            <div v-else class="d-flex justify-center align-center" style="height: 80%">
               <v-progress-circular indeterminate />
             </div>
           </div>
-      </v-col>
-    </v-row>
-  </v-container>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <style scoped>
 .iframe-container {
-  width: 100vw;
-  height: 450px;
   overflow: hidden;
 }
 

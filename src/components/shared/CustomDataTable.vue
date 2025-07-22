@@ -31,6 +31,7 @@ interface CustomButtonAction {
   label: string;
   color?: string;
   onClick: (item: any) => void;
+  disabled?: boolean;
 }
 
 interface Props {
@@ -42,6 +43,7 @@ interface Props {
   formComponent?: Component;
   customActions?: CustomAction[];
   customButtons?: CustomButtonAction[];
+  customButtonsFn?: (item: any) => CustomButtonAction[];
   filterComponent?: Component;
   autoFetch?: boolean;
   queryParams?: Record<string, any>;
@@ -489,16 +491,31 @@ const resetFilter = () => {
                   >
                     {{ action.title }}
                   </v-btn>
-                  <v-btn
-                    v-for="button in props.customButtons"
-                    :key="button.label"
-                    :color="button.color || 'primary'"
-                    size="small"
-                    class="mr-2"
-                    @click="button.onClick(item)"
-                  >
-                    {{ button.label }}
-                  </v-btn>
+                  <template v-if="props.customButtonsFn">
+                    <v-btn
+                      v-for="button in props.customButtonsFn(item)"
+                      :key="button.label"
+                      :color="button.color || 'primary'"
+                      size="small"
+                      class="mr-2"
+                      :disabled="button.disabled"
+                      @click="button.onClick(item)"
+                    >
+                      {{ button.label }}
+                    </v-btn>
+                  </template>
+                  <template v-else>
+                    <v-btn
+                      v-for="button in props.customButtons"
+                      :key="button.label"
+                      :color="button.color || 'primary'"
+                      size="small"
+                      class="mr-2"
+                      @click="button.onClick(item)"
+                    >
+                      {{ button.label }}
+                    </v-btn>
+                  </template>
                 </template>
                 <template v-else>
                   {{ getTranslatedValue(item[column.key], column) }}

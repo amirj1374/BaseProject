@@ -10,6 +10,7 @@ import Lc from '@/components/sections/approval/draft/LcHistory.vue';
 import Deposit from '@/components/sections/approval/draft/Deposit.vue';
 import Consideration from '@/components/sections/approval/draft/Consideration.vue';
 import { useApprovalStore } from '@/stores/approval';
+import OcpHistory from '@/components/sections/approval/draft/OcpHistory.vue';
 
 const loading = ref(false);
 const currencies = ref<CurrenciesDto[]>([]);
@@ -42,12 +43,8 @@ defineExpose({ submitData });
 </script>
 
 <template>
-  <div>
-    <template v-if="loading">
-      <p>Loading...</p>
-    </template>
-
-    <template v-else>
+  <div class="approval-section">
+    <h3 class="group-title">پیشنویس</h3>
       <v-container fluid>
         <v-row class="mt-5">
           <!-- Facilities Checkbox -->
@@ -81,10 +78,13 @@ defineExpose({ submitData });
           <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
             <Consideration/>
           </v-col>
+          <!-- ocp Checkbox -->
+          <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
+            <OcpHistory/>
+          </v-col>
         </v-row>
       </v-container>
-    </template>
-  </div>
+    </div>
 </template>
 
 <style scoped>
