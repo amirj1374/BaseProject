@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { shallowRef } from 'vue';
+import { shallowRef, computed } from 'vue';
 import { useCustomizerStore } from '@/stores/customizer';
-import sidebarItems from './sidebarItem';
+import { useCustomerInfoStore } from '@/stores/customerInfo';
+import sidebarItems, { getFilteredSidebarItems } from './sidebarItem';
 
 import NavGroup from './NavGroup/NavGroup.vue';
 import NavItem from './NavItem/NavItem.vue';
@@ -9,7 +10,17 @@ import NavCollapse from './NavCollapse/NavCollapse.vue';
 import Logo from '../logo/LogoMain.vue';
 
 const customizer = useCustomizerStore();
-const sidebarMenu = shallowRef(sidebarItems);
+const customerInfo = useCustomerInfoStore();
+
+// Use filtered menu items based on user permissions
+const sidebarMenu = computed(() => {
+  // Only filter menu items if user info is loaded
+  if (customerInfo.isUserInfoLoaded) {
+    return getFilteredSidebarItems();
+  }
+  // Return all items if user info is not loaded yet
+  return sidebarItems;
+});
 </script>
 
 <template>

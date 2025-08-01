@@ -2,10 +2,12 @@
 import { ref } from 'vue';
 import { IconSettings, IconLogout, IconUser } from '@tabler/icons-vue';
 import { useAuthStore } from '@/stores/auth';
+import { useCustomerInfoStore } from '@/stores/customerInfo';
 
 const swt1 = ref(true);
 const swt2 = ref(false);
 const authStore = useAuthStore();
+const customerInfoStore = useCustomerInfoStore();
 </script>
 
 <template>
@@ -13,8 +15,8 @@ const authStore = useAuthStore();
   <!-- profile DD -->
   <!-- ---------------------------------------------- -->
   <div class="pa-4">
-    <h4 class="mb-n1">صبح بخیر, <span class="font-weight-regular">امیر جلیلی</span></h4>
-    <span class="text-subtitle-2 text-medium-emphasis">frontend developer</span>
+    <h4 class="mb-n1">صبح بخیر, <span class="font-weight-regular">{{ customerInfoStore.userInfo?.fullName }}</span></h4>
+    <span class="text-subtitle-2 text-medium-emphasis">{{ customerInfoStore.userInfo?.position }}</span>
 
     <v-text-field persistent-placeholder placeholder="جستجو" class="my-3" color="primary" variant="outlined" hide-details>
 <!--      <template v-slot:prepend-inner>-->

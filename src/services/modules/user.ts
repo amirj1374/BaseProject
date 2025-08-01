@@ -1,7 +1,11 @@
 import axios, { type AxiosInstance } from "axios";
 import type { PersonDTO } from '@/types/models/person';
+import type { UserInfoResponse } from '@/types/models/userInfo';
 
-const personApi = (axiosInstance: AxiosInstance) => ({
+const userApi = (axiosInstance: AxiosInstance) => ({
+  getUserInfo(): Promise<{ data: UserInfoResponse }> {
+    return axiosInstance.get('/api/v1/token');
+  },
   fetch(page: number, limit: number) {
     return axiosInstance.get(`/api/v1/person-requests`, { params: { page, limit } });
   },
@@ -16,4 +20,4 @@ const personApi = (axiosInstance: AxiosInstance) => ({
   },
 });
 
-export default personApi(axios);
+export default userApi;
