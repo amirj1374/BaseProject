@@ -28,11 +28,6 @@ export interface menu {
 
 const sidebarItem: menu[] = [
   {
-    title: 'اطلاعات پایه',
-    icon: IconDatabase,
-    permissionKey: 'basic_info' // No specific permission required
-  },
-  {
     title: 'درخواست مصوبه جدید',
     icon: IconPencilPlus,
     to: '/approval',
@@ -60,7 +55,24 @@ const sidebarItem: menu[] = [
     title: 'گزارشات',
     icon: IconClipboardData,
     to: '/report',
-    permissionKey: 'reports' // No specific permission required
+    permissionKey: 'admin'
+  },
+  {
+    title: 'اطلاعات پایه',
+    icon: IconDatabase,
+    permissionKey: 'admin',
+    children: [
+      {
+        title: 'مدیریت نقش ها',
+        to: '/base/role-managment',
+        permissionKey: 'admin'
+      },
+      {
+        title: 'مدیریت دپارتمان ها',
+        to: '/base/department-managment',
+        permissionKey: 'admin'
+      }
+    ]
   }
 ];
 
@@ -73,7 +85,20 @@ export function getFilteredSidebarItems(): menu[] {
     if (!item.permissionKey) return true;
     
     // Check if user has permission for this menu item
-    return permissionsStore.hasMenuPermission(item.permissionKey);
+    const hasPermission = permissionsStore.hasMenuPermission(item.permissionKey);
+    
+    // If item has children, filter them too
+    if (item.children && item.children.length > 0) {
+      item.children = item.children.filter(child => {
+        if (!child.permissionKey) return true;
+        return permissionsStore.hasMenuPermission(child.permissionKey);
+      });
+      
+      // Show parent if it has any visible children or if parent itself is accessible
+      return hasPermission || item.children.length > 0;
+    }
+    
+    return hasPermission;
   });
 }
 

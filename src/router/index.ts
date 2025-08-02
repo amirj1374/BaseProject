@@ -2,10 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router';
 import MainRoutes from './MainRoutes';
 import AuthRoutes from './AuthRoutes';
 import { useAuthStore } from '@/stores/auth';
+import { usePermissionsStore } from '@/stores/permissions';
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/error/403',
+      component: () => import('@/views/pages/maintenance/error/Error403Page.vue')
+    },
     {
       path: '/:pathMatch(.*)*',
       component: () => import('@/views/pages/maintenance/error/Error404Page.vue')
@@ -30,18 +35,42 @@ interface AuthStore {
   logout(): void;
 }
 
+// Route permission mapping
+const routePermissions: Record<string, string> = {
+  '/approval': 'approval_new',
+  '/approval/edit': 'approval_edit',
+  '/cartable': 'cartable',
+  '/cartable/reference': 'cartable_operation',
+  '/report': 'admin',
+  '/base/role-managment': 'admin',
+  '/base/department-managment': 'admin'
+};
+
 router.beforeEach(async (to, from, next) => {
   // redirect to login page if not logged in and trying to access a restricted page
   const publicPages = ['/approval'];
   const authRequired = !publicPages.includes(to.path);
   const auth: AuthStore = useAuthStore();
+  const permissionsStore = usePermissionsStore();
 
+  // Check authentication first
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (authRequired && !auth.user) {
       auth.returnUrl = to.fullPath;
       return next('/auth/login');
-    } else next();
-  } else {
-    next();
+    }
   }
+
+  // Check permissions for the route
+  const requiredPermission = routePermissions[to.path];
+  if (requiredPermission) {
+    const hasPermission = permissionsStore.hasMenuPermission(requiredPermission);
+    
+    if (!hasPermission) {
+      // Redirect to a 403 error page
+      return next('/error/403');
+    }
+  }
+
+  next();
 });

@@ -21,6 +21,16 @@ const MainRoutes = {
       path: '/cartable/:id/detail',
       component: () => import('@/components/sections/cartable/cartableDetail/cartableDetail.vue')
     },
+    {
+      name: 'BaseRoles',
+      path: '/base/role-managment',
+      component: () => import('@/views/base/roles/roles.vue')
+    },
+    {
+      name: 'BaseDepartment',
+      path: '/base/department-managment',
+      component: () => import('@/views/base/department/department.vue')
+    }
   ]
 };
 
