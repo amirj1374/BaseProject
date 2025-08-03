@@ -123,6 +123,11 @@ export interface RegionsDto {
   status: string;
 }
 
+export interface DepartmentLevelDto {
+  departmentLevel: string;
+  name: string;
+}
+
 export interface ContractTypeDto {
   id: number;
   parentId: number;
@@ -251,7 +256,7 @@ export interface GuaranteeRequest {
   day?: string;
   durationDay?: string;
   collaterals: Collaterals[];
-  percentageDeposits: string;
+  percentDeposit: string;
   contractType: ContractType;
   facility?: FacilityDto;
 }
@@ -267,8 +272,8 @@ export interface LcRequest {
   creditType: string;
   durationDay?: string;
   collaterals: Collaterals[];
-  betweenReceiving: string;
-  preReceiving: string;
+  intermediatePayment: string;
+  advancePayment: string;
   lcType: string;
 }
 export interface ContractType {

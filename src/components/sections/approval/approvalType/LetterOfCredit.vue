@@ -162,7 +162,7 @@
               </v-col>
               <v-col cols="12" md="4">
                 <v-text-field
-                  v-model="formData.preReceiving"
+                  v-model="formData.advancePayment"
                   label="پیش دریافت"
                   placeholder="0"
                   variant="outlined"
@@ -176,7 +176,7 @@
               </v-col>
               <v-col cols="12" md="4">
                 <v-text-field
-                  v-model="formData.betweenReceiving"
+                  v-model="formData.intermediatePayment"
                   label="میان دریافت"
                   placeholder="0"
                   variant="outlined"
@@ -336,8 +336,8 @@ const formData = reactive({
   durationDay: '',
   amount: 0,
   collateral: true,
-  betweenReceiving: '',
-  preReceiving: '',
+  intermediatePayment: '',
+  advancePayment: '',
   creditType: '',
   lcType: ''
 });
@@ -348,8 +348,8 @@ const headers = [
   { title: 'مدت', key: 'durationDay', width: '200px' },
   { title: 'نوع اعتبار', key: 'creditType', width: '250px' },
   { title: 'نوع اعتبار اسنادی', key: 'lcType', width: '250px' },
-  { title: 'میان دریافت', key: 'betweenReceiving', width: '200px' },
-  { title: 'پیش دریافت', key: 'preReceiving', width: '200px' },
+  { title: 'میان دریافت', key: 'intermediatePayment', width: '200px' },
+  { title: 'پیش دریافت', key: 'advancePayment', width: '200px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
 ];
@@ -441,8 +441,8 @@ function editItem(item: LcRequest) {
   formData.day = item.day || '';
   formData.durationDay = item.durationDay || '';
   selectedCollaterals.value = item.collaterals ? item.collaterals : [];
-  formData.betweenReceiving = item.betweenReceiving;
-  formData.preReceiving = item.preReceiving;
+  formData.intermediatePayment = item.intermediatePayment;
+  formData.advancePayment = item.advancePayment;
   formData.creditType = item.creditType;
   formData.lcType = item.lcType;
   dialog.value = true;

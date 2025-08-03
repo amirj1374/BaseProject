@@ -6,6 +6,9 @@ const userApi = (axiosInstance: AxiosInstance) => ({
   getUserInfo(): Promise<{ data: UserInfoResponse }> {
     return axiosInstance.get('/api/v1/token');
   },
+  getDepartmentsLevel() {
+    return axiosInstance.get("/api/v1/department-role/levels");
+  },
   fetch(page: number, limit: number) {
     return axiosInstance.get(`/api/v1/person-requests`, { params: { page, limit } });
   },

@@ -3,6 +3,7 @@ import MainRoutes from './MainRoutes';
 import AuthRoutes from './AuthRoutes';
 import { useAuthStore } from '@/stores/auth';
 import { usePermissionsStore } from '@/stores/permissions';
+import { waitForInitialization } from '@/utils/appInitializer';
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -48,6 +49,15 @@ const routePermissions: Record<string, string> = {
 };
 
 router.beforeEach(async (to, from, next) => {
+  // Wait for app initialization to complete before checking permissions
+  try {
+    await waitForInitialization();
+  } catch (error) {
+    console.error('App initialization failed:', error);
+    // If initialization fails, you might want to redirect to an error page
+    return next('/error/403');
+  }
+
   // redirect to login page if not logged in and trying to access a restricted page
   const publicPages = ['/'];
   const authRequired = !publicPages.includes(to.path);

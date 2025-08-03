@@ -82,7 +82,7 @@
               </v-col>
               <v-col cols="12" md="4">
                 <v-text-field
-                  v-model="formData.percentageDeposits"
+                  v-model="formData.percentDeposit"
                   label="درصد سپرده نقدی"
                   placeholder="0"
                   variant="outlined"
@@ -328,7 +328,7 @@ const formData = reactive({
   durationDay: '',
   amount: 0,
   collateral: true,
-  percentageDeposits: '',
+  percentDeposit: '',
   contractType: null as ContractType | null,
   facility: null as FacilityDto | null
 });
@@ -338,7 +338,7 @@ const headers = [
   { title: 'نوع ارز', key: 'currency', width: '150px' },
   { title: 'نوع ضمانت نامه', key: 'contractType', width: '150px' },
   { title: 'نوع محصول', key: 'facility', width: '150px' },
-  { title: 'درصد سپرده نقدی', key: 'percentageDeposits', width: '200px' },
+  { title: 'درصد سپرده نقدی', key: 'percentDeposit', width: '200px' },
   { title: 'مدت', key: 'durationDay', width: '100px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
@@ -433,7 +433,7 @@ function editItem(item: GuaranteeRequest) {
   selectedCollaterals.value = item.collaterals ? item.collaterals : [];
   formData.contractType = item.contractType || null;
   formData.facility = item.facility || null;
-  formData.percentageDeposits = item.percentageDeposits;
+  formData.percentDeposit = item.percentDeposit;
   dialog.value = true;
 }
 
