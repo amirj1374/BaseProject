@@ -8,6 +8,7 @@ export function useRouteGuard() {
   // Check if user can access a specific route
   const canAccessRoute = (routePath: string): boolean => {
     const routePermissions: Record<string, string> = {
+      '/dashboard': '', // No permission required for dashboard
       '/approval': 'approval_new',
       '/approval/edit': 'approval_edit',
       '/cartable': 'cartable',
@@ -18,7 +19,8 @@ export function useRouteGuard() {
     };
 
     const requiredPermission = routePermissions[routePath];
-    if (!requiredPermission) return true; // No permission required
+    if (requiredPermission === undefined) return true; // No permission defined
+    if (requiredPermission === '') return true; // No permission required
 
     return permissionsStore.hasMenuPermission(requiredPermission);
   };

@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
-import type { CollateralDto, CurrenciesDto } from '@/types/approval/approvalType';
+import type { CollateralDto, CurrenciesDto, RegionsDto } from '@/types/approval/approvalType';
 
 export const useBaseStore = defineStore('baseStore', {
   state: () => ({
     currency: [] as CurrenciesDto[],
-    collateral: [] as CollateralDto[]
+    collateral: [] as CollateralDto[],
+    regions: [] as RegionsDto[]
   }),
 
   actions: {
@@ -13,6 +14,9 @@ export const useBaseStore = defineStore('baseStore', {
     },
     setCollateralList(payload: CollateralDto[]) {
       this.collateral = payload
+    },
+    setRegionsList(payload: RegionsDto[]) {
+      this.regions = payload
     },
     resetAll() {
       this.currency = [] as CurrenciesDto[]

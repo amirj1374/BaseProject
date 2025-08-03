@@ -4,7 +4,7 @@ import {
   IconDatabase, 
   IconFileSymlink, 
   IconHome, 
-  IconPencilPlus ,
+  IconPencilPlus,
   IconTableShare
 } from '@tabler/icons-vue';
 import { usePermissionsStore } from '@/stores/permissions';
@@ -27,6 +27,11 @@ export interface menu {
 }
 
 const sidebarItem: menu[] = [
+  {
+    title: 'داشبورد',
+    icon: IconHome,
+    to: '/',
+  },
   {
     title: 'درخواست مصوبه جدید',
     icon: IconPencilPlus,
@@ -55,7 +60,7 @@ const sidebarItem: menu[] = [
     title: 'گزارشات',
     icon: IconClipboardData,
     to: '/report',
-    permissionKey: 'admin'
+    permissionKey: 'report'
   },
   {
     title: 'اطلاعات پایه',
@@ -64,11 +69,13 @@ const sidebarItem: menu[] = [
     children: [
       {
         title: 'مدیریت نقش ها',
+        icon: IconBookmarkEdit,
         to: '/base/role-managment',
         permissionKey: 'admin'
       },
       {
         title: 'مدیریت دپارتمان ها',
+        icon: IconDatabase,
         to: '/base/department-managment',
         permissionKey: 'admin'
       }

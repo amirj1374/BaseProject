@@ -117,6 +117,12 @@ export interface CollateralDto {
   collateralTypeCode: string;
 }
 
+export interface RegionsDto {
+  code: string;
+  name: string;
+  status: string;
+}
+
 export interface ContractTypeDto {
   id: number;
   parentId: number;

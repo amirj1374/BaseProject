@@ -19,7 +19,7 @@ const customizer = useCustomizerStore();
       <VerticalSidebarVue/>
       <VerticalHeaderVue/>
       <v-main>
-        <loading/>
+        <Loading/>
         <v-container fluid class="page-wrapper">
           <div>
             <RouterView />

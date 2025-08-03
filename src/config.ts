@@ -23,7 +23,7 @@ const config: ConfigProps = {
   layoutType: 'SideBar',
   inputBg: false,
   boxed: true,
-  loading: true
+  loading: false
 };
 
 export default config;

@@ -131,4 +131,13 @@ export default (axiosInstance: AxiosInstance) => ({
   logout() {
     return axiosInstance.get("logout");
   },
+  getBranch(parentCode: string) {
+    return axiosInstance.get(`api/v1/branch?parentBranchCode=${parentCode}`);
+  },
+  getRegions() {
+    return axiosInstance.get("api/v1/branch/regions");
+  },
+  getCartableReport() {
+    return axiosInstance.get("api/v1/cartable-report");
+  },
 });

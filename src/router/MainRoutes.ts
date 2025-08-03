@@ -7,8 +7,13 @@ const MainRoutes = {
   component: () => import('@/layouts/full/FullLayout.vue'),
   children: [
     {
-      name: 'Approval',
+      name: 'Dashboard',
       path: '/',
+      component: () => import('@/views/dashboards/default/Dashboard.vue')
+    },
+    {
+      name: 'Approval',
+      path: '/approval',
       component: () => import('@/views/approval/approval.vue')
     },
     {
@@ -20,6 +25,11 @@ const MainRoutes = {
       name: 'CartableDetail',
       path: '/cartable/:id/detail',
       component: () => import('@/components/sections/cartable/cartableDetail/cartableDetail.vue')
+    },
+    {
+      name: 'Report',
+      path: '/report',
+      component: () => import('@/views/reports/cartableReport/cartableReport.vue')
     },
     {
       name: 'BaseRoles',

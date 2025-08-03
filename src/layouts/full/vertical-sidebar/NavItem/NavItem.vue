@@ -16,7 +16,7 @@ const props = defineProps({ item: Object, level: Number });
     :target="item.type === 'external' ? '_blank' : ''"
   >
     <!---If icon-->
-    <template v-slot:prepend>
+    <template v-slot:prepend v-if="props.item.icon">
       <Icon :item="props.item.icon" :level="props.level" />
     </template>
     <v-list-item-title>{{ item.title }}</v-list-item-title>

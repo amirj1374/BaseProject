@@ -1,13 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { IconSettings, IconLogout, IconUser } from '@tabler/icons-vue';
 import { useAuthStore } from '@/stores/auth';
 import { useCustomerInfoStore } from '@/stores/customerInfo';
+import { GreetingUtils } from '@/utils/greetingUtils';
 
 const swt1 = ref(true);
 const swt2 = ref(false);
 const authStore = useAuthStore();
 const customerInfoStore = useCustomerInfoStore();
+
+// Get dynamic greeting based on server time
+const greeting = computed(() => {
+  return GreetingUtils.getGreeting(customerInfoStore.userInfo?.authTime);
+});
 </script>
 
 <template>
@@ -15,8 +21,8 @@ const customerInfoStore = useCustomerInfoStore();
   <!-- profile DD -->
   <!-- ---------------------------------------------- -->
   <div class="pa-4">
-    <h4 class="mb-n1">صبح بخیر, <span class="font-weight-regular">{{ customerInfoStore.userInfo?.fullName }}</span></h4>
-    <span class="text-subtitle-2 text-medium-emphasis">{{ customerInfoStore.userInfo?.position }}</span>
+    <h3 class="mb-2 text-secondary">{{ greeting }} , <span class="font-weight-regular">{{ customerInfoStore.userInfo?.fullName }}</span></h3>
+    <h3 class="text-subtitle-2 text-medium-emphasis">{{ customerInfoStore.userInfo?.position }}</h3>
 
     <v-text-field persistent-placeholder placeholder="جستجو" class="my-3" color="primary" variant="outlined" hide-details>
 <!--      <template v-slot:prepend-inner>-->

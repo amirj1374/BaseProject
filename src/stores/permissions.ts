@@ -13,11 +13,11 @@ export const usePermissionsStore = defineStore({
     menuPermissions: [
       {
         menuKey: 'approval_new',
-        requiredRoles: ['smp_create_approval']
+        requiredRoles: ['SMP_CREATE_APPROVAL']
       },
       {
         menuKey: 'approval_edit',
-        requiredRoles: ['smp_edit_approval']
+        requiredRoles: ['SMP_EDIT_APPROVAL']
       },
       {
         menuKey: 'cartable',
@@ -44,8 +44,12 @@ export const usePermissionsStore = defineStore({
         requiredRoles: ['SMP_BASIC_INFO']
       },
       {
+        menuKey: 'report',
+        requiredRoles: ['SMP_REPORT']
+      },
+      {
         menuKey: 'admin',
-        requiredRoles: ['SMP_ADMIN']
+        requiredRoles: ['SMP_CREATE_FLOW_MNG']
       }
     ] as MenuPermission[]
   }),

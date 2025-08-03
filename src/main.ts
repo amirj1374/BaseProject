@@ -27,6 +27,9 @@ app.use(VueApexCharts);
 app.directive('digit-limit', DigitLimit);
 app.directive('permission', vPermission);
 
+// Mount the app first so loading component can be rendered
+app.use(vuetify).mount('#app');
+
 // Initialize app and call getUserInfo on startup
 initializeApp()
   .then(() => {
@@ -34,9 +37,6 @@ initializeApp()
   })
   .catch((error) => {
     console.error('App initialization failed:', error);
-  })
-  .finally(() => {
-    app.use(vuetify).mount('#app');
   });
 
 

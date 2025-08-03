@@ -37,6 +37,7 @@ interface AuthStore {
 
 // Route permission mapping
 const routePermissions: Record<string, string> = {
+  '/dashboard': '', // No permission required for dashboard
   '/approval': 'approval_new',
   '/approval/edit': 'approval_edit',
   '/cartable': 'cartable',
@@ -48,7 +49,7 @@ const routePermissions: Record<string, string> = {
 
 router.beforeEach(async (to, from, next) => {
   // redirect to login page if not logged in and trying to access a restricted page
-  const publicPages = ['/approval'];
+  const publicPages = ['/'];
   const authRequired = !publicPages.includes(to.path);
   const auth: AuthStore = useAuthStore();
   const permissionsStore = usePermissionsStore();
@@ -63,12 +64,17 @@ router.beforeEach(async (to, from, next) => {
 
   // Check permissions for the route
   const requiredPermission = routePermissions[to.path];
-  if (requiredPermission) {
-    const hasPermission = permissionsStore.hasMenuPermission(requiredPermission);
-    
-    if (!hasPermission) {
-      // Redirect to a 403 error page
-      return next('/error/403');
+  if (requiredPermission !== undefined) {
+    // If permission is empty string, no permission required
+    if (requiredPermission === '') {
+      // No permission required, allow access
+    } else {
+      const hasPermission = permissionsStore.hasMenuPermission(requiredPermission);
+      
+      if (!hasPermission) {
+        // Redirect to a 403 error page
+        return next('/error/403');
+      }
     }
   }
 
