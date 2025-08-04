@@ -78,8 +78,8 @@
                     variant="outlined"
                     density="comfortable"
                     hide-details="auto"
-                    suffix="میلیون ریال"
                     :rules="[required]"
+                    :suffix="dynamicSuffix"
                   />
                 </v-col>
               </v-row>
@@ -230,6 +230,11 @@
   
   const required = (v: any) => !!v || 'این فیلد الزامی است';
   const collateralRequired = computed(() => selectedCollaterals.value.length > 0);
+  
+  // Dynamic suffix based on currency code
+  const dynamicSuffix = computed(() => {
+    return formData.currency === 'IRR' ? ' میلیون ریال' : '';
+  });
   
   const props = defineProps<{
     loading?: boolean;

@@ -184,7 +184,7 @@
                   variant="outlined"
                   density="comfortable"
                   hide-details="auto"
-                  suffix="میلیون ریال"
+                :suffix="dynamicSuffix"
                   :rules="[required]"
                 />
               </v-col>
@@ -431,6 +431,11 @@ const dayCalculate = async () => {
     console.error('Error calculating days:', err);
   }
 };
+
+  // Dynamic suffix based on currency code
+  const dynamicSuffix = computed(() => {
+    return formData.currency === 'IRR' ? ' میلیون ریال' : '';
+  });
 
 async function openDialog() {
   isEditing.value = false;

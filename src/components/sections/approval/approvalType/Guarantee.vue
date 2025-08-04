@@ -189,7 +189,7 @@
                   variant="outlined"
                   density="comfortable"
                   hide-details="auto"
-                  suffix="میلیون ریال"
+                 :suffix="dynamicSuffix"
                   :rules="[required]"
                 />
               </v-col>
@@ -419,6 +419,11 @@ function resetForm() {
   selectedCollaterals.value = [];
   form.value?.reset();
 }
+
+  // Dynamic suffix based on currency code
+  const dynamicSuffix = computed(() => {
+    return formData.currency === 'IRR' ? ' میلیون ریال' : '';
+  });
 
 function editItem(item: GuaranteeRequest) {
   isEditing.value = true;
