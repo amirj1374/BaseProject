@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { ref, computed, defineAsyncComponent, onMounted, onBeforeUnmount } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import AppStepper from '@/components/common/AppStepper.vue';
 import { useBaseStore } from '@/stores/base';
+import type { LoanRequestDetail, GuarantorDto } from '@/types/approval/approvalType';
 
 const router = useRouter();
 const approvalStore = useApprovalStore();
@@ -15,6 +16,56 @@ const showError = ref(false);
 const showSuccess = ref(false);
 const stepper = ref(1);
 const stepperRef = ref();
+
+const { id } = useRoute().params;
+
+onMounted(async () => {
+  // Only call API if id parameter exists
+  if (id) {
+    try {
+      const res = await api.approval.getApprovalEdit(id as string);
+      if (res.status === 200) {
+        console.log('API Response:', res.data); // Debug log
+        
+        // Set basic info
+        approvalStore.loanRequestId = res.data.loanRequestId?.toString() || '';
+        approvalStore.trackingCode = res.data.trackingCode || '';
+        
+        // Set customer info - API returns customerInfoDTO
+        if (res.data.customerInfoDTO) {
+          approvalStore.setCustomerInfo(res.data.customerInfoDTO);
+        }
+        
+        // Set loan request detail list - API returns loanRequestDetailDTO.loanRequestDetailList
+        if (res.data.loanRequestDetailDTO?.loanRequestDetailList) {
+          // Take the first item from the array since our store expects a single object
+          const firstDetail = res.data.loanRequestDetailDTO.loanRequestDetailList[0];
+          if (firstDetail) {
+            approvalStore.setLoanRequestDetailList(firstDetail);
+          }
+        }
+        
+        // Set guarantor - API returns guarantorInfoDTO
+        if (res.data.guarantorInfoDTO && Array.isArray(res.data.guarantorInfoDTO)) {
+          approvalStore.setGuarantor(res.data.guarantorInfoDTO);
+        } else {
+          // If no guarantor data, set empty array
+          approvalStore.setGuarantor([]);
+        }
+        
+        console.log('Store after update:', {
+          customerInfo: approvalStore.customerInfo,
+          loanRequestDetailList: approvalStore.loanRequestDetailList,
+          guarantor: approvalStore.guarantor
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching approval data:', err);
+      error.value = 'خطا در بارگذاری اطلاعات مصوبه';
+      showError.value = true;
+    }
+  }
+});
 
 // Steps array for AppStepper
 const steps = [

@@ -140,4 +140,7 @@ export default (axiosInstance: AxiosInstance) => ({
   getCartableReport() {
     return axiosInstance.get("api/v1/cartable-report");
   },
+  getApprovalEdit(loanRequestId: string) {
+    return axiosInstance.get(`/api/v1/general/more-detail?loanRequestId=${loanRequestId}`);
+  },
 });

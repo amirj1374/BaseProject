@@ -7,7 +7,7 @@ import CartableHistory from '@/components/sections/cartable/cartableHistory/cart
 import UploadList from '@/components/sections/cartable/uploadList/uploadList.vue';
 import LoanRequestHistory from '@/components/sections/cartable/loanRequestHistory/loanRequestHistory.vue';
 import FilterCartable from '@/components/sections/cartable/FilterCartable.vue';
-import Sign from '@/components/sections/cartable/sign/sign.vue';
+import Sign from '@/components/sections/cartable/sign/Sign.vue';
 
 const breadcrumbs = ref([
   {

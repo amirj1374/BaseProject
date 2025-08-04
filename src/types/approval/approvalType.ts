@@ -241,7 +241,7 @@ export interface FacilitiesRequest {
   durationDay?: string;
   collaterals: Collaterals[];
   preferentialRate: string;
-  preReceiving: string;
+  advancePayment: string;
   contractType: ContractType;
   facility?: FacilityDto;
 }

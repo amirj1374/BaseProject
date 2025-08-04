@@ -66,7 +66,26 @@ export const ActionTypeOptions = [
   { title: 'ارجاع برای امضا', value: ActionTypeEnum.REFERRED_FOR_SIGNED },
 ];
 
-// action type
+// loan request status
+export const LoanRequestStatusEnum = {
+  TEMPORARY_REGISTRATION:'TEMPORARY_REGISTRATION',
+  PENDING_PROCESS:'PENDING_PROCESS',
+  APPROVED:'APPROVED',
+  REJECTED:'REJECTED',
+  AWAITING_START_CARTABLE:'AWAITING_START_CARTABLE',
+} as const;
+
+export type LoanRequestStatus = (typeof LoanRequestStatusEnum)[keyof typeof LoanRequestStatusEnum];
+
+export const LoanRequestStatusOptions = [
+  { title: 'ثبت موقت', value: LoanRequestStatusEnum.TEMPORARY_REGISTRATION },
+  { title: 'در انتظار فرایند', value: LoanRequestStatusEnum.PENDING_PROCESS },
+  { title: 'تایید شده', value: LoanRequestStatusEnum.APPROVED },
+  { title: 'رد شده', value: LoanRequestStatusEnum.REJECTED },
+  { title: 'انتظار برای شروع فرایند', value: LoanRequestStatusEnum.AWAITING_START_CARTABLE },
+];
+
+// file type
 
 export const FileTypeEnum = {
   NATIONAL_CARD:'NATIONAL_CARD',

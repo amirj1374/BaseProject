@@ -205,7 +205,7 @@
               </v-col>
               <v-col cols="12" md="4">
                 <v-text-field
-                  v-model="formData.preReceiving"
+                  v-model="formData.advancePayment"
                   label="پیش دریافت"
                   placeholder="0"
                   variant="outlined"
@@ -355,7 +355,7 @@ const formData = reactive({
   amount: 0,
   collateral: true,
   preferentialRate: '',
-  preReceiving: '',
+  advancePayment: '',
   contractType: null as ContractType | null,
   facility: null as FacilityDto | null
 });
@@ -367,7 +367,7 @@ const headers = [
   { title: 'نوع محصول', key: 'facility', width: '200px' },
   { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '250px' },
   { title: 'نرخ ترجیحی', key: 'preferentialRate', width: '200px' },
-  { title: 'پیش دریافت', key: 'preReceiving', width: '250px' },
+  { title: 'پیش دریافت', key: 'advancePayment', width: '250px' },
   { title: 'مدت', key: 'durationDay', width: '200px' },
   { title: 'مبلغ', key: 'amount', width: '200px' },
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }

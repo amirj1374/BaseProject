@@ -17,6 +17,11 @@ const MainRoutes = {
       component: () => import('@/views/approval/approval.vue')
     },
     {
+      name: 'ApprovalDetail',
+      path: '/approval/:id',
+      component: () => import('@/views/approval/approval.vue')
+    },
+    {
       name: 'Cartable',
       path: '/cartable',
       component: () => import('@/views/cartable/cartable.vue')
@@ -40,6 +45,11 @@ const MainRoutes = {
       name: 'BaseDepartment',
       path: '/base/department-managment',
       component: () => import('@/views/base/actionManagement/actionManagement.vue')
+    },
+    {
+      name: 'ApprovalEdit',
+      path: '/approval/edit',
+      component: () => import('@/views/approval/approval-edit.vue')
     }
   ]
 };

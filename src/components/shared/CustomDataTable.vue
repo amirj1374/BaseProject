@@ -79,7 +79,7 @@ const itemToDelete = ref<Record<string, any> | null>(null);
 const snackbar = ref(true);
 const snackbarMessage = ref('');
 const router = useRouter();
-const itemsPerPage = ref(100);
+const itemsPerPage = ref(10);
 const totalSize = ref(0);
 const totalPages = ref(0);
 const currentPage = ref(1);
@@ -518,9 +518,9 @@ const handleFilterApply = (filterData: any) => {
                   <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
                     >🔍 نمایش
                   </v-btn>
-                  <template v-for="key in props.routes" :key="key">
-                    <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(key, item)">
-                      {{ key.toUpperCase() }}
+                  <template v-for="(routePath, routeKey) in props.routes" :key="routeKey">
+                    <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(routeKey, item)">
+                      {{ routeKey.toUpperCase() }}
                     </v-btn>
                   </template>
                   <v-btn v-for="key in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">

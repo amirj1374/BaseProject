@@ -49,11 +49,6 @@ onMounted(() => {
 
 // get guarantor
 async function addGuarantor() {
-  // 1. Validation
-  if (data.value.length >= 3) {
-    showErrorMessage('حداکثر ۳ ضامن می‌توانید اضافه کنید');
-    return;
-  }
   if (!formData.value.nationalCode && !formData.value.cif) {
     showErrorMessage('کد ملی یا شماره مشتری را وارد کنید');
     return;
@@ -146,12 +141,6 @@ const submitData = async () => {
     error.value = 'اطلاعات ضامن یافت نشد';
     showError.value = true;
     return Promise.reject(error.value);
-  }
-
-  // Prevent submission if tracking code already exists
-  if (approvalStore.trackingCode) {
-    // Optionally, you can show a message or just return silently
-    return;
   }
 
   submitting.value = true;
