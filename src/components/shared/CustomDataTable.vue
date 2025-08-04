@@ -20,6 +20,10 @@ interface Header {
   translate?: boolean;
   options?: Array<{ title: string; value: string | number | boolean }>;
   conditionalStyle?: (value: any, item: any) => Record<string, string>;
+  // New properties for custom JSON support
+  nestedKey?: string; // For nested properties like "user.name"
+  customRenderer?: (item: any) => string | number | boolean; // Custom renderer function
+  formatter?: (value: any, item: any) => string; // Custom formatter function
 }
 
 interface CustomAction {
@@ -389,9 +393,26 @@ const getColumnStyle = (column: any, item: any) => {
   return baseStyle;
 };
 
-const getTranslatedValue = (value: any, column: any) => {
+// Helper function to get nested object values
+const getNestedValue = (obj: any, path: string) => {
+  return path.split('.').reduce((current, key) => {
+    return current && current[key] !== undefined ? current[key] : null;
+  }, obj);
+};
+
+const getTranslatedValue = (value: any, column: any, item: any) => {
   const header = props.headers.find((h) => h.key === column.key);
   if (!header) return value;
+
+  // Use custom renderer if provided
+  if (header.customRenderer) {
+    return header.customRenderer(item);
+  }
+
+  // Use custom formatter if provided
+  if (header.formatter) {
+    return header.formatter(value, item);
+  }
 
   if (header.translate) {
     if (header.options) {
@@ -518,7 +539,7 @@ const resetFilter = () => {
                   </template>
                 </template>
                 <template v-else>
-                  {{ getTranslatedValue(item[column.key], column) }}
+                  {{ getTranslatedValue(getNestedValue(item, column.key), column, item) }}
                 </template>
               </td>
             </tr>

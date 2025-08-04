@@ -8,7 +8,7 @@
           <CustomDataTable
             ref="dataTableRef"
             :headers="headers"
-            api-resource="/api/v1/department-role"
+            api-resource="department-role"
             :auto-fetch="true"
             :show-pagination="false"
             :height="500"
