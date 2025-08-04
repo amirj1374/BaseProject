@@ -7,7 +7,7 @@
         api-resource="referral-config-template"
         :auto-fetch="true"
         :show-pagination="true"
-        :height="500"
+        :height="550"
         :actions="['create', 'edit', 'delete']"
         :form-component="CreateActionManagement"
         :show-refresh-button="true"

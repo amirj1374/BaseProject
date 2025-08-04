@@ -6,6 +6,7 @@ import Reference from '@/components/sections/cartable/reference/Reference.vue';
 import CartableHistory from '@/components/sections/cartable/cartableHistory/cartableHistory.vue';
 import UploadList from '@/components/sections/cartable/uploadList/uploadList.vue';
 import LoanRequestHistory from '@/components/sections/cartable/loanRequestHistory/loanRequestHistory.vue';
+import FilterCartable from '@/components/sections/cartable/FilterCartable.vue';
 
 const breadcrumbs = ref([
   {
@@ -56,8 +57,11 @@ function handleReferenceSuccess() {
       ref="tableRef"
       :apiResource="`cartable`"
       :headers="header"
-      :height="500"
+      :height="550"
+      :filter-component="FilterCartable"
       :auto-fetch="true"
+      :show-pagination="true"
+      :show-refresh-button="true"
       :custom-actions="[
         { title: 'عملیات', component: (props) => h(Reference, { ...props, onSuccess: handleReferenceSuccess }) },
         { title: 'لیست مدارک', component: UploadList },

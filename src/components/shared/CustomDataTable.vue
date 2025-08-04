@@ -457,6 +457,14 @@ const resetFilter = () => {
   fetchData();
   filterDialog.value = false;
 };
+
+// Handle filter apply from custom filter component
+const handleFilterApply = (filterData: any) => {
+  filterModel.value = filterData;
+  currentPage.value = 1;
+  fetchData();
+  filterDialog.value = false;
+};
 </script>
 
 <template>
@@ -468,8 +476,8 @@ const resetFilter = () => {
   <!-- Action Buttons OUTSIDE the table container -->
   <div class="action-buttons">
     <v-btn v-if="props.actions?.includes('create')" color="green" class="me-2" @click="openDialog()">ایجاد ✅</v-btn>
-    <v-btn v-if="props.showRefreshButton" color="blue" class="me-2" @click="fetchData" :loading="loading">بروزرسانی 🔄 </v-btn>
-    <v-btn v-if="hasFilterComponent" @click="filterDialog = true">فیلتر 🔍</v-btn>
+    <v-btn v-if="hasFilterComponent" class="me-2" @click="filterDialog = true">فیلتر 🔍</v-btn>
+    <v-btn v-if="props.showRefreshButton" color="blue"  @click="fetchData" :loading="loading">بروزرسانی 🔄 </v-btn>
   </div>
 
   <!-- Data Table Container (fills parent height) -->
@@ -639,13 +647,9 @@ const resetFilter = () => {
           :is="props.filterComponent"
           v-model="filterModel"
           @update:modelValue="filterModel = $event"
+          @apply="handleFilterApply"
         />
       </v-card-text>
-      <v-card-actions>
-        <v-btn color="grey" @click="filterDialog = false">انصراف</v-btn>
-        <v-btn color="primary" @click="applyFilter">اعمال فیلتر</v-btn>
-        <v-btn color="error" @click="resetFilter">پاک کردن فیلتر</v-btn>
-      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
