@@ -1,20 +1,20 @@
 export interface CartableDetail {
-  createdAt: string
-  createdBy: string
-  status: string
-  trackingCode: string
-  updatedAt: string
-  updatedBy: string
-  userName: string
-  roleName: string
-  branchCode: string
-  branchName: string
+  createdAt: string;
+  createdBy: string;
+  status: string;
+  trackingCode: string;
+  updatedAt: string;
+  updatedBy: string;
+  userName: string;
+  roleName: string;
+  branchCode: string;
+  branchName: string;
 }
 
 export interface ValidUserPayload {
-  id: number
-  actionType: string
-  roleCode: string
+  id: number;
+  actionType: string;
+  roleCode: string;
 }
 
 export interface ValidRole {
@@ -35,6 +35,17 @@ export interface RoleDTO {
   code: number;
 }
 
+export interface SamapRoleDTO {
+  code: number;
+  createdAt: string;
+  createdBy: string;
+  id: number;
+  name: string;
+  description: string;
+  updatedAt: string;
+  updatedBy: string;
+}
+
 export interface SubmitReferencePayload {
   cartableId: number;
   roleDTO: RoleDTO;
@@ -43,7 +54,7 @@ export interface SubmitReferencePayload {
   usernameList: string[];
 }
 
-type CartableAction = "CREATED" | "UPDATED" | "DELETED"; // Extend as needed
+type CartableAction = 'CREATED' | 'UPDATED' | 'DELETED'; // Extend as needed
 
 export interface CartableHistory {
   action: CartableAction;
@@ -57,4 +68,3 @@ export interface CartableHistory {
   updatedAt: string | null;
   updatedBy: string | null;
 }
-

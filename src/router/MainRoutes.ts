@@ -39,7 +39,7 @@ const MainRoutes = {
     {
       name: 'BaseDepartment',
       path: '/base/department-managment',
-      component: () => import('@/views/base/department/department.vue')
+      component: () => import('@/views/base/actionManagement/actionManagement.vue')
     }
   ]
 };

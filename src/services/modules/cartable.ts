@@ -24,5 +24,8 @@ export default (axiosInstance: AxiosInstance) => ({
   submitReference(payload: SubmitReferencePayload) {
     return axiosInstance.post("/api/v1/cartable/submit", payload);
   },
+  getRole() {
+    return axiosInstance.get("/api/v1/role/samap");
+  },
 
 });

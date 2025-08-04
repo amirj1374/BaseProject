@@ -54,8 +54,8 @@ interface Props {
   showPagination?: boolean;
   height: number;
   pagination?: any;
-  // Simple refresh button prop
   showRefreshButton?: boolean; // Shows refresh button in action buttons
+  title?: string; // Custom title for the page
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -460,6 +460,11 @@ const resetFilter = () => {
 </script>
 
 <template>
+  <!-- Page Title -->
+  <div v-if="props.title" class="page-title">
+    <h3 class="title-text">{{ props.title }}</h3>
+  </div>
+  
   <!-- Action Buttons OUTSIDE the table container -->
   <div class="action-buttons">
     <v-btn v-if="props.actions?.includes('create')" color="green" class="me-2" @click="openDialog()">ایجاد ✅</v-btn>
@@ -668,6 +673,19 @@ const resetFilter = () => {
   border-top: 1px solid rgba(0, 0, 0, 0.12);
   background: white;
   z-index: 2;
+}
+
+.page-title {
+  margin-bottom: 16px;
+  padding: 16px 0 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.title-text {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--v-primary-base);
 }
 
 .action-buttons {

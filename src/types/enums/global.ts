@@ -50,6 +50,7 @@ export const ActionTypeEnum = {
   CREATED:'CREATED',
   CLOSED:'CLOSED',
   PASSED:'PASSED',
+  REFERRED_FOR_SIGNED:'REFERRED_FOR_SIGNED',
 } as const;
 
 export type ActionType = (typeof ActionTypeEnum)[keyof typeof ActionTypeEnum];
@@ -62,6 +63,7 @@ export const ActionTypeOptions = [
   { title: 'ایجاد', value: ActionTypeEnum.CREATED },
   { title: 'اتمام', value: ActionTypeEnum.CLOSED },
   { title: 'ارجاع', value: ActionTypeEnum.PASSED },
+  { title: 'ارجاع برای امضا', value: ActionTypeEnum.REFERRED_FOR_SIGNED },
 ];
 
 // action type

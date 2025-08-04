@@ -74,7 +74,7 @@ const sidebarItem: menu[] = [
         permissionKey: 'admin'
       },
       {
-        title: 'مدیریت دپارتمان ها',
+        title: 'مدیریت عملیات',
         icon: IconDatabase,
         to: '/base/department-managment',
         permissionKey: 'admin'

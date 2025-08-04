@@ -7,10 +7,11 @@
         api-resource="referral-config-template"
         :auto-fetch="true"
         :show-pagination="true"
-        :height="600"
+        :height="500"
         :actions="['create', 'edit', 'delete']"
-        :form-component="CreateActionType"
+        :form-component="CreateActionManagement"
         :show-refresh-button="true"
+        title="مدیریت عملیات"
         @item-created="onItemCreated"
         @item-updated="onItemUpdated"
         @item-deleted="onItemDeleted"
@@ -28,7 +29,7 @@
 import { onMounted, ref } from 'vue';
 import { useRouteGuard } from '@/composables/useRouteGuard';
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import CreateActionType from '@/components/sections/actionType/CreateActionType.vue';
+import CreateActionManagement from '@/components/sections/actionManagement/CreateActionManagement.vue';
 import { ActionTypeOptions } from '@/types/enums/global';
 
 const { requirePermission } = useRouteGuard();
@@ -81,7 +82,7 @@ const headers = [
     title: 'کاربر ایجاد کننده',
     key: 'createdBy',
     sortable: true,
-    width: 200,
+    width: 200
   },
   {
     title: 'تاریخ ایجاد',
