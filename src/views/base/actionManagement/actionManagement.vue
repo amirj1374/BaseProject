@@ -1,6 +1,6 @@
 <template>
-  <v-card class="department-card">
-    <v-card-text>
+    <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
+    <div class="upload-form">
       <CustomDataTable
         ref="dataTableRef"
         :headers="headers"
@@ -11,14 +11,11 @@
         :actions="['create', 'edit', 'delete']"
         :form-component="CreateActionManagement"
         :show-refresh-button="true"
-        title="مدیریت عملیات"
         @item-created="onItemCreated"
         @item-updated="onItemUpdated"
         @item-deleted="onItemDeleted"
       />
-    </v-card-text>
-  </v-card>
-
+    </div>
   <!-- Success/Error Messages -->
   <v-snackbar v-model="showSnackbar" :color="snackbarColor" timeout="3000">
     {{ snackbarMessage }}
@@ -31,9 +28,17 @@ import { useRouteGuard } from '@/composables/useRouteGuard';
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import CreateActionManagement from '@/components/sections/actionManagement/CreateActionManagement.vue';
 import { ActionTypeOptions } from '@/types/enums/global';
+import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 
 const { requirePermission } = useRouteGuard();
-
+const breadcrumbs = ref([
+  {
+    title: 'اطلاعات پایه',
+    disabled: false,
+    href: '#'
+  }
+]);
+const page = ref({ title: 'مدیریت عملیات' });
 // Reactive data
 const dataTableRef = ref();
 const showSnackbar = ref(false);

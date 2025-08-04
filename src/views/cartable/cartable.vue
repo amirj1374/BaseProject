@@ -56,7 +56,7 @@ function handleReferenceSuccess() {
       ref="tableRef"
       :apiResource="`cartable`"
       :headers="header"
-      :height="400"
+      :height="500"
       :auto-fetch="true"
       :custom-actions="[
         { title: 'عملیات', component: (props) => h(Reference, { ...props, onSuccess: handleReferenceSuccess }) },
