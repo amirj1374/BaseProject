@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, defineAsyncComponent, onMounted } from 'vue';
+import { ref, computed, defineAsyncComponent, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
@@ -93,7 +93,6 @@ const handleSubmit = async () => {
     submitting.value = false;
   }
 };
-
 // Submit all data to cartable
 const handleCartable = async () => {
   submitting.value = true;
@@ -112,6 +111,11 @@ const handleCartable = async () => {
 
 // Get current component
 const currentComponent = computed(() => steps[stepper.value - 1].section);
+
+// Reset approval store when leaving the component
+onBeforeUnmount(() => {
+  approvalStore.resetAll();
+});
 </script>
 
 <template>

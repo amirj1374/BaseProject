@@ -70,9 +70,23 @@ const facilitiesData = ref<Facility[]>([]);
 const guaranteeData = ref<Guarantee[]>([]);
 
 onMounted(() => {
-  if (approvalStore.customerInfo) {
-    items.value = [approvalStore.customerInfo];
+  // Check if customerInfo has any meaningful data (not just an empty object)
+  const customerInfo = approvalStore.customerInfo;
+  const hasCustomerData = customerInfo && 
+    (customerInfo.cif || 
+     customerInfo.nationalCode || 
+     customerInfo.customerName || 
+     customerInfo.clientgroupname || 
+     customerInfo.branchName);
+  
+  if (hasCustomerData) {
+    items.value = [customerInfo];
     isValid.value = true;
+  } else {
+    // Reset the approval store if customerInfo doesn't have meaningful data
+    approvalStore.resetAll();
+    items.value = [];
+    isValid.value = false;
   }
 });
 
