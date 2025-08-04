@@ -5,6 +5,9 @@ import { useCustomizerStore } from '@/stores/customizer';
 
 // Global initialization promise
 let initializationPromise: Promise<any> | null = null;
+let resolveInit: ((value: any) => void) | null = null;
+let rejectInit: ((reason?: any) => void) | null = null;
+let isInitializing = false;
 
 export async function initializeApp() {
   // If already initializing, return the existing promise
@@ -12,61 +15,62 @@ export async function initializeApp() {
     return initializationPromise;
   }
 
-  initializationPromise = new Promise(async (resolve, reject) => {
-    const customerInfoStore = useCustomerInfoStore();
-    const customizer = useCustomizerStore();
-    const baseStore = useBaseStore();
-
-    try {
-      console.log('Initializing app...');    
-      // Set loading to true at the start
-      console.log('Setting loading to true...');
-      customizer.SET_LOADING(true);
-      console.log('Loading state after setting to true:', customizer.loading);
-      customerInfoStore.clearError();
-      
-      // Sequential API calls - one after another
-      console.log('Fetching user info...');
-      const userInfo = await api.user.getUserInfo();
-      customerInfoStore.setUserInfo(userInfo.data);
-      
-      console.log('Fetching currencies...');
-      const currency = await api.approval.fetchCurrencies();
-      baseStore.setCurrencyList(currency.data);
-      
-      console.log('Fetching collateral...');
-      const collateral = await api.approval.getCollateral();
-      baseStore.setCollateralList(collateral.data);
-      
-      console.log('Fetching regions...');
-      const regions = await api.approval.getRegions();
-      baseStore.setRegionsList(regions.data);
-
-      console.log('Fetching departmentsLevel...');
-      const departmentLevel = await api.user.getDepartmentsLevel();
-      baseStore.setDepartmentLevel(departmentLevel.data);
-      
-      console.log('All API calls completed successfully');
-      resolve(userInfo.data);
-      
-    } catch (error) {
-      console.error('Failed to initialize app:', error);
-      customerInfoStore.setError(error instanceof Error ? error.message : 'Failed to load application data');
-      reject(error);
-    } finally {
-      // Always set loading to false when done
-      console.log('Setting loading to false...');
-      customizer.SET_LOADING(false);
-      console.log('Loading state after setting to false:', customizer.loading);
-    }
+  // Create promise immediately for router guard
+  initializationPromise = new Promise((resolve, reject) => {
+    resolveInit = resolve;
+    rejectInit = reject;
   });
+
+  // Mark as initializing
+  isInitializing = true;
 
   return initializationPromise;
 }
 
+export async function startInitialization() {
+  if (!isInitializing) {
+    return;
+  }
+
+  // Initialize stores
+  const customerInfoStore = useCustomerInfoStore();
+  const customizer = useCustomizerStore();
+  const baseStore = useBaseStore();
+
+  try {
+    customerInfoStore.clearError();
+    
+    // Sequential API calls - one after another
+    const userInfo = await api.user.getUserInfo();
+    customerInfoStore.setUserInfo(userInfo.data);
+    
+    const currency = await api.approval.fetchCurrencies();
+    baseStore.setCurrencyList(currency.data);
+    
+    const collateral = await api.approval.getCollateral();
+    baseStore.setCollateralList(collateral.data);
+    
+    const regions = await api.approval.getRegions();
+    baseStore.setRegionsList(regions.data);
+
+    const departmentLevel = await api.user.getDepartmentsLevel();
+    baseStore.setDepartmentLevel(departmentLevel.data);
+    
+    resolveInit?.(userInfo.data);
+    
+  } catch (error) {
+    customerInfoStore.setError(error instanceof Error ? error.message : 'Failed to load application data');
+    rejectInit?.(error);
+  } finally {
+    // Always set loading to false when done
+    customizer.SET_LOADING(false);
+    isInitializing = false;
+  }
+}
+
 // Function to check if app is initialized
 export function isAppInitialized(): boolean {
-  return initializationPromise !== null;
+  return initializationPromise !== null && !isInitializing;
 }
 
 // Function to wait for initialization

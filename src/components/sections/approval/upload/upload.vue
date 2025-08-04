@@ -44,8 +44,6 @@ const headers = [
   { title: 'عنوان مدرک', key: 'fileTitle' },
 ];
 const handleUpload = (doc: Document) => {
-  console.log(doc)
-
   selectedDoc.value = doc;
   showUploadDialog.value = true;
 };

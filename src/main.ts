@@ -8,7 +8,8 @@ import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';
 import VueApexCharts from 'vue3-apexcharts';
 import DigitLimit from '@/directives/v-digit-limit'
 import { vPermission } from '@/directives/v-permission';
-import { initializeApp } from '@/utils/appInitializer';
+import { initializeApp, startInitialization } from '@/utils/appInitializer';
+import { nextTick } from 'vue';
 
 import { fakeBackend } from '@/utils/helpers/fake-backend';
 
@@ -17,7 +18,12 @@ import print from 'vue3-print-nb';
 
 const app = createApp(App);
 fakeBackend();
-app.use(createPinia());
+const pinia = createPinia();
+app.use(pinia);
+
+// Create initialization promise BEFORE setting up router
+const initPromise = initializeApp();
+
 app.use(router);
 app.use(PerfectScrollbarPlugin);
 app.use(print);
@@ -30,13 +36,26 @@ app.directive('permission', vPermission);
 // Mount the app first so loading component can be rendered
 app.use(vuetify).mount('#app');
 
-// Initialize app and call getUserInfo on startup
-initializeApp()
-  .then(() => {
-    console.log('App initialized successfully');
-  })
-  .catch((error) => {
-    console.error('App initialization failed:', error);
-  });
+// Set loading to true and start initialization after nextTick
+nextTick(async () => {
+  // Import and use store after pinia is installed
+  const { useCustomizerStore } = await import('@/stores/customizer');
+  const customizer = useCustomizerStore();
+  
+  // Set loading to true BEFORE starting initialization
+  customizer.SET_LOADING(true);
+  
+  // Start the actual API calls
+  startInitialization();
+  
+  // Wait for initialization to complete
+  initPromise
+    .then(() => {
+      // App initialized successfully
+    })
+    .catch((error) => {
+      // App initialization failed
+    });
+});
 
 

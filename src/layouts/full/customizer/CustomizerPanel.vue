@@ -70,7 +70,6 @@ const tab = ref('style');
 watch(
   () => customizer.fontTheme,
   (newFont) => {
-    console.log(newFont);
     // Set the new font value in the CSS custom property (global font)
     document.documentElement.style.setProperty('--font-theme', newFont);
   },
@@ -81,7 +80,6 @@ watch(
 watch(
   () => customizer.layoutType,
   (newLayout) => {
-    console.log(newLayout);
     // Apply the new layout class to the body or root element
     document.body.className = ''; // Reset classes
     document.body.classList.add(`layout-${newLayout.toLowerCase()}`);

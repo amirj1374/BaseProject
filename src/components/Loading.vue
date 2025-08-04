@@ -20,17 +20,8 @@
 <script setup lang="ts">
 import { Vue3Lottie } from 'vue3-lottie';
 import { useCustomizerStore } from '@/stores/customizer';
-import { watch } from 'vue';
 
 const customizer = useCustomizerStore();
-
-// Debug: Watch loading state changes
-watch(() => customizer.loading, (newValue) => {
-  console.log('Loading state changed:', newValue);
-});
-
-// Debug: Log initial loading state
-console.log('Initial loading state:', customizer.loading);
 </script>
 
 <style scoped>

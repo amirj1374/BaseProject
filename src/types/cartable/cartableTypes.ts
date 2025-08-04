@@ -40,7 +40,7 @@ export interface SubmitReferencePayload {
   roleDTO: RoleDTO;
   description: string;
   actionType: string;
-  username: string;
+  usernameList: string[];
 }
 
 type CartableAction = "CREATED" | "UPDATED" | "DELETED"; // Extend as needed

@@ -16,7 +16,6 @@ export const useAuthStore = defineStore({
   actions: {
     async login(username: string, password: string) {
       const user = await fetchWrapper.post(`${baseUrl}/authenticate`, { username, password });
-      console.log('sada')
       // update pinia state
       this.user = user;
       // store user details and jwt in local storage to keep user logged in between page refreshes
@@ -27,11 +26,7 @@ export const useAuthStore = defineStore({
     logout() {
       this.user = null;
       localStorage.removeItem('user');
-      console.log('logout');
       window.location.href = "back/logout"
-      
-
-      // router.push('/auth/login');
     }
   }
 });

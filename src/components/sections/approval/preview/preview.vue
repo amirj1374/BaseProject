@@ -8,7 +8,7 @@ let pdfObjectUrl: string | null = null;
 
 onMounted(async () => {
   try {
-    const response = await api.approval.getResult(22905);
+    const response = await api.approval.getResult(approvalStore.loanRequestId);
     const byteCharacters = atob(response.data);
     const byteNumbers = new Uint8Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {

@@ -16,7 +16,6 @@ const fetchAccounts = async () => {
   loading.value = true;
   try {
     const res = await api.approval.getAllDeposit(approvalStore.loanRequestId);
-    console.log(res.data);
     if (res.status === 200) {
       items.value = res.data;
     }

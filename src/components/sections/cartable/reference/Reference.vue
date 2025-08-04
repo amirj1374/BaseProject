@@ -52,7 +52,7 @@ watch(selectedRole, (newRole) => {
     handleValidUser(newRole);
   } else {
     validUserOptions.value = [];
-    selectedValidUser.value = null;
+    selectedValidUser.value = [];
   }
 });
 
@@ -71,7 +71,7 @@ const submitForm = async () => {
       },
       description: description.value,
       actionType: selectedAction.value?.actionType ?? '',
-      username: selectedValidUser.value?.username ?? '',
+      usernameList: selectedValidUser.value.map(user => user.username), // Extract usernames from selected users array
     };
     const response = await api.cartable.submitReference(payload);
     if (response.status === 200) {
@@ -96,7 +96,7 @@ const submitForm = async () => {
 const percent = ref<number | null>(null);
 
 const validUserOptions = ref<any[]>([]);
-const selectedValidUser = ref<any | null>(null);
+const selectedValidUser = ref<any[]>([]); // Changed from any | null to any[]
 
 const handleValidUser = async (role: ValidRole) => {
   if (!role || !selectedAction.value) return;
@@ -107,10 +107,10 @@ const handleValidUser = async (role: ValidRole) => {
 });
   if (res?.data) {
     validUserOptions.value = res.data;
-    selectedValidUser.value = res.data[0] || null;
+    selectedValidUser.value = []; // Reset to empty array instead of null
   } else {
     validUserOptions.value = [];
-    selectedValidUser.value = null;
+    selectedValidUser.value = [];
   }
 };
 
@@ -125,9 +125,9 @@ const roleOptions = computed(() =>
 
 watch(validUserOptions, (newOptions) => {
   if (newOptions.length > 0) {
-    selectedValidUser.value = newOptions[0];
+    selectedValidUser.value = []; // Reset to empty array instead of selecting first item
   } else {
-    selectedValidUser.value = null;
+    selectedValidUser.value = [];
   }
 });
 </script>
@@ -144,7 +144,6 @@ watch(validUserOptions, (newOptions) => {
           label="انتخاب عملیات"
           variant="outlined"
           return-object
-          @update:modelValue="(val: ActionData) => console.log('Action changed:', val)"
         />
       </v-col>
       <v-col cols="12" md="4">
@@ -168,6 +167,9 @@ watch(validUserOptions, (newOptions) => {
           label="انتخاب کاربر"
           variant="outlined"
           return-object
+          multiple
+          chips
+          closable-chips
         />
       </v-col>
     </v-row>

@@ -1,6 +1,6 @@
 <template>
     <div class="section-header">
-      <h3 class="group-title">مدیرست نقش ها</h3>
+      <h3 class="group-title"> مدیریت نقش ها</h3>
     </div>
     <form class="customer-form">
       <v-row class="mt-2">

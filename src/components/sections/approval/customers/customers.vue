@@ -47,7 +47,7 @@ const formData = ref({
 });
 
 const headers = ref([
-  { title: 'شسیشسی', key: 'cif', width: '200px', sortable: true },
+  { title: 'کد مشتری', key: 'cif', width: '200px', sortable: true },
   { title: 'کدملی / شناسه ملی', align: 'center', key: 'nationalCode', width: '250px', sortable: true },
   { title: 'نام مشتری', key: 'customerName', width: '160px', sortable: true },
   { title: 'گروه مشتری', key: 'clientGroupName', width: '140px', sortable: true },
@@ -189,42 +189,34 @@ watch(
 
 function handleSaveFacility(data: any) {
   // Handle saving facility data
-  console.log('Saving facility:', data);
 }
 
 function handleDeleteFacility(item: any) {
   // Handle deleting facility
-  console.log('Deleting facility:', item);
 }
 
 function handleSaveLC(data: any) {
   // Handle saving LC data
-  console.log('Saving LC:', data);
 }
 
 function handleDeleteLC(item: any) {
   // Handle deleting LC
-  console.log('Deleting LC:', item);
 }
 
 function handleSaveGuarantee(data: any) {
   // Handle saving guarantee data
-  console.log('Saving guarantee:', data);
 }
 
 function handleDeleteGuarantee(item: any) {
   // Handle deleting guarantee
-  console.log('Deleting guarantee:', item);
 }
 
 function handleSaveGreenLicense(data: any) {
   // Handle saving green license data
-  console.log('Saving green license:', data);
 }
 
 function handleDeleteGreenLicense(item: any) {
   // Handle deleting green license
-  console.log('Deleting green license:', item);
 }
 
 defineExpose({ submitData });

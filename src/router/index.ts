@@ -53,7 +53,6 @@ router.beforeEach(async (to, from, next) => {
   try {
     await waitForInitialization();
   } catch (error) {
-    console.error('App initialization failed:', error);
     // If initialization fails, you might want to redirect to an error page
     return next('/error/403');
   }

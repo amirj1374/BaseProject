@@ -31,8 +31,6 @@ const submitData = async (): Promise<void> => {
       lc: lcData.value
     };
 
-    console.log('Final submission payload:', payload);
-
     // return Promise.resolve();
   } catch (err) {
     console.error('Submit error', err);

@@ -49,31 +49,16 @@ const testAxiosConfig = async () => {
     error.value = null;
     results.value = null;
 
-    console.log('🔧 Testing axios configuration...');
-
-    // Test 1: Check axios instance
-    const config = {
-      baseURL: axiosInstance.defaults.baseURL,
-      timeout: axiosInstance.defaults.timeout,
-      headers: axiosInstance.defaults.headers
-    };
-
-    console.log('Axios config:', config);
-
-    // Test 2: Check auth token
-    const token = authStore.user?.token;
-    console.log('Auth token:', {
-      hasToken: !!token,
-      tokenLength: token?.length || 0,
-      tokenStart: token?.substring(0, 20) + '...'
-    });
-
-    // Test 3: Try a simple API call
-    console.log('Making test API call...');
-    const response = await axiosInstance.get('/api/v1/token');
+    // Test axios configuration
+    const config = axiosInstance.defaults;
     
-    console.log('API response:', response);
-
+    // Check auth token
+    const token = config.headers?.Authorization;
+    
+    // Make test API call
+    const response = await axiosInstance.get('/test-endpoint');
+    
+    // Handle response
     results.value = {
       axiosConfig: config,
       authToken: {
@@ -88,7 +73,6 @@ const testAxiosConfig = async () => {
     };
 
   } catch (err: any) {
-    console.error('❌ Axios test failed:', err);
     error.value = err.toString();
     
     results.value = {

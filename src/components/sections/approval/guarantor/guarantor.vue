@@ -189,7 +189,6 @@ const submitData = async () => {
 
     if (response.status === 200) {
       success.value = response.data.trackingCode;
-      console.log('response.data.loanRequestId', response.data.loanRequestId);
       approvalStore.setLoanRequestId(response.data.loanRequestId);
       approvalStore.setTrackingCode(response.data.trackingCode);
       dialog.value = true;
