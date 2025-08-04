@@ -1,4 +1,4 @@
-import type { SubmitReferencePayload, ValidUserPayload } from "@/types/cartable/cartableTypes";
+import type { SubmitReferencePayload, SubmitSignPayload, ValidUserPayload } from "@/types/cartable/cartableTypes";
 import type { AxiosInstance } from "axios";
 
 export default (axiosInstance: AxiosInstance) => ({
@@ -26,6 +26,10 @@ export default (axiosInstance: AxiosInstance) => ({
   },
   getRole() {
     return axiosInstance.get("/api/v1/role/samap");
+  },
+
+  submitSign(payload: SubmitSignPayload) {
+    return axiosInstance.post("/api/v1/cartable/sign", payload);
   },
 
 });

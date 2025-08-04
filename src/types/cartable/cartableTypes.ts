@@ -54,6 +54,12 @@ export interface SubmitReferencePayload {
   usernameList: string[];
 }
 
+export interface SubmitSignPayload {
+  cartableId: number;
+  comment: string;
+  agreed: boolean;
+}
+
 type CartableAction = 'CREATED' | 'UPDATED' | 'DELETED'; // Extend as needed
 
 export interface CartableHistory {

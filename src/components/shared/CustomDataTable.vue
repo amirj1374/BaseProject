@@ -29,6 +29,7 @@ interface Header {
 interface CustomAction {
   title: string;
   component: Component;
+  condition?: (item: any) => boolean; // Optional condition function
 }
 
 interface CustomButtonAction {
@@ -525,16 +526,17 @@ const handleFilterApply = (filterData: any) => {
                   <v-btn v-for="key in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
                     {{ key.toUpperCase() }} ⬇️
                   </v-btn>
-                  <v-btn
-                    v-for="action in props.customActions"
-                    :key="action.title"
-                    color="orange"
-                    size="small"
-                    class="mr-2"
-                    @click="openCustomActionDialog(action, item)"
-                  >
-                    {{ action.title }}
-                  </v-btn>
+                  <template v-for="(action, index) in props.customActions" :key="action.title || index">
+                    <v-btn
+                      v-if="!action.condition || action.condition(item)"
+                      color="orange"
+                      size="small"
+                      class="mr-2"
+                      @click="openCustomActionDialog(action, item)"
+                    >
+                      {{ action.title }}
+                    </v-btn>
+                  </template>
                   <template v-if="props.customButtonsFn">
                     <v-btn
                       v-for="button in props.customButtonsFn(item)"
