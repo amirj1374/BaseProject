@@ -60,8 +60,7 @@ defineExpose({ submitData });
             v-model="formData.description"
             label="توضیحات"
             variant="outlined"
-            density="comfortable"
-            rows="2"
+            rows="3"
           />
         </v-col>
         <v-divider inset></v-divider>

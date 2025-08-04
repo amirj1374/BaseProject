@@ -121,7 +121,9 @@ defineExpose({ submitData });
       ref="dataTableRef"
       :headers="headers"
       api-resource="general/get-all-doc"
-      :query-params="{ loanRequestId: approvalStore.loanRequestId }"
+      :query-params="{ loanRequestId: approvalStore.loanRequestId, 
+        groupByItem: 'GUARANTOR'
+      }"
       :auto-fetch="true"
       :show-pagination="true"
       :custom-buttons-fn="getCustomButtons"
