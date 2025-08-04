@@ -54,11 +54,14 @@ interface Props {
   showPagination?: boolean;
   height: number;
   pagination?: any;
+  // Simple refresh button prop
+  showRefreshButton?: boolean; // Shows refresh button in action buttons
 }
 
 const props = withDefaults(defineProps<Props>(), {
   autoFetch: true,
-  showPagination: true
+  showPagination: true,
+  showRefreshButton: false
 });
 
 defineOptions({ inheritAttrs: false });
@@ -89,7 +92,7 @@ const hasMore = ref(true);
 // Memoize computed properties
 const cleanFilterModel = computed(() => {
   const model = { ...filterModel.value };
-  Object.keys(model).forEach(key => {
+  Object.keys(model).forEach((key) => {
     if (model[key] === null || model[key] === undefined || model[key] === '') {
       delete model[key];
     }
@@ -162,9 +165,13 @@ const fetchData = async (queryParams?: {}) => {
 const debouncedFetchData = useDebounceFn(fetchData, 300);
 
 // Update watcher to use debounced function
-watch([currentPage, cleanFilterModel], () => {
-  debouncedFetchData();
-}, { deep: true });
+watch(
+  [currentPage, cleanFilterModel],
+  () => {
+    debouncedFetchData();
+  },
+  { deep: true }
+);
 
 // Cleanup on component unmount
 onBeforeUnmount(() => {
@@ -456,6 +463,7 @@ const resetFilter = () => {
   <!-- Action Buttons OUTSIDE the table container -->
   <div class="action-buttons">
     <v-btn v-if="props.actions?.includes('create')" color="green" class="me-2" @click="openDialog()">ایجاد ✅</v-btn>
+    <v-btn v-if="props.showRefreshButton" color="blue" class="me-2" @click="fetchData" :loading="loading">بروزرسانی 🔄 </v-btn>
     <v-btn v-if="hasFilterComponent" @click="filterDialog = true">فیلتر 🔍</v-btn>
   </div>
 
@@ -478,8 +486,10 @@ const resetFilter = () => {
         >
           <template v-slot:item="{ item, columns, index }">
             <tr :style="{ background: index % 2 === 0 ? '#fff' : '#f5f7fa' }">
-              <td v-for="column in columns" :key="column.key"
-                  :style="{
+              <td
+                v-for="column in columns"
+                :key="column.key"
+                :style="{
                   ...getColumnStyle(column, item),
                   ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
                 }"
@@ -489,17 +499,17 @@ const resetFilter = () => {
                     ویرایش ✏️
                   </v-btn>
                   <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="mr-2" @click="openDeleteDialog(item)"
-                  >حذف ❌
+                    >حذف ❌
                   </v-btn>
                   <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
-                  >🔍 نمایش
+                    >🔍 نمایش
                   </v-btn>
-                  <template v-for="(key) in props.routes" :key="key">
+                  <template v-for="key in props.routes" :key="key">
                     <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(key, item)">
                       {{ key.toUpperCase() }}
                     </v-btn>
                   </template>
-                  <v-btn v-for="(key) in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
+                  <v-btn v-for="key in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
                     {{ key.toUpperCase() }} ⬇️
                   </v-btn>
                   <v-btn
@@ -609,12 +619,7 @@ const resetFilter = () => {
         {{ props.customActions?.find((a) => a.component === customActionComponent)?.title || '' }}
       </v-card-title>
       <v-card-text>
-        <component
-          v-if="customActionComponent"
-          :is="customActionComponent"
-          :item="customActionItem"
-          @close="customActionDialog = false"
-        />
+        <component v-if="customActionComponent" :is="customActionComponent" :item="customActionItem" @close="customActionDialog = false" />
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -647,7 +652,7 @@ const resetFilter = () => {
   height: 100%;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .table-wrapper {
@@ -675,12 +680,13 @@ const resetFilter = () => {
   top: 0;
   background: white;
   z-index: 1;
-  box-shadow: 0 2px 4px -2px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.04);
 }
 
 :deep(.v-data-table__wrapper tbody tr:nth-child(even)) {
   background: #f5f7fa !important;
 }
+
 :deep(.v-data-table__wrapper tbody tr:nth-child(odd)) {
   background: #fff !important;
 }
