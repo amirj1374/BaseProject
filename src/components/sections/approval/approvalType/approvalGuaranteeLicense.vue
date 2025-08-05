@@ -2,7 +2,7 @@
     <div class="approval-section">
       <div class="section-header">
         <h4 class="section-title">تضامین جواز سبز</h4>
-        <v-btn color="secondary" @click="openDialog" :disabled="loading"> افزودن تضامین جواز سبز</v-btn>    </div>
+        <v-btn color="secondary" @click="openDialog" :disabled="loading || greenLicense.length >= 1"> افزودن تضامین جواز سبز</v-btn>    </div>
   
       <v-data-table-virtual
         :headers="headers"

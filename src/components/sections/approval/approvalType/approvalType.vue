@@ -37,6 +37,21 @@ const guaranteeData = ref<GuaranteeRequest[]>([]);
 const lcData = ref<LcRequest[]>([]);
 const greenLicenseData = ref<GreenLicense[]>([]);
 
+// Computed property to check if any data exists
+const hasAnyData = computed(() => {
+  return facilitiesData.value.length > 0 || 
+         guaranteeData.value.length > 0 || 
+         lcData.value.length > 0 || 
+         greenLicenseData.value.length > 0;
+});
+
+// Computed property for form validation
+const isFormValid = computed(() => {
+  return formData.value.summary.trim() !== '' && 
+         formData.value.activityType.trim() !== '' && 
+         formData.value.description.trim() !== '';
+});
+
 onMounted(() => {
   if (approvalStore.loanRequestDetailList) {
     isValid.value = true;
@@ -52,40 +67,81 @@ onMounted(() => {
 
 const submitData = async () => {
   try {
-    if (facilitiesData.value.length || guaranteeData.value.length || lcData.value.length || greenLicenseData.value.length) {
-      approvalStore.setLoanRequestDetailList({
-        summaryRequest: {
-          summary: formData.value.summary,
-          activityType: formData.value.activityType,
-          description: formData.value.description
-        },
-        facilities: facilitiesData.value[0] || {} as FacilitiesRequest,
-        guarantee: guaranteeData.value[0] || {} as GuaranteeRequest,
-        lc: lcData.value[0] || {} as LcRequest,
-        greenLicense: greenLicenseData.value[0] || {} as GreenLicense
-      });
+    // Check if any approval data exists
+    if (!hasAnyData.value) {
+      const errorMsg = 'لطفا درخواست مصوبه را ثبت کنید';
+      error.value = errorMsg;
+      showError.value = true;
+      return Promise.reject(errorMsg);
     }
-    else {
-      return Promise.reject('لطفا درخواست مصوبه را ثبت کنید');
-    }
+
+    // Update store with all data
+    approvalStore.setLoanRequestDetailList({
+      summaryRequest: {
+        summary: formData.value.summary,
+        activityType: formData.value.activityType,
+        description: formData.value.description
+      },
+      facilities: facilitiesData.value[0] || {} as FacilitiesRequest,
+      guarantee: guaranteeData.value[0] || {} as GuaranteeRequest,
+      lc: lcData.value[0] || {} as LcRequest,
+      greenLicense: greenLicenseData.value[0] || {} as GreenLicense
+    });
+
     return Promise.resolve();
   } catch (err) {
-    error.value = 'خطای ناشناخته در ثبت اطلاعات مشتری';
+    const errorMsg = err instanceof Error ? err.message : 'خطای ناشناخته در ثبت اطلاعات مشتری';
+    error.value = errorMsg;
     showError.value = true;
-    return Promise.reject(error.value);
+    return Promise.reject(errorMsg);
   }
 };
 
-// Add watch to load data when editing
+// Add watch to load data when editing for all data types
 watch(() => approvalStore.loanRequestDetailList?.facilities, (newFacilities) => {
   if (newFacilities && !isObjectEmpty(newFacilities)) {
     facilitiesData.value = [newFacilities];
   }
+  // Don't clear local data if store has empty object - this prevents data loss when navigating
+}, { immediate: true });
+
+watch(() => approvalStore.loanRequestDetailList?.guarantee, (newGuarantee) => {
+  if (newGuarantee && !isObjectEmpty(newGuarantee)) {
+    guaranteeData.value = [newGuarantee];
+  }
+  // Don't clear local data if store has empty object - this prevents data loss when navigating
+}, { immediate: true });
+
+watch(() => approvalStore.loanRequestDetailList?.lc, (newLc) => {
+  if (newLc && !isObjectEmpty(newLc)) {
+    lcData.value = [newLc];
+  }
+  // Don't clear local data if store has empty object - this prevents data loss when navigating
+}, { immediate: true });
+
+watch(() => approvalStore.loanRequestDetailList?.greenLicense, (newGreenLicense) => {
+  if (newGreenLicense && !isObjectEmpty(newGreenLicense)) {
+    greenLicenseData.value = [newGreenLicense];
+  }
+  // Don't clear local data if store has empty object - this prevents data loss when navigating
 }, { immediate: true });
 
 function isObjectEmpty(obj: any): boolean {
   if (!obj) return true;
-  return Object.values(obj).every((v) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0));
+  if (typeof obj !== 'object') return true;
+  if (Array.isArray(obj)) return obj.length === 0;
+  
+  // Check if it's an empty object (no own properties)
+  const keys = Object.keys(obj);
+  if (keys.length === 0) return true;
+  
+  // Check if all values are empty/null/undefined
+  return Object.values(obj).every((v) => {
+    if (v === undefined || v === null || v === '') return true;
+    if (Array.isArray(v)) return v.length === 0;
+    if (typeof v === 'object') return isObjectEmpty(v);
+    return false;
+  });
 }
 
 function handleSaveFacility(data: FacilitiesRequest) {
@@ -95,7 +151,8 @@ function handleSaveFacility(data: FacilitiesRequest) {
 
 function handleDeleteFacility(item: FacilitiesRequest) {
   facilitiesData.value = [];
-  approvalStore.updateFacilities({} as FacilitiesRequest);
+  // Don't update store with empty object, let it remain as is
+  // This prevents the watch from clearing data when navigating back
 }
 
 function handleSaveLC(data: LcRequest) {
@@ -105,7 +162,8 @@ function handleSaveLC(data: LcRequest) {
 
 function handleDeleteLC(item: LcRequest) {
   lcData.value = [];
-  approvalStore.updateLc({} as LcRequest);
+  // Don't update store with empty object, let it remain as is
+  // This prevents the watch from clearing data when navigating back
 }
 
 function handleSaveGuarantee(data: GuaranteeRequest) {
@@ -115,7 +173,8 @@ function handleSaveGuarantee(data: GuaranteeRequest) {
 
 function handleDeleteGuarantee(item: GuaranteeRequest) {
   guaranteeData.value = [];
-  approvalStore.updateGuarantee({} as GuaranteeRequest);
+  // Don't update store with empty object, let it remain as is
+  // This prevents the watch from clearing data when navigating back
 }
 
 function handleSaveGreenLicense(data: GreenLicense) {
@@ -125,10 +184,32 @@ function handleSaveGreenLicense(data: GreenLicense) {
 
 function handleDeleteGreenLicense(item: GreenLicense) {
   greenLicenseData.value = [];
-  approvalStore.updateGreenLicense({} as GreenLicense);
+  // Don't update store with empty object, let it remain as is
+  // This prevents the watch from clearing data when navigating back
 }
 
-defineExpose({ submitData });
+// Method to properly clear all data when needed (e.g., when starting a new request)
+function clearAllData() {
+  facilitiesData.value = [];
+  guaranteeData.value = [];
+  lcData.value = [];
+  greenLicenseData.value = [];
+  formData.value = {
+    summary: '',
+    activityType: '',
+    description: ''
+  };
+  // Clear the store as well
+  approvalStore.setLoanRequestDetailList({
+    summaryRequest: {} as any,
+    facilities: {} as FacilitiesRequest,
+    guarantee: {} as GuaranteeRequest,
+    lc: {} as LcRequest,
+    greenLicense: {} as GreenLicense
+  });
+}
+
+defineExpose({ submitData, clearAllData });
 </script>
 
 <template>
@@ -141,7 +222,8 @@ defineExpose({ submitData });
             v-model="formData.summary"
             label="خلاصه درخواست"
             variant="outlined"
-            density="comfortable" />
+            density="comfortable"
+            :rules="[(v: any) => !!v || 'این فیلد الزامی است']" />
         </v-col>
         <!-- National Code Input -->
         <v-col cols="12" md="6">
@@ -150,6 +232,7 @@ defineExpose({ submitData });
             label="نوع فعالیت"
             variant="outlined"
             density="comfortable"
+            :rules="[(v: any) => !!v || 'این فیلد الزامی است']"
           />
         </v-col>
         <v-col cols="12" md="12">
@@ -159,6 +242,7 @@ defineExpose({ submitData });
             variant="outlined"
             density="comfortable"
             rows="2"
+            :rules="[(v: any) => !!v || 'این فیلد الزامی است']"
           />
         </v-col>
         <v-divider inset></v-divider>
@@ -174,10 +258,40 @@ defineExpose({ submitData });
       <v-tab value="lc">اعتبار اسنادی</v-tab>
       <v-tab value="greenLicense">تضامین جواز سبز</v-tab>
     </v-tabs>
-    <Facilities ref="facilitiesRef" v-show="activeTab === 'facilities'" :loading="loading" @save="handleSaveFacility" @delete="handleDeleteFacility" @update:facilities="facilitiesData = $event" />
-    <Guarantee ref="guaranteeRef" :loading="loading" v-show="activeTab === 'guarantee'" @save="handleSaveGuarantee" @delete="handleDeleteGuarantee" @update:guarantee="guaranteeData = $event" />
-    <LetterOfCredit ref="lcRef" :loading="loading" v-show="activeTab === 'lc'" @save="handleSaveLC" @delete="handleDeleteLC" @update:lc="lcData = $event" />
-    <GreenLicense ref="greenLicenseRef" :loading="loading" v-show="activeTab === 'greenLicense'" @save="handleSaveGreenLicense" @delete="handleDeleteGreenLicense" @update:greenLicense="greenLicenseData = $event" />
+    
+    <!-- Use v-if instead of v-show for better performance -->
+    <Facilities 
+      v-if="activeTab === 'facilities'" 
+      ref="facilitiesRef" 
+      :loading="loading" 
+      @save="handleSaveFacility" 
+      @delete="handleDeleteFacility" 
+      @update:facilities="facilitiesData = $event" 
+    />
+    <Guarantee 
+      v-if="activeTab === 'guarantee'" 
+      ref="guaranteeRef" 
+      :loading="loading" 
+      @save="handleSaveGuarantee" 
+      @delete="handleDeleteGuarantee" 
+      @update:guarantee="guaranteeData = $event" 
+    />
+    <LetterOfCredit 
+      v-if="activeTab === 'lc'" 
+      ref="lcRef" 
+      :loading="loading" 
+      @save="handleSaveLC" 
+      @delete="handleDeleteLC" 
+      @update:lc="lcData = $event" 
+    />
+    <GreenLicense 
+      v-if="activeTab === 'greenLicense'" 
+      ref="greenLicenseRef" 
+      :loading="loading" 
+      @save="handleSaveGreenLicense" 
+      @delete="handleDeleteGreenLicense" 
+      @update:greenLicense="greenLicenseData = $event" 
+    />
   </div>
   <v-snackbar v-model="showError" color="error" timeout="5500">
     {{ error }}

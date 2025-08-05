@@ -169,7 +169,6 @@
                   density="comfortable"
                   suffix="%"
                   type="number"
-                  :rules="[percentRule]"
                   min="1"
                   max="100"
                 />
@@ -183,7 +182,6 @@
                   density="comfortable"
                   suffix="%"
                   type="number"
-                  :rules="[percentRule]"
                   min="1"
                   max="100"
                 />

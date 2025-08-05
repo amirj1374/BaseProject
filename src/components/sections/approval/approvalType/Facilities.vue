@@ -213,7 +213,6 @@
                   hide-details="auto"
                   suffix="%"
                   type="number"
-                  :rules="[percentRule]"
                   min="1"
                   max="100"
                 />
@@ -422,12 +421,15 @@ const cancelDeleteCollateral = () => {
 const dayCalculate = async () => {
   if (formData.year === null && formData.month === null && formData.day === null) {
     error.value = 'لطفا مقادیر تاریخ را وارد کنید';
+    showError.value = true;
     return;
   }
   try {
     const res = await api.approval.getCalculatedDay(Number(formData.year), Number(formData.month), Number(formData.day));
     formData.durationDay = res.data;
   } catch (err) {
+    error.value = 'خطا در محاسبه روزها';
+    showError.value = true;
     console.error('Error calculating days:', err);
   }
 };
@@ -470,7 +472,7 @@ function editItem(item: FacilitiesRequest) {
   formData.contractType = item.contractType || null;
   formData.facility = item.facility || null;
   formData.preferentialRate = item.preferentialRate;
-  formData.preReceiving = item.preReceiving;
+  formData.advancePayment = item.advancePayment;
   dialog.value = true;
 }
 
@@ -506,8 +508,14 @@ function deleteItem(item: FacilitiesRequest) {
 
 async function fetchFacilities(newContractType: ContractType | null) {
   if (!newContractType) return;
-  const res = await api.approval.getFacilities(newContractType.coreId, 'ContractCode');
-  facilityList.value = res.data.facilityDtoList || [];
+  try {
+    const res = await api.approval.getFacilities(newContractType.coreId, 'ContractCode');
+    facilityList.value = res.data.facilityDtoList || [];
+  } catch (err) {
+    error.value = 'خطا در دریافت لیست تسهیلات';
+    showError.value = true;
+    console.error('Error fetching facilities:', err);
+  }
 }
 
 function isObjectEmpty(obj: any): boolean {
@@ -516,10 +524,16 @@ function isObjectEmpty(obj: any): boolean {
 }
 
 onMounted(async () => {
-  const res = await api.approval.getContractType('ContractCode');
-  contractTypes.value = res.data.generalParameterList || [];
-  if (approvalStore.loanRequestDetailList?.facilities && !isObjectEmpty(approvalStore.loanRequestDetailList.facilities)) {
-    facilities.value = [approvalStore.loanRequestDetailList.facilities];
+  try {
+    const res = await api.approval.getContractType('ContractCode');
+    contractTypes.value = res.data.generalParameterList || [];
+    if (approvalStore.loanRequestDetailList?.facilities && !isObjectEmpty(approvalStore.loanRequestDetailList.facilities)) {
+      facilities.value = [approvalStore.loanRequestDetailList.facilities];
+    }
+  } catch (err) {
+    error.value = 'خطا در دریافت انواع قرارداد';
+    showError.value = true;
+    console.error('Error fetching contract types:', err);
   }
 });
 
