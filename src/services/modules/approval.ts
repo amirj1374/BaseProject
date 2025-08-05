@@ -30,7 +30,7 @@ export default (axiosInstance: AxiosInstance) => ({
   getContractType(loanRequestType: string) {
     return axiosInstance.get("/api/v1/general/get-contract-type", {
       params: {loanRequestType},
-      timeout: 60000 // مثلاً 10 ثانیه
+      timeout: 60000
     });
   },
   getFacilities(contractId: number, loanRequestTypeCode: string) {
@@ -48,7 +48,9 @@ export default (axiosInstance: AxiosInstance) => ({
   },
 
   saveGeneral(data: SaveGeneralPayload) {
-    return axiosInstance.post(`/api/v1/general`, data);
+    return axiosInstance.post(`/api/v1/general`, data, {
+      timeout: 60000
+    });
   },
   getSapInquiry(payload: FetchInquiryPayload) {
     return axiosInstance.post('/api/v1/sap-inquiry', payload, {

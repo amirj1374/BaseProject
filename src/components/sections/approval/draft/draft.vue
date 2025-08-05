@@ -44,7 +44,7 @@ defineExpose({ submitData });
   <div class="approval-section">
     <h3 class="group-title">پیشنویس</h3>
       <v-container fluid>
-        <v-row class="mt-5">
+        <v-row class="">
           <!-- Facilities Checkbox -->
           <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
             <Facilities :currencies="currencies"/>

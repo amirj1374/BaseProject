@@ -18,12 +18,11 @@ const formData = ref({
   beneficiaryCustomer: null,
   relatedName: null,
   unrelatedObligationsAmount: null,
-  currentOffersAmount: null,
+  creditLimitDate: null,
   approvalNumber: null,
   approvedFacilitiesAmount: null,
   approvalDate: null,
-  creditLimitDate: null,
-  loanRequestId: null,
+  currentOffersAmount: null,
   atBranchLevel: false,
   notUsed: false,
   previousLoanAppropriate: false
@@ -90,53 +89,21 @@ const submitData = async () => {
     <v-card title="ملاحظات">
       <v-card-text>
         <v-row>
-          <v-col cols="12" md="3">
+          <v-col cols="12" md="6">
             <v-radio-group inline label="بازپرداخت تسهیلات دریافتی قبلی">
-              <v-radio v-model="formData.previousLoanAppropriate" label="مناسب نبوده است" value="false"></v-radio>
-              <v-radio v-model="formData.previousLoanAppropriate" label="مناسب بوده است" value="true"></v-radio>
+              <v-radio v-model="formData.previousLoanAppropriate" label="مناسب نبوده است" :value=false></v-radio>
+              <v-radio v-model="formData.previousLoanAppropriate" label="مناسب بوده است" :value=true></v-radio>
             </v-radio-group>
           </v-col>
-          <v-col cols="12" md="3">
+          <v-col cols="12" md="6">
             <v-radio-group inline label="سفته واخواستی">
               <v-radio v-model="formData.havePromissoryNote" label="ندارد" value="false"></v-radio>
               <v-radio v-model="formData.havePromissoryNote" label="دارد" value="true"></v-radio>
             </v-radio-group>
           </v-col>
-          <v-col cols="12" md="3">
-            <v-radio-group inline label="در حد شعبه">
-              <v-radio v-model="formData.atBranchLevel" label="هست" value="true"></v-radio>
-              <v-radio v-model="formData.atBranchLevel" label="نیست" value="false"></v-radio>
-            </v-radio-group>
-          </v-col>
-          <v-col cols="12" md="3">
-            <v-radio-group inline label="مورد استفاده مشتری">
-              <v-radio v-model="formData.notUsed" label="قرار گرفته هست" value="true"></v-radio>
-              <v-radio v-model="formData.notUsed" label="قرار نگرفته هست" value="false"></v-radio>
-            </v-radio-group>
-          </v-col>
         </v-row>
         <v-row>
-          <v-col cols="12" md="4">
-            <v-text-field
-              v-model="formData.approvedFacilitiesAmount"
-              density="comfortable"
-              hide-details="auto"
-              variant="outlined"
-              color="primary"
-              label="تسهیلات تصویبی به مبلغ"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-text-field
-              v-model="formData.approvalNumber"
-              density="comfortable"
-              hide-details="auto"
-              variant="outlined"
-              color="primary"
-              label="شماره مصوبه"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" md="4">
+          <v-col cols="12" md="12">
             <v-text-field
               v-model="formData.currentOffersAmount"
               density="comfortable"
@@ -144,36 +111,18 @@ const submitData = async () => {
               variant="outlined"
               color="primary"
               label="پیشنهادات در جریان به مبلغ"
+              suffix="قبلا ارسال ولیکن هنوز مصوبه دریافت نشده است"
             ></v-text-field>
           </v-col>
-          <v-col cols="12" md="4">
+          <v-col cols="12" md="12">
             <v-text-field
-              v-model="formData.unrelatedObligationsAmount"
+              v-model="formData.creditLimitDate"
               density="comfortable"
               hide-details="auto"
               variant="outlined"
               color="primary"
-              label="مشتری دارای تعهدات غیر مستقیم به میزان"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-text-field
-              v-model="formData.relatedName"
-              density="comfortable"
-              hide-details="auto"
-              variant="outlined"
-              color="primary"
-              label="بابت تسهیلات خانم / آقا / شرکت"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-text-field
-              v-model="formData.beneficiaryCustomer"
-              density="comfortable"
-              hide-details="auto"
-              variant="outlined"
-              color="primary"
-              label="مشتری ذینفع واحد خانم / آقا / شرکت"
+              label="حد اعتباریه سالانه / سقف اعتباری مشتری در تاریخ"
+              suffix="سر رسید میگردد"
             ></v-text-field>
           </v-col>
         </v-row>
