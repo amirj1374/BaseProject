@@ -57,13 +57,24 @@ interface Props {
   pagination?: any;
   showRefreshButton?: boolean; // Shows refresh button in action buttons
   title?: string; // Custom title for the page
+  selectable?: boolean; // Enable row selection
+  multiSelect?: boolean; // Allow multiple row selection
+  selectedItems?: any[]; // External selected items (for v-model)
 }
 
 const props = withDefaults(defineProps<Props>(), {
   autoFetch: true,
   showPagination: true,
-  showRefreshButton: false
+  showRefreshButton: false,
+  selectable: false,
+  multiSelect: false,
+  selectedItems: () => []
 });
+
+const emit = defineEmits<{
+  (e: 'update:selectedItems', items: any[]): void;
+  (e: 'selection-change', items: any[]): void;
+}>();
 
 defineOptions({ inheritAttrs: false });
 
@@ -89,6 +100,63 @@ const filterModel = ref<Record<string, any>>({});
 const tableRef = ref<HTMLElement | null>(null);
 const isLoadingMore = ref(false);
 const hasMore = ref(true);
+
+// Selection state
+const selectedItems = ref<any[]>([]);
+const selectAll = ref(false);
+
+// Selection methods
+const toggleSelection = (item: any) => {
+  if (!props.selectable) return;
+  
+  const index = selectedItems.value.findIndex(selected => selected.id === item.id);
+  if (index > -1) {
+    selectedItems.value.splice(index, 1);
+  } else {
+    if (props.multiSelect) {
+      selectedItems.value.push(item);
+    } else {
+      selectedItems.value = [item];
+    }
+  }
+  
+  // Emit selection change events
+  emit('update:selectedItems', selectedItems.value);
+  emit('selection-change', selectedItems.value);
+};
+
+const toggleSelectAll = () => {
+  if (!props.selectable || !props.multiSelect) return;
+  
+  if (selectAll.value) {
+    selectedItems.value = [];
+  } else {
+    selectedItems.value = [...items.value];
+  }
+  selectAll.value = !selectAll.value;
+  
+  // Emit selection change events
+  emit('update:selectedItems', selectedItems.value);
+  emit('selection-change', selectedItems.value);
+};
+
+const isSelected = (item: any) => {
+  return selectedItems.value.some(selected => selected.id === item.id);
+};
+
+// Computed properties for selection
+const selectedCount = computed(() => selectedItems.value.length);
+const hasSelection = computed(() => selectedItems.value.length > 0);
+
+// Clear selection method
+const clearSelection = () => {
+  selectedItems.value = [];
+  selectAll.value = false;
+  
+  // Emit selection change events
+  emit('update:selectedItems', selectedItems.value);
+  emit('selection-change', selectedItems.value);
+};
 
 // Memoize computed properties
 const cleanFilterModel = computed(() => {
@@ -241,7 +309,13 @@ const loadMore = async () => {
 // Expose methods to parent component
 defineExpose({
   fetchData,
-  items
+  items,
+  selectedItems,
+  getSelectedItems: () => selectedItems.value,
+  clearSelection: () => {
+    selectedItems.value = [];
+    selectAll.value = false;
+  }
 });
 
 const openDialog = (item?: any) => {
@@ -479,6 +553,16 @@ const handleFilterApply = (filterData: any) => {
     <v-btn v-if="props.actions?.includes('create')" color="green" class="me-2" @click="openDialog()">ایجاد ✅</v-btn>
     <v-btn v-if="hasFilterComponent" class="me-2" @click="filterDialog = true">فیلتر 🔍</v-btn>
     <v-btn v-if="props.showRefreshButton" color="blue"  @click="fetchData" :loading="loading">بروزرسانی 🔄 </v-btn>
+    
+    <!-- Selection Actions -->
+    <div v-if="props.selectable && hasSelection" class="selection-actions">
+      <v-chip color="primary" class="me-2">
+        {{ selectedCount }} آیتم انتخاب شده
+      </v-chip>
+      <v-btn color="orange" size="small" class="me-2" @click="clearSelection">
+        پاک کردن انتخاب
+      </v-btn>
+    </div>
   </div>
 
   <!-- Data Table Container (fills parent height) -->
@@ -489,7 +573,11 @@ const handleFilterApply = (filterData: any) => {
       </template>
       <template v-else>
         <v-data-table
-          :headers="[...props.headers, { title: 'عملیات', key: 'actions', sortable: false }]"
+          :headers="[
+            ...(props.selectable ? [{ title: '', key: 'selection', sortable: false, width: 50 }] : []),
+            ...props.headers, 
+            { title: 'عملیات', key: 'actions', sortable: false }
+          ]"
           :items="items"
           hide-default-footer
           class="elevation-1"
@@ -498,6 +586,17 @@ const handleFilterApply = (filterData: any) => {
           fixed-header
           :height="props.height"
         >
+          <!-- Custom Header for Selection -->
+          <template v-slot:header.selection="{ column }">
+            <v-checkbox
+              v-if="props.selectable && props.multiSelect"
+              :model-value="selectAll"
+              @update:model-value="toggleSelectAll"
+              :indeterminate="selectedCount > 0 && selectedCount < items.length"
+              hide-details
+              density="compact"
+            />
+          </template>
           <template v-slot:item="{ item, columns, index }">
             <tr :style="{ background: index % 2 === 0 ? '#fff' : '#f5f7fa' }">
               <td
@@ -508,6 +607,16 @@ const handleFilterApply = (filterData: any) => {
                   ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
                 }"
               >
+                <!-- Selection Checkbox -->
+                <template v-if="column.key === 'selection'">
+                  <v-checkbox
+                    :model-value="isSelected(item)"
+                    @update:model-value="toggleSelection(item)"
+                    :disabled="!props.selectable"
+                    hide-details
+                    density="compact"
+                  />
+                </template>
                 <template v-if="column.key === 'actions'">
                   <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
                     ویرایش ✏️
@@ -697,6 +806,16 @@ const handleFilterApply = (filterData: any) => {
 .action-buttons {
   margin-bottom: 16px;
   padding: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.selection-actions {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
 }
 
 :deep(.v-data-table__wrapper table thead) {

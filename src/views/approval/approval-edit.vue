@@ -28,7 +28,7 @@ import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import ApprovalEdit from '@/components/sections/approval/approvalEdit/approvalEdit.vue';
 
 const routes = {
-  'جزییات بیشتر ⬅️':'/approval/{id}'
+  'جزییات بیشتر⬅️':'/approval/{id}'
 };
 const { requirePermission } = useRouteGuard();
 const breadcrumbs = ref([
