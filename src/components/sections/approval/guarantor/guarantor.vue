@@ -143,6 +143,12 @@ const submitData = async () => {
     return Promise.reject(error.value);
   }
 
+  // Always call API, but don't show success alert if we already have trackingCode
+  const hasExistingTrackingCode = !!approvalStore.trackingCode;
+  if (hasExistingTrackingCode) {
+    console.log('Already have trackingCode:', approvalStore.trackingCode);
+  }
+
   submitting.value = true;
   error.value = null;
   showError.value = false;
@@ -173,6 +179,8 @@ const submitData = async () => {
       trackingCode: approvalStore.trackingCode
     };
 
+    console.log('Calling saveGeneral API with payload:', payload);
+
     // Call API to send data
     const response = await api.approval.saveGeneral(payload);
 
@@ -180,18 +188,14 @@ const submitData = async () => {
       success.value = response.data.trackingCode;
       approvalStore.setLoanRequestId(response.data.loanRequestId);
       approvalStore.setTrackingCode(response.data.trackingCode);
-      dialog.value = true;
-
-      // Return a new Promise that resolves when dialog is closed
-      return new Promise((resolve, reject) => {
-        const unwatch = watch(dialog, (newValue) => {
-          if (!newValue) {
-            // When dialog is closed
-            unwatch(); // Stop watching
-            resolve(data.value);
-          }
-        });
-      });
+      
+      // Only show dialog if we didn't have a trackingCode before
+      if (!hasExistingTrackingCode) {
+        dialog.value = true;
+      }
+      
+      // Return success without waiting for dialog to close
+      return data.value;
     } else {
       error.value = 'خطا در ثبت اطلاعات';
       showError.value = true;
@@ -295,7 +299,7 @@ defineExpose({ submitData });
         <v-dialog v-model="dialog" max-width="400">
           <v-card prepend-icon="mdi-update" title="پیام سیستم">
             <v-card-text>
-              <v-alert v-if="success" type="success" variant="tonal" class="my-4"> کد رهگیری: {{ success }}</v-alert>
+              <v-alert v-if="success" type="success" variant="tonal" class="my-4" timeout="10000"> کد رهگیری: {{ success }}</v-alert>
             </v-card-text>
 
             <v-card-text>

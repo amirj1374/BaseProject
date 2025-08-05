@@ -135,7 +135,11 @@ const handleSubmit = async () => {
     if (currentStepComponent && typeof currentStepComponent.submitData === 'function') {
       await currentStepComponent.submitData();
     }
-    await nextStep();
+    
+    // Move to next step without calling submitData again
+    if (stepper.value < totalSteps) {
+      stepper.value++;
+    } 
   } catch (err) {
     showSuccess.value = false;
     error.value = typeof err === 'string' ? err : (err && (err as any).message ? (err as any).message : 'لطفا اطلاعات را بررسی کنید');

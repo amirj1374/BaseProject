@@ -36,19 +36,19 @@ const sidebarItem: menu[] = [
     title: 'درخواست مصوبه جدید',
     icon: IconPencilPlus,
     to: '/approval',
-    permissionKey: 'approval_new'
-  },
-  {
-    title: 'کارتابل',
-    icon: IconTableShare,
-    to: '/cartable',
-    permissionKey: 'cartable'
+    permissionKey: 'approval_new',
   },
   {
     title: 'ویرایش درخواست مصوبه',
     icon: IconBookmarkEdit,
     to: '/approval/edit',
     permissionKey: 'approval_edit'
+  },
+  {
+    title: 'کارتابل',
+    icon: IconTableShare,
+    to: '/cartable',
+    permissionKey: 'cartable'
   },
   {
     title: 'ارجاع درخواست های جاری',
