@@ -41,7 +41,7 @@ const headers = [
   { title: 'نام و نام خانوادگی', key: 'fullName' },
   { title: 'کد ملی', key: 'nationalCode' },
   { title: 'نوع', key: 'relationType', translate: true, options: RelationTypeOptions },
-  { title: 'عنوان مدرک', key: 'fileTitle' },
+  { title: 'عنوان مدرک', key: 'fileTitle' }
 ];
 const handleUpload = (doc: Document) => {
   selectedDoc.value = doc;
@@ -109,6 +109,7 @@ function getCustomButtons(doc: Document) {
     }
   ];
 }
+
 const submitData = async () => {
   return Promise.resolve();
 };
@@ -116,20 +117,21 @@ defineExpose({ submitData });
 </script>
 
 <template>
-  <form @submit.prevent="submitData" class="upload-form">
-    <CustomDataTable
-      ref="dataTableRef"
-      :headers="headers"
-      api-resource="general/get-all-doc"
-      :query-params="{ loanRequestId: approvalStore.loanRequestId, 
-        groupByItem: 'GUARANTOR'
-      }"
-      :auto-fetch="true"
-      :show-pagination="true"
-      :custom-buttons-fn="getCustomButtons"
-      :height="500"
-    />
-  </form>
+  <div class="approval-section">
+    <form @submit.prevent="submitData" class="upload-form">
+      <CustomDataTable
+        ref="dataTableRef"
+        :headers="headers"
+        api-resource="general/get-all-doc"
+        :query-params="{ loanRequestId: approvalStore.loanRequestId }"
+        :show-refresh-button="true"
+        :auto-fetch="true"
+        :show-pagination="true"
+        :custom-buttons-fn="getCustomButtons"
+        :height="430"
+      />
+    </form>
+  </div>
 
   <v-dialog v-model="showUploadDialog" max-width="500px">
     <v-card>
@@ -159,8 +161,8 @@ defineExpose({ submitData });
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-title>
-      <v-card-text style="text-align: center;" mini-variant>
-        <img v-if="imageDialogUrl" :src="imageDialogUrl" alt="تصویر" style="max-width: 100%; max-height: 400px; border-radius: 8px;" />
+      <v-card-text style="text-align: center" mini-variant>
+        <img v-if="imageDialogUrl" :src="imageDialogUrl" alt="تصویر" style="max-width: 100%; max-height: 400px; border-radius: 8px" />
       </v-card-text>
     </v-card>
   </v-dialog>
