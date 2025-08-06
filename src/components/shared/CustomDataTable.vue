@@ -60,6 +60,7 @@ interface Props {
   selectable?: boolean; // Enable row selection
   multiSelect?: boolean; // Allow multiple row selection
   selectedItems?: any[]; // External selected items (for v-model)
+  uniqueKey?: string | ((item: any) => string | number); // Custom unique key for selection
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -68,7 +69,8 @@ const props = withDefaults(defineProps<Props>(), {
   showRefreshButton: false,
   selectable: false,
   multiSelect: false,
-  selectedItems: () => []
+  selectedItems: () => [],
+  uniqueKey: 'id'
 });
 
 const emit = defineEmits<{
@@ -105,11 +107,28 @@ const hasMore = ref(true);
 const selectedItems = ref<any[]>([]);
 const selectAll = ref(false);
 
+// Helper function to get unique value from item
+const getUniqueValue = (item: any): string | number => {
+  if (typeof props.uniqueKey === 'function') {
+    return props.uniqueKey(item);
+  }
+  
+  if (typeof props.uniqueKey === 'string') {
+    // Handle nested properties like "user.id"
+    return props.uniqueKey.split('.').reduce((obj, key) => obj?.[key], item);
+  }
+  
+  // Fallback to id
+  return item.id;
+};
+
 // Selection methods
 const toggleSelection = (item: any) => {
   if (!props.selectable) return;
   
-  const index = selectedItems.value.findIndex(selected => selected.id === item.id);
+  const itemUniqueValue = getUniqueValue(item);
+  const index = selectedItems.value.findIndex(selected => getUniqueValue(selected) === itemUniqueValue);
+  
   if (index > -1) {
     selectedItems.value.splice(index, 1);
   } else {
@@ -141,7 +160,8 @@ const toggleSelectAll = () => {
 };
 
 const isSelected = (item: any) => {
-  return selectedItems.value.some(selected => selected.id === item.id);
+  const itemUniqueValue = getUniqueValue(item);
+  return selectedItems.value.some(selected => getUniqueValue(selected) === itemUniqueValue);
 };
 
 // Computed properties for selection

@@ -128,7 +128,7 @@ defineExpose({ submitData });
               <div>در حال استعلام تعهدات مستقیم...</div>
             </div>
             <template v-else>
-              <div><b>مبلغ کل : </b> {{ DirectObligationData?.totalAmount || 'استعلام نا موفق' }}</div>
+              <div><b>مبلغ کل : </b> {{ DirectObligationData?.totalAmount }}</div>
             </template>
           </div>
         </v-card>

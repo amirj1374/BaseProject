@@ -22,6 +22,7 @@
             :selectable="true"
             :multi-select="true"
             :selectedItems="selectedItems"
+            unique-key="accountNo"
           />
         </v-card-text>
         <v-card-actions style="display: flex; justify-content: space-evenly">
@@ -43,6 +44,7 @@ import { useRouteGuard } from '@/composables/useRouteGuard';
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import { useApprovalStore } from '@/stores/approval';
 import { api } from '@/services/api';
+import type { DepositAccount } from '@/types/approval/approvalType';
 
 const { requirePermission } = useRouteGuard();
 const approvalStore = useApprovalStore();
@@ -56,7 +58,7 @@ const isDialogActive = ref(false);
 const valid = ref(false);
 
 // Selected items state
-const selectedItems = ref<any[]>([]);
+const selectedItems = ref<DepositAccount[]>([]);
 
 // handle selected changes
 const handleSelectionChange = (items: any[]) => {
@@ -71,21 +73,43 @@ const handleSelectedItemsUpdate = (items: any[]) => {
 };
 
 const handleSave = async () => {
-  console.log(selectedItems.value);
-  // if (!selectedItems.value) {
-  //   error.value = "لطفاً یک حساب را انتخاب کنید";
-  //   return;
-  // }
-  // try {
-  //   const res = await api.approval.saveDeposit(approvalStore.loanRequestId, selectedItems);
-  //   if (res.status === 200) {
-  //     isDialogActive.value = false;
-  //     valid.value = true;
-  //   }
-  // } catch (err) {
-  //   console.error('API error:', err);
-  // } finally {
-  // }
+  console.log('Selected accounts:', selectedItems.value);
+  
+  if (!selectedItems.value || selectedItems.value.length === 0) {
+    error.value = "لطفاً حداقل یک حساب را انتخاب کنید";
+    snackbarMessage.value = error.value;
+    snackbarColor.value = 'error';
+    showSnackbar.value = true;
+    return;
+  }
+  
+  try {
+    // Ensure we have a valid loanRequestId
+    const loanRequestId = approvalStore.loanRequestId;
+    if (!loanRequestId) {
+      throw new Error('شناسه درخواست وام یافت نشد');
+    }
+    
+    // The API expects an array of deposit accounts (type definition is incorrect in service)
+    const res = await (api.approval as any).saveDeposit(loanRequestId as string, selectedItems.value);
+    if (res.status === 200) {
+      isDialogActive.value = false;
+      valid.value = true;
+      snackbarMessage.value = `${selectedItems.value.length} حساب با موفقیت ثبت شد`;
+      snackbarColor.value = 'success';
+      showSnackbar.value = true;
+      
+      // Clear selection after successful save
+      selectedItems.value = [];
+      dataTableRef.value?.clearSelection();
+    }
+  } catch (err: any) {
+    console.error('API error:', err);
+    error.value = err?.response?.data?.message || err?.message || 'خطا در ثبت حساب‌ها';
+    snackbarMessage.value = error.value || 'خطا در ثبت حساب‌ها';
+    snackbarColor.value = 'error';
+    showSnackbar.value = true;
+  }
 };
 // Headers configuration with custom JSON support
 const headers = [

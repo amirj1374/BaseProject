@@ -57,7 +57,7 @@ const headers = [
     // Custom formatter example
     formatter: (value: any, item: any) => {
       if (item.fromRole && typeof item.fromRole === 'object') {
-        return `${item.fromRole.name}`;
+        return `${item.fromRole.description}`;
       }
       return value;
     }
@@ -70,7 +70,7 @@ const headers = [
     nestedKey: 'toRole.name',
     formatter: (value: any, item: any) => {
       if (item.toRole && typeof item.toRole === 'object') {
-        return `${item.toRole.name}`;
+        return `${item.toRole.description}`;
       }
       return value;
     }
