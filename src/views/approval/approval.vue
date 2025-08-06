@@ -179,6 +179,7 @@ onBeforeUnmount(() => {
   <div class="actions">
     <v-btn v-if="stepper < totalSteps" color="secondary" @click="handleSubmit" :loading="submitting"> مرحله بعد</v-btn>
     <v-btn v-else color="secondary" @click="handleCartable" :loading="submitting"> ایجاد کارتابل</v-btn>
+    <v-chip v-if="approvalStore.trackingCode" size="x-large" color="secondary" variant="tonal" readonly>  کد درخواست :  {{approvalStore.trackingCode}}</v-chip>
     <v-btn @click="prevStep" :disabled="stepper === 1">مرحله قبلی</v-btn>
   </div>
 
