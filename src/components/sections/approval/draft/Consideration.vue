@@ -13,19 +13,12 @@ const approvalStore = useApprovalStore()
 
 // initial data
 const formData = ref({
+  loanRequestId: approvalStore.loanRequestId,
+  previousLoanAppropriate: false,
   havePromissoryNote: false,
-  signatory: null,
-  beneficiaryCustomer: null,
-  relatedName: null,
-  unrelatedObligationsAmount: null,
-  creditLimitDate: null,
-  approvalNumber: null,
-  approvedFacilitiesAmount: null,
-  approvalDate: null,
-  currentOffersAmount: null,
-  atBranchLevel: false,
-  notUsed: false,
-  previousLoanAppropriate: false
+  signatory:'',
+  currentOffersAmount: 0,
+  creditLimitDate: null
 });
 
 onMounted(async () => {
@@ -42,22 +35,15 @@ async function save() {
 
   try {
     const payload: ConsiderationPayload = {
+      loanRequestId: approvalStore.loanRequestId,
+      previousLoanAppropriate: formData.value.previousLoanAppropriate,
       havePromissoryNote: formData.value.havePromissoryNote,
       signatory: formData.value.signatory,
-      beneficiaryCustomer: formData.value.beneficiaryCustomer,
-      relatedName: formData.value.relatedName,
-      unrelatedObligationsAmount: formData.value.unrelatedObligationsAmount,
       currentOffersAmount: formData.value.currentOffersAmount,
-      approvalNumber: formData.value.approvalNumber,
-      approvedFacilitiesAmount: formData.value.approvedFacilitiesAmount,
-      approvalDate: formData.value.approvalDate,
-      creditLimitDate: formData.value.creditLimitDate,
-      atBranchLevel: formData.value.atBranchLevel,
-      notUsed: formData.value.notUsed,
-      previousLoanAppropriate: formData.value.previousLoanAppropriate
+      creditLimitDate: null,
     };
 
-    const response = await api.approval.saveConsideration(payload, approvalStore.loanRequestId);
+    const response = await api.approval.saveConsideration(payload);
 
     if (response.status === 200 && response.data) {
       const raw = response.data;
@@ -90,15 +76,15 @@ const submitData = async () => {
       <v-card-text>
         <v-row>
           <v-col cols="12" md="6">
-            <v-radio-group inline label="بازپرداخت تسهیلات دریافتی قبلی">
-              <v-radio v-model="formData.previousLoanAppropriate" label="مناسب نبوده است" :value=false></v-radio>
-              <v-radio v-model="formData.previousLoanAppropriate" label="مناسب بوده است" :value=true></v-radio>
+            <v-radio-group inline label="بازپرداخت تسهیلات دریافتی قبلی" v-model="formData.previousLoanAppropriate">
+              <v-radio label="مناسب نبوده است" :value=false></v-radio>
+              <v-radio label="مناسب بوده است" :value=true></v-radio>
             </v-radio-group>
           </v-col>
           <v-col cols="12" md="6">
-            <v-radio-group inline label="سفته واخواستی">
-              <v-radio v-model="formData.havePromissoryNote" label="ندارد" value="false"></v-radio>
-              <v-radio v-model="formData.havePromissoryNote" label="دارد" value="true"></v-radio>
+            <v-radio-group inline label="سفته واخواستی" v-model="formData.havePromissoryNote">
+              <v-radio label="ندارد" :value="false"></v-radio>
+              <v-radio label="دارد"  :value="true"></v-radio>
             </v-radio-group>
           </v-col>
         </v-row>

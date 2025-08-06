@@ -192,19 +192,12 @@ export interface DepositListResponse {
 }
 
 export interface ConsiderationPayload {
-  havePromissoryNote: boolean;
-  signatory: string | null;
-  beneficiaryCustomer: string | null;
-  relatedName: string | null;
-  unrelatedObligationsAmount: number | null;
-  currentOffersAmount: number | null;
-  approvalNumber: number | null;
-  approvedFacilitiesAmount: number | null;
-  approvalDate: string | null;
-  creditLimitDate: string | null;
-  atBranchLevel: boolean;
-  notUsed: boolean;
+  loanRequestId: string;
   previousLoanAppropriate: boolean;
+  havePromissoryNote: boolean;
+  signatory: string;
+  currentOffersAmount: number;
+  creditLimitDate: Date | null;
 }
 
 export interface UploadFile {
@@ -276,6 +269,7 @@ export interface LcRequest {
   advancePayment: string;
   lcType: string;
 }
+
 export interface ContractType {
   coreId: number;
   activationDate: string;

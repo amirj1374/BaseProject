@@ -4,7 +4,6 @@
     <AlertCircleIcon v-if="!valid" style="margin-right: 20px" size="20" />
     <SquareRoundedCheckFilledIcon v-if="valid" style="margin-right: 20px" size="20" />
   </v-btn>
-  <div class="approval-section">
     <v-dialog v-model="isDialogActive" max-width="full" min-height="full">
       <v-card title="حساب های سپرده">
         <v-card-text>
@@ -35,7 +34,6 @@
     <v-snackbar v-model="showSnackbar" :color="snackbarColor" timeout="3000">
       {{ snackbarMessage }}
     </v-snackbar>
-  </div>
 </template>
 
 <script lang="ts" setup>

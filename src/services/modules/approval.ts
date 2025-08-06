@@ -92,8 +92,8 @@ export default (axiosInstance: AxiosInstance) => ({
     });
   },
 
-    saveConsideration(payload: ConsiderationPayload, loanRequestId: string) {
-      return axiosInstance.post('/api/v1/consideration',{payload,loanRequestId});
+    saveConsideration(payload: ConsiderationPayload) {
+      return axiosInstance.post('/api/v1/consideration',payload);
     },
 
   uploadExcel(payload: UploadFile) {
