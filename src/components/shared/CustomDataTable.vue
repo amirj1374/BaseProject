@@ -1103,14 +1103,14 @@ const handleFilterApply = (filterData: any) => {
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #f5f7fa 0%, #E3EBEB 100%);
   cursor: pointer;
   transition: all 0.3s ease;
   border-bottom: 1px solid #e0e0e0;
 }
 
 .group-header:hover {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  background: linear-gradient(135deg, #e3f2fd 0%, #E3EBEB 100%);
 }
 
 .group-header.expanded {
