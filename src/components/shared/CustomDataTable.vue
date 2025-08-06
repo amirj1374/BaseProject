@@ -61,6 +61,10 @@ interface Props {
   multiSelect?: boolean; // Allow multiple row selection
   selectedItems?: any[]; // External selected items (for v-model)
   uniqueKey?: string | ((item: any) => string | number); // Custom unique key for selection
+  pageSize?: number; // Page size for pagination (default: 10)
+  groupBy?: string | ((item: any) => string | number); // Property to group items by
+  groupHeaderTemplate?: (groupKey: string | number, groupItems: any[]) => string; // Custom group header template
+  defaultExpanded?: boolean; // Whether groups are expanded by default
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -70,7 +74,9 @@ const props = withDefaults(defineProps<Props>(), {
   selectable: false,
   multiSelect: false,
   selectedItems: () => [],
-  uniqueKey: 'id'
+  uniqueKey: 'id',
+  pageSize: 10,
+  defaultExpanded: false
 });
 
 const emit = defineEmits<{
@@ -92,7 +98,7 @@ const itemToDelete = ref<Record<string, any> | null>(null);
 const snackbar = ref(true);
 const snackbarMessage = ref('');
 const router = useRouter();
-const itemsPerPage = ref(10);
+const itemsPerPage = ref(props.pageSize);
 const totalSize = ref(0);
 const totalPages = ref(0);
 const currentPage = ref(1);
@@ -107,6 +113,16 @@ const hasMore = ref(true);
 const selectedItems = ref<any[]>([]);
 const selectAll = ref(false);
 
+// Grouping state
+const groupedItems = ref<Array<{
+  groupKey: string | number;
+  groupLabel: string;
+  items: any[];
+  isExpanded: boolean;
+  count: number;
+}>>([]);
+const expandedGroups = ref<Set<string | number>>(new Set());
+
 // Helper function to get unique value from item
 const getUniqueValue = (item: any): string | number => {
   if (typeof props.uniqueKey === 'function') {
@@ -120,6 +136,67 @@ const getUniqueValue = (item: any): string | number => {
   
   // Fallback to id
   return item.id;
+};
+
+// Helper function to get group value from item
+const getGroupValue = (item: any): string | number => {
+  if (!props.groupBy) return '';
+  
+  if (typeof props.groupBy === 'function') {
+    return props.groupBy(item);
+  }
+  
+  if (typeof props.groupBy === 'string') {
+    // Handle nested properties like "user.department"
+    return props.groupBy.split('.').reduce((obj, key) => obj?.[key], item);
+  }
+  
+  return item[props.groupBy] || '';
+};
+
+// Helper function to get group label
+const getGroupLabel = (groupKey: string | number, groupItems: any[]): string => {
+  if (props.groupHeaderTemplate) {
+    return props.groupHeaderTemplate(groupKey, groupItems);
+  }
+  
+  return `${groupKey} (${groupItems.length} آیتم)`;
+};
+
+// Function to group items
+const groupItems = (items: any[]) => {
+  if (!props.groupBy) {
+    groupedItems.value = [];
+    return;
+  }
+  
+  const groups = new Map<string | number, any[]>();
+  
+  // Group items by the specified property
+  items.forEach(item => {
+    const groupKey = getGroupValue(item);
+    if (!groups.has(groupKey)) {
+      groups.set(groupKey, []);
+    }
+    groups.get(groupKey)!.push(item);
+  });
+  
+  // Convert to array format
+  groupedItems.value = Array.from(groups.entries()).map(([groupKey, groupItems]) => ({
+    groupKey,
+    groupLabel: getGroupLabel(groupKey, groupItems),
+    items: groupItems,
+    isExpanded: props.defaultExpanded || expandedGroups.value.has(groupKey),
+    count: groupItems.length
+  }));
+  
+  // Sort groups by key
+  groupedItems.value.sort((a, b) => {
+    if (typeof a.groupKey === 'string' && typeof b.groupKey === 'string') {
+      return a.groupKey.localeCompare(b.groupKey);
+    }
+    return a.groupKey < b.groupKey ? -1 : a.groupKey > b.groupKey ? 1 : 0;
+  });
 };
 
 // Selection methods
@@ -157,6 +234,36 @@ const toggleSelectAll = () => {
   // Emit selection change events
   emit('update:selectedItems', selectedItems.value);
   emit('selection-change', selectedItems.value);
+};
+
+// Group toggle function
+const toggleGroup = (groupKey: string | number) => {
+  const group = groupedItems.value.find(g => g.groupKey === groupKey);
+  if (group) {
+    group.isExpanded = !group.isExpanded;
+    
+    if (group.isExpanded) {
+      expandedGroups.value.add(groupKey);
+    } else {
+      expandedGroups.value.delete(groupKey);
+    }
+  }
+};
+
+// Expand all groups
+const expandAllGroups = () => {
+  groupedItems.value.forEach(group => {
+    group.isExpanded = true;
+    expandedGroups.value.add(group.groupKey);
+  });
+};
+
+// Collapse all groups
+const collapseAllGroups = () => {
+  groupedItems.value.forEach(group => {
+    group.isExpanded = false;
+    expandedGroups.value.delete(group.groupKey);
+  });
 };
 
 const isSelected = (item: any) => {
@@ -236,6 +343,9 @@ const fetchData = async (queryParams?: {}) => {
     totalSize.value = response.data.page.totalElements;
     totalPages.value = response.data.page.totalPages;
     hasMore.value = currentPage.value < response.data.page.totalPages;
+    
+    // Group items if groupBy is specified
+    groupItems(items.value);
   } catch (err: any) {
     if (err.response) {
       error.value = `خطای سرور: ${err.response.status} - ${err.response.data.message || 'خطای ناشناخته'}`;
@@ -260,6 +370,18 @@ watch(
     debouncedFetchData();
   },
   { deep: true }
+);
+
+// Watch for pageSize prop changes
+watch(
+  () => props.pageSize,
+  (newPageSize) => {
+    itemsPerPage.value = newPageSize;
+    // Reset to first page when page size changes
+    currentPage.value = 1;
+    // Refetch data with new page size
+    debouncedFetchData();
+  }
 );
 
 // Cleanup on component unmount
@@ -335,7 +457,13 @@ defineExpose({
   clearSelection: () => {
     selectedItems.value = [];
     selectAll.value = false;
-  }
+  },
+  // Grouping methods
+  groupedItems,
+  toggleGroup,
+  expandAllGroups,
+  collapseAllGroups,
+  groupItems
 });
 
 const openDialog = (item?: any) => {
@@ -587,12 +715,154 @@ const handleFilterApply = (filterData: any) => {
 
   <!-- Data Table Container (fills parent height) -->
   <div class="data-table-container" v-bind="$attrs">
-    <div class="table-wrapper">
-      <template v-if="loading && !isLoadingMore">
-        <v-skeleton-loader type="table" :loading="loading" class="mx-auto" max-width="100%" :boilerplate="false" />
-      </template>
-      <template v-else>
+    <template v-if="loading && !isLoadingMore">
+      <v-skeleton-loader type="table" :loading="loading" class="mx-auto" max-width="100%" :boilerplate="false" />
+    </template>
+    <template v-else>
+        <!-- Grouped Table Structure -->
+        <div v-if="props.groupBy && groupedItems.length > 0" class="grouped-table">
+          <!-- Group Controls -->
+          <div class="group-controls mb-3">
+            <v-btn size="small" color="primary" @click="expandAllGroups" class="me-2">
+              گسترش همه
+            </v-btn>
+            <v-btn size="small" color="secondary" @click="collapseAllGroups" class="me-2">
+              جمع کردن همه
+            </v-btn>
+          </div>
+          
+          <!-- Single Scrollable Container for All Groups -->
+          <div class="groups-scroll-container" :style="{ height: `${props.height - 120}px` }">
+            <div class="groups-container">
+              <div v-for="group in groupedItems" :key="group.groupKey" class="group-section">
+                <!-- Group Header -->
+                <div 
+                  class="group-header" 
+                  @click="toggleGroup(group.groupKey)"
+                  :class="{ 'expanded': group.isExpanded }"
+                >
+                  <v-icon :icon="group.isExpanded ? 'mdi-chevron-down' : 'mdi-chevron-right'" class="me-2" />
+                  <span class="group-label">{{ group.groupLabel }}</span>
+                  <v-chip size="small" color="primary" class="ms-auto">{{ group.count }}</v-chip>
+                </div>
+                
+                <!-- Group Items -->
+                <div v-if="group.isExpanded" class="group-items">
+                  <v-data-table
+                    :headers="[
+                      ...(props.selectable ? [{ title: '', key: 'selection', sortable: false, width: 50 }] : []),
+                      ...props.headers, 
+                      { title: 'عملیات', key: 'actions', sortable: false }
+                    ]"
+                    :items="group.items"
+                    hide-default-footer
+                    class="elevation-1 group-table"
+                    no-data-text="رکوردی یافت نشد"
+                    hover
+                    :height="'auto'"
+                  >
+          <!-- Custom Header for Selection -->
+          <template v-slot:header.selection="{ column }">
+            <v-checkbox
+              v-if="props.selectable && props.multiSelect"
+              :model-value="selectAll"
+              @update:model-value="toggleSelectAll"
+              :indeterminate="selectedCount > 0 && selectedCount < items.length"
+              hide-details
+              density="compact"
+            />
+          </template>
+          <template v-slot:item="{ item, columns, index }">
+            <tr :style="{ background: index % 2 === 0 ? '#fff' : '#f5f7fa' }">
+              <td
+                v-for="column in columns"
+                :key="column.key"
+                :style="{
+                  ...getColumnStyle(column, item),
+                  ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
+                }"
+              >
+                <!-- Selection Checkbox -->
+                <template v-if="column.key === 'selection'">
+                  <v-checkbox
+                    :model-value="isSelected(item)"
+                    @update:model-value="toggleSelection(item)"
+                    :disabled="!props.selectable"
+                    hide-details
+                    density="compact"
+                  />
+                </template>
+                <template v-if="column.key === 'actions'">
+                  <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
+                    ویرایش ✏️
+                  </v-btn>
+                  <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="mr-2" @click="openDeleteDialog(item)"
+                    >حذف ❌
+                  </v-btn>
+                  <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
+                    >🔍 نمایش
+                  </v-btn>
+                  <template v-for="(routePath, routeKey) in props.routes" :key="routeKey">
+                    <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(routeKey, item)">
+                      {{ routeKey.toUpperCase() }}
+                    </v-btn>
+                  </template>
+                  <v-btn v-for="key in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
+                    {{ key.toUpperCase() }} ⬇️
+                  </v-btn>
+                  <template v-for="(action, index) in props.customActions" :key="action.title || index">
+                    <v-btn
+                      v-if="!action.condition || action.condition(item)"
+                      color="orange"
+                      size="small"
+                      class="mr-2"
+                      @click="openCustomActionDialog(action, item)"
+                    >
+                      {{ action.title }}
+                    </v-btn>
+                  </template>
+                  <template v-if="props.customButtonsFn">
+                    <v-btn
+                      v-for="button in props.customButtonsFn(item)"
+                      :key="button.label"
+                      :color="button.color || 'primary'"
+                      size="small"
+                      class="mr-2"
+                      :disabled="button.disabled"
+                      @click="button.onClick(item)"
+                    >
+                      {{ button.label }}
+                    </v-btn>
+                  </template>
+                  <template v-else>
+                    <v-btn
+                      v-for="button in props.customButtons"
+                      :key="button.label"
+                      :color="button.color || 'primary'"
+                      size="small"
+                      class="mr-2"
+                      @click="button.onClick(item)"
+                    >
+                      {{ button.label }}
+                    </v-btn>
+                  </template>
+                </template>
+                <template v-else>
+                  {{ getTranslatedValue(getNestedValue(item, column.key), column, item) }}
+                </template>
+              </td>
+            </tr>
+                    </template>
+        </v-data-table>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </div>
+        
+        <!-- Regular Table Structure (when not grouped) -->
         <v-data-table
+          v-else
           :headers="[
             ...(props.selectable ? [{ title: '', key: 'selection', sortable: false, width: 50 }] : []),
             ...props.headers, 
@@ -705,7 +975,6 @@ const handleFilterApply = (filterData: any) => {
           <v-progress-circular indeterminate color="primary"></v-progress-circular>
         </div>
       </template>
-    </div>
 
     <!-- Custom Pagination always visible at the bottom -->
     <div v-if="props.showPagination" class="pagination-wrapper">
@@ -795,13 +1064,92 @@ const handleFilterApply = (filterData: any) => {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
-.table-wrapper {
-  flex: 1 1 auto;
-  min-height: 0;
-  position: relative;
-  max-height: 600px; /* Set your desired max height */
-  overflow-y: auto;
+/* Grouped Table Styles */
+.grouped-table {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
+
+.group-controls {
+  display: flex;
+  gap: 8px;
+  padding: 8px 0;
+  flex-shrink: 0;
+}
+
+.groups-scroll-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+}
+
+.groups-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 16px;
+}
+
+.group-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.group-header:hover {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+.group-header.expanded {
+  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+}
+
+.group-label {
+  font-weight: 600;
+  color: #2c3e50;
+  flex: 1;
+}
+
+.group-items {
+  background: white;
+}
+
+.group-table {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.group-table :deep(.v-data-table__wrapper) {
+  border: none !important;
+  overflow: visible !important;
+}
+
+.group-table :deep(.v-data-table__thead) {
+  background: #f8f9fa !important;
+}
+
+.group-table :deep(.v-data-table__tbody tr:hover) {
+  background: #f5f7fa !important;
+}
+
+.group-table :deep(.v-data-table__tbody) {
+  overflow: visible !important;
+}
+
+
 
 .pagination-wrapper {
   flex-shrink: 0;

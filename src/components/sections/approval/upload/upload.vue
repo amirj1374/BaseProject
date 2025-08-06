@@ -109,7 +109,6 @@ function getCustomButtons(doc: Document) {
     }
   ];
 }
-
 const submitData = async () => {
   return Promise.resolve();
 };
@@ -128,7 +127,10 @@ defineExpose({ submitData });
         :auto-fetch="true"
         :show-pagination="true"
         :custom-buttons-fn="getCustomButtons"
-        :height="430"
+        :height="1500"
+        group-by="groupByItem"
+        :default-expanded="true"
+        :page-size="100"
       />
     </form>
   </div>
