@@ -89,7 +89,7 @@ interface FormData {
 }
 
 onMounted(async () => {
-  const roles = await api.cartable.getRole();
+  const roles = await api.cartable.getSamapRole();
   roleOptions.value.push(...roles.data);
 });
 

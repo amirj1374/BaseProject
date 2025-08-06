@@ -24,8 +24,11 @@ export default (axiosInstance: AxiosInstance) => ({
   submitReference(payload: SubmitReferencePayload) {
     return axiosInstance.post("/api/v1/cartable/submit", payload);
   },
-  getRole() {
+  getSamapRole() {
     return axiosInstance.get("/api/v1/role/samap");
+  },
+  getLotusRole() {
+    return axiosInstance.get("/api/v1/role/lotus");
   },
 
   submitSign(payload: SubmitSignPayload) {
