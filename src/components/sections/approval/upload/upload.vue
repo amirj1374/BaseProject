@@ -29,12 +29,52 @@ const imageDialogUrl = ref<string | null>(null);
 const dataTableRef = ref();
 
 function fixUrl(url: string): string {
+  // Handle different URL formats
+  if (!url) return '';
+  
+  // If it's already a full URL, return as is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // If it's a relative path, prepend the base URL
+  if (url.startsWith('/')) {
+    // You might need to adjust this base URL based on your API configuration
+    return `${window.location.origin}${url}`;
+  }
+  
+  // For other cases, try to fix common issues
   return url.replace(/(https?:\/\/[^:]+:\d+)(?!\/)/, '$1/');
 }
 
 function openImageDialog(url: string) {
-  imageDialogUrl.value = fixUrl(url);
-  showImageDialog.value = true;
+  console.log('Original URL:', url);
+  
+  if (!url) {
+    error.value = 'آدرس تصویر نامعتبر است';
+    return;
+  }
+  
+  const fixedUrl = fixUrl(url);
+  console.log('Fixed URL:', fixedUrl);
+  
+  // Test if the image can be loaded
+  const img = new Image();
+  img.onload = () => {
+    imageDialogUrl.value = fixedUrl;
+    showImageDialog.value = true;
+    error.value = null;
+  };
+  
+  img.onerror = () => {
+    console.error('Failed to load image:', fixedUrl);
+    error.value = 'تصویر قابل بارگذاری نیست. لطفا آدرس را بررسی کنید.';
+    // Still show the dialog but with error message
+    imageDialogUrl.value = fixedUrl;
+    showImageDialog.value = true;
+  };
+  
+  img.src = fixedUrl;
 }
 
 const headers = [
@@ -109,6 +149,21 @@ function getCustomButtons(doc: Document) {
     }
   ];
 }
+// Image handling functions
+const handleImageError = () => {
+  error.value = 'تصویر قابل بارگذاری نیست. لطفا آدرس را بررسی کنید.';
+};
+
+const handleImageLoad = () => {
+  error.value = null;
+};
+
+const openInNewTab = () => {
+  if (imageDialogUrl.value) {
+    window.open(imageDialogUrl.value, '_blank');
+  }
+};
+
 const submitData = async () => {
   return Promise.resolve();
 };
@@ -164,7 +219,32 @@ defineExpose({ submitData });
         </v-btn>
       </v-card-title>
       <v-card-text style="text-align: center" mini-variant>
-        <img v-if="imageDialogUrl" :src="imageDialogUrl" alt="تصویر" style="max-width: 100%; max-height: 400px; border-radius: 8px" />
+        <div v-if="imageDialogUrl" class="image-container">
+          <img 
+            :src="imageDialogUrl" 
+            alt="تصویر" 
+            style="max-width: 100%; max-height: 400px; border-radius: 8px"
+            @error="handleImageError"
+            @load="handleImageLoad"
+          />
+          <div v-if="error" class="error-message mt-3">
+            <v-alert type="error" variant="tonal">
+              {{ error }}
+            </v-alert>
+            <v-btn 
+              color="primary" 
+              variant="outlined" 
+              @click="openInNewTab"
+              class="mt-2"
+            >
+              باز کردن در تب جدید
+            </v-btn>
+          </div>
+        </div>
+        <div v-else class="loading-container">
+          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+          <p class="mt-2">در حال بارگذاری تصویر...</p>
+        </div>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -180,5 +260,23 @@ defineExpose({ submitData });
   flex-direction: column;
   height: 100%;
   min-height: 0;
+}
+
+.image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+}
+
+.error-message {
+  max-width: 400px;
+  text-align: center;
 }
 </style>

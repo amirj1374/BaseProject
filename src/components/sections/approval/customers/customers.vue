@@ -148,7 +148,6 @@ const changePattern = () => {
   error.value = null;
   showError.value = false;
   isValid.value = false;
-  items.value = [];
 };
 
 const changeCustomerType = () => {
