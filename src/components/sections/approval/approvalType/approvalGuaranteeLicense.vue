@@ -269,7 +269,6 @@
     try {
       const amountValue = parseFloat(data.amount.replace(/,/g, ''));
       const percentValue = parseFloat(data.percent);
-      if (isNaN(amountValue) || amountValue <= 0) throw new Error('مبلغ وثیقه باید عدد مثبت باشد');
       if (isNaN(percentValue) || percentValue < 0 || percentValue > 100) throw new Error('درصد ارزش گذاری باید بین 0 تا 100 باشد');
       const newCollateralEntry = { collateral: data.collateral, amount: amountValue, percent: percentValue };
       selectedCollaterals.value = [...selectedCollaterals.value, newCollateralEntry];
