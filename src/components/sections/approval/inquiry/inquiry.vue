@@ -107,7 +107,7 @@ onMounted(() => {
 
 const submitData = async () => {
   if (canSubmit.value === false) {
-    return Promise.reject('ابتدا استعلام های خود را انجام دهید');
+    return Promise.reject('لطفا تا زمان دریافت استعلام منتطر بمانید');
   } else return Promise.resolve();
 };
 

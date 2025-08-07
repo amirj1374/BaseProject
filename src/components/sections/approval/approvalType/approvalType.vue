@@ -4,6 +4,8 @@ import { onMounted, ref, watch, defineAsyncComponent, computed } from 'vue';
 //type
 import type { CustomerDto, FacilitiesRequest, Facility, GuaranteeRequest, LcRequest, GreenLicense } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
+import { useCustomizerStore } from '@/stores/customizer';
+const customizerStore = useCustomizerStore();
 // Use dynamic imports for heavy components
 const Facilities = defineAsyncComponent(() => import('./Facilities.vue'));
 const LetterOfCredit = defineAsyncComponent(() => import('./LetterOfCredit.vue'));
@@ -14,7 +16,7 @@ const approvalStore = useApprovalStore();
 const activeTab = ref('facilities');
 
 // Search Section State
-const loading = ref(false);
+
 const error = ref<string | null>(null);
 const showError = ref(false);
 const items = ref<CustomerDto[]>([]);
@@ -263,7 +265,7 @@ defineExpose({ submitData, clearAllData });
     <Facilities 
       v-if="activeTab === 'facilities'" 
       ref="facilitiesRef" 
-      :loading="loading" 
+      :loading="customizerStore.loading"
       @save="handleSaveFacility" 
       @delete="handleDeleteFacility" 
       @update:facilities="facilitiesData = $event" 
@@ -271,7 +273,7 @@ defineExpose({ submitData, clearAllData });
     <Guarantee 
       v-if="activeTab === 'guarantee'" 
       ref="guaranteeRef" 
-      :loading="loading" 
+      :loading="customizerStore.loading"
       @save="handleSaveGuarantee" 
       @delete="handleDeleteGuarantee" 
       @update:guarantee="guaranteeData = $event" 
@@ -279,7 +281,7 @@ defineExpose({ submitData, clearAllData });
     <LetterOfCredit 
       v-if="activeTab === 'lc'" 
       ref="lcRef" 
-      :loading="loading" 
+      :loading="customizerStore.loading"
       @save="handleSaveLC" 
       @delete="handleDeleteLC" 
       @update:lc="lcData = $event" 
@@ -287,7 +289,7 @@ defineExpose({ submitData, clearAllData });
     <GreenLicense 
       v-if="activeTab === 'greenLicense'" 
       ref="greenLicenseRef" 
-      :loading="loading" 
+      :loading="customizerStore.loading"
       @save="handleSaveGreenLicense" 
       @delete="handleDeleteGreenLicense" 
       @update:greenLicense="greenLicenseData = $event" 

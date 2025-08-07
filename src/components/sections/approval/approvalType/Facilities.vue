@@ -2,13 +2,13 @@
   <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">تسهیلات</h4>
-      <v-btn color="secondary" @click="openDialog" :disabled="loading || facilities.length >= 1"> افزودن تسهیلات</v-btn>
+      <v-btn color="secondary" @click="openDialog" :disabled="customizerStore.loading || facilities.length >= 1"> افزودن تسهیلات</v-btn>
     </div>
 
     <v-data-table-virtual
       :headers="headers"
       :items="facilities"
-      :loading="loading"
+      :loading="customizerStore.loading"
       no-data-text="رکوردی یافت نشد"
       density="comfortable"
       hover
@@ -301,7 +301,8 @@ import { useApprovalStore } from '@/stores/approval';
 import type { CollateralDto, ContractType, FacilitiesRequest, Facility, FacilityDto } from '@/types/approval/approvalType';
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
-
+import { useCustomizerStore } from '@/stores/customizer';
+const customizerStore = useCustomizerStore();
 const baseStore = useBaseStore();
 const approvalStore = useApprovalStore();
 const dialog = ref(false);
@@ -331,7 +332,7 @@ const collateralTableItems = computed(() =>
     equivalentValue: (item.amount * item.percent) / 100
   }))
 );
-const percentRule = (v: string) => (!v && 'این فیلد الزامی است') || (Number(v) >= 1 && Number(v) <= 100) || 'درصد باید بین 1 تا 100 باشد';
+const percentRule = (v: string) =>  (Number(v) >= 1 && Number(v) <= 100) || 'درصد باید بین 1 تا 100 باشد';
 
 const props = defineProps<{
   loading?: boolean;

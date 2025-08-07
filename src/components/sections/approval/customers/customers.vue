@@ -8,6 +8,7 @@ import { nationalCodeRule } from '@/validators/nationalCodeRule';
 import type { CustomerDto, FetchCustomerPayload, Facility, Guarantee, Lc, GreenLicense } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
 import { IconTrash } from '@tabler/icons-vue';
+import { useCustomizerStore } from '@/stores/customizer';
 // Use dynamic imports for heavy components
 const Facilities = defineAsyncComponent(() => import('./Facilities.vue'));
 const LetterOfCredit = defineAsyncComponent(() => import('./LetterOfCredit.vue'));
@@ -16,6 +17,7 @@ const GreenLicense = defineAsyncComponent(() => import('./GreenLicense.vue'));
 
 type AllowedStatus = 'nationalCode' | 'cif';
 const approvalStore = useApprovalStore();
+const customizerStore = useCustomizerStore();
 
 // Tab Management
 const activeTab = ref('facilities');
@@ -33,7 +35,6 @@ const searchTypes = ref<{ title: string; value: AllowedStatus }[]>([
   { title: 'کدملی', value: 'nationalCode' }
 ]);
 const errors = ref<{ nationalCode?: string[]; cif?: string[] }>({});
-const loading = ref(false);
 const error = ref<string | null>(null);
 const showError = ref(false);
 const items = ref<CustomerDto[]>([]);
@@ -112,7 +113,7 @@ const debouncedSearch = useDebounceFn(async () => {
     return;
   }
 
-  loading.value = true;
+  customizerStore.loading = true;
   error.value = null;
   try {
     const payload: FetchCustomerPayload = {
@@ -133,7 +134,7 @@ const debouncedSearch = useDebounceFn(async () => {
     error.value = 'خطا در دریافت اطلاعات';
     showError.value = true;
   } finally {
-    loading.value = false;
+    customizerStore.loading = false;
   }
 }, 500); // 500ms delay
 
@@ -248,7 +249,7 @@ defineExpose({ submitData });
             label="نوع جستجو"
             variant="outlined"
             density="comfortable"
-            :disabled="loading"
+            :disabled="customizerStore.loading"
             @update:model-value="changePattern"
           />
         </v-col>
@@ -259,7 +260,7 @@ defineExpose({ submitData });
             variant="outlined"
             density="comfortable"
             :items="customerTypes"
-            :disabled="loading"
+            :disabled="customizerStore.loading"
             @update:model-value="changeCustomerType"
           />
         </v-col>
@@ -269,7 +270,7 @@ defineExpose({ submitData });
             label="شماره مشتری"
             variant="outlined"
             density="comfortable"
-            :disabled="loading"
+            :disabled="customizerStore.loading"
             :error-messages="errors.cif"
           />
         </v-col>
@@ -282,19 +283,19 @@ defineExpose({ submitData });
             type="number"
             v-digit-limit="11"
             :error-messages="errors.nationalCode"
-            :disabled="loading"
+            :disabled="customizerStore.loading"
 
           />
         </v-col>
         <v-col cols="12" md="12" class="customer-search-btn">
-          <v-btn color="secondary" @click="search" type="button" :loading="loading" :disabled="loading"> جستجو</v-btn>
+          <v-btn color="secondary" @click="search" type="button" :loading="customizerStore.loading" :disabled="customizerStore.loading"> جستجو</v-btn>
         </v-col>
         <v-col cols="12" md="12">
           <v-data-table-virtual
             v-model:search="searchString"
             :items="items"
             :headers="headers"
-            :loading="loading"
+            :loading="customizerStore.loading"
             :items-length="totalItems"
             no-data-text="رکوردی یافت نشد"
             density="comfortable"
@@ -321,10 +322,10 @@ defineExpose({ submitData });
       <v-tab value="lc">اعتبار اسنادی</v-tab>
       <v-tab value="greenLicense">تضامین جواز سبز</v-tab>
     </v-tabs>
-    <Facilities ref="facilitiesRef" v-show="activeTab === 'facilities'" :loading="loading" @save="handleSaveFacility" @delete="handleDeleteFacility" @update:facilities="facilitiesData = $event" />
-    <Guarantee ref="guaranteeRef" :loading="loading" v-show="activeTab === 'guarantee'" @save="handleSaveGuarantee" @delete="handleDeleteGuarantee" @update:guarantee="guaranteeData = $event" />
-    <LetterOfCredit ref="lcRef" :loading="loading" v-show="activeTab === 'lc'" @save="handleSaveLC" @delete="handleDeleteLC" @update:lc="lcData = $event" />
-    <GreenLicense ref="greenLicenseRef" :loading="loading" v-show="activeTab === 'greenLicense'" @save="handleSaveGreenLicense" @delete="handleDeleteGreenLicense" @update:greenLicense="greenLicenseData = $event" />
+    <Facilities ref="facilitiesRef" v-show="activeTab === 'facilities'" :loading="customizerStore.loading" @save="handleSaveFacility" @delete="handleDeleteFacility" @update:facilities="facilitiesData = $event" />
+    <Guarantee ref="guaranteeRef" :loading="customizerStore.loading" v-show="activeTab === 'guarantee'" @save="handleSaveGuarantee" @delete="handleDeleteGuarantee" @update:guarantee="guaranteeData = $event" />
+    <LetterOfCredit ref="lcRef" :loading="customizerStore.loading" v-show="activeTab === 'lc'" @save="handleSaveLC" @delete="handleDeleteLC" @update:lc="lcData = $event" />
+    <GreenLicense ref="greenLicenseRef" :loading="customizerStore.loading" v-show="activeTab === 'greenLicense'" @save="handleSaveGreenLicense" @delete="handleDeleteGreenLicense" @update:greenLicense="greenLicenseData = $event" />
   </div>
   <v-snackbar v-model="showError" color="error" timeout="5500">
     {{ error }}

@@ -3,9 +3,9 @@ import { computed, ref, onMounted, watch } from 'vue';
 import { api } from '@/services/api';
 import type { FetchGuarantorPayload, GuarantorDto, SaveGeneralPayload, GuarantorInfoDTO } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
-
+import { useCustomizerStore } from '@/stores/customizer';
+const customizerStore = useCustomizerStore();
 const approvalStore = useApprovalStore();
-const loading = ref(false);
 const dialog = ref(false);
 const hideInput = ref(false);
 const canSubmit = ref(false);
@@ -65,7 +65,7 @@ async function addGuarantor() {
     return;
   }
 
-  loading.value = true;
+  customizerStore.loading = true;
   error.value = null;
   showError.value = false;
 
@@ -126,7 +126,7 @@ async function addGuarantor() {
     hideInput.value = true;
     canSubmit.value = false;
   } finally {
-    loading.value = false;
+    customizerStore.loading = false;
   }
 }
 
@@ -156,7 +156,7 @@ const submitData = async () => {
   try {
     // First save to store
     approvalStore.setGuarantor(data.value);
-
+    customizerStore.loading = true;
     // Create guarantor info payload
     const guarantorInfoDTO: GuarantorInfoDTO[] = data.value
       .filter((guarantor) => guarantor.nationalCode && guarantor.guarantorName)
@@ -204,9 +204,11 @@ const submitData = async () => {
   } catch (err: any) {
     error.value = err.response?.data?.message || 'خطای سرور در ثبت اطلاعات';
     showError.value = true;
+    customizerStore.loading = false;
     return Promise.reject(error.value);
   } finally {
     submitting.value = false;
+    customizerStore.loading = false;
   }
 };
 
@@ -248,7 +250,7 @@ defineExpose({ submitData });
             label="نوع جستجو"
             variant="outlined"
             density="comfortable"
-            :disabled="loading"
+            :disabled="customizerStore.loading"
             @update:model-value="changePattern"
           />
         </v-col>
@@ -270,13 +272,13 @@ defineExpose({ submitData });
           <v-text-field v-model="formData.GuarantorName" label="نام و نام خانوادگی" variant="outlined" density="comfortable" />
         </v-col>
         <v-col cols="12" md="12" class="text-center">
-          <v-btn color="secondary" @click="addGuarantor" type="button" :loading="loading"> جستجو</v-btn>
+          <v-btn color="secondary" @click="addGuarantor" type="button" :loading="customizerStore.loading"> جستجو</v-btn>
         </v-col>
         <v-col cols="12" md="12">
           <v-data-table
             :headers="headers"
             :items="data"
-            :loading="loading"
+            :loading="customizerStore.loading"
             class="elevation-1"
             density="comfortable"
             hover

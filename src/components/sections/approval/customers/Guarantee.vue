@@ -438,9 +438,12 @@ function deleteItem(item: Guarantee) {
     emit('delete', item);
   }
 }
-
+function isObjectEmpty(obj: any): boolean {
+  if (!obj) return true;
+  return Object.values(obj).every((v) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0));
+}
 onMounted(() => {
-  if (approvalStore.customerInfo?.guarantee) {
+  if (approvalStore.customerInfo?.guarantee && !isObjectEmpty(approvalStore.customerInfo.guarantee)) {
     guarantee.value = [approvalStore.customerInfo.guarantee];
   }
 });

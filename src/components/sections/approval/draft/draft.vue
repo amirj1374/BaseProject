@@ -12,12 +12,11 @@ import Consideration from '@/components/sections/approval/draft/Consideration.vu
 import { useApprovalStore } from '@/stores/approval';
 import OcpHistory from '@/components/sections/approval/draft/OcpHistory.vue';
 
-const loading = ref(false);
+
 const currencies = ref<CurrenciesDto[]>([]);
 const facilitiesData = ref();
 const guaranteeData = ref();
 const lcData = ref();
-const approvalStore = useApprovalStore()
 
 onMounted(async () => {
 });

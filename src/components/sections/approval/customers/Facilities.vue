@@ -454,8 +454,13 @@ function deepEqual(a: any, b: any): boolean {
 
 const isDirty = computed(() => !deepEqual(formData, initialFormData.value));
 
+function isObjectEmpty(obj: any): boolean {
+  if (!obj) return true;
+  return Object.values(obj).every((v) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0));
+}
+
 onMounted(() => {
-  if (approvalStore.customerInfo?.facilities) {
+  if (approvalStore.customerInfo?.facilities && !isObjectEmpty(approvalStore.customerInfo.facilities)) {
     facilities.value = [approvalStore.customerInfo.facilities];
   }
 });
