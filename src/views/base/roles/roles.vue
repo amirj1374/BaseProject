@@ -36,7 +36,14 @@ const header = ref([
   {
     title: 'نقش لوتوسی',
     key: 'lotusRoles',
-    sortable: true
+    sortable: true,
+    nestedKey: 'lotusRoles.description',
+       formatter: (value: any, item: any) => {
+      if (item.lotusRoles && Array.isArray(item.lotusRoles)) {
+        return item.lotusRoles.map((role: any) => role.description).join(', ');
+      }
+      return value;
+    }
   },
   {
     title: 'وضعیت',

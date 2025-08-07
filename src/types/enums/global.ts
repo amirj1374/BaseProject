@@ -69,20 +69,22 @@ export const ActionTypeOptions = [
 // loan request status
 export const LoanRequestStatusEnum = {
   TEMPORARY_REGISTRATION:'TEMPORARY_REGISTRATION',
-  PENDING_PROCESS:'PENDING_PROCESS',
   APPROVED:'APPROVED',
   REJECTED:'REJECTED',
   AWAITING_START_CARTABLE:'AWAITING_START_CARTABLE',
+  CORRECT_FROM_REGION:'CORRECT_FROM_REGION',
+  CORRECT_FROM_BRANCH:'CORRECT_FROM_BRANCH',
 } as const;
 
 export type LoanRequestStatus = (typeof LoanRequestStatusEnum)[keyof typeof LoanRequestStatusEnum];
 
 export const LoanRequestStatusOptions = [
   { title: 'ثبت موقت', value: LoanRequestStatusEnum.TEMPORARY_REGISTRATION },
-  { title: 'در انتظار فرایند', value: LoanRequestStatusEnum.PENDING_PROCESS },
   { title: 'تایید شده', value: LoanRequestStatusEnum.APPROVED },
   { title: 'رد شده', value: LoanRequestStatusEnum.REJECTED },
   { title: 'انتظار برای شروع فرایند', value: LoanRequestStatusEnum.AWAITING_START_CARTABLE },
+  { title: 'اصلاح از منطقه', value: LoanRequestStatusEnum.CORRECT_FROM_REGION },
+  { title: 'اصلاح از شعبه', value: LoanRequestStatusEnum.CORRECT_FROM_BRANCH },
 ];
 
 // file type

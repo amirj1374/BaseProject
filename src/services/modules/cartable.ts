@@ -19,7 +19,9 @@ export default (axiosInstance: AxiosInstance) => ({
   },
 
   getValidUser(payload: ValidUserPayload) {
-    return axiosInstance.get(`/api/v1/cartable/${payload.id}/get-valid-users?actionType=${payload.actionType}&roleCode=${payload.roleCode}`);
+    return axiosInstance.get(`/api/v1/cartable/${payload.id}/get-valid-users?actionType=${payload.actionType}&roleCode=${payload.roleCode}`,{
+      timeout: 40000,
+    });
   },
   submitReference(payload: SubmitReferencePayload) {
     return axiosInstance.post("/api/v1/cartable/submit", payload);

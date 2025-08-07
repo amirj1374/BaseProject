@@ -38,8 +38,19 @@ const header = ref([
   },
   {
     title: 'نقش',
-    key: 'roleName',
+    key: 'description',
     sortable: true
+  },
+  {
+    title: 'گروه مشتری',
+    key: 'customerGroup',
+    sortable: true
+  },
+  {
+    title: 'وضعیت',
+    key: 'status',
+    sortable: true,
+    translate: true,
   }
 ]);
 
