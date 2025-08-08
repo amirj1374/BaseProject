@@ -1,13 +1,14 @@
 <template>
-  <CustomDataTable
-    ref="dataTableRef"
-    :headers="headers"
-    api-resource="deposit-info"
-    :queryParams="{ loanRequestId: props.loanRequestId }"
-    :auto-fetch="true"
-    :show-pagination="true"
-    :height="550"
-  />
+  <div class="approval-section">
+    <CustomDataTable
+      ref="dataTableRef"
+      :headers="headers"
+      api-resource="deposit-info"
+      :queryParams="{ loanRequestId: props.loanRequestId }"
+      :auto-fetch="true"
+      :height="380"
+    />
+  </div>
 </template>
 <script lang="ts" setup>
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
@@ -17,9 +18,22 @@ const props = defineProps({
   loanRequestId: {
     type: String,
     required: true
+  },
+  cartableId: {
+    type: String,
+    required: true
+  },
+  currentStep: {
+    type: Number,
+    required: true
+  },
+  totalSteps: {
+    type: Number,
+    required: true
   }
 })
-const approvalStore = useApprovalStore();
+
+console.log('DepositStatus component received props:', props);
 
 const headers = [
   {
@@ -57,7 +71,7 @@ const headers = [
     title: 'میانگین موجودی شش ماه گذشته',
     key: 'avgBalanceHalf',
     sortable: true,
-    width: 400,
+    width: 500,
     isDate: true
   },
   {
@@ -91,4 +105,24 @@ const headers = [
     width: 250
   }
 ];
+
+// Submit data method for stepper
+const submitData = async () => {
+  try {
+    // Add your validation and submission logic here
+    console.log('Submitting deposit status data for loan request:', props.loanRequestId);
+    
+    // Example: Validate data before proceeding
+    // if (!someRequiredData) {
+    //   throw new Error('اطلاعات الزامی وارد نشده است');
+    // }
+    
+    return Promise.resolve();
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+// Expose the submitData method for the stepper
+defineExpose({ submitData });
 </script>

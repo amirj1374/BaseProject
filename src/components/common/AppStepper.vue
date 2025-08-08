@@ -20,6 +20,10 @@ const props = defineProps({
   disableClick: {
     type: Boolean,
     default: false
+  },
+  stepProps: {
+    type: Object,
+    default: () => ({})
   }
 });
 
@@ -109,7 +113,7 @@ defineExpose({ currentStepComponentRef });
       class="app-stepper-content"
       :style="props.contentMinHeight ? { minHeight: props.contentMinHeight } : undefined"
     >
-      <component :is="steps[modelValue - 1].section" ref="currentStepComponentRef" />
+      <component :is="steps[modelValue - 1].section" ref="currentStepComponentRef" v-bind="stepProps" />
     </div>
   </div>
 </template>
