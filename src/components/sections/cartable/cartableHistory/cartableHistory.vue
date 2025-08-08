@@ -15,46 +15,47 @@ const header = ref([
     sortable: true,
     editable: true,
     translate: true,
-    options: ActionTypeOptions
+    options: ActionTypeOptions,
+    width: 200,
   },
   {
     title: 'توضیحات',
     key: 'comments',
     sortable: true,
-    editable: true
+    editable: true,
+    width: 200,
   },
   {
-    title: 'تاریخ تکمیل',
-    key: 'completedAt',
+    title: 'نقش',
+    key: 'roleName',
     sortable: true,
-    isDate: true
+    width: 200,
+  },
+  {
+    title: 'ایجاد شده توسط',
+    key: 'createdBy',
+    sortable: true,
+    width: 200,
   },
   {
     title: 'تاریخ ایجاد',
     key: 'createdAt',
     sortable: true,
-    isDate: true
-  },
-  {
-    title: 'ایجاد شده توسط',
-    key: 'createdBy',
-    sortable: true
-  },
-  {
-    title: 'نقش',
-    key: 'roleName',
-    sortable: true
+    isDate: true,
+    width: 200,
   },
   {
     title: 'ویرایش شده توسط',
     key: 'updatedAt',
     sortable: true,
-    isDate: true
+    isDate: true,
+    width: 200,
   },
   {
     title: 'تاریج ویرایش',
     key: 'updatedBy',
-    sortable: true
+    sortable: true,
+    width: 200,
   }
 ]);
 </script>

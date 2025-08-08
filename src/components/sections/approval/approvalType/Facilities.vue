@@ -332,7 +332,7 @@ const collateralTableItems = computed(() =>
     equivalentValue: (item.amount * item.percent) / 100
   }))
 );
-const percentRule = (v: string) =>  (Number(v) >= 1 && Number(v) <= 100) || 'درصد باید بین 1 تا 100 باشد';
+const percentRule = (v: string) =>  (Number(v) >= 0 && Number(v) <= 100) || 'درصد باید بین 1 تا 100 باشد';
 
 const props = defineProps<{
   loading?: boolean;
@@ -354,7 +354,7 @@ const formData = reactive({
   durationDay: '',
   amount: 0,
   collateral: true,
-  preferentialRate: '',
+  preferentialRate: 0,
   advancePayment: '',
   contractType: null as ContractType | null,
   facility: null as FacilityDto | null

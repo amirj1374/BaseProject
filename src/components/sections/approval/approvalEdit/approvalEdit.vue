@@ -4,8 +4,8 @@
         <!-- Created By Filter -->
         <v-col cols="12" md="6">
           <v-text-field
-            v-model="filterModel.createdBy"
-            label="ایجاد شده توسط"
+            v-model="filterModel.cif"
+            label="شماره مشتری"
             variant="outlined"
             density="comfortable"
             hide-details="auto"
@@ -63,7 +63,7 @@ import { ref, reactive, watch, defineProps, defineEmits } from 'vue';
   interface FilterModel {
     dateFrom: string;
     dateTo: string;
-    createdBy: string;
+    cif: string;
     trackingCode: string;
     roleName: string;
     status: string;
@@ -82,7 +82,7 @@ import { ref, reactive, watch, defineProps, defineEmits } from 'vue';
   const filterModel = reactive<FilterModel>({
     dateFrom: '',
     dateTo: '',
-    createdBy: '',
+    cif: '',
     trackingCode: '',
     roleName: '',
     status: ''

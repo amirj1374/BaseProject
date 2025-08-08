@@ -12,75 +12,76 @@
 <script lang="ts" setup>
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import FilterCartable from '@/views/reports/cartableReport/cartableReportFilter.vue';
+import { CartableStatusTypeOptions } from '@/types/enums/global';
 
 const headers = [
   {
-    title: 'شماره حساب',
-    key: 'accountNo',
+    title: 'کد درخواست',
+    key: 'trackingCode',
     sortable: true,
-    width: 250
+    width: 200,
   },
   {
-    title: 'عنوان حساب',
-    key: 'accountTitle',
+    title: 'کد مشتری',
+    key: 'customerCode',
     sortable: true,
-    width: 250
+    editable: true,
+    width: 200,
   },
   {
-    title: 'تاریخ افتتاح',
-    key: 'openingDate',
+    title: 'نام مشتری',
+    key: 'customerName',
     sortable: true,
+    editable: true,
+    width: 200,
+  },
+  {
+    title: 'گروه مشتری',
+    key: 'customerGroup',
+    sortable: true,
+    width: 200,
+  },
+  {
+    title: 'نوع مشتری',
+    key: 'customerType',
+    sortable: true,
+    width: 200,
+  },
+  {
+    title: 'وضعیت',
+    key: 'status',
+    sortable: true,
+    translate: true,
+    options: CartableStatusTypeOptions,
+    width: 200,
+  },
+  {
+    title: 'شعبه ثبت کننده درخواست',
+    key: 'branchName',
+    sortable: true,
+    editable: true,
+    width: 200,
+  },
+  {
+    title: 'ایجاد شده توسط',
+    key: 'createdBy',
+    sortable: true,
+    editable: true,
+    width: 200,
+  },
+  {
+    title: 'تاریخ ایجاد',
+    key: 'createdAt',
+    sortable: true,
+    editable: true,
     isDate: true,
-    width: 250
+    width: 200
   },
   {
-    title: 'نوع حساب',
-    key: 'accountType',
+    title: 'نقش',
+    key: 'description',
     sortable: true,
-    width: 250
-  },
-  {
-    title: 'شعبه',
-    key: 'branch',
-    sortable: true,
-    width: 250
-  },
-  {
-    title: 'میانگین موجودی شش ماه گذشته',
-    key: 'avgBalanceHalf',
-    sortable: true,
-    width: 400,
-    isDate: true
-  },
-  {
-    title: 'مبلغ گردش بدهکار',
-    key: 'creditTurnoverHalf',
-    sortable: true,
-    width: 400
-  },
-  {
-    title: 'تعداد گردش بدهکار',
-    key: 'countCreditTurnoverHalf',
-    sortable: true,
-    width: 400
-  },
-  {
-    title: 'تعداد گردش بستانکار',
-    key: 'countDebitTurnoverHalf',
-    sortable: true,
-    width: 400
-  },
-  {
-    title: 'مبلغ گردش بستانکار',
-    key: 'debitTurnoverHalf',
-    sortable: true,
-    width: 250
-  },
-  {
-    title: 'مانده موجودی',
-    key: 'finalBalance',
-    sortable: true,
-    width: 250
+    width: 200,
   }
 ];
 </script>

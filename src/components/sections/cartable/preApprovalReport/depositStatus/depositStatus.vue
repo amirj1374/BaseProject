@@ -12,7 +12,6 @@
 </template>
 <script lang="ts" setup>
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import { useApprovalStore } from '@/stores/approval';
 
 const props = defineProps({
   loanRequestId: {
@@ -32,8 +31,6 @@ const props = defineProps({
     required: true
   }
 })
-
-console.log('DepositStatus component received props:', props);
 
 const headers = [
   {
