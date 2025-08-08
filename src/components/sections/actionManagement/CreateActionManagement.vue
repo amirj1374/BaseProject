@@ -4,9 +4,9 @@
       <v-col cols="12" md="4">
         <v-autocomplete
           v-model="formData.fromDepartmentLevel"
-          :items="baseStore.departmentLevel"
-          item-title="name"
-          item-value="departmentLevel"
+          :items="DepartmentTypeOptions"
+          item-title="title"
+          item-value="value"
           label="دپارتمان مبدا"
           variant="outlined"
           density="comfortable"
@@ -17,9 +17,9 @@
       <v-col cols="12" md="4">
         <v-autocomplete
           v-model="formData.toDepartmentLevel"
-          :items="baseStore.departmentLevel"
-          item-title="name"
-          item-value="departmentLevel"
+          :items="DepartmentTypeOptions"
+          item-title="title"
+          item-value="value"
           label="دپارتمان مقصد"
           variant="outlined"
           density="comfortable"
@@ -72,12 +72,11 @@
 
 <script setup lang="ts">
 import { api } from '@/services/api';
-import { ActionTypeOptions } from '@/types/enums/global';
+import { ActionTypeOptions, DepartmentTypeOptions } from '@/types/enums/global';
 import { ref, reactive, watch, defineProps, defineEmits, onMounted } from 'vue';
 import { useBaseStore } from '@/stores/base';
 import type { SamapRoleDTO } from '@/types/cartable/cartableTypes';
 const roleOptions = ref<SamapRoleDTO[]>([]);
-
 const baseStore = useBaseStore();
 
 interface FormData {

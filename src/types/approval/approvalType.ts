@@ -207,46 +207,46 @@ export interface CollateralsInfoPayload {
   sharesBond: SharesBondDTO;
   stock: StockDTO;
   otherCollateralAmount: number;
-  id: number
+  id: number;
 }
 
 export interface DepositDTO {
-  customerName:string
-  blockedAmount:number
-  assignedAmount:number
-  assignedDate:string
-  externalRef?:number
-  id:number
+  customerName: string;
+  blockedAmount: number;
+  assignedAmount: number;
+  assignedDate: string;
+  externalRef?: number;
+  id: number;
 }
 
 export interface EstateDTO {
-  customerName:string
-  houseNumberPlate:string
-  type:string
-  evaluatedPrice:number
-  evaluationDate:string
-  assignedAmount:number
-  assignedDate:string
-  id:number
+  customerName: string;
+  houseNumberPlate: string;
+  type: string;
+  evaluatedPrice: number;
+  evaluationDate: string;
+  assignedAmount: number;
+  assignedDate: string;
+  id: number;
 }
 
 export interface SharesBondDTO {
-  assignedAmount:number
-  parsianBankAgency:boolean
-  assignedDate:string
-  customerName:string
-  id:number
+  assignedAmount: number;
+  parsianBankAgency: boolean;
+  assignedDate: string;
+  customerName: string;
+  id: number;
 }
 
 export interface StockDTO {
-  stockCount:number
-  customerName:string
-  assignedAmount:number
-  assignedDate:string
-  totalAmount:number
-  companyName:string
-  nationalCode:string
-  id:number
+  stockCount: number;
+  customerName: string;
+  assignedAmount: number;
+  assignedDate: string;
+  totalAmount: number;
+  companyName: string;
+  nationalCode: string;
+  id: number;
 }
 
 export interface UploadFile {
@@ -403,4 +403,10 @@ export interface SaveGeneralPayload {
   guarantorInfoDTO: GuarantorInfoDTO[];
   loanRequestId: string;
   trackingCode: string;
+}
+
+export interface BranchDto {
+  code: number;
+  name: string;
+  status: boolean;
 }

@@ -115,13 +115,15 @@ const selectedItems = ref<any[]>([]);
 const selectAll = ref(false);
 
 // Grouping state
-const groupedItems = ref<Array<{
-  groupKey: string | number;
-  groupLabel: string;
-  items: any[];
-  isExpanded: boolean;
-  count: number;
-}>>([]);
+const groupedItems = ref<
+  Array<{
+    groupKey: string | number;
+    groupLabel: string;
+    items: any[];
+    isExpanded: boolean;
+    count: number;
+  }>
+>([]);
 const expandedGroups = ref<Set<string | number>>(new Set());
 
 // Helper function to get unique value from item
@@ -129,12 +131,12 @@ const getUniqueValue = (item: any): string | number => {
   if (typeof props.uniqueKey === 'function') {
     return props.uniqueKey(item);
   }
-  
+
   if (typeof props.uniqueKey === 'string') {
     // Handle nested properties like "user.id"
     return props.uniqueKey.split('.').reduce((obj, key) => obj?.[key], item);
   }
-  
+
   // Fallback to id
   return item.id;
 };
@@ -142,16 +144,16 @@ const getUniqueValue = (item: any): string | number => {
 // Helper function to get group value from item
 const getGroupValue = (item: any): string | number => {
   if (!props.groupBy) return '';
-  
+
   if (typeof props.groupBy === 'function') {
     return props.groupBy(item);
   }
-  
+
   if (typeof props.groupBy === 'string') {
     // Handle nested properties like "user.department"
     return props.groupBy.split('.').reduce((obj, key) => obj?.[key], item);
   }
-  
+
   return item[props.groupBy] || '';
 };
 
@@ -160,7 +162,7 @@ const getGroupLabel = (groupKey: string | number, groupItems: any[]): string => 
   if (props.groupHeaderTemplate) {
     return props.groupHeaderTemplate(groupKey, groupItems);
   }
-  
+
   return `${groupKey} (${groupItems.length} آیتم)`;
 };
 
@@ -170,18 +172,18 @@ const groupItems = (items: any[]) => {
     groupedItems.value = [];
     return;
   }
-  
+
   const groups = new Map<string | number, any[]>();
-  
+
   // Group items by the specified property
-  items.forEach(item => {
+  items.forEach((item) => {
     const groupKey = getGroupValue(item);
     if (!groups.has(groupKey)) {
       groups.set(groupKey, []);
     }
     groups.get(groupKey)!.push(item);
   });
-  
+
   // Convert to array format
   groupedItems.value = Array.from(groups.entries()).map(([groupKey, groupItems]) => ({
     groupKey,
@@ -190,7 +192,7 @@ const groupItems = (items: any[]) => {
     isExpanded: props.defaultExpanded || expandedGroups.value.has(groupKey),
     count: groupItems.length
   }));
-  
+
   // Sort groups by key
   groupedItems.value.sort((a, b) => {
     if (typeof a.groupKey === 'string' && typeof b.groupKey === 'string') {
@@ -203,10 +205,10 @@ const groupItems = (items: any[]) => {
 // Selection methods
 const toggleSelection = (item: any) => {
   if (!props.selectable) return;
-  
+
   const itemUniqueValue = getUniqueValue(item);
-  const index = selectedItems.value.findIndex(selected => getUniqueValue(selected) === itemUniqueValue);
-  
+  const index = selectedItems.value.findIndex((selected) => getUniqueValue(selected) === itemUniqueValue);
+
   if (index > -1) {
     selectedItems.value.splice(index, 1);
   } else {
@@ -216,7 +218,7 @@ const toggleSelection = (item: any) => {
       selectedItems.value = [item];
     }
   }
-  
+
   // Emit selection change events
   emit('update:selectedItems', selectedItems.value);
   emit('selection-change', selectedItems.value);
@@ -224,14 +226,14 @@ const toggleSelection = (item: any) => {
 
 const toggleSelectAll = () => {
   if (!props.selectable || !props.multiSelect) return;
-  
+
   if (selectAll.value) {
     selectedItems.value = [];
   } else {
     selectedItems.value = [...items.value];
   }
   selectAll.value = !selectAll.value;
-  
+
   // Emit selection change events
   emit('update:selectedItems', selectedItems.value);
   emit('selection-change', selectedItems.value);
@@ -239,10 +241,10 @@ const toggleSelectAll = () => {
 
 // Group toggle function
 const toggleGroup = (groupKey: string | number) => {
-  const group = groupedItems.value.find(g => g.groupKey === groupKey);
+  const group = groupedItems.value.find((g) => g.groupKey === groupKey);
   if (group) {
     group.isExpanded = !group.isExpanded;
-    
+
     if (group.isExpanded) {
       expandedGroups.value.add(groupKey);
     } else {
@@ -253,7 +255,7 @@ const toggleGroup = (groupKey: string | number) => {
 
 // Expand all groups
 const expandAllGroups = () => {
-  groupedItems.value.forEach(group => {
+  groupedItems.value.forEach((group) => {
     group.isExpanded = true;
     expandedGroups.value.add(group.groupKey);
   });
@@ -261,7 +263,7 @@ const expandAllGroups = () => {
 
 // Collapse all groups
 const collapseAllGroups = () => {
-  groupedItems.value.forEach(group => {
+  groupedItems.value.forEach((group) => {
     group.isExpanded = false;
     expandedGroups.value.delete(group.groupKey);
   });
@@ -269,7 +271,7 @@ const collapseAllGroups = () => {
 
 const isSelected = (item: any) => {
   const itemUniqueValue = getUniqueValue(item);
-  return selectedItems.value.some(selected => getUniqueValue(selected) === itemUniqueValue);
+  return selectedItems.value.some((selected) => getUniqueValue(selected) === itemUniqueValue);
 };
 
 // Computed properties for selection
@@ -280,7 +282,7 @@ const hasSelection = computed(() => selectedItems.value.length > 0);
 const clearSelection = () => {
   selectedItems.value = [];
   selectAll.value = false;
-  
+
   // Emit selection change events
   emit('update:selectedItems', selectedItems.value);
   emit('selection-change', selectedItems.value);
@@ -344,7 +346,7 @@ const fetchData = async (queryParams?: {}) => {
     totalSize.value = response.data.page.totalElements;
     totalPages.value = response.data.page.totalPages;
     hasMore.value = currentPage.value < response.data.page.totalPages;
-    
+
     // Group items if groupBy is specified
     groupItems(items.value);
   } catch (err: any) {
@@ -696,21 +698,17 @@ const handleFilterApply = (filterData: any) => {
   <div v-if="props.title" class="page-title">
     <h3 class="title-text">{{ props.title }}</h3>
   </div>
-  
+
   <!-- Action Buttons OUTSIDE the table container -->
   <div class="action-buttons">
     <v-btn v-if="props.actions?.includes('create')" color="green" class="me-2" @click="openDialog()">ایجاد ✅</v-btn>
     <v-btn v-if="hasFilterComponent" class="me-2" @click="filterDialog = true">فیلتر 🔍</v-btn>
-    <v-btn v-if="props.showRefreshButton" color="blue"  @click="fetchData" :loading="loading">بروزرسانی 🔄 </v-btn>
-    
+    <v-btn v-if="props.showRefreshButton" color="blue" @click="fetchData" :loading="loading">بروزرسانی 🔄</v-btn>
+
     <!-- Selection Actions -->
     <div v-if="props.selectable && hasSelection" class="selection-actions">
-      <v-chip color="primary" class="me-2">
-        {{ selectedCount }} آیتم انتخاب شده
-      </v-chip>
-      <v-btn color="orange" size="small" class="me-2" @click="clearSelection">
-        پاک کردن انتخاب
-      </v-btn>
+      <v-chip color="primary" class="me-2"> {{ selectedCount }} آیتم انتخاب شده </v-chip>
+      <v-btn color="orange" size="small" class="me-2" @click="clearSelection"> پاک کردن انتخاب </v-btn>
     </div>
   </div>
 
@@ -720,262 +718,266 @@ const handleFilterApply = (filterData: any) => {
       <v-skeleton-loader type="table" :loading="loading" class="mx-auto" max-width="100%" :boilerplate="false" />
     </template>
     <template v-else>
-        <!-- Grouped Table Structure -->
-        <div v-if="props.groupBy && groupedItems.length > 0" class="grouped-table">
-          <!-- Group Controls -->
-          <div class="group-controls mb-3">
-            <v-btn size="small" color="primary" @click="expandAllGroups" class="me-2">
-              گسترش همه
-            </v-btn>
-            <v-btn size="small" color="secondary" @click="collapseAllGroups" class="me-2">
-              جمع کردن همه
-            </v-btn>
-          </div>
-          
-          <!-- Single Scrollable Container for All Groups -->
-          <div class="groups-scroll-container" :style="{ height: `${props.height - 120}px` }">
-            <div class="groups-container">
-              <div v-for="group in groupedItems" :key="group.groupKey" class="group-section">
-                <!-- Group Header -->
-                <div 
-                  class="group-header" 
-                  @click="toggleGroup(group.groupKey)"
-                  :class="{ 'expanded': group.isExpanded }"
-                >
-                  <v-icon :icon="group.isExpanded ? 'mdi-chevron-down' : 'mdi-chevron-right'" class="me-2" />
-                  <span class="group-label">{{ group.groupLabel }}</span>
-                  <v-chip size="small" color="primary" class="ms-auto">{{ group.count }}</v-chip>
-                </div>
-                
-                <!-- Group Items -->
-                <div v-if="group.isExpanded" class="group-items">
-                  <v-data-table
-                    :headers="[
-                      ...(props.selectable ? [{ title: '', key: 'selection', sortable: false, width: 50 }] : []),
-                      ...props.headers, 
-                      { title: 'عملیات', key: 'actions', sortable: false }
-                    ]"
-                    :items="group.items"
-                    hide-default-footer
-                    class="elevation-1 group-table"
-                    no-data-text="رکوردی یافت نشد"
-                    hover
-                    :height="'auto'"
-                  >
-          <!-- Custom Header for Selection -->
-          <template v-slot:header.selection="{ column }">
-            <v-checkbox
-              v-if="props.selectable && props.multiSelect"
-              :model-value="selectAll"
-              @update:model-value="toggleSelectAll"
-              :indeterminate="selectedCount > 0 && selectedCount < items.length"
-              hide-details
-              density="compact"
-            />
-          </template>
-          <template v-slot:item="{ item, columns, index }">
-            <tr :style="{ background: index % 2 === 0 ? '#fff' : '#f5f7fa' }">
-              <td
-                v-for="column in columns"
-                :key="column.key"
-                :style="{
-                  ...getColumnStyle(column, item),
-                  ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
-                }"
-              >
-                <!-- Selection Checkbox -->
-                <template v-if="column.key === 'selection'">
-                  <v-checkbox
-                    :model-value="isSelected(item)"
-                    @update:model-value="toggleSelection(item)"
-                    :disabled="!props.selectable"
-                    hide-details
-                    density="compact"
-                  />
-                </template>
-                <template v-if="column.key === 'actions'">
-                  <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
-                    ویرایش ✏️
-                  </v-btn>
-                  <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="mr-2" @click="openDeleteDialog(item)"
-                    >حذف ❌
-                  </v-btn>
-                  <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
-                    >🔍 نمایش
-                  </v-btn>
-                  <template v-for="(routePath, routeKey) in props.routes" :key="routeKey">
-                    <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(routeKey, item)">
-                      {{ routeKey.toUpperCase() }}
-                    </v-btn>
-                  </template>
-                  <v-btn v-for="key in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
-                    {{ key.toUpperCase() }} ⬇️
-                  </v-btn>
-                  <template v-for="(action, index) in props.customActions" :key="action.title || index">
-                    <v-btn
-                      v-if="!action.condition || action.condition(item)"
-                      color="orange"
-                      size="small"
-                      class="mr-2"
-                      @click="openCustomActionDialog(action, item)"
-                    >
-                      {{ action.title }}
-                    </v-btn>
-                  </template>
-                  <template v-if="props.customButtonsFn">
-                    <v-btn
-                      v-for="button in props.customButtonsFn(item)"
-                      :key="button.label"
-                      :color="button.color || 'primary'"
-                      size="small"
-                      class="mr-2"
-                      :disabled="button.disabled"
-                      @click="button.onClick(item)"
-                    >
-                      {{ button.label }}
-                    </v-btn>
-                  </template>
-                  <template v-else>
-                    <v-btn
-                      v-for="button in props.customButtons"
-                      :key="button.label"
-                      :color="button.color || 'primary'"
-                      size="small"
-                      class="mr-2"
-                      @click="button.onClick(item)"
-                    >
-                      {{ button.label }}
-                    </v-btn>
-                  </template>
-                </template>
-                <template v-else>
-                  {{ getTranslatedValue(getNestedValue(item, column.key), column, item) }}
-                </template>
-              </td>
-            </tr>
-                    </template>
-        </v-data-table>
-                 </div>
-               </div>
-             </div>
-           </div>
-         </div>
-        
-        <!-- Regular Table Structure (when not grouped) -->
-        <v-data-table
-          v-else
-          :headers="[
-            ...(props.selectable ? [{ title: '', key: 'selection', sortable: false, width: 50 }] : []),
-            ...props.headers, 
-            { title: 'عملیات', key: 'actions', sortable: false }
-          ]"
-          :items="items"
-          hide-default-footer
-          class="elevation-1"
-          no-data-text="رکوردی یافت نشد"
-          hover
-          fixed-header
-          :height="props.height"
-        >
-          <!-- Custom Header for Selection -->
-          <template v-slot:header.selection="{ column }">
-            <v-checkbox
-              v-if="props.selectable && props.multiSelect"
-              :model-value="selectAll"
-              @update:model-value="toggleSelectAll"
-              :indeterminate="selectedCount > 0 && selectedCount < items.length"
-              hide-details
-              density="compact"
-            />
-          </template>
-          <template v-slot:item="{ item, columns, index }">
-            <tr :style="{ background: index % 2 === 0 ? '#fff' : '#f5f7fa' }">
-              <td
-                v-for="column in columns"
-                :key="column.key"
-                :style="{
-                  ...getColumnStyle(column, item),
-                  ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
-                }"
-              >
-                <!-- Selection Checkbox -->
-                <template v-if="column.key === 'selection'">
-                  <v-checkbox
-                    :model-value="isSelected(item)"
-                    @update:model-value="toggleSelection(item)"
-                    :disabled="!props.selectable"
-                    hide-details
-                    density="compact"
-                  />
-                </template>
-                <template v-if="column.key === 'actions'">
-                  <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
-                    ویرایش ✏️
-                  </v-btn>
-                  <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="mr-2" @click="openDeleteDialog(item)"
-                    >حذف ❌
-                  </v-btn>
-                  <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
-                    >🔍 نمایش
-                  </v-btn>
-                  <template v-for="(routePath, routeKey) in props.routes" :key="routeKey">
-                    <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(routeKey, item)">
-                      {{ routeKey.toUpperCase() }}
-                    </v-btn>
-                  </template>
-                  <v-btn v-for="key in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
-                    {{ key.toUpperCase() }} ⬇️
-                  </v-btn>
-                  <template v-for="(action, index) in props.customActions" :key="action.title || index">
-                    <v-btn
-                      v-if="!action.condition || action.condition(item)"
-                      color="orange"
-                      size="small"
-                      class="mr-2"
-                      @click="openCustomActionDialog(action, item)"
-                    >
-                      {{ action.title }}
-                    </v-btn>
-                  </template>
-                  <template v-if="props.customButtonsFn">
-                    <v-btn
-                      v-for="button in props.customButtonsFn(item)"
-                      :key="button.label"
-                      :color="button.color || 'primary'"
-                      size="small"
-                      class="mr-2"
-                      :disabled="button.disabled"
-                      @click="button.onClick(item)"
-                    >
-                      {{ button.label }}
-                    </v-btn>
-                  </template>
-                  <template v-else>
-                    <v-btn
-                      v-for="button in props.customButtons"
-                      :key="button.label"
-                      :color="button.color || 'primary'"
-                      size="small"
-                      class="mr-2"
-                      @click="button.onClick(item)"
-                    >
-                      {{ button.label }}
-                    </v-btn>
-                  </template>
-                </template>
-                <template v-else>
-                  {{ getTranslatedValue(getNestedValue(item, column.key), column, item) }}
-                </template>
-              </td>
-            </tr>
-          </template>
-        </v-data-table>
-
-        <!-- Loading indicator for infinite scroll -->
-        <div v-if="isLoadingMore" class="d-flex justify-center align-center pa-4">
-          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+      <!-- Grouped Table Structure -->
+      <div v-if="props.groupBy && groupedItems.length > 0" class="grouped-table">
+        <!-- Group Controls -->
+        <div class="group-controls mb-3">
+          <v-btn size="small" color="primary" @click="expandAllGroups" class="me-2"> گسترش همه </v-btn>
+          <v-btn size="small" color="secondary" @click="collapseAllGroups" class="me-2"> جمع کردن همه </v-btn>
         </div>
-      </template>
+
+        <!-- Single Scrollable Container for All Groups -->
+        <div class="groups-scroll-container" :style="{ height: `${props.height - 120}px` }">
+          <div class="groups-container">
+            <div v-for="group in groupedItems" :key="group.groupKey" class="group-section">
+              <!-- Group Header -->
+              <div class="group-header" @click="toggleGroup(group.groupKey)" :class="{ expanded: group.isExpanded }">
+                <v-icon :icon="group.isExpanded ? 'mdi-chevron-down' : 'mdi-chevron-right'" class="me-2" />
+                <span class="group-label">{{ group.groupLabel }}</span>
+                <v-chip size="small" color="primary" class="ms-auto">{{ group.count }}</v-chip>
+              </div>
+
+              <!-- Group Items -->
+              <div v-if="group.isExpanded" class="group-items">
+                <v-data-table
+                  :headers="[
+                    ...(props.selectable ? [{ title: '', key: 'selection', sortable: false, width: 50 }] : []),
+                    ...props.headers,
+                    { title: 'عملیات', key: 'actions', sortable: false }
+                  ]"
+                  :items="group.items"
+                  hide-default-footer
+                  class="elevation-1 group-table"
+                  no-data-text="رکوردی یافت نشد"
+                  hover
+                  :height="'auto'"
+                >
+                  <!-- Custom Header for Selection -->
+                  <template v-slot:header.selection="{ column }">
+                    <v-checkbox
+                      v-if="props.selectable && props.multiSelect"
+                      :model-value="selectAll"
+                      @update:model-value="toggleSelectAll"
+                      :indeterminate="selectedCount > 0 && selectedCount < items.length"
+                      hide-details
+                      density="compact"
+                    />
+                  </template>
+                  <template v-slot:item="{ item, columns, index }">
+                    <tr :style="{ background: index % 2 === 0 ? '#fff' : '#f5f7fa' }">
+                      <td
+                        v-for="column in columns"
+                        :key="column.key"
+                        :style="{
+                          ...getColumnStyle(column, item),
+                          ...(column.width
+                            ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' }
+                            : {})
+                        }"
+                      >
+                        <!-- Selection Checkbox -->
+                        <template v-if="column.key === 'selection'">
+                          <v-checkbox
+                            :model-value="isSelected(item)"
+                            @update:model-value="toggleSelection(item)"
+                            :disabled="!props.selectable"
+                            hide-details
+                            density="compact"
+                          />
+                        </template>
+                        <template v-if="column.key === 'actions'">
+                          <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
+                            ویرایش ✏️
+                          </v-btn>
+                          <v-btn
+                            v-if="props.actions?.includes('delete')"
+                            color="red"
+                            size="small"
+                            class="mr-2"
+                            @click="openDeleteDialog(item)"
+                            >حذف ❌
+                          </v-btn>
+                          <v-btn
+                            v-if="props.actions?.includes('view')"
+                            color="purple"
+                            size="small"
+                            class="mr-2"
+                            @click="goToRoute('view', item)"
+                            >🔍 نمایش
+                          </v-btn>
+                          <template v-for="(routePath, routeKey) in props.routes" :key="routeKey">
+                            <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(routeKey, item)">
+                              {{ routeKey.toUpperCase() }}
+                            </v-btn>
+                          </template>
+                          <v-btn v-for="key in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
+                            {{ key.toUpperCase() }} ⬇️
+                          </v-btn>
+                          <template v-for="(action, index) in props.customActions" :key="action.title || index">
+                            <v-btn
+                              v-if="!action.condition || action.condition(item)"
+                              color="orange"
+                              size="small"
+                              class="mr-2"
+                              @click="openCustomActionDialog(action, item)"
+                            >
+                              {{ action.title }}
+                            </v-btn>
+                          </template>
+                          <template v-if="props.customButtonsFn">
+                            <v-btn
+                              v-for="button in props.customButtonsFn(item)"
+                              :key="button.label"
+                              :color="button.color || 'primary'"
+                              size="small"
+                              class="mr-2"
+                              :disabled="button.disabled"
+                              @click="button.onClick(item)"
+                            >
+                              {{ button.label }}
+                            </v-btn>
+                          </template>
+                          <template v-else>
+                            <v-btn
+                              v-for="button in props.customButtons"
+                              :key="button.label"
+                              :color="button.color || 'primary'"
+                              size="small"
+                              class="mr-2"
+                              @click="button.onClick(item)"
+                            >
+                              {{ button.label }}
+                            </v-btn>
+                          </template>
+                        </template>
+                        <template v-else>
+                          {{ getTranslatedValue(getNestedValue(item, column.key), column, item) }}
+                        </template>
+                      </td>
+                    </tr>
+                  </template>
+                </v-data-table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regular Table Structure (when not grouped) -->
+      <v-data-table
+        v-else
+        :headers="[
+          ...(props.selectable ? [{ title: '', key: 'selection', sortable: false, width: 50 }] : []),
+          ...props.headers,
+          { title: 'عملیات', key: 'actions', sortable: false, width: 650 }
+        ]"
+        :items="items"
+        hide-default-footer
+        class="elevation-1"
+        no-data-text="رکوردی یافت نشد"
+        hover
+        fixed-header
+        :height="props.height"
+      >
+        <!-- Custom Header for Selection -->
+        <template v-slot:header.selection="{ column }">
+          <v-checkbox
+            v-if="props.selectable && props.multiSelect"
+            :model-value="selectAll"
+            @update:model-value="toggleSelectAll"
+            :indeterminate="selectedCount > 0 && selectedCount < items.length"
+            hide-details
+            density="compact"
+          />
+        </template>
+        <template v-slot:item="{ item, columns, index }">
+          <tr :style="{ background: index % 2 === 0 ? '#fff' : '#f5f7fa' }">
+            <td
+              v-for="column in columns"
+              :key="column.key"
+              :style="{
+                ...getColumnStyle(column, item),
+                ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
+              }"
+            >
+              <!-- Selection Checkbox -->
+              <template v-if="column.key === 'selection'">
+                <v-checkbox
+                  :model-value="isSelected(item)"
+                  @update:model-value="toggleSelection(item)"
+                  :disabled="!props.selectable"
+                  hide-details
+                  density="compact"
+                />
+              </template>
+              <template v-if="column.key === 'actions'">
+                <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
+                  ویرایش ✏️
+                </v-btn>
+                <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="mr-2" @click="openDeleteDialog(item)"
+                  >حذف ❌
+                </v-btn>
+                <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
+                  >🔍 نمایش
+                </v-btn>
+                <template v-for="(routePath, routeKey) in props.routes" :key="routeKey">
+                  <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(routeKey, item)">
+                    {{ routeKey.toUpperCase() }}
+                  </v-btn>
+                </template>
+                <v-btn v-for="key in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
+                  {{ key.toUpperCase() }} ⬇️
+                </v-btn>
+                <template v-for="(action, index) in props.customActions" :key="action.title || index">
+                  <v-btn
+                    v-if="!action.condition || action.condition(item)"
+                    color="orange"
+                    size="small"
+                    class="mr-2"
+                    @click="openCustomActionDialog(action, item)"
+                  >
+                    {{ action.title }}
+                  </v-btn>
+                </template>
+                <template v-if="props.customButtonsFn">
+                  <v-btn
+                    v-for="button in props.customButtonsFn(item)"
+                    :key="button.label"
+                    :color="button.color || 'primary'"
+                    size="small"
+                    class="mr-2"
+                    :disabled="button.disabled"
+                    @click="button.onClick(item)"
+                  >
+                    {{ button.label }}
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <v-btn
+                    v-for="button in props.customButtons"
+                    :key="button.label"
+                    :color="button.color || 'primary'"
+                    size="small"
+                    class="mr-2"
+                    @click="button.onClick(item)"
+                  >
+                    {{ button.label }}
+                  </v-btn>
+                </template>
+              </template>
+              <template v-else>
+                {{ getTranslatedValue(getNestedValue(item, column.key), column, item) }}
+              </template>
+            </td>
+          </tr>
+        </template>
+      </v-data-table>
+
+      <!-- Loading indicator for infinite scroll -->
+      <div v-if="isLoadingMore" class="d-flex justify-center align-center pa-4">
+        <v-progress-circular indeterminate color="primary"></v-progress-circular>
+      </div>
+    </template>
 
     <!-- Custom Pagination always visible at the bottom -->
     <div v-if="props.showPagination" class="pagination-wrapper">
@@ -1012,7 +1014,7 @@ const handleFilterApply = (filterData: any) => {
       </v-card-text>
       <v-card-actions>
         <v-btn variant="tonal" color="error" @click="dialog = false">انصراف</v-btn>
-        <v-btn color="primary" variant="tonal" @click="saveItem">{{ isEditing ? 'ذخیره' : 'ایجاد' }}</v-btn>
+        <v-btn color="primary" var @click="saveItem">{{ isEditing ? 'ذخیره' : 'ایجاد' }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -1105,14 +1107,14 @@ const handleFilterApply = (filterData: any) => {
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #E3EBEB 100%);
+  background: linear-gradient(135deg, #f5f7fa 0%, #e3ebeb 100%);
   cursor: pointer;
   transition: all 0.3s ease;
   border-bottom: 1px solid #e0e0e0;
 }
 
 .group-header:hover {
-  background: linear-gradient(135deg, #e3f2fd 0%, #E3EBEB 100%);
+  background: linear-gradient(135deg, #e3f2fd 0%, #e3ebeb 100%);
 }
 
 .group-header.expanded {
@@ -1150,8 +1152,6 @@ const handleFilterApply = (filterData: any) => {
 .group-table :deep(.v-data-table__tbody) {
   overflow: visible !important;
 }
-
-
 
 .pagination-wrapper {
   flex-shrink: 0;

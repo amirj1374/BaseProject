@@ -1,5 +1,6 @@
 import type { SubmitReferencePayload, SubmitSignPayload, ValidUserPayload } from "@/types/cartable/cartableTypes";
 import type { AxiosInstance } from "axios";
+import { stubTrue } from 'lodash-es';
 
 export default (axiosInstance: AxiosInstance) => ({
   getCartable(trackingCode: string) {
@@ -37,7 +38,7 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post("/api/v1/cartable/sign", payload);
   },
   
-  getLoanRequestId(cartableId: number) {
+  getLoanRequestId(cartableId: string) {
     return axiosInstance.get(`/api/v1/cartable/${cartableId}/loan-request/id`);
   },
 

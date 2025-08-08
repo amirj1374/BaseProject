@@ -157,3 +157,19 @@ export const CartableStatusTypeOptions = [
   { title: 'رد شده', value: CartableStatusTypeEnum.REJECTED },
   { title: 'بسته شده', value: CartableStatusTypeEnum.CLOSED },
 ];
+
+
+// department type
+export const DepartmentypeEnum = {
+  BRANCH	: 'BRANCH',
+  HEADQUARTERS: 'HEADQUARTERS',
+  CORPBANKINGORREGION: 'CORPBANKINGORREGION',
+} as const;
+
+export type DepartmentType = (typeof DepartmentypeEnum)[keyof typeof DepartmentypeEnum];
+
+export const DepartmentTypeOptions = [
+  { title: 'شعبه', value: DepartmentypeEnum.BRANCH},
+  { title: 'ستاد', value: DepartmentypeEnum.HEADQUARTERS },
+  { title: 'منطقه', value: DepartmentypeEnum.CORPBANKINGORREGION },
+];

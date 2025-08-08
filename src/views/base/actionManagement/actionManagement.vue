@@ -27,7 +27,7 @@ import { onMounted, ref } from 'vue';
 import { useRouteGuard } from '@/composables/useRouteGuard';
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import CreateActionManagement from '@/components/sections/actionManagement/CreateActionManagement.vue';
-import { ActionTypeOptions } from '@/types/enums/global';
+import { ActionTypeOptions, DepartmentTypeOptions } from '@/types/enums/global';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 
 const { requirePermission } = useRouteGuard();
@@ -47,6 +47,37 @@ const snackbarColor = ref('success');
 
 // Headers configuration with custom JSON support
 const headers = [
+  {
+    title: 'رکن مبدا',
+    key: 'fromDepartmentLevel',
+    sortable: true,
+    width: 200,
+    translate: true,
+    options: DepartmentTypeOptions,
+  },
+  {
+    title: 'رکن مقصد',
+    key: 'toDepartmentLevel',
+    sortable: true,
+    width: 200,
+    translate: true,
+    options: DepartmentTypeOptions,
+  },
+  {
+    title: 'نقش مبدا',
+    key: 'fromRole',
+    sortable: true,
+    width: 200,
+    // Example of nested key usage
+    nestedKey: 'fromRole.name',
+    // Custom formatter example
+    formatter: (value: any, item: any) => {
+      if (item.fromRole && typeof item.fromRole === 'object') {
+        return `${item.fromRole.description}`;
+      }
+      return value;
+    }
+  },
   {
     title: 'نقش مبدا',
     key: 'fromRole',

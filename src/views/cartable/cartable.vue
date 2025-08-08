@@ -21,7 +21,7 @@ const page = ref({ title: 'کارتابل ها' });
 const header = ref([
   {
     title: 'تاریخ ایجاد',
-    key: 'createdAt',
+    key: 'requestDate',
     sortable: true,
     editable: true,
     isDate: true
@@ -30,37 +30,68 @@ const header = ref([
     title: 'ایجاد شده توسط',
     key: 'createdBy',
     sortable: true,
-    editable: true
+    editable: true,
+    width: 200,
   },
   {
-    title: 'کد رهگیری',
-    key: 'trackingCode',
-    sortable: true
+    title: 'شعبه ثبت کننده درخواست',
+    key: 'branchName',
+    sortable: true,
+    editable: true,
+    width: 200,
   },
   {
-    title: 'نقش',
-    key: 'description',
-    sortable: true
+    title: 'نام مشتری',
+    key: 'customerName',
+    sortable: true,
+    editable: true,
+    width: 200,
+  },
+  {
+    title: 'کد مشتری',
+    key: 'customerCode',
+    sortable: true,
+    editable: true,
+    width: 200,
   },
   {
     title: 'گروه مشتری',
     key: 'customerGroup',
-    sortable: true
+    sortable: true,
+    width: 200,
+  },  {
+    title: 'نوع مشتری',
+    key: 'customerType',
+    sortable: true,
+    width: 200,
+  },
+  {
+    title: 'کد رهگیری',
+    key: 'trackingCode',
+    sortable: true,
+    width: 200,
+  },
+  {
+    title: 'نقش',
+    key: 'description',
+    sortable: true,
+    width: 200,
   },
   {
     title: 'وضعیت',
     key: 'status',
     sortable: true,
     translate: true,
-    options: CartableStatusTypeOptions
+    options: CartableStatusTypeOptions,
+    width: 200,
   }
 ]);
 
 const tableRef = ref();
 const route = {
-  'گزارش پیش مصوبه': 'preApprovalReport/{id}',
+  'گزارش پیش مصوبه': 'preApprovalReport/{id}'
+};
 
-}
 function handleReferenceSuccess() {
   tableRef.value?.fetchData();
 }
@@ -80,28 +111,34 @@ function handleReferenceSuccess() {
       :show-pagination="true"
       :show-refresh-button="true"
       :custom-actions="[
-        { 
-          title: 'عملیات', 
+        {
+          title: 'عملیات',
           component: (props) => h(Reference, { ...props, onSuccess: handleReferenceSuccess }),
-          condition: (item) => item.mainAssignee === true
+          condition: (item) => item.canSubmit === true
         },
-        { 
-          title: 'امضا', 
+        {
+          title: 'امضا',
           component: (props) => h(Sign, { ...props, onSuccess: handleReferenceSuccess }),
           condition: (item) => item.hasSignPermission === true
         },
-        { 
-          title: 'لیست مدارک', 
+        {
+          title: 'لیست مدارک',
+          component: UploadList
+        },
+        // TODO
+        {
+          title: 'مشاهده نظرات',
           component: UploadList,
+          condition: (item) => item.commiteInquiries
         },
-        { 
-          title: 'تاریخچه کارتابل', 
-          component: CartableHistory,
+        {
+          title: 'تاریخچه کارتابل',
+          component: CartableHistory
         },
-        { 
-          title: 'تاریخچه درخواست مصوبه', 
-          component: LoanRequestHistory,
-        },
+        {
+          title: 'تاریخچه درخواست مصوبه',
+          component: LoanRequestHistory
+        }
       ]"
       :routes="route"
     />
@@ -113,6 +150,7 @@ function handleReferenceSuccess() {
   display: flex;
   flex-direction: column;
 }
+
 .upload-form {
   flex: 1 1 auto;
   display: flex;

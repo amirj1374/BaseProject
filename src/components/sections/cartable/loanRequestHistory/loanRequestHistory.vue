@@ -52,7 +52,7 @@ const header = ref([
     isDate: true
   },
   {
-    title: 'تاریج ویرایش',
+    title: 'تاریخ ویرایش',
     key: 'updatedBy',
     sortable: true
   }

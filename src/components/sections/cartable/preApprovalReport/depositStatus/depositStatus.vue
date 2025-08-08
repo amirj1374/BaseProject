@@ -2,8 +2,8 @@
   <CustomDataTable
     ref="dataTableRef"
     :headers="headers"
-    api-resource="deposit-info/get-all-deposit"
-    :queryParams="{ loanRequestId: approvalStore.loanRequestId }"
+    api-resource="deposit-info"
+    :queryParams="{ loanRequestId: props.loanRequestId }"
     :auto-fetch="true"
     :show-pagination="true"
     :height="550"
@@ -13,6 +13,12 @@
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import { useApprovalStore } from '@/stores/approval';
 
+const props = defineProps({
+  loanRequestId: {
+    type: String,
+    required: true
+  }
+})
 const approvalStore = useApprovalStore();
 
 const headers = [

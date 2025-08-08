@@ -11,7 +11,7 @@
     </v-tabs>
     <SummaryPerformance v-if="activeTab === 'summaryPerformance'" ref="summaryPerformanceRef"/>
     <CreditOffer v-if="activeTab === 'creditOffer'" ref="creditOfferRef"/>
-    <DepositStatus v-if="activeTab === 'depositStatus'" ref="depositStatusRef"/>
+    <DepositStatus v-if="activeTab === 'depositStatus'" ref="depositStatusRef" :loan-request-id="id"/>
     <FacilityStatus v-if="activeTab === 'facilityStatus'" ref="facilityStatusRef"/>
     <RecentApproval v-if="activeTab === 'recentApproval'" ref="recentApprovalRef"/>
     <Comments v-if="activeTab === 'comments'" ref="commentsRef"/>
@@ -26,8 +26,15 @@ import DepositStatus from '@/components/sections/cartable/preApprovalReport/depo
 import FacilityStatus from '@/components/sections/cartable/preApprovalReport/facilityStatus/facilityStatus.vue';
 import RecentApproval from '@/components/sections/cartable/preApprovalReport/recentApproval/recentApproval.vue';
 import Comments from '@/components/sections/cartable/preApprovalReport/comments/comments.vue';
+import { onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { api } from '@/services/api';
 
-import { ref } from 'vue';
+const { id } = useRoute().params;
+onMounted(async () => {
+  const loanRequestId = await api.cartable.getLoanRequestId(id as string);
+})
+
 const breadcrumbs = ref([
   {
     title: 'کارتابل ها',
