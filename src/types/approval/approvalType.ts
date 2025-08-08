@@ -215,7 +215,6 @@ export interface DepositDTO {
   blockedAmount:number
   assignedAmount:number
   assignedDate:string
-  nationalCode: number
   externalRef?:number
   id:number
 }
@@ -228,14 +227,12 @@ export interface EstateDTO {
   evaluationDate:string
   assignedAmount:number
   assignedDate:string
-  nationalCode: number
   id:number
 }
 
 export interface SharesBondDTO {
   assignedAmount:number
   parsianBankAgency:boolean
-  nationalCode:string
   assignedDate:string
   customerName:string
   id:number

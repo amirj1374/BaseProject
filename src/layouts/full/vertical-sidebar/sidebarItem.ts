@@ -50,12 +50,12 @@ const sidebarItem: menu[] = [
     to: '/cartable',
     permissionKey: 'cartable'
   },
-  // {
-  //   title: 'ارجاع درخواست های جاری',
-  //   icon: IconFileSymlink,
-  //   to: '/cartable/reference',
-  //   permissionKey: 'cartable_operation'
-  // },
+  {
+    title: 'گزارش کارشناسی',
+    icon: IconFileSymlink,
+    to: '/report',
+    permissionKey: 'cartable_operation'
+  },
   {
     title: 'گزارشات',
     icon: IconClipboardData,

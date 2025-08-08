@@ -8,6 +8,7 @@ import UploadList from '@/components/sections/cartable/uploadList/uploadList.vue
 import LoanRequestHistory from '@/components/sections/cartable/loanRequestHistory/loanRequestHistory.vue';
 import FilterCartable from '@/components/sections/cartable/FilterCartable.vue';
 import Sign from '@/components/sections/cartable/sign/Sign.vue';
+import { CartableStatusTypeOptions } from '@/types/enums/global';
 
 const breadcrumbs = ref([
   {
@@ -51,11 +52,15 @@ const header = ref([
     key: 'status',
     sortable: true,
     translate: true,
+    options: CartableStatusTypeOptions
   }
 ]);
 
 const tableRef = ref();
+const route = {
+  'گزارش پیش مصوبه': 'preApprovalReport/{id}',
 
+}
 function handleReferenceSuccess() {
   tableRef.value?.fetchData();
 }
@@ -96,8 +101,9 @@ function handleReferenceSuccess() {
         { 
           title: 'تاریخچه درخواست مصوبه', 
           component: LoanRequestHistory,
-        }
+        },
       ]"
+      :routes="route"
     />
   </div>
 </template>

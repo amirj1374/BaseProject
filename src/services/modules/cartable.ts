@@ -19,7 +19,7 @@ export default (axiosInstance: AxiosInstance) => ({
   },
 
   getValidUser(payload: ValidUserPayload) {
-    return axiosInstance.get(`/api/v1/cartable/${payload.id}/get-valid-users?actionType=${payload.actionType}&roleCode=${payload.roleCode}`,{
+    return axiosInstance.get(`/api/v1/cartable/${payload.id}/get-valid-users?actionType=${payload.actionType}&roleName=${payload.roleName}`,{
       timeout: 40000,
     });
   },
@@ -35,6 +35,10 @@ export default (axiosInstance: AxiosInstance) => ({
 
   submitSign(payload: SubmitSignPayload) {
     return axiosInstance.post("/api/v1/cartable/sign", payload);
+  },
+  
+  getLoanRequestId(cartableId: number) {
+    return axiosInstance.get(`/api/v1/cartable/${cartableId}/loan-request/id`);
   },
 
 });

@@ -24,7 +24,6 @@ const formData = ref<CollateralsInfoPayload>({
     blockedAmount: 0,
     assignedAmount: 0,
     assignedDate: '',
-    nationalCode: 0,
     id: 0
   },
   estate: {
@@ -35,13 +34,11 @@ const formData = ref<CollateralsInfoPayload>({
     evaluationDate: '',
     assignedAmount: 0,
     assignedDate: '',
-    nationalCode: 0,
     id: 0
   },
   sharesBond: {
     assignedAmount: 0,
     parsianBankAgency: false,
-    nationalCode: '',
     assignedDate: '',
     customerName: '',
     id: 0
@@ -71,17 +68,6 @@ const isFormComplete = computed(() => {
   );
 });
 
-// Validation rules
-const required = (value: any) => !!value || 'این فیلد الزامی است';
-const nationalCodeRule = (value: string) => {
-  if (!value) return true;
-  return /^\d{10}$/.test(value) || 'کد ملی باید 10 رقم باشد';
-};
-const dateRule = (value: string) => {
-  if (!value) return true;
-  return /^\d{4}-\d{2}-\d{2}$/.test(value) || 'فرمت تاریخ باید YYYY-MM-DD باشد';
-};
-
 // Load existing data
 onMounted(async () => {
   try {
@@ -97,7 +83,6 @@ onMounted(async () => {
 
 // Validate form
 const validateForm = () => {
-  valid.value = isFormComplete.value;
   canSubmit.value = Boolean(isFormValid.value) && valid.value;
 };
 
@@ -127,7 +112,6 @@ async function save() {
         blockedAmount: Number(formData.value.deposit.blockedAmount) || 0,
         assignedAmount: Number(formData.value.deposit.assignedAmount) || 0,
         assignedDate: formData.value.deposit.assignedDate,
-        nationalCode: Number(formData.value.deposit.nationalCode) || 0,
         id: formData.value.deposit.id
       },
       estate: {
@@ -138,13 +122,11 @@ async function save() {
         evaluationDate: formData.value.estate.evaluationDate,
         assignedAmount: Number(formData.value.estate.assignedAmount) || 0,
         assignedDate: formData.value.estate.assignedDate,
-        nationalCode: Number(formData.value.estate.nationalCode) || 0,
         id: formData.value.estate.id
       },
       sharesBond: {
         assignedAmount: Number(formData.value.sharesBond.assignedAmount) || 0,
         parsianBankAgency: formData.value.sharesBond.parsianBankAgency,
-        nationalCode: formData.value.sharesBond.nationalCode,
         assignedDate: formData.value.sharesBond.assignedDate,
         customerName: formData.value.sharesBond.customerName,
         id: formData.value.sharesBond.id
@@ -210,76 +192,8 @@ const closeDialog = () => {
     <v-card title="وثایق">
       <v-card-text>
         <v-form ref="form" v-model="isFormValid" @update:model-value="watchFormValidation">
-          <!-- Deposit Section -->
-          <v-card variant="outlined" class="mb-4">
-            <v-card-title class="text-h6">سپرده</v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="formData.deposit.customerName"
-                    label="ملک / املاک متعلق به"
-                    variant="outlined"
-                    density="comfortable"
-                    :rules="[required]"
-                  />
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="formData.deposit.nationalCode"
-                    label="کد ملی"
-                    variant="outlined"
-                    density="comfortable"
-                    :rules="[nationalCodeRule]"
-                    type="number"
-                  />
-                </v-col>
-                <v-col cols="12" md="6">
-                  <MoneyInput
-                    v-model="formData.deposit.blockedAmount"
-                    label="مبلغ مسدودی"
-                    placeholder="0"
-                    variant="outlined"
-                    density="comfortable"
-                    suffix="ریال"
-                  />
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="formData.deposit.assignedDate"
-                    label="تاریخ مسدودی"
-                    variant="outlined"
-                    density="comfortable"
-                    type="date"
-                    :rules="[dateRule]"
-                  />
-                </v-col>
-                <v-col cols="12" md="6">
-                  <MoneyInput
-                    v-model="formData.deposit.assignedAmount"
-                    label="مبلغ توثیق"
-                    placeholder="0"
-                    variant="outlined"
-                    density="comfortable"
-                    suffix="ریال"
-                  />
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="formData.deposit.assignedDate"
-                    label="تاریخ توثیق"
-                    variant="outlined"
-                    density="comfortable"
-                    type="date"
-                    :rules="[dateRule]"
-                  />
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-
-          <!-- Estate Section -->
-          <v-card variant="outlined" class="mb-4">
+               <!-- Estate Section -->
+               <v-card variant="outlined" class="mb-4">
             <v-card-title class="text-h6">املاک</v-card-title>
             <v-card-text>
               <v-row>
@@ -314,7 +228,7 @@ const closeDialog = () => {
                     placeholder="0"
                     variant="outlined"
                     density="comfortable"
-                    suffix="ریال"
+                    suffix="میلیون ریال"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -323,8 +237,6 @@ const closeDialog = () => {
                     label="تاریخ ارزیابی"
                     variant="outlined"
                     density="comfortable"
-                    type="date"
-                    :rules="[dateRule]"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -334,7 +246,7 @@ const closeDialog = () => {
                     placeholder="0"
                     variant="outlined"
                     density="comfortable"
-                    suffix="ریال"
+                    suffix="میلیون ریال"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -343,71 +255,49 @@ const closeDialog = () => {
                     label="تاریخ ترهمین"
                     variant="outlined"
                     density="comfortable"
-                    type="date"
-                    :rules="[dateRule]"
-                  />
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="formData.estate.nationalCode"
-                    label="کد ملی"
-                    variant="outlined"
-                    density="comfortable"
-                    :rules="[nationalCodeRule]"
-                    type="number"
                   />
                 </v-col>
               </v-row>
             </v-card-text>
           </v-card>
-
-          <!-- Shares/Bonds Section -->
+          <!-- Deposit Section -->
           <v-card variant="outlined" class="mb-4">
-            <v-card-title class="text-h6">سهام و اوراق</v-card-title>
+            <v-card-title class="text-h6">گروه نقد</v-card-title>
             <v-card-text>
               <v-row>
                 <v-col cols="12" md="6">
                   <v-text-field
-                    v-model="formData.sharesBond.customerName"
+                    v-model="formData.deposit.customerName"
                     label="متعلق به"
                     variant="outlined"
                     density="comfortable"
-                  />
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="formData.sharesBond.nationalCode"
-                    label="کد ملی"
-                    variant="outlined"
-                    density="comfortable"
-                    :rules="[nationalCodeRule]"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
                   <MoneyInput
-                    v-model="formData.sharesBond.assignedAmount"
+                    v-model="formData.deposit.assignedAmount"
                     label="مبلغ توثیق"
                     placeholder="0"
                     variant="outlined"
                     density="comfortable"
-                    suffix="ریال"
+                    suffix="میلیون ریال"
+                  />
+                </v-col>
+                <v-col cols="12" md="6">
+                  <MoneyInput
+                    v-model="formData.deposit.blockedAmount"
+                    label="مبلغ مسدودی"
+                    placeholder="0"
+                    variant="outlined"
+                    density="comfortable"
+                    suffix="میلیون ریال"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
                   <v-text-field
-                    v-model="formData.sharesBond.assignedDate"
+                    v-model="formData.deposit.assignedDate"
                     label="تاریخ توثیق"
                     variant="outlined"
-                    density="comfortable"
-                    type="date"
-                    :rules="[dateRule]"
-                  />
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-checkbox
-                    :model-value="Boolean(formData.sharesBond.parsianBankAgency)"
-                    @update:model-value="(value: any) => formData.sharesBond.parsianBankAgency = Boolean(value)"
-                    label="سهام شرکت پارسیان"
                     density="comfortable"
                   />
                 </v-col>
@@ -415,28 +305,11 @@ const closeDialog = () => {
             </v-card-text>
           </v-card>
 
-          <!-- Stock Section -->
-          <v-card variant="outlined" class="mb-4">
+            <!-- Stock Section -->
+            <v-card variant="outlined" class="mb-4">
             <v-card-title class="text-h6">سهام</v-card-title>
             <v-card-text>
               <v-row>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="formData.stock.customerName"
-                    label="متعلق به"
-                    variant="outlined"
-                    density="comfortable"
-                  />
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="formData.stock.nationalCode"
-                    label="کد ملی"
-                    variant="outlined"
-                    density="comfortable"
-                    :rules="[nationalCodeRule]"
-                  />
-                </v-col>
                 <v-col cols="12" md="6">
                   <v-text-field
                     v-model="formData.stock.stockCount"
@@ -448,8 +321,8 @@ const closeDialog = () => {
                 </v-col>
                 <v-col cols="12" md="6">
                   <v-text-field
-                    v-model="formData.stock.companyName"
-                    label="سهام شرکت"
+                    v-model="formData.stock.customerName"
+                    label="متعلق به"
                     variant="outlined"
                     density="comfortable"
                   />
@@ -461,7 +334,7 @@ const closeDialog = () => {
                     placeholder="0"
                     variant="outlined"
                     density="comfortable"
-                    suffix="ریال"
+                    suffix="میلیون ریال"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -470,8 +343,6 @@ const closeDialog = () => {
                     label="تاریخ توثیق"
                     variant="outlined"
                     density="comfortable"
-                    type="date"
-                    :rules="[dateRule]"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -481,7 +352,45 @@ const closeDialog = () => {
                     placeholder="0"
                     variant="outlined"
                     density="comfortable"
-                    suffix="ریال"
+                    suffix="میلیون ریال"
+                  />
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    v-model="formData.stock.companyName"
+                    label="سهام شرکت"
+                    variant="outlined"
+                    density="comfortable"
+                  />
+                </v-col>
+           
+        
+       
+              </v-row>
+            </v-card-text>
+          </v-card>
+
+          <!-- Shares/Bonds Section -->
+          <v-card variant="outlined" class="mb-4">
+            <v-card-title class="text-h6">اوراق مشارکت / سرمایه گذاری</v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <MoneyInput
+                    v-model="formData.sharesBond.assignedAmount"
+                    label="مبلغ توثیق"
+                    placeholder="0"
+                    variant="outlined"
+                    density="comfortable"
+                    suffix="میلیون ریال"
+                  />
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-checkbox
+                    :model-value="Boolean(formData.sharesBond.parsianBankAgency)"
+                    @update:model-value="(value: any) => formData.sharesBond.parsianBankAgency = Boolean(value)"
+                    label="سهام شرکت سایر بانک ها"
+                    density="comfortable"
                   />
                 </v-col>
               </v-row>
@@ -500,18 +409,7 @@ const closeDialog = () => {
                     placeholder="0"
                     variant="outlined"
                     density="comfortable"
-                    suffix="ریال"
-                  />
-                </v-col>
-                <v-col cols="12" md="6">
-                  <MoneyInput
-                    v-model="formData.otherCollateralAmount"
-                    label="جمعا به مبلغ توثیق"
-                    placeholder="0"
-                    variant="outlined"
-                    density="comfortable"
-                    suffix="ریال"
-                    readonly
+                    suffix="میلیون ریال"
                   />
                 </v-col>
               </v-row>

@@ -140,3 +140,20 @@ export const LcTypeOptions = [
   { title: 'داخلی', value: LcTypeEnum.INTERNAL },
   { title: 'وارداتی', value: LcTypeEnum.IMPORT },
 ];
+
+// lc type
+export const CartableStatusTypeEnum = {
+  IN_PROGRESS: 'IN_PROGRESS',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+  CLOSED: 'CLOSED'
+} as const;
+
+export type CartableStatusType = (typeof CartableStatusTypeEnum)[keyof typeof CartableStatusTypeEnum];
+
+export const CartableStatusTypeOptions = [
+  { title: 'در حال بررسی', value: CartableStatusTypeEnum.IN_PROGRESS },
+  { title: 'تایید شده', value: CartableStatusTypeEnum.ACCEPTED },
+  { title: 'رد شده', value: CartableStatusTypeEnum.REJECTED },
+  { title: 'بسته شده', value: CartableStatusTypeEnum.CLOSED },
+];

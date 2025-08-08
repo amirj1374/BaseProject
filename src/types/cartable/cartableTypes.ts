@@ -14,7 +14,7 @@ export interface CartableDetail {
 export interface ValidUserPayload {
   id: number;
   actionType: string;
-  roleCode: string;
+  roleName: string;
 }
 
 export interface ValidRole {

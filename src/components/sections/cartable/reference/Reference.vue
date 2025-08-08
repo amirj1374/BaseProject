@@ -103,7 +103,7 @@ const handleValidUser = async (role: ValidRole) => {
   const res = await api.cartable.getValidUser({
   id: Number(id.value),
   actionType: selectedAction.value.actionType,
-  roleCode: String(role.roleCode)
+  roleName: String(role.roleName)
 });
   if (res?.data) {
     validUserOptions.value = res.data;

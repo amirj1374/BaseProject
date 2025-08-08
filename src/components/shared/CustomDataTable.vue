@@ -24,6 +24,7 @@ interface Header {
   nestedKey?: string; // For nested properties like "user.name"
   customRenderer?: (item: any) => string | number | boolean; // Custom renderer function
   formatter?: (value: any, item: any) => string; // Custom formatter function
+  type?: string;
 }
 
 interface CustomAction {
@@ -987,7 +988,7 @@ const handleFilterApply = (filterData: any) => {
     </div>
   </div>
 
-  <v-dialog v-model="dialog" max-width="800">
+  <v-dialog v-model="dialog" max-width="1400">
     <v-card>
       <v-card-title>{{ isEditing ? 'ویرایش' : 'ایجاد' }}</v-card-title>
       <v-card-text>
@@ -1002,6 +1003,7 @@ const handleFilterApply = (filterData: any) => {
                   variant="outlined"
                   :disabled="header.editable === false"
                   v-if="!header.hidden"
+                  :type="header.type"
                 />
               </v-col>
             </v-row>
@@ -1009,8 +1011,8 @@ const handleFilterApply = (filterData: any) => {
         </v-container>
       </v-card-text>
       <v-card-actions>
-        <v-btn color="grey" @click="dialog = false">انصراف</v-btn>
-        <v-btn color="green" @click="saveItem">{{ isEditing ? 'ذخیره' : 'ایجاد' }}</v-btn>
+        <v-btn variant="tonal" color="error" @click="dialog = false">انصراف</v-btn>
+        <v-btn color="primary" variant="tonal" @click="saveItem">{{ isEditing ? 'ذخیره' : 'ایجاد' }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

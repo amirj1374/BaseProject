@@ -50,6 +50,11 @@ const MainRoutes = {
       name: 'ApprovalEdit',
       path: '/approval/edit',
       component: () => import('@/views/approval/approval-edit.vue')
+    },
+    {
+      name: 'preApprovalReport',
+      path: '/preApprovalReport/:id',
+      component: () => import('@/components/sections/cartable/preApprovalReport/preApprovalReport.vue')
     }
   ]
 };
