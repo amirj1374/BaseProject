@@ -2,15 +2,14 @@
 import { onMounted, ref } from 'vue';
 import Facilities from '@/components/sections/approval/draft/FacilitiesHistory.vue';
 import NunRialFacilitiesHistory from '@/components/sections/approval/draft/NunRialFacilitiesHistory.vue';
-import { api } from '@/services/api';
-import type { CurrenciesDto,RequestInformationDto } from '@/types/approval/approvalType';
+import type { CurrenciesDto } from '@/types/approval/approvalType';
 import Guarantee from '@/components/sections/approval/draft/GuaranteesHistory.vue';
 import NonRialGuarantee from '@/components/sections/approval/draft/NonRialGuaranteesHistory.vue';
 import Lc from '@/components/sections/approval/draft/LcHistory.vue';
 import Deposit from '@/components/sections/approval/draft/Deposit.vue';
 import Consideration from '@/components/sections/approval/draft/Consideration.vue';
-import { useApprovalStore } from '@/stores/approval';
 import OcpHistory from '@/components/sections/approval/draft/OcpHistory.vue';
+import Collaterls from '@/components/sections/approval/draft/Collaterls.vue';
 
 
 const currencies = ref<CurrenciesDto[]>([]);
@@ -78,6 +77,10 @@ defineExpose({ submitData });
           <!-- ocp Checkbox -->
           <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
             <OcpHistory/>
+          </v-col>
+          <!-- collateral Checkbox -->
+          <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
+            <collaterls/>
           </v-col>
         </v-row>
       </v-container>

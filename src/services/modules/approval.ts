@@ -1,5 +1,6 @@
 import type { AxiosInstance } from "axios";
 import type {
+  CollateralsInfoPayload,
   ConsiderationPayload,
   DepositAccount,
   FetchCustomerPayload,
@@ -90,6 +91,15 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.get('/api/v1/consideration', {
       params: { loanRequestId }
     });
+  },
+
+  getCollateralsInfo(loanRequestId: string) {
+    return axiosInstance.get('/api/v1/collaterals-info', {
+      params: { loanRequestId }
+    });
+  },
+  editCollateralsInfo(payload: CollateralsInfoPayload) {
+    return axiosInstance.put('/api/v1/collaterals-info', payload);
   },
 
     saveConsideration(payload: ConsiderationPayload) {

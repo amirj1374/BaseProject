@@ -358,9 +358,12 @@
     emit('delete', item);
     emit('update:greenLicense', greenLicense.value);
   }
-
+  function isObjectEmpty(obj: any): boolean {
+    if (!obj) return true;
+    return Object.values(obj).every((v) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0));
+  }
   onMounted(() => {
-    if (approvalStore.loanRequestDetailList?.greenLicense) {
+    if (approvalStore.loanRequestDetailList?.greenLicense && !isObjectEmpty(approvalStore.loanRequestDetailList.greenLicense)) {
       greenLicense.value = [approvalStore.loanRequestDetailList.greenLicense];
       emit('update:greenLicense', greenLicense.value);
     }

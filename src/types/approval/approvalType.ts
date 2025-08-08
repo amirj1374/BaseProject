@@ -200,6 +200,58 @@ export interface ConsiderationPayload {
   creditLimitDate: Date | null;
 }
 
+export interface CollateralsInfoPayload {
+  loanRequestId: string;
+  deposit: DepositDTO;
+  estate: EstateDTO;
+  sharesBond: SharesBondDTO;
+  stock: StockDTO;
+  otherCollateralAmount: number;
+  id: number
+}
+
+export interface DepositDTO {
+  customerName:string
+  blockedAmount:number
+  assignedAmount:number
+  assignedDate:string
+  nationalCode: number
+  externalRef?:number
+  id:number
+}
+
+export interface EstateDTO {
+  customerName:string
+  houseNumberPlate:string
+  type:string
+  evaluatedPrice:number
+  evaluationDate:string
+  assignedAmount:number
+  assignedDate:string
+  nationalCode: number
+  id:number
+}
+
+export interface SharesBondDTO {
+  assignedAmount:number
+  parsianBankAgency:boolean
+  nationalCode:string
+  assignedDate:string
+  customerName:string
+  id:number
+}
+
+export interface StockDTO {
+  stockCount:number
+  customerName:string
+  assignedAmount:number
+  assignedDate:string
+  totalAmount:number
+  companyName:string
+  nationalCode:string
+  id:number
+}
+
 export interface UploadFile {
   customerNumber?: string | null;
   customerCode?: string | null;
