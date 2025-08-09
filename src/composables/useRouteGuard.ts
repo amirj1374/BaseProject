@@ -13,9 +13,10 @@ export function useRouteGuard() {
       '/approval/edit': 'approval_edit',
       '/cartable': 'cartable',
       '/cartable/reference': 'cartable_operation',
-      '/report': 'admin',
       '/base/role-managment': 'admin',
-      '/base/department-managment': 'admin'
+      '/base/department-managment': 'admin',
+      '/preApprovalReport': 'preApprovalReport',
+      '/report': 'cartableReport'
     };
 
     const requiredPermission = routePermissions[routePath];

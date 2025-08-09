@@ -107,7 +107,7 @@ const generatePdf = async () => {
     console.log('Loan Request ID:', props.loanRequestId);
     
     // Call API to generate PDF report
-    const response = await api.cartable.getCreditApproval(props.cartableId);
+    const response = await api.cartable.getCreditApprovalReport(props.cartableId);
     
     console.log('API Response:', response);
     console.log('Response data type:', typeof response.data);

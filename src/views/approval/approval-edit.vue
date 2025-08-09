@@ -90,6 +90,6 @@ const headers = [
 ];
 onMounted(() => {
   // Check if user has permission to access this page
-  requirePermission('admin');
+  requirePermission('approval_edit');
 });
 </script>

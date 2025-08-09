@@ -42,8 +42,15 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.get(`/api/v1/cartable/${cartableId}/loan-request/id`);
   },
 
-  getCreditApproval(cartableId: string) {
+  getCreditApprovalReport(cartableId: string) {
     return axiosInstance.get(`/api/v1/credit-approvals/report/base?cartableId=${cartableId}`);
   },
+  
+  saveCreditApproval(payload: any) {
+    return axiosInstance.post(`/api/v1/credit-approvals`, payload);
+  },
 
+  getCreditApproval(cartableId: string) {
+    return axiosInstance.get(`/api/v1/credit-approvals/${cartableId}`);
+  },
 });

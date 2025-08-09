@@ -62,7 +62,7 @@ export const ActionTypeOptions = [
   { title: 'اصلاح', value: ActionTypeEnum.CORRECTED },
   { title: 'ایجاد', value: ActionTypeEnum.CREATED },
   { title: 'اتمام', value: ActionTypeEnum.CLOSED },
-  { title: 'ارجاع', value: ActionTypeEnum.PASSED },
+  { title: 'ارسال برای ابلاغ', value: ActionTypeEnum.PASSED },
   { title: 'ارجاع برای امضا', value: ActionTypeEnum.REFERRED_FOR_SIGNED },
 ];
 

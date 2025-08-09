@@ -44,28 +44,28 @@ const loanRequestId = ref<string>('');
 const steps = [
   {
     title: 'خلاصه وضعیت مالی و عملکرد متقاضی',
-    section: defineAsyncComponent(() => import('./summaryPerformance/summaryPerformance.vue'))
+    section: defineAsyncComponent(() => import('./creditApproval/CreditApprovalForm.vue'))
   },
-  {
-    title: 'مشخصات پيشنهاد اعتباري',
-    section: defineAsyncComponent(() => import('./creditOffer/creditOffer.vue'))
-  },
+  // {
+  //   title: 'مشخصات پيشنهاد اعتباري',
+  //   section: defineAsyncComponent(() => import('./creditOffer/creditOffer.vue'))
+  // },
   {
     title: 'وضعيت سپرده های مشتري',
     section: defineAsyncComponent(() => import('./depositStatus/depositStatus.vue'))
   },
-  {
-    title: 'وضعيت تسهيلات و تعهدات مشتري',
-    section: defineAsyncComponent(() => import('./facilityStatus/facilityStatus.vue'))
-  },
+  // {
+  //   title: 'وضعيت تسهيلات و تعهدات مشتري',
+  //   section: defineAsyncComponent(() => import('./facilityStatus/facilityStatus.vue'))
+  // },
   // {
   //   title: 'مصوبات اخیر',
   //   section: defineAsyncComponent(() => import('./recentApproval/recentApproval.vue'))
   // },
-  {
-    title: 'ساير شرايط و ملاحظات',
-    section: defineAsyncComponent(() => import('./comments/comments.vue'))
-  },
+  // {
+  //   title: 'ساير شرايط و ملاحظات',
+  //   section: defineAsyncComponent(() => import('./comments/comments.vue'))
+  // },
   {
     title: 'مشاهده گزارش پیش مصوبه',
     section: defineAsyncComponent(() => import('./pdfPreview/pdfPreview.vue'))
