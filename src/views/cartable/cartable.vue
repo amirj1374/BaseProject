@@ -9,6 +9,9 @@ import LoanRequestHistory from '@/components/sections/cartable/loanRequestHistor
 import FilterCartable from '@/components/sections/cartable/FilterCartable.vue';
 import Sign from '@/components/sections/cartable/sign/Sign.vue';
 import { CartableStatusTypeOptions, CustomerTypeOptions } from '@/types/enums/global';
+import { usePermissionsStore } from '@/stores/permissions';
+
+const permissionsStore = usePermissionsStore();
 
 const breadcrumbs = ref([
   {
@@ -159,7 +162,7 @@ function handleReferenceSuccess() {
           component: LoanRequestHistory
         }
       ]"
-      :routes="route"
+      :routes="permissionsStore.hasMenuPermission('preApprovalReport')? route : {}"
     />
   </div>
 </template>

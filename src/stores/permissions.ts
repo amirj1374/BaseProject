@@ -50,6 +50,10 @@ export const usePermissionsStore = defineStore({
       {
         menuKey: 'admin',
         requiredRoles: ['SMP_CREATE_FLOW_MNG']
+      },
+      {
+        menuKey: 'preApprovalReport',
+        requiredRoles: ['SMP_PRE_APPROVAL_REPORT']
       }
     ] as MenuPermission[]
   }),
