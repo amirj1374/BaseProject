@@ -126,6 +126,38 @@ const groupedItems = ref<
 >([]);
 const expandedGroups = ref<Set<string | number>>(new Set());
 
+// Computed flag to determine if any actions should be shown
+const hasAnyActions = computed(() => {
+  const hasCrudActions = Array.isArray(props.actions) && props.actions.length > 0;
+  const hasRoutes = !!props.routes && Object.keys(props.routes).length > 0;
+  const hasDownloadLinks = !!props.downloadLink && Object.keys(props.downloadLink).length > 0;
+  const hasCustomActions = Array.isArray(props.customActions) && props.customActions.length > 0;
+  const hasCustomButtons = (Array.isArray(props.customButtons) && props.customButtons.length > 0) || !!props.customButtonsFn;
+  return hasCrudActions || hasRoutes || hasDownloadLinks || hasCustomActions || hasCustomButtons;
+});
+
+const selectionHeader = { title: '', key: 'selection', sortable: false, width: 50 } as const;
+
+const groupedHeaders = computed(() => {
+  const base = [
+    ...(props.selectable ? [selectionHeader] : []),
+    ...props.headers,
+  ];
+  return hasAnyActions.value
+    ? [...base, { title: 'عملیات', key: 'actions', sortable: false }]
+    : base;
+});
+
+const normalHeaders = computed(() => {
+  const base = [
+    ...(props.selectable ? [selectionHeader] : []),
+    ...props.headers,
+  ];
+  return hasAnyActions.value
+    ? [...base, { title: 'عملیات', key: 'actions', sortable: false, width: 650 }]
+    : base;
+});
+
 // Helper function to get unique value from item
 const getUniqueValue = (item: any): string | number => {
   if (typeof props.uniqueKey === 'function') {
@@ -740,11 +772,7 @@ const handleFilterApply = (filterData: any) => {
               <!-- Group Items -->
               <div v-if="group.isExpanded" class="group-items">
                 <v-data-table
-                  :headers="[
-                    ...(props.selectable ? [{ title: '', key: 'selection', sortable: false, width: 50 }] : []),
-                    ...props.headers,
-                    { title: 'عملیات', key: 'actions', sortable: false }
-                  ]"
+                  :headers="groupedHeaders"
                   :items="group.items"
                   hide-default-footer
                   class="elevation-1 group-table"
@@ -785,7 +813,7 @@ const handleFilterApply = (filterData: any) => {
                             density="compact"
                           />
                         </template>
-                        <template v-if="column.key === 'actions'">
+                        <template v-if="column.key === 'actions' && hasAnyActions">
                           <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
                             ویرایش ✏️
                           </v-btn>
@@ -866,11 +894,7 @@ const handleFilterApply = (filterData: any) => {
       <!-- Regular Table Structure (when not grouped) -->
       <v-data-table
         v-else
-        :headers="[
-          ...(props.selectable ? [{ title: '', key: 'selection', sortable: false, width: 50 }] : []),
-          ...props.headers,
-          { title: 'عملیات', key: 'actions', sortable: false, width: 650 }
-        ]"
+        :headers="normalHeaders"
         :items="items"
         hide-default-footer
         class="elevation-1"
@@ -910,7 +934,7 @@ const handleFilterApply = (filterData: any) => {
                   density="compact"
                 />
               </template>
-              <template v-if="column.key === 'actions'">
+              <template v-if="column.key === 'actions' && hasAnyActions">
                 <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
                   ویرایش ✏️
                 </v-btn>
