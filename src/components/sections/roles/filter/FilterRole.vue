@@ -61,8 +61,20 @@ const submitForm = async () => {
     loading.value = true;
     error.value = '';
 
+    // Normalize selection to an array of objects (always array of objects)
+    const rawSelection = selectedLotusRoles.value as unknown;
+    const normalizedSelection: any[] = Array.isArray(rawSelection)
+      ? rawSelection
+      : rawSelection != null
+        ? [rawSelection]
+        : [];
+
+    const lotusRolesPayload: Array<{ id: string | number; [key: string]: any }> = normalizedSelection
+      .map((r: any) => (typeof r === 'object' ? r : { id: r }))
+      .filter(Boolean);
+
     // Validate form
-    if (!selectedLotusRoles.value || selectedLotusRoles.value.length === 0) {
+    if (lotusRolesPayload.length === 0) {
       error.value = 'لطفا حداقل یک نقش لوتوسی انتخاب کنید';
       snackbarMessage.value = error.value;
       snackbarColor.value = 'error';
@@ -70,10 +82,10 @@ const submitForm = async () => {
       return;
     }
 
-    // Prepare update payload
+    // Prepare update payload (always array of objects)
     const updatePayload = {
       id: id.value,
-      lotusRoles: selectedLotusRoles.value,
+      lotusRoles: lotusRolesPayload,
     };
 
     // Call update API using the department-role resource

@@ -76,12 +76,6 @@ const headers = [
     editable: true,
     isDate: true,
     width: 200
-  },
-  {
-    title: 'نقش',
-    key: 'description',
-    sortable: true,
-    width: 200,
   }
 ];
 </script>

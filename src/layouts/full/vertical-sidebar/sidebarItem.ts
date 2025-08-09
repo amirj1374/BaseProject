@@ -51,7 +51,7 @@ const sidebarItem: menu[] = [
     permissionKey: 'cartable'
   },
   {
-    title: 'گزارش کارشناسی',
+    title: 'کارشناسی',
     icon: IconFileSymlink,
     to: '/report',
     permissionKey: 'cartable_operation'

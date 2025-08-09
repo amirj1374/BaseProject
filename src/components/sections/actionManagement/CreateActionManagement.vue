@@ -38,6 +38,7 @@
           density="comfortable"
           :rules="[required]"
           @update:model-value="updateForm"
+          return-object
         />
       </v-col>
       <v-col cols="12" md="4">
@@ -51,6 +52,7 @@
           density="comfortable"
           :rules="[required]"
           @update:model-value="updateForm"
+          return-object
         />
       </v-col>
       <v-col cols="12" md="4">

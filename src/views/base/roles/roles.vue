@@ -2,7 +2,6 @@
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import { ref, h } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import Reference from '@/components/sections/cartable/reference/Reference.vue';
 import FilterRole from '@/components/sections/roles/filter/FilterRole.vue';
 import { BooleanEnumOptions } from '@/types/enums/global';
 

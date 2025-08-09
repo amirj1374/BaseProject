@@ -91,12 +91,6 @@ const header = ref([
     editable: true,
     width: 200,
   },
-  {
-    title: 'نقش',
-    key: 'description',
-    sortable: true,
-    width: 200,
-  }
 ]);
 
 const tableRef = ref();
