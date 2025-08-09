@@ -173,3 +173,59 @@ export const DepartmentTypeOptions = [
   { title: 'ستاد', value: DepartmentypeEnum.HEADQUARTERS },
   { title: 'منطقه', value: DepartmentypeEnum.CORPBANKINGORREGION },
 ];
+
+// customer type enum
+export const CustomerTypeEnum = {
+  Corporate	: 'Corporate',
+  Individual: 'Individual',
+} as const;
+
+export type CustomerType = (typeof CustomerTypeEnum)[keyof typeof CustomerTypeEnum];
+
+export const CustomerTypeOptions = [
+  { title: 'حقوقی', value: CustomerTypeEnum.Corporate},
+  { title: 'حقیقی', value: CustomerTypeEnum.Individual },
+];
+
+
+
+// customer type enum
+export const RoleTypeEnum = {
+  SMPUSER	: 'SMPUSER',
+  SMPADMIN: 'SMPADMIN',
+  SMPSIGNER: 'SMPSIGNER',
+  SMPCOORDINATOR: 'SMPCOORDINATOR',
+  SMPSIGNERCC: 'SMPSIGNERCC',
+  SMPCOORDINATORCC: 'SMPCOORDINATORCC',
+  SMPSIGNERSC: 'SMPSIGNERSC',
+  SMPCOORDINATORSC: 'SMPCOORDINATORSC',
+  SMPSIGNEREC: 'SMPSIGNEREC',
+  SMPCOORDINATOREC: 'SMPCOORDINATOREC',
+  SMPSIGNERBC: 'SMPSIGNERBC',
+  SMPCOORDINATORBC: 'SMPCOORDINATORBC',
+  SMPUSERCM: 'SMPUSERCM',
+  SMPCOORDINATORCM: 'SMPCOORDINATORCM',
+  SMPALTSIGNERCC: 'SMPALTSIGNERCC',
+  SMPALTCOORDINATORCC: 'SMPALTCOORDINATORCC',
+} as const;
+
+export type RoleType = (typeof RoleTypeEnum)[keyof typeof RoleTypeEnum];
+
+export const RoleTypeOptions = [
+  { title: 'کارشناس سماپ-شعبه/منطقه', value: RoleTypeEnum.SMPUSER},
+  { title: 'ادمین سامانه سماپ', value: RoleTypeEnum.SMPADMIN },
+  { title: 'امضادار سماپ-شعبه/منطقه', value: RoleTypeEnum.SMPSIGNER },
+  { title: 'دبیر سامانه سماپ-شعبه/منطقه', value: RoleTypeEnum.SMPCOORDINATOR },
+  { title: 'امضادار سماپ-کمیته مرکزی', value: RoleTypeEnum.SMPSIGNERCC },
+  { title: 'دبیر سماپ-کمیته مرکزی', value: RoleTypeEnum.SMPCOORDINATORCC },
+  { title: 'امضادار سماپ-کمیته عالی', value: RoleTypeEnum.SMPSIGNERSC },
+  { title: 'دبیر سماپ-کمیته عالی', value: RoleTypeEnum.SMPCOORDINATORSC },
+  { title: 'امضادار سماپ-کمیته هیات عامل', value: RoleTypeEnum.SMPSIGNEREC },
+  { title: 'دبیر سماپ-کمیته هیات عامل', value: RoleTypeEnum.SMPCOORDINATOREC },
+  { title: 'امضادار سماپ-کمیته هیات مدیره', value: RoleTypeEnum.SMPSIGNERBC },
+  { title: 'دبیر سماپ-کمیته هیات مدیره', value: RoleTypeEnum.SMPCOORDINATORBC },
+  { title: 'کارشناس سماپ-مدیریت اعتبارات', value: RoleTypeEnum.SMPUSERCM },
+  { title: 'دبیر سماپ-مدیریت اعتبارات', value: RoleTypeEnum.SMPCOORDINATORCM },
+  { title: 'جانشین امضادار سماپ-کمیته مرکزی', value: RoleTypeEnum.SMPALTSIGNERCC },
+  { title: 'جانشین دبیر سماپ-کمیته مرکزی', value: RoleTypeEnum.SMPALTCOORDINATORCC },
+];

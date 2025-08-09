@@ -4,6 +4,7 @@
       <!-- Loading State -->
       <v-row v-if="customerInfoStore.isLoading">
         <v-col cols="12" class="text-center">
+
           <v-progress-circular
             indeterminate
             color="primary"

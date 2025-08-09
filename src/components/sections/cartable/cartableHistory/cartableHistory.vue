@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import { ref } from 'vue';
-import { ActionTypeOptions } from '@/types/enums/global';
+import { ActionTypeOptions, RoleTypeOptions } from '@/types/enums/global';
 const props = defineProps<{
   item: any;
   onSuccess?: () => void;
@@ -30,6 +30,8 @@ const header = ref([
     key: 'roleName',
     sortable: true,
     width: 200,
+    translate: true,
+    options: RoleTypeOptions,
   },
   {
     title: 'ایجاد شده توسط',

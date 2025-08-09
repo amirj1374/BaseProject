@@ -8,7 +8,7 @@ import UploadList from '@/components/sections/cartable/uploadList/uploadList.vue
 import LoanRequestHistory from '@/components/sections/cartable/loanRequestHistory/loanRequestHistory.vue';
 import FilterCartable from '@/components/sections/cartable/FilterCartable.vue';
 import Sign from '@/components/sections/cartable/sign/Sign.vue';
-import { CartableStatusTypeOptions } from '@/types/enums/global';
+import { CartableStatusTypeOptions, CustomerTypeOptions } from '@/types/enums/global';
 
 const breadcrumbs = ref([
   {
@@ -27,17 +27,17 @@ const header = ref([
     isDate: true
   },
   {
-    title: 'ایجاد شده توسط',
-    key: 'createdBy',
+    title: 'کد رهگیری',
+    key: 'trackingCode',
     sortable: true,
-    editable: true,
     width: 200,
   },
   {
-    title: 'شعبه ثبت کننده درخواست',
-    key: 'branchName',
+    title: 'وضعیت',
+    key: 'status',
     sortable: true,
-    editable: true,
+    translate: true,
+    options: CartableStatusTypeOptions,
     width: 200,
   },
   {
@@ -64,25 +64,34 @@ const header = ref([
     key: 'customerType',
     sortable: true,
     width: 200,
+    translate: true,
+    options: CustomerTypeOptions
   },
   {
-    title: 'کد رهگیری',
-    key: 'trackingCode',
+    title: 'شعبه ثبت کننده درخواست',
+    key: 'branchName',
     sortable: true,
+    editable: true,
+    width: 200,
+  },
+  {
+    title: 'کد شعبه ثبت کننده درخواست',
+    key: 'branchCode',
+    sortable: true,
+    editable: true,
+    width: 250,
+  },
+  {
+    title: 'ایجاد شده توسط',
+    key: 'createdBy',
+    sortable: true,
+    editable: true,
     width: 200,
   },
   {
     title: 'نقش',
     key: 'description',
     sortable: true,
-    width: 200,
-  },
-  {
-    title: 'وضعیت',
-    key: 'status',
-    sortable: true,
-    translate: true,
-    options: CartableStatusTypeOptions,
     width: 200,
   }
 ]);
@@ -123,12 +132,22 @@ function handleReferenceSuccess() {
         },
         {
           title: 'لیست مدارک',
-          component: UploadList
+          component: (props) => h(UploadList, { 
+            ...props, 
+            cartableId: props.item.id,
+            trackingCode: props.item.trackingCode,
+            loanRequestId: props.item.loanRequestId,
+            // Add any other props you want to pass
+          })
         },
         // TODO
         {
           title: 'مشاهده نظرات',
-          component: UploadList,
+          component: (props) => h(UploadList, { 
+            ...props, 
+            isComments: true,
+            cartableId: props.item.id 
+          }),
           condition: (item) => item.commiteInquiries
         },
         {
