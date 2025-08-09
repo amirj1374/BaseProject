@@ -119,17 +119,17 @@ function handleReferenceSuccess() {
       :show-refresh-button="true"
       :custom-actions="[
         {
-          title: 'عملیات',
+          title: '⚙️ عملیات',
           component: (props) => h(Reference, { ...props, onSuccess: handleReferenceSuccess }),
           condition: (item) => item.canSubmit === true
         },
         {
-          title: 'امضا',
+          title: '✍️امضا',
           component: (props) => h(Sign, { ...props, onSuccess: handleReferenceSuccess }),
           condition: (item) => item.hasSignPermission === true
         },
         {
-          title: 'لیست مدارک',
+          title: '📑 لیست مدارک',
           component: (props) => h(UploadList, { 
             ...props, 
             cartableId: props.item.id,
@@ -139,7 +139,7 @@ function handleReferenceSuccess() {
           })
         },
         {
-          title: 'مشاهده نظرات',
+          title: '💬 مشاهده نظرات',
           component: (props) => h(SignList, { 
             ...props, 
             item: props.item,
@@ -148,11 +148,11 @@ function handleReferenceSuccess() {
           condition: (item) => item.hasSignPermission !== null
         },
         {
-          title: 'تاریخچه کارتابل',
+          title: '📜 تاریخچه کارتابل',
           component: CartableHistory
         },
         {
-          title: 'تاریخچه درخواست مصوبه',
+          title: '📜 تاریخچه درخواست مصوبه',
           component: LoanRequestHistory
         }
       ]"
