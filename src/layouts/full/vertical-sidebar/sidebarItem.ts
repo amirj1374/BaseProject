@@ -54,13 +54,7 @@ const sidebarItem: menu[] = [
     title: 'گزارش',
     icon: IconFileSymlink,
     to: '/report',
-    permissionKey: 'cartable_operation'
-  },
-  {
-    title: 'گزارشات',
-    icon: IconClipboardData,
-    to: '/report',
-    permissionKey: 'report'
+    permissionKey: 'cartable'
   },
   {
     title: 'اطلاعات پایه',

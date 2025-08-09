@@ -215,6 +215,7 @@
                   type="number"
                   min="1"
                   max="100"
+                  :rules="[percentRule]"
                 />
               </v-col>
             </v-row>

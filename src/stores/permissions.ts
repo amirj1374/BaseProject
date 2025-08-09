@@ -53,7 +53,11 @@ export const usePermissionsStore = defineStore({
       },
       {
         menuKey: 'preApprovalReport',
-        requiredRoles: ['SMP_PRE_APPROVAL_REPORT']
+        requiredRoles: ['SMP_PRE_APPROVAL_RPT']
+      },
+      {
+        menuKey: 'cartableReport',
+        requiredRoles: ['SMP_CARTABLE_RPT']
       }
     ] as MenuPermission[]
   }),

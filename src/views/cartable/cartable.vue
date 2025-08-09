@@ -135,7 +135,6 @@ function handleReferenceSuccess() {
             cartableId: props.item.id,
             trackingCode: props.item.trackingCode,
             loanRequestId: props.item.loanRequestId,
-            // Add any other props you want to pass
           })
         },
         {
@@ -145,7 +144,7 @@ function handleReferenceSuccess() {
             item: props.item,
             onSuccess: handleReferenceSuccess
           }),
-          condition: (item) => item.hasSignPermission !== null
+          condition: (item) => item.mainAssignee === true && item.commiteInquiries !== null
         },
         {
           title: '📜 تاریخچه کارتابل',

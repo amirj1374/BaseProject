@@ -171,6 +171,8 @@
                   type="number"
                   min="1"
                   max="100"
+                  :rules="[percentRule]"
+
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -184,6 +186,7 @@
                   type="number"
                   min="1"
                   max="100"
+                  :rules="[percentRule]"
                 />
               </v-col>
             </v-row>
@@ -305,6 +308,7 @@ const selectedCollaterals = ref<
   }>
 >([]);
 const required = (v: any) => !!v || 'این فیلد الزامی است';
+const percentRule = (v: string) => ((Number(v) >= 1 && Number(v) <= 100) || 'درصد باید بین 1 تا 100 باشد');
 const contractTypes = ref<ContractType[]>([]);
 const facilityList = ref<FacilityDto[]>([]);
 const collateralTableItems = computed(() =>
@@ -313,7 +317,6 @@ const collateralTableItems = computed(() =>
     equivalentValue: (item.amount * item.percent) / 100
   }))
 );
-const percentRule = (v: string) => (!v && 'این فیلد الزامی است') || (Number(v) >= 1 && Number(v) <= 100) || 'درصد باید بین 1 تا 100 باشد';
 
 const props = defineProps<{
   loading?: boolean;

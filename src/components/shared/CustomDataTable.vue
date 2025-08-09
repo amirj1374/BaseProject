@@ -154,7 +154,7 @@ const normalHeaders = computed(() => {
     ...props.headers,
   ];
   return hasAnyActions.value
-    ? [...base, { title: 'عملیات', key: 'actions', sortable: false, width: 650 }]
+    ? [...base, { title: 'عملیات', key: 'actions', sortable: false, width: props.customActions?.length ? props.customActions.length * 120 : 650 }]
     : base;
 });
 
