@@ -118,7 +118,7 @@ const roleOptions = computed(() =>
   selectedAction.value
     ? selectedAction.value.validRoles.map(role => ({
         ...role,
-        display: `${role.roleName} - ${role.departmentLevelName}`
+        display: `${role.roleDescription} - ${role.departmentLevelName}`
       }))
     : []
 );

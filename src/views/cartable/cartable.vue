@@ -10,6 +10,7 @@ import FilterCartable from '@/components/sections/cartable/FilterCartable.vue';
 import Sign from '@/components/sections/cartable/sign/Sign.vue';
 import { CartableStatusTypeOptions, CustomerTypeOptions } from '@/types/enums/global';
 import { usePermissionsStore } from '@/stores/permissions';
+import SignList from '@/components/sections/cartable/signList/SignList.vue';
 
 const permissionsStore = usePermissionsStore();
 
@@ -137,15 +138,14 @@ function handleReferenceSuccess() {
             // Add any other props you want to pass
           })
         },
-        // TODO
         {
           title: 'مشاهده نظرات',
-          component: (props) => h(UploadList, { 
+          component: (props) => h(SignList, { 
             ...props, 
-            isComments: true,
-            cartableId: props.item.id 
+            item: props.item,
+            onSuccess: handleReferenceSuccess
           }),
-          condition: (item) => item.commiteInquiries
+          condition: (item) => item.hasSignPermission !== null
         },
         {
           title: 'تاریخچه کارتابل',

@@ -22,6 +22,7 @@ export interface ValidRole {
   departmentLevelName: string;
   roleName: string;
   roleCode: number;
+  roleDescription: string;
 }
 
 export interface ActionData {
