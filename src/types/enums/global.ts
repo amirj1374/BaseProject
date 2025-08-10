@@ -130,14 +130,14 @@ export const CreditTypeOptions = [
 // lc type
 
 export const LcTypeEnum = {
-  INTERNAL: 'INTERNAL',
+  EXPORT: 'EXPORT',
   IMPORT: 'IMPORT'
 } as const;
 
 export type LcType = (typeof LcTypeEnum)[keyof typeof LcTypeEnum];
 
 export const LcTypeOptions = [
-  { title: 'داخلی', value: LcTypeEnum.INTERNAL },
+  { title: 'داخلی', value: LcTypeEnum.EXPORT },
   { title: 'وارداتی', value: LcTypeEnum.IMPORT },
 ];
 
