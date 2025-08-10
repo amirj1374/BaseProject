@@ -724,7 +724,7 @@ const handleFilterApply = (filterData: any) => {
   <div class="action-buttons">
     <v-btn v-if="props.actions?.includes('create')" color="green" class="me-2" @click="openDialog()">ایجاد ✅</v-btn>
     <v-btn v-if="hasFilterComponent" class="me-2" @click="filterDialog = true">فیلتر 🔍</v-btn>
-    <v-btn v-if="props.showRefreshButton" color="blue" @click="fetchData" :loading="loading">بروزرسانی 🔄</v-btn>
+    <v-btn v-if="props.showRefreshButton" color="blue" @click="debouncedFetchData" :loading="loading">بروزرسانی 🔄</v-btn>
 
     <!-- Selection Actions -->
     <div v-if="props.selectable && hasSelection" class="selection-actions">
