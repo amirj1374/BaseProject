@@ -37,4 +37,5 @@ declare module '@tabler/icons-vue' {
   export const IconChevronsDown : DefineComponent
   export const IconMessageQuestion : DefineComponent
   export const IconShieldCancel  : DefineComponent
+  export const IconSquareChevronRight : DefineComponent
 }

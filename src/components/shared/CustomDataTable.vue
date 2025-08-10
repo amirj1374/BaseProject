@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router';
 import type { Component } from 'vue';
 import { DateConverter } from '@/utils/date-convertor';
 import { useDebounceFn } from '@vueuse/core';
+import { IconChevronRight, IconChevronDown } from '@tabler/icons-vue';
 
 interface Header {
   title: string;
@@ -96,7 +97,7 @@ const isEditing = ref(false);
 const editedItem = ref<Record<string, any> | null>(null);
 const formModel = ref<Record<string, any>>({});
 const itemToDelete = ref<Record<string, any> | null>(null);
-const snackbar = ref(true);
+const snackbar = ref(false);
 const snackbarMessage = ref('');
 const router = useRouter();
 const itemsPerPage = ref(props.pageSize);
@@ -595,8 +596,8 @@ const goToRoute = (key: string, item?: any) => {
   router.push(routePath);
 };
 
-// The current download function is commented out. Here's a working version:
-const download = (key: string, item: any) => {
+// Improved download function with proper URL handling
+const download = async (key: string, item: any) => {
   if (!props.downloadLink || !item) return;
 
   const fileKey = props.downloadLink[key];
@@ -608,13 +609,139 @@ const download = (key: string, item: any) => {
     return;
   }
 
-  const link = document.createElement('a');
-  link.href = fileUrl;
-  link.download = ''; // or provide a filename
-  link.target = '_blank';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  try {
+    // Method 1: Fetch file as blob with proper headers
+    const response = await fetch(fileUrl, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/octet-stream,application/pdf,image/*,*/*',
+      },
+      credentials: 'include', // Include cookies for authentication
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    // Check if response is actually a file or an error
+    const contentType = response.headers.get('content-type');
+    const contentLength = response.headers.get('content-length');
+    
+    console.log('Response headers:', {
+      contentType,
+      contentLength,
+      url: fileUrl
+    });
+    
+    // If content-type is XML, it's likely an error response
+    if (contentType && contentType.includes('xml')) {
+      const errorText = await response.text();
+      console.error('Server returned XML error:', errorText);
+      snackbarMessage.value = `❌ خطای سرور: فایل در دسترس نیست`;
+      snackbar.value = true;
+      return;
+    }
+    
+    // If content-length is very small, it might be an error
+    if (contentLength && parseInt(contentLength) < 1000) {
+      const responseText = await response.text();
+      console.log('Small response:', responseText);
+      if (responseText.includes('error') || responseText.includes('Error')) {
+        snackbarMessage.value = `❌ خطای سرور: فایل در دسترس نیست`;
+        snackbar.value = true;
+        return;
+      }
+    }
+    
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = url;
+    
+    // Extract filename from URL or use default
+    const filename = fileUrl.split('/').pop() || 'download';
+    link.download = filename;
+    
+    // Add to DOM, click, and cleanup
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Clean up the blob URL
+    window.URL.revokeObjectURL(url);
+    
+    snackbarMessage.value = `✅ دانلود شروع شد`;
+    snackbar.value = true;
+  } catch (error) {
+    console.error('Download error:', error);
+    
+    // Method 2: Try with axios instance (includes auth headers)
+    try {
+      const axiosResponse = await axiosInstance.get(fileUrl, {
+        responseType: 'blob',
+        headers: {
+          'Accept': 'application/octet-stream,application/pdf,image/*,*/*',
+        }
+      });
+      
+      // Check response type
+      const contentType = axiosResponse.headers['content-type'];
+      const contentLength = axiosResponse.headers['content-length'];
+      
+      console.log('Axios response headers:', {
+        contentType,
+        contentLength,
+        url: fileUrl
+      });
+      
+      // If it's XML, convert to text to see the error
+      if (contentType && contentType.includes('xml')) {
+        const textResponse = await axiosInstance.get(fileUrl, {
+          responseType: 'text'
+        });
+        console.error('Server returned XML error:', textResponse.data);
+        snackbarMessage.value = `❌ خطای سرور: فایل در دسترس نیست`;
+        snackbar.value = true;
+        return;
+      }
+      
+      const blob = new Blob([axiosResponse.data]);
+      const url = window.URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      const filename = fileUrl.split('/').pop() || 'download';
+      link.download = filename;
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      window.URL.revokeObjectURL(url);
+      
+      snackbarMessage.value = `✅ دانلود شروع شد`;
+      snackbar.value = true;
+    } catch (axiosError: any) {
+      console.error('Axios download error:', axiosError);
+      
+      // Try to get the error response as text
+      if (axiosError.response) {
+        try {
+          const errorText = await axiosInstance.get(fileUrl, {
+            responseType: 'text'
+          });
+          console.error('Server error response:', errorText.data);
+        } catch (textError) {
+          console.error('Could not get error text:', textError);
+        }
+      }
+      
+      snackbarMessage.value = `❌ خطا در دانلود فایل`;
+      snackbar.value = true;
+    }
+  }
 };
 
 // Handle page change from pagination
@@ -753,7 +880,8 @@ const handleFilterApply = (filterData: any) => {
             <div v-for="group in groupedItems" :key="group.groupKey" class="group-section">
               <!-- Group Header -->
               <div class="group-header" @click="toggleGroup(group.groupKey)" :class="{ expanded: group.isExpanded }">
-                <v-icon :icon="group.isExpanded ? 'mdi-chevron-down' : 'mdi-chevron-right'" class="me-2" />
+                <IconChevronRight v-if="group.isExpanded" class="me-2" />
+                <IconChevronDown v-else class="me-2" />
                 <span class="group-label">{{ group.groupLabel }}</span>
                 <v-chip size="small" color="primary" class="ms-auto">{{ group.count }}</v-chip>
               </div>
@@ -1069,6 +1197,16 @@ const handleFilterApply = (filterData: any) => {
       </v-card-text>
     </v-card>
   </v-dialog>
+
+  <!-- Snackbar for messages -->
+  <v-snackbar v-if="snackbar" v-model="snackbar" :timeout="3000" location="top">
+    {{ snackbarMessage }}
+    <template v-slot:actions>
+      <v-btn color="white" variant="text" @click="snackbar = false">
+        بستن
+      </v-btn>
+    </template>
+  </v-snackbar>
 </template>
 
 <style scoped>

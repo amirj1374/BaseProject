@@ -28,8 +28,17 @@ const props = defineProps({
   trackingCode: {
     type: String,
     required: true
+  },
+  item: {
+    type: Object,
+    required: false,
+    default: null
   }
 });
+
+const emit = defineEmits<{
+  (e: 'close'): void;
+}>();
 
 const docs = ref<Document[]>([]);
 const loading = ref(false);

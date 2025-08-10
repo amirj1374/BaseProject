@@ -185,7 +185,7 @@ defineExpose({ submitData });
         :height="600"
         group-by="groupByItem"
         :default-expanded="true"
-        :page-size="20"
+        :page-size="50"
       />
     </form>
   </div>
