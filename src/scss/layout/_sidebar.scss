@@ -11,6 +11,8 @@
 /* This is for the Vertical sidebar */
 .scrollnavbar {
   height: calc(100vh - 100px);
+  overflow-y: auto; 
+  overflow-x: hidden;
 
   .smallCap {
     padding: 0px 0 0 4px !important;

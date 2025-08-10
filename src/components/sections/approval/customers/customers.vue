@@ -238,7 +238,7 @@ defineExpose({ submitData });
 
 <template>
   <div class="approval-section">
-    <h3 class="group-title">انتخاب مشتری</h3>
+    <h4 class="group-title">انتخاب مشتری</h4>
     <!-- Search Section -->
     <form @submit.prevent="search" class="customer-form">
       <v-row class="mt-2">
@@ -315,7 +315,7 @@ defineExpose({ submitData });
   </div>
   <!-- Render only the active tab's component -->
   <div class="approval-section">
-    <h3 class="group-title">درخواست مشتری</h3>
+    <h4 class="group-title">درخواست مشتری</h4>
     <v-tabs v-model="activeTab" class="mb-2">
       <v-tab value="facilities">تسهیلات</v-tab>
       <v-tab value="guarantee">ضمانت‌نامه</v-tab>

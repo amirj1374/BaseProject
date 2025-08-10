@@ -116,7 +116,7 @@ defineExpose({ submitData });
 
 <template>
   <div class="approval-section">
-    <h3 class="group-title">استعلام</h3>
+    <h4 class="group-title">استعلام</h4>
     <v-row justify="center">
       <!-- تعهدات مستقیم -->
       <v-col cols="12" md="6">

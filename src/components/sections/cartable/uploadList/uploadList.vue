@@ -199,10 +199,10 @@ defineExpose({ submitData });
         :show-refresh-button="true"
         :auto-fetch="true"
         :show-pagination="true"
-        :height="1500"
+        :height="600"
         group-by="groupByItem"
         :default-expanded="true"
-        :page-size="100"
+        :page-size="20"
         :download-link="downloadLink"
       />
     </form>
