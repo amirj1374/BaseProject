@@ -78,8 +78,6 @@ function openImageDialog(url: string) {
 }
 
 const headers = [
-  { title: 'نام و نام خانوادگی', key: 'fullName' },
-  { title: 'کد ملی', key: 'nationalCode' },
   { title: 'نوع', key: 'relationType', translate: true, options: RelationTypeOptions },
   { title: 'عنوان مدرک', key: 'fileTitle' }
 ];
@@ -167,6 +165,16 @@ const openInNewTab = () => {
 const submitData = async () => {
   return Promise.resolve();
 };
+
+// Group header template function to show nationalCode and fullName
+const getGroupHeaderTemplate = (groupKey: string | number, groupItems: any[]): string => {
+  if (groupItems.length > 0) {
+    const firstItem = groupItems[0];
+    return ` نام و نام خانوادگی :  ${firstItem.fullName}  -  کد ملی : ${firstItem.nationalCode} (${groupItems.length} مدرک)`;
+  }
+  return `${groupKey} (${groupItems.length} مدرک)`;
+};
+
 defineExpose({ submitData });
 </script>
 
@@ -186,6 +194,7 @@ defineExpose({ submitData });
         group-by="groupByItem"
         :default-expanded="true"
         :page-size="50"
+        :group-header-template="getGroupHeaderTemplate"
       />
     </form>
   </div>
