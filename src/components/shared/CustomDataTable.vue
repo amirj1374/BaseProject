@@ -400,7 +400,7 @@ const debouncedFetchData = useDebounceFn(fetchData, 300);
 
 // Update watcher to use debounced function
 watch(
-  [currentPage, cleanFilterModel],
+  [cleanFilterModel],
   () => {
     debouncedFetchData();
   },
@@ -617,22 +617,11 @@ const download = (key: string, item: any) => {
   document.body.removeChild(link);
 };
 
-// const sortedItems = computed(() => {
-//   if (!sortBy.value) {
-//     const defaultKey = props.headers[0]?.key;
-//     return defaultKey ? [...items.value].sort((a, b) => (a[defaultKey] < b[defaultKey] ? -1 : 1)) : items.value;
-//   }
-//
-//   const { key, order } = sortBy.value;
-//   return [...items.value].sort((a, b) => {
-//     const orderFactor = order === 'asc' ? 1 : -1;
-//     if (a[key] < b[key]) return -1 * orderFactor;
-//     if (a[key] > b[key]) return 1 * orderFactor;
-//     return 0;
-//   });
-// });
-
-watch(currentPage, fetchData); // 👈 add this line
+// Handle page change from pagination
+const handlePageChange = (newPage: number) => {
+  currentPage.value = newPage;
+  debouncedFetchData();
+};
 
 onMounted(() => {
   if (props.autoFetch) {
@@ -705,14 +694,14 @@ const translateValue = (value: string) => {
 
 const applyFilter = () => {
   currentPage.value = 1; // Reset to first page when applying new filters
-  fetchData();
+  debouncedFetchData();
   filterDialog.value = false;
 };
 
 const resetFilter = () => {
   filterModel.value = {};
   currentPage.value = 1;
-  fetchData();
+  debouncedFetchData();
   filterDialog.value = false;
 };
 
@@ -720,7 +709,7 @@ const resetFilter = () => {
 const handleFilterApply = (filterData: any) => {
   filterModel.value = filterData;
   currentPage.value = 1;
-  fetchData();
+  debouncedFetchData();
   filterDialog.value = false;
 };
 </script>
@@ -1009,7 +998,7 @@ const handleFilterApply = (filterData: any) => {
         <div class="text-subtitle-2">
           نمایش {{ (currentPage - 1) * itemsPerPage + 1 }} تا {{ Math.min(currentPage * itemsPerPage, totalSize) }} از {{ totalSize }} رکورد
         </div>
-        <v-pagination v-model="currentPage" :length="totalPages" :total-visible="5" size="small" @update:model-value="fetchData" />
+        <v-pagination v-model="currentPage" :length="totalPages" :total-visible="5" size="small" @update:model-value="handlePageChange" />
       </div>
     </div>
   </div>
