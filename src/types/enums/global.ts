@@ -117,7 +117,7 @@ export const FileTypeOptions = [
 
 export const CreditTypeEnum = {
   SIGHT_PAYMENT: 'SIGHT_PAYMENT',
-  DEFERRED_PAYMENT: 'LODEFERRED_PAYMENTNG'
+  DEFERRED_PAYMENT: 'DEFERRED_PAYMENT'
 } as const;
 
 export type CreditType = (typeof CreditTypeEnum)[keyof typeof CreditTypeEnum];

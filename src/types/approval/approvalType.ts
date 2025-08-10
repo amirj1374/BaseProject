@@ -316,7 +316,7 @@ export interface LcRequest {
   collaterals: Collaterals[];
   intermediatePayment: string;
   advancePayment: string;
-  lcType: string;
+  LcContractType: string;
 }
 
 export interface ContractType {
