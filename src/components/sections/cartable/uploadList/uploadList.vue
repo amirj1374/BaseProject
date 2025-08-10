@@ -192,7 +192,7 @@ const submitData = async () => {
   return Promise.resolve();
 };
 const downloadLink = {
-  'file': 'file'
+  'دانلود فایل': 'file'
 };
 defineExpose({ submitData });
 </script>
@@ -211,7 +211,7 @@ defineExpose({ submitData });
         :height="600"
         group-by="groupByItem"
         :default-expanded="true"
-        :page-size="20"
+        :page-size="50"
         :download-link="downloadLink"
       />
     </form>

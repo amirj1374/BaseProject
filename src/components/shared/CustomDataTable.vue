@@ -955,8 +955,8 @@ const handleFilterApply = (filterData: any) => {
                               {{ routeKey.toUpperCase() }}
                             </v-btn>
                           </template>
-                          <v-btn v-for="key in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
-                            {{ key.toUpperCase() }} ⬇️
+                          <v-btn v-for="(value, key) in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
+                            {{ key }} ⬇️
                           </v-btn>
                           <template v-for="(action, index) in props.customActions" :key="action.title || index">
                             <v-btn
@@ -1066,8 +1066,8 @@ const handleFilterApply = (filterData: any) => {
                     {{ routeKey.toUpperCase() }}
                   </v-btn>
                 </template>
-                <v-btn v-for="key in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
-                  {{ key.toUpperCase() }} ⬇️
+                <v-btn v-for="(value, key) in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
+                  {{ key }} ⬇️
                 </v-btn>
                 <template v-for="(action, index) in props.customActions" :key="action.title || index">
                   <v-btn
