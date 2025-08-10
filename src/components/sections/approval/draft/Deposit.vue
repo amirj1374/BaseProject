@@ -22,7 +22,7 @@
             :multi-select="true"
             :selectedItems="selectedItems"
             unique-key="accountNo"
-             default-selected="isSelected"
+            default-selected="isSelected"
           />
         </v-card-text>
         <v-card-actions style="display: flex; justify-content: space-evenly">

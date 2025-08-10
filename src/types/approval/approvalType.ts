@@ -208,6 +208,7 @@ export interface CollateralsInfoPayload {
   stock: StockDTO;
   otherCollateralAmount: number;
   id: number;
+  description: string
 }
 
 export interface DepositDTO {

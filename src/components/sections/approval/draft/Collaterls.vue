@@ -54,7 +54,8 @@ const formData = ref<CollateralsInfoPayload>({
     id: 0
   },
   otherCollateralAmount: 0,
-  id: 0
+  id: 0,
+  description: ''
 });
 
 // Computed properties for validation
@@ -142,7 +143,8 @@ async function save() {
         id: formData.value.stock.id
       },
       otherCollateralAmount: Number(formData.value.otherCollateralAmount) || 0,
-      id: formData.value.id
+      id: formData.value.id,
+      description: formData.value.description
     };
 
     const response = await api.approval.editCollateralsInfo(payload);
@@ -194,7 +196,7 @@ const closeDialog = () => {
         <v-form ref="form" v-model="isFormValid" @update:model-value="watchFormValidation">
                <!-- Estate Section -->
                <v-card variant="outlined" class="mb-4">
-            <v-card-title class="text-h6">املاک</v-card-title>
+            <v-card-title class="text-h3 text-center mb-4">املاک</v-card-title>
             <v-card-text>
               <v-row>
                 <v-col cols="12" md="6">
@@ -262,7 +264,7 @@ const closeDialog = () => {
           </v-card>
           <!-- Deposit Section -->
           <v-card variant="outlined" class="mb-4">
-            <v-card-title class="text-h6">گروه نقد</v-card-title>
+            <v-card-title class="text-h3 text-center mb-4">گروه نقد</v-card-title>
             <v-card-text>
               <v-row>
                 <v-col cols="12" md="6">
@@ -307,7 +309,7 @@ const closeDialog = () => {
 
             <!-- Stock Section -->
             <v-card variant="outlined" class="mb-4">
-            <v-card-title class="text-h6">سهام</v-card-title>
+            <v-card-title class="text-h3 text-center mb-4">سهام</v-card-title>
             <v-card-text>
               <v-row>
                 <v-col cols="12" md="6">
@@ -372,7 +374,7 @@ const closeDialog = () => {
 
           <!-- Shares/Bonds Section -->
           <v-card variant="outlined" class="mb-4">
-            <v-card-title class="text-h6">اوراق مشارکت / سرمایه گذاری</v-card-title>
+            <v-card-title class="text-h3 text-center mb-4">اوراق مشارکت / سرمایه گذاری</v-card-title>
             <v-card-text>
               <v-row>
                 <v-col cols="12" md="6">
@@ -399,7 +401,7 @@ const closeDialog = () => {
 
           <!-- Other Collateral Section -->
           <v-card variant="outlined" class="mb-4">
-            <v-card-title class="text-h6">سایر وثایق</v-card-title>
+            <v-card-title class="text-h3 text-center mb-4">سایر وثایق</v-card-title>
             <v-card-text>
               <v-row>
                 <v-col cols="12" md="6">
@@ -410,6 +412,21 @@ const closeDialog = () => {
                     variant="outlined"
                     density="comfortable"
                     suffix="میلیون ریال"
+                  />
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+          <v-card variant="outlined" class="mb-4">
+            <v-card-title class="text-h3 text-center mb-4">توضیحات</v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" md="12">
+                  <v-textarea
+                    v-model="formData.description"
+                    label="توضیحات"
+                    variant="outlined"
+                    density="comfortable"
                   />
                 </v-col>
               </v-row>
