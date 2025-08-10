@@ -67,6 +67,7 @@ interface Props {
   groupBy?: string | ((item: any) => string | number); // Property to group items by
   groupHeaderTemplate?: (groupKey: string | number, groupItems: any[]) => string; // Custom group header template
   defaultExpanded?: boolean; // Whether groups are expanded by default
+  defaultSelected?: string; // Property name to check for auto-selection (e.g., 'isSelected')
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -382,6 +383,16 @@ const fetchData = async (queryParams?: {}) => {
 
     // Group items if groupBy is specified
     groupItems(items.value);
+
+    // Auto-select items if defaultSelected prop is provided
+    if (props.defaultSelected && items.value.length > 0 && props.defaultSelected in items.value[0]) {
+      const defaultSelectedItems = items.value.filter(
+        (item) => item[props.defaultSelected!] === true
+      );
+      selectedItems.value = [...defaultSelectedItems];
+      emit('update:selectedItems', selectedItems.value);
+      emit('selection-change', selectedItems.value);
+    }
   } catch (err: any) {
     if (err.response) {
       error.value = `خطای سرور: ${err.response.status} - ${err.response.data.message || 'خطای ناشناخته'}`;
@@ -476,6 +487,18 @@ const loadMore = async () => {
 
     items.value = [...items.value, ...formattedItems];
     hasMore.value = currentPage.value < response.data.totalPages;
+    
+    // Auto-select new items if defaultSelected prop is provided
+    if (props.defaultSelected && props.selectable) {
+      const newSelectedItems = formattedItems.filter(
+        (item: any) => item[props.defaultSelected!] === true
+      );
+      if (newSelectedItems.length > 0) {
+        selectedItems.value = [...selectedItems.value, ...newSelectedItems];
+        emit('update:selectedItems', selectedItems.value);
+        emit('selection-change', selectedItems.value);
+      }
+    }
   } catch (err) {
     console.error('Error loading more items:', err);
     currentPage.value--; // Revert page number on error
