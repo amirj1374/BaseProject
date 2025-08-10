@@ -16,13 +16,13 @@
           :hide-default-footer="true"
         >
           <template #item.isAgreed="{ value }">
-            <v-chip :color="value ? 'success' : 'error'" size="small" variant="tonal">
-              {{ value ? 'بله' : 'خیر' }}
+            <v-chip :color="value === true ? 'success' : value === false ? 'error' : 'grey'" size="small" variant="tonal">
+              {{ value === true ? 'بله' : value === false ? 'خیر' : 'نامشخص' }}
             </v-chip>
           </template>
           <template #item.actionDone="{ value }">
-            <v-chip :color="value ? 'success' : 'warning'" size="small" variant="tonal">
-              {{ value ? 'انجام شد' : 'انجام نشده' }}
+            <v-chip :color="value === true ? 'success' : value === false ? 'warning' : 'grey'" size="small" variant="tonal">
+              {{ value === true ? 'انجام شد' : value === false ? 'انجام نشده' : 'نامشخص' }}
             </v-chip>
           </template>
           <template #item.actionDoneAt="{ value }">
@@ -31,6 +31,7 @@
           <template #no-data>
             <div class="py-6 text-center">رکوردی یافت نشد</div>
           </template>
+
         </v-data-table>
       </v-card-text>
     </v-card>
@@ -42,10 +43,10 @@ import { DateConverter } from '@/utils/date-convertor';
 import { computed } from 'vue';
 
 interface SignRow {
-  actionDone?: boolean;
+  actionDone?: boolean | null;
   actionDoneAt?: string | null;
   comment?: string | null;
-  isAgreed?: boolean;
+  isAgreed?: boolean | null;
   name?: string;
   username?: string;
 }
