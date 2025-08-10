@@ -308,7 +308,7 @@ const selectedCollaterals = ref<
   }>
 >([]);
 const required = (v: any) => !!v || 'این فیلد الزامی است';
-const percentRule = (v: string) => ((Number(v) >= 1 && Number(v) <= 100) || 'درصد باید بین 1 تا 100 باشد');
+const percentRule = (v: string) => ((Number(v) >= 0 && Number(v) <= 100) || 'درصد باید بین 1 تا 100 باشد');
 const contractTypes = ref<ContractType[]>([]);
 const facilityList = ref<FacilityDto[]>([]);
 const collateralTableItems = computed(() =>

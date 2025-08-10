@@ -261,9 +261,9 @@ defineExpose({ submitData, clearAllData });
       <v-tab value="greenLicense">تضامین جواز سبز</v-tab>
     </v-tabs>
     
-    <!-- Use v-if instead of v-show for better performance -->
+    <!-- Use v-show to preserve component state when switching tabs -->
     <Facilities 
-      v-if="activeTab === 'facilities'" 
+      v-show="activeTab === 'facilities'" 
       ref="facilitiesRef" 
       :loading="customizerStore.loading"
       @save="handleSaveFacility" 
@@ -271,7 +271,7 @@ defineExpose({ submitData, clearAllData });
       @update:facilities="facilitiesData = $event" 
     />
     <Guarantee 
-      v-if="activeTab === 'guarantee'" 
+      v-show="activeTab === 'guarantee'" 
       ref="guaranteeRef" 
       :loading="customizerStore.loading"
       @save="handleSaveGuarantee" 
@@ -279,7 +279,7 @@ defineExpose({ submitData, clearAllData });
       @update:guarantee="guaranteeData = $event" 
     />
     <LetterOfCredit 
-      v-if="activeTab === 'lc'" 
+      v-show="activeTab === 'lc'" 
       ref="lcRef" 
       :loading="customizerStore.loading"
       @save="handleSaveLC" 
@@ -287,7 +287,7 @@ defineExpose({ submitData, clearAllData });
       @update:lc="lcData = $event" 
     />
     <GreenLicense 
-      v-if="activeTab === 'greenLicense'" 
+      v-show="activeTab === 'greenLicense'" 
       ref="greenLicenseRef" 
       :loading="customizerStore.loading"
       @save="handleSaveGreenLicense" 
