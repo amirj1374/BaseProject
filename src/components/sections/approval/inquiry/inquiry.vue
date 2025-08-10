@@ -17,6 +17,58 @@ const DirectObligationData = ref<any>(null);
 const sapData = ref<any>(null);
 const canSubmit = ref(false);
 
+// Individual retry functions for each inquiry type
+const retryChequeInquiry = async () => {
+  isLoadingCheque.value = true;
+  try {
+    const res = await api.approval.getInquiryCheque(approvalStore.loanRequestId);
+    chequeData.value = res.data;
+  } catch (error) {
+    console.error('Error retrying cheque inquiry:', error);
+  } finally {
+    isLoadingCheque.value = false;
+  }
+};
+
+const retryIndirectInquiry = async () => {
+  isLoadingIndirect.value = true;
+  try {
+    const res = await api.approval.getIndirectObligation(approvalStore.loanRequestId);
+    IndirectObligationData.value = res.data;
+  } catch (error) {
+    console.error('Error retrying indirect inquiry:', error);
+  } finally {
+    isLoadingIndirect.value = false;
+  }
+};
+
+const retryDirectInquiry = async () => {
+  isLoadingDirect.value = true;
+  try {
+    const res = await api.approval.getDirectObligation(approvalStore.loanRequestId);
+    DirectObligationData.value = res.data;
+  } catch (error) {
+    console.error('Error retrying direct inquiry:', error);
+  } finally {
+    isLoadingDirect.value = false;
+  }
+};
+
+const retrySapInquiry = async () => {
+  isLoadingSap.value = true;
+  try {
+    const res = await api.approval.getSapInquiry({
+      loanRequestId: approvalStore.loanRequestId,
+      nationalCode: approvalStore.customerInfo.nationalCode
+    });
+    sapData.value = res.data;
+  } catch (error) {
+    console.error('Error retrying SAP inquiry:', error);
+  } finally {
+    isLoadingSap.value = false;
+  }
+};
+
 const getInquiry = async () => {
   responseStatus.value = 'idle';
   chequeData.value = null;
@@ -100,7 +152,6 @@ const getInquiry = async () => {
   }
 };
 
-
 onMounted(() => {
   getInquiry();
 });
@@ -117,18 +168,50 @@ defineExpose({ submitData });
 <template>
   <div class="approval-section">
     <h4 class="group-title">استعلام</h4>
+    
+    <!-- Global retry button -->
+    <div class="mb-4 text-center">
+      <v-btn 
+        color="secondary"
+        variant="tonal" 
+        @click="getInquiry"
+        :loading="isLoadingCheque || isLoadingIndirect || isLoadingDirect || isLoadingSap"
+        class="me-2"
+      >
+        🔄 استعلام مجدد همه
+      </v-btn>
+    </div>
+
     <v-row justify="center">
       <!-- تعهدات مستقیم -->
       <v-col cols="12" md="6">
         <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="sm" variant="outlined">
-          <h3 class="text-4 text-secondary text-center mb-2">استعلام تعهدات مستقیم</h3>
+          <div class="d-flex justify-space-between align-center mb-2">
+            <h3 class="text-4 text-secondary text-center">استعلام تعهدات مستقیم</h3>
+            <v-btn 
+              v-if="!isLoadingDirect"
+              color="secondary" 
+              size="small" 
+              variant="tonal"
+              @click="retryDirectInquiry"
+              :loading="isLoadingDirect"
+            >
+              🔄 تلاش مجدد
+            </v-btn>
+          </div>
           <div class="inquiry-result-container">
             <div v-if="isLoadingDirect" class="text-center loading-container">
-              <v-progress-circular indeterminate color="primary" />
+              <v-progress-circular indeterminate color="secondary" />
               <div>در حال استعلام تعهدات مستقیم...</div>
             </div>
-            <template v-else>
+            <template v-else-if="DirectObligationData">
               <div><b>مبلغ کل : </b> {{ DirectObligationData?.totalAmount }}</div>
+            </template>
+            <template v-else>
+              <div class="text-center text-error">
+                <v-icon color="error" class="mb-2">mdi-alert-circle</v-icon>
+                <div>خطا در دریافت اطلاعات</div>
+              </div>
             </template>
           </div>
         </v-card>
@@ -137,15 +220,33 @@ defineExpose({ submitData });
       <!-- تعهدات غیر مستقیم -->
       <v-col cols="12" md="6">
         <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="sm" variant="outlined">
-          <h3 class="text-4 text-secondary text-center mb-2">استعلام تعهدات غیر مستقیم</h3>
+          <div class="d-flex justify-space-between align-center mb-2">
+            <h3 class="text-4 text-secondary text-center">استعلام تعهدات غیر مستقیم</h3>
+            <v-btn 
+              v-if="!isLoadingIndirect"
+              color="secondary" 
+              size="small" 
+              variant="tonal"
+              @click="retryIndirectInquiry"
+              :loading="isLoadingIndirect"
+            >
+              🔄 تلاش مجدد
+            </v-btn>
+          </div>
           <div class="inquiry-result-container">
             <div v-if="isLoadingIndirect" class="text-center loading-container">
-              <v-progress-circular indeterminate color="primary" />
+              <v-progress-circular indeterminate color="secondary" />
               <div>در حال استعلام تعهدات غیر مستقیم...</div>
             </div>
-            <template v-else>
+            <template v-else-if="IndirectObligationData">
               <div><b>نام : </b> {{ IndirectObligationData?.allOfThem || 'نامشخص' }}</div>
               <div><b>مبلغ کل : </b> {{ IndirectObligationData?.totalAmount || 'نامشخص' }}</div>
+            </template>
+            <template v-else>
+              <div class="text-center text-error">
+                <v-icon color="error" class="mb-2">mdi-alert-circle</v-icon>
+                <div>خطا در دریافت اطلاعات</div>
+              </div>
             </template>
           </div>
         </v-card>
@@ -155,16 +256,34 @@ defineExpose({ submitData });
       <v-col cols="12" md="6">
         <div class="inquiry-card-wrapper">
           <v-card color="grey-lighten-4" class="pa-4 text-start mb-4" rounded="sm" variant="outlined">
-            <h3 class="text-4 text-secondary text-center mb-2">استعلام چک های برگشتی</h3>
+            <div class="d-flex justify-space-between align-center mb-2">
+              <h3 class="text-4 text-secondary text-center">استعلام چک های برگشتی</h3>
+              <v-btn 
+                v-if="!isLoadingCheque"
+                color="secondary" 
+                size="small" 
+                variant="tonal"
+                @click="retryChequeInquiry"
+                :loading="isLoadingCheque"
+              >
+                🔄 تلاش مجدد
+              </v-btn>
+            </div>
             <div class="inquiry-result-container">
               <div v-if="isLoadingCheque" class="text-center loading-container">
-                <v-progress-circular indeterminate color="primary" />
+                <v-progress-circular indeterminate color="secondary" />
                 <div>در حال استعلام چک های برگشتی...</div>
               </div>
-              <template v-else>
+              <template v-else-if="chequeData">
                 <div><b>چک برگشتی دارد؟ </b> {{ chequeData?.bouncedCheque || 'ندارد' }}</div>
                 <div><b>تعداد : </b> {{ chequeData?.count || '0' }}</div>
                 <div><b>مبلغ کل : </b> {{ chequeData?.amount || '0' }}</div>
+              </template>
+              <template v-else>
+                <div class="text-center text-error">
+                  <v-icon color="error" class="mb-2">mdi-alert-circle</v-icon>
+                  <div>خطا در دریافت اطلاعات</div>
+                </div>
               </template>
             </div>
           </v-card>
@@ -175,16 +294,34 @@ defineExpose({ submitData });
       <!-- ساپ -->
       <v-col cols="12" md="6">
         <v-card color="grey-lighten-4" class="pa-4 text-start" rounded="sm" variant="outlined">
-          <h3 class="text-4 text-secondary text-center mb-2">استعلام ساپ</h3>
+          <div class="d-flex justify-space-between align-center mb-2">
+            <h3 class="text-4 text-secondary text-center">استعلام ساپ</h3>
+            <v-btn 
+              v-if="!isLoadingSap"
+              color="secondary" 
+              size="small" 
+              variant="tonal"
+              @click="retrySapInquiry"
+              :loading="isLoadingSap"
+            >
+              🔄 تلاش مجدد
+            </v-btn>
+          </div>
           <div class="inquiry-result-container">
             <div v-if="isLoadingSap" class="text-center loading-container">
-              <v-progress-circular indeterminate color="primary" />
+              <v-progress-circular indeterminate color="secondary" />
               <div>در حال استعلام ساپ...</div>
             </div>
-            <template v-else>
+            <template v-else-if="sapData">
               <div><b>برچسب : </b> {{ sapData?.label || 'نامشخص' }}</div>
               <div><b>وثیقه : </b> {{ sapData?.collateral || 'نامشخص' }}</div>
               <div><b>مبلغ : </b> {{ sapData?.value?.toLocaleString() || 'نامشخص' }}</div>
+            </template>
+            <template v-else>
+              <div class="text-center text-error">
+                <v-icon color="error" class="mb-2">mdi-alert-circle</v-icon>
+                <div>خطا در دریافت اطلاعات</div>
+              </div>
             </template>
           </div>
         </v-card>
