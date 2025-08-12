@@ -58,7 +58,6 @@ defineExpose({ submitData });
         </v-row>
         <v-row class="mt-5">
           <!-- NonRial-facilities Checkbox -->
-
           <v-col cols="12" md="4" sm="4" style="display: flex; justify-content: center">
             <NunRialFacilitiesHistory :currencies="currencies"/>
           </v-col>

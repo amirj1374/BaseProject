@@ -88,7 +88,7 @@
               </v-col>
               <v-col cols="12" md="4">
                 <v-select
-                  v-model="formData.LcContractType"
+                  v-model="formData.lcContractType"
                   label="نوع اعتبار اسنادی"
                   variant="outlined"
                   density="comfortable"
@@ -340,7 +340,7 @@ const formData = reactive({
   intermediatePayment: '',
   advancePayment: '',
   creditType: '',
-  LcContractType : ''
+  lcContractType : ''
 });
 
 const headers = [
@@ -348,7 +348,7 @@ const headers = [
   { title: 'نوع ارز', key: 'currency', width: '200px' },
   { title: 'مدت', key: 'durationDay', width: '200px' },
   { title: 'نوع اعتبار', key: 'creditType', width: '250px' },
-  { title: 'نوع اعتبار اسنادی', key: 'LcContractType', width: '250px' },
+  { title: 'نوع اعتبار اسنادی', key: 'lcContractType', width: '250px' },
   { title: 'میان دریافت', key: 'intermediatePayment', width: '200px' },
   { title: 'پیش دریافت', key: 'advancePayment', width: '200px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
@@ -444,7 +444,7 @@ function editItem(item: LcRequest) {
   formData.intermediatePayment = item.intermediatePayment;
   formData.advancePayment = item.advancePayment;
   formData.creditType = item.creditType;
-  formData.LcContractType  = item.LcContractType;
+  formData.lcContractType  = item.lcContractType;
   dialog.value = true;
 }
 
