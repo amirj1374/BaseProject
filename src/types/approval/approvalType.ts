@@ -197,7 +197,7 @@ export interface ConsiderationPayload {
   havePromissoryNote: boolean;
   signatory: string;
   currentOffersAmount: number;
-  creditLimitDate: Date | null;
+  creditLimitDate: string;
 }
 
 export interface CollateralsInfoPayload {

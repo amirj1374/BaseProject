@@ -12,7 +12,7 @@ interface Document {
   fileType: string;
   fileTitle: string;
   description: string | null;
-  file: string | null;
+  filePath: string | null;
   loanRequestId: number;
 }
 
@@ -113,8 +113,8 @@ const handleUpload = (doc: Document) => {
 };
 
 const handleView = (doc: Document) => {
-  if (doc.file) {
-    window.open(doc.file, '_blank');
+  if (doc.filePath) {
+    window.open(doc.filePath, '_blank');
   }
 };
 
@@ -155,8 +155,8 @@ const handleFileUpload = async () => {
 };
 
 function getCustomButtons(doc: Document) {
-  const hasImage = !!(doc.file && doc.file.match(/\.(jpg|jpeg|png)$/i));
-  const hasFile = !!doc.file;
+  const hasImage = !!(doc.filePath && doc.filePath.match(/\.(jpg|jpeg|png)$/i));
+  const hasFile = !!doc.filePath;
   return [
     {
       label: hasFile ? 'ویرایش' : 'آپلود',
@@ -167,7 +167,7 @@ function getCustomButtons(doc: Document) {
       label: 'مشاهده تصویر مدرک',
       color: 'primary',
       onClick: () => {
-        if (hasImage) openImageDialog(doc.file!);
+        if (hasImage) openImageDialog(doc.filePath!);
       },
       disabled: !hasImage
     }
@@ -192,7 +192,7 @@ const submitData = async () => {
   return Promise.resolve();
 };
 const downloadLink = {
-  'دانلود فایل': 'file'
+  'دانلود فایل': 'filePath'
 };
 defineExpose({ submitData });
 </script>

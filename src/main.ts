@@ -16,6 +16,9 @@ import { fakeBackend } from '@/utils/helpers/fake-backend';
 // print
 import print from 'vue3-print-nb';
 
+// Persian Date Picker
+import Vue3PersianDatetimePicker from 'vue3-persian-datetime-picker';
+
 const app = createApp(App);
 fakeBackend();
 const pinia = createPinia();
@@ -28,6 +31,7 @@ app.use(router);
 app.use(PerfectScrollbarPlugin);
 app.use(print);
 app.use(VueApexCharts);
+app.component('Vue3PersianDatetimePicker', Vue3PersianDatetimePicker);
 
 // Register directives
 app.directive('digit-limit', DigitLimit);

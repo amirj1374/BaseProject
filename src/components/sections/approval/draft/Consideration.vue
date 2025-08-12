@@ -3,28 +3,48 @@ import { onMounted, ref } from 'vue';
 import { api } from '@/services/api';
 import type { ConsiderationPayload } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
+import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
+import MoneyInput from '@/components/shared/MoneyInput.vue';
 
 const isDialogActive = ref(false);
 const loading = ref(false);
 const valid = ref(false);
 const canSubmit = ref(false);
 const error = ref<string | null>(null);
-const approvalStore = useApprovalStore()
+const approvalStore = useApprovalStore();
 
 // initial data
 const formData = ref({
   loanRequestId: approvalStore.loanRequestId,
   previousLoanAppropriate: false,
   havePromissoryNote: false,
-  signatory:'',
+  signatory: '',
   currentOffersAmount: 0,
-  creditLimitDate: null
+  creditLimitDate: ''
 });
 
 onMounted(async () => {
   const response = await api.approval.getConsideration(approvalStore.loanRequestId);
   if (response.status === 200 && response.data) {
-    formData.value = response.data;
+    // Handle date conversion if creditLimitDate is a Date object or ISO string
+    const data = response.data;
+    if (data.creditLimitDate) {
+      console.log('Original creditLimitDate from server:', data.creditLimitDate);
+      // Keep the full ISO string format for consistency
+      let dateStr = data.creditLimitDate;
+      if (dateStr instanceof Date) {
+        dateStr = dateStr.toISOString();
+      } else if (typeof dateStr === 'string') {
+        // If it's already an ISO string, keep it as is
+        if (!dateStr.includes('T')) {
+          // If it's just YYYY-MM-DD, convert to full ISO
+          dateStr = dateStr + 'T00:00:00.000Z';
+        }
+      }
+      console.log('Processed creditLimitDate:', dateStr);
+      data.creditLimitDate = dateStr;
+    }
+    formData.value = data;
   }
 });
 
@@ -40,7 +60,7 @@ async function save() {
       havePromissoryNote: formData.value.havePromissoryNote,
       signatory: formData.value.signatory,
       currentOffersAmount: formData.value.currentOffersAmount,
-      creditLimitDate: null,
+      creditLimitDate: formData.value.creditLimitDate
     };
 
     const response = await api.approval.saveConsideration(payload);
@@ -61,7 +81,7 @@ async function save() {
 
 // submit form
 const submitData = async () => {
-  await save()
+  await save();
 };
 </script>
 
@@ -77,20 +97,20 @@ const submitData = async () => {
         <v-row>
           <v-col cols="12" md="6">
             <v-radio-group inline label="بازپرداخت تسهیلات دریافتی قبلی" v-model="formData.previousLoanAppropriate">
-              <v-radio label="مناسب نبوده است" :value=false></v-radio>
-              <v-radio label="مناسب بوده است" :value=true></v-radio>
+              <v-radio label="مناسب نبوده است" :value="false"></v-radio>
+              <v-radio label="مناسب بوده است" :value="true"></v-radio>
             </v-radio-group>
           </v-col>
           <v-col cols="12" md="6">
             <v-radio-group inline label="سفته واخواستی" v-model="formData.havePromissoryNote">
               <v-radio label="ندارد" :value="false"></v-radio>
-              <v-radio label="دارد"  :value="true"></v-radio>
+              <v-radio label="دارد" :value="true"></v-radio>
             </v-radio-group>
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="12" md="12">
-            <v-text-field
+            <MoneyInput
               v-model="formData.currentOffersAmount"
               density="comfortable"
               hide-details="auto"
@@ -98,18 +118,18 @@ const submitData = async () => {
               color="primary"
               label="پیشنهادات در جریان به مبلغ"
               suffix="قبلا ارسال ولیکن هنوز مصوبه دریافت نشده است"
-            ></v-text-field>
+            />
           </v-col>
           <v-col cols="12" md="12">
-            <v-text-field
+            <ShamsiDatePicker
               v-model="formData.creditLimitDate"
+              label="حد اعتباریه سالانه / سقف اعتباری مشتری در تاریخ"
+              color="black"
+              icon="mdi-calendar"
               density="comfortable"
               hide-details="auto"
               variant="outlined"
-              color="primary"
-              label="حد اعتباریه سالانه / سقف اعتباری مشتری در تاریخ"
-              suffix="سر رسید میگردد"
-            ></v-text-field>
+            />
           </v-col>
         </v-row>
       </v-card-text>
@@ -130,6 +150,7 @@ const submitData = async () => {
 .error {
   color: red;
   margin-top: 0.5em;
+  /* color:goldenrod */
 }
 
 .radioBtnContainer {
