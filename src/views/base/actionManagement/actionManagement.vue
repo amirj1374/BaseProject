@@ -79,21 +79,6 @@ const headers = [
     }
   },
   {
-    title: 'نقش مبدا',
-    key: 'fromRole',
-    sortable: true,
-    width: 200,
-    // Example of nested key usage
-    nestedKey: 'fromRole.name',
-    // Custom formatter example
-    formatter: (value: any, item: any) => {
-      if (item.fromRole && typeof item.fromRole === 'object') {
-        return `${item.fromRole.description}`;
-      }
-      return value;
-    }
-  },
-  {
     title: 'نقش مقصد',
     key: 'toRole',
     sortable: true,

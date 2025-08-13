@@ -30,8 +30,8 @@
       <template #item.contractType="{ item }">
         {{ item.contractType?.longTitle || '-' }}
       </template>
-      <template #item.LcContractType="{ item }">
-        {{ LcTypeOptions.find((opt) => opt.value === item.LcContractType)?.title || '-' }}
+      <template #item.lcContractType="{ item }">
+        {{ LcTypeOptions.find((opt) => opt.value === item.lcContractType)?.title || '-' }}
       </template>
       <template #item.creditType="{ item }">
         {{ CreditTypeOptions.find((opt) => opt.value === item.creditType)?.title || '-' }}

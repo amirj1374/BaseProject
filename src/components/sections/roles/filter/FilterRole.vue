@@ -12,6 +12,8 @@ const snackbar = ref<boolean>(false);
 const error = ref<string>('');
 const lotusRoles = ref<any[]>([]);
 const selectedLotusRoles = ref<any[]>([]);
+const minUserNumber = ref('');
+const maxUserNumber = ref('');
 const props = defineProps<{
   item: any;
   onSuccess?: () => void;
@@ -27,6 +29,8 @@ const required = (v: any) => !!v || 'این فیلد الزامی است';
 // Initialize form data when item changes
 const initializeFormData = () => {
   if (props.item) {
+    minUserNumber.value = props.item.minUserNumber;
+    maxUserNumber.value = props.item.maxUserNumber;
     // Set existing lotus roles if available
     if (props.item.lotusRoles && Array.isArray(props.item.lotusRoles)) {
       selectedLotusRoles.value = props.item.lotusRoles;
@@ -86,8 +90,8 @@ const submitForm = async () => {
     const updatePayload = {
       id: id.value,
       lotusRoles: lotusRolesPayload,
-      minUserNumber: props.item.minUserNumber,
-      maxUserNumber: props.item.maxUserNumber,
+      minUserNumber: minUserNumber.value,
+      maxUserNumber: maxUserNumber.value,
     };
 
     // Call update API using the department-role resource
@@ -168,7 +172,7 @@ onMounted(async () => {
     <v-row>
       <v-col cols="12" md="3">
         <v-text-field
-          v-model="props.item.minUserNumber"
+          v-model="minUserNumber"
           label="حداقل تعداد کاربران"
           variant="outlined"
           type="number"
@@ -177,7 +181,7 @@ onMounted(async () => {
       </v-col>
       <v-col cols="12" md="3">
         <v-text-field
-          v-model="props.item.maxUserNumber"
+          v-model="maxUserNumber"
           label="حداکثر تعداد کاربران"
           variant="outlined"
           type="number"

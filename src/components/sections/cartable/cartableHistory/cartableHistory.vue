@@ -48,16 +48,17 @@ const header = ref([
   },
   {
     title: 'ویرایش شده توسط',
-    key: 'updatedAt',
+    key: 'updatedBy',
     sortable: true,
-    isDate: true,
     width: 200,
   },
   {
     title: 'تاریج ویرایش',
-    key: 'updatedBy',
+    key: 'updatedAt',
     sortable: true,
     width: 200,
+    isDate: true,
+
   }
 ]);
 </script>
