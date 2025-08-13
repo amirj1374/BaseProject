@@ -105,7 +105,7 @@ const headers = [
   { title: 'نام و نام خانوادگی', key: 'fullName' },
   { title: 'کد ملی', key: 'nationalCode' },
   { title: 'نوع', key: 'relationType', translate: true, options: RelationTypeOptions },
-  { title: 'عنوان مدرک', key: 'fileTitle' }
+  { title: 'عنوان مدرک', key: 'fileName' }
 ];
 const handleUpload = (doc: Document) => {
   selectedDoc.value = doc;

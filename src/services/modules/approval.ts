@@ -105,16 +105,6 @@ export default (axiosInstance: AxiosInstance) => ({
     saveConsideration(payload: ConsiderationPayload) {
       return axiosInstance.post('/api/v1/consideration',payload);
     },
-
-  uploadExcel(payload: UploadFile) {
-    return axiosInstance.post(`/api/v1/general/save-doc`, payload, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        'Accept': '*/*',
-      },
-      timeout: 60000
-    });
-  },
   deleteTransaction(id: string) {
     return axiosInstance.delete(`/personTransaction-requests/${id}`);
   },

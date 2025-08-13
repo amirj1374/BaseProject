@@ -16,7 +16,7 @@
           @update:model-value="
             (val: RegionsDto | null) => {
               filterModel.branchCode = '';
-              fetchBranchs(val);
+              fetchBranchs(val?.code || null);
             }
           "
         />
@@ -54,7 +54,7 @@ import { api } from '@/services/api';
 const branchList = ref<BranchDto[]>([]);
 const baseStore = useBaseStore();
 
-async function fetchBranchs(newRegion: String | null) {
+async function fetchBranchs(newRegion: string | null) {
   console.log(newRegion);
   if (!newRegion) return;
   try {

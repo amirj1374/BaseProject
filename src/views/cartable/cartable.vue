@@ -11,6 +11,7 @@ import Sign from '@/components/sections/cartable/sign/Sign.vue';
 import { CartableStatusTypeOptions, CustomerTypeOptions } from '@/types/enums/global';
 import { usePermissionsStore } from '@/stores/permissions';
 import SignList from '@/components/sections/cartable/signList/SignList.vue';
+import type { CustomerDto } from '@/types/approval/approvalType';
 
 const permissionsStore = usePermissionsStore();
 
@@ -29,6 +30,21 @@ const header = ref([
     sortable: true,
     editable: true,
     isDate: true
+  },
+  {
+    title: 'تاریخ ویرایش',
+    key: 'updateDate',
+    sortable: true,
+    editable: true,
+    isDate: true,
+    width: 250,
+    formatter: (value: any, item: any) => {
+      if (item.updateDate &&  item.updateTime) {
+        return `${item.updateTime} - ${item.updateDate}`;
+      }
+      return value;
+    }
+
   },
   {
     title: 'کد رهگیری',
@@ -87,7 +103,7 @@ const header = ref([
   },
   {
     title: 'ایجاد شده توسط',
-    key: 'createdBy',
+    key: 'createByName',
     sortable: true,
     editable: true,
     width: 200,
