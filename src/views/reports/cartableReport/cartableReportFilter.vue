@@ -15,7 +15,7 @@
           clearable
           @update:model-value="
             (val: RegionsDto | null) => {
-              filterModel.branch = '';
+              filterModel.branchCode = '';
               fetchBranchs(val);
             }
           "
@@ -23,7 +23,7 @@
       </v-col>
       <v-col cols="12" md="6">
         <v-autocomplete
-          v-model="filterModel.branch"
+          v-model="filterModel.branchCode"
           :items="branchList"
           label="شعبه"
           item-value="code"
@@ -66,8 +66,8 @@ async function fetchBranchs(newRegion: String | null) {
 }
 
 interface FilterModel {
-  regionBranchCode: string;
   branchCode: string;
+  regionBranchCode: string;
 }
 
 const props = defineProps<{

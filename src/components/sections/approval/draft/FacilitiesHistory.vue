@@ -16,22 +16,22 @@ const approvalStore = useApprovalStore()
 //   isDialogActive.value = false;
 // });
 const header = ref([
-  { title: 'نوع ارز', key: 'currencyCode', width:250, sortable: true, editable: false },
-  { title: 'نوع تسهیلات', key: 'loanContractTypeTitle', width:250, sortable: true, editable: false },
-  { title: 'مبلغ تصویبی حد سالانه', key: 'annualLimitApprovalAmount', width:250, sortable: true, editable: true },
-  { title: 'مبلغ تصویبی سقف', key: 'maximumLimitApprovalAmount', width:250, sortable: true, editable: true },
-  { title: 'مبلغ تصویبی موردی', key: 'caseLimitApprovalAmount', width:250, sortable: true, editable: true },
-  { title: ' اصل - مانده استفاده شدهی جاری حد سالانه', key: 'annualLimitCurrentPrincipalRemain', width:250, sortable: true, editable: true },
-  { title: 'سود - مانده استفاده شدهی جاری حد سالانه', key: 'annualLimitCurrentInterestRemain', width:250, sortable: true, editable: true },
-  { title: 'اصل - مانده استفاده شدهی جاری سقف', key: 'maximumLimitCurrentPrincipalRemain', width:250, sortable: true, editable: true },
-  { title: 'سود - مانده استفاده شدهی جاری سقف', key: 'maximumLimitCurrentInterestRemain', width:250, sortable: true, editable: true },
-  { title: '- اصل - مانده استفاده شدهی جاری موردی', key: 'caseLimitCurrentPrincipalRemain', width:250, sortable: true, editable: true },
-  { title: 'سود-مانده استفاده شدهی جاری موردی', key: 'caseLimitCurrentInterestRemain', width:250, sortable: true, editable: true },
-  { title: 'اصل / سررسید گذشته', key: 'overDuePrincipalRemain', width:250, sortable: true, editable: true },
-  { title: 'سود / سررسید گذشته', key: 'overDueInterestRemain', width:250, sortable: true, editable: true },
-  { title: 'وجه التزام / سررسید گذشته', key: 'penaltyAmount', width:250, sortable: true, editable: true },
-  { title: 'مبالغ سفته', key: 'estateAmount', sortable: true, width:250, editable: true },
-]);
+  { title: 'نوع ارز', key: 'currencyCode', width:250, sortable: true, editable: false, type: 'string' },
+  { title: 'نوع تسهیلات', key: 'loanContractTypeTitle', width:250, sortable: true, editable: false , type: 'string' },
+  { title: 'مبلغ تصویبی حد سالانه', key: 'annualLimitApprovalAmount', width:250, sortable: true, editable: true, type: 'number' },
+  { title: 'مبلغ تصویبی سقف', key: 'maximumLimitApprovalAmount', width:250, sortable: true, editable: true, type: 'number' },
+  { title: 'مبلغ تصویبی موردی', key: 'caseLimitApprovalAmount', width:250, sortable: true, editable: true, type: 'number' },
+  { title: ' اصل - مانده استفاده شدهی جاری حد سالانه', key: 'annualLimitCurrentPrincipalRemain', width:250, sortable: true, editable: true, type: 'number' },
+  { title: 'سود - مانده استفاده شدهی جاری حد سالانه', key: 'annualLimitCurrentInterestRemain', width:250, sortable: true, editable: true, type: 'number' },
+  { title: 'اصل - مانده استفاده شدهی جاری سقف', key: 'maximumLimitCurrentPrincipalRemain', width:250, sortable: true, editable: true, type: 'number' },
+  { title: 'سود - مانده استفاده شدهی جاری سقف', key: 'maximumLimitCurrentInterestRemain', width:250, sortable: true, editable: true, type: 'number' },
+  { title: '- اصل - مانده استفاده شدهی جاری موردی', key: 'caseLimitCurrentPrincipalRemain', width:250, sortable: true, editable: true, type: 'number' },
+  { title: 'سود-مانده استفاده شدهی جاری موردی', key: 'caseLimitCurrentInterestRemain', width:250, sortable: true, editable: true, type: 'number' },
+  { title: 'اصل / سررسید گذشته', key: 'overDuePrincipalRemain', width:250, sortable: true, editable: true, type: 'number' },
+  { title: 'سود / سررسید گذشته', key: 'overDueInterestRemain', width:250, sortable: true, editable: true, type: 'number' },
+  { title: 'وجه التزام / سررسید گذشته', key: 'penaltyAmount', width:250, sortable: true, editable: true, type: 'number' },
+  { title: 'مبالغ سفته', key: 'estateAmount', sortable: true, width:250, editable: true, type: 'number' },
+]); 
 </script>
 
 <template>

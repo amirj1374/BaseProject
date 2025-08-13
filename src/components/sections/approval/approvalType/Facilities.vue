@@ -482,6 +482,7 @@ function saveFacility() {
   const facilityData: FacilitiesRequest = {
     id: editingId.value || Date.now(),
     ...formData,
+    preferentialRate: Number(formData.preferentialRate) || 0,
     contractType: formData.contractType || ({} as ContractType),
     facility: formData.facility || ({} as FacilityDto),
     collaterals: selectedCollaterals.value

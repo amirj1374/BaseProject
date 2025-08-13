@@ -16,16 +16,16 @@ const approvalStore = useApprovalStore()
 //   isDialogActive.value = false;
 // });
 const header = ref([
-  { title: 'ضمانت نامه های ریالی / ارزی', key: 'bgContractTypeCodeTitle', sortable: true, editable: false },
-  { title: 'مبلغ تصویبی / حد سالانه', key: 'annualLimitApprovalAmount', sortable: true, editable: true },
-  { title: 'مبلغ تصویبی / موردی', key: 'caseLimitApprovalAmount', sortable: true, editable: true },
-  { title: 'مانده استفاده شده / فعال حد سالانه', key: 'annualLimitAmountRemain', sortable: true, editable: true },
-  { title: 'مانده استفاده شده / فعال موردی', key: 'caseLimitAmountRemain', sortable: true, editable: true },
-  { title: 'ضمانت نامه پرداخت شده', key: 'bgAmount', sortable: true, editable: true },
-  { title: 'مبلغ وثایق / سفته', key: 'promissoryNoteAmount', sortable: true, editable: true },
-  { title: 'مبلغ وثایق / غیر منقول', key: 'estateAmount', sortable: true, editable: true },
-  { title: 'مبلغ وثایق / سپرده', key: 'depositAmount', sortable: true, editable: true },
-  { title: 'مبلغ وثایق / سایر', key: 'otherCollateralAmount', sortable: true, editable: true },
+  { title: 'ضمانت نامه های ریالی / ارزی', key: 'bgContractTypeCodeTitle', sortable: true, editable: false, width: 400 },
+  { title: 'مبلغ تصویبی / حد سالانه', key: 'annualLimitApprovalAmount', sortable: true, editable: true, width: 250, type: 'number' },
+  { title: 'مبلغ تصویبی / موردی', key: 'caseLimitApprovalAmount', sortable: true, editable: true, width: 250, type: 'number' },
+  { title: 'مانده استفاده شده / فعال حد سالانه', key: 'annualLimitAmountRemain', sortable: true, editable: true, width: 250, type: 'number' },
+  { title: 'مانده استفاده شده / فعال موردی', key: 'caseLimitAmountRemain', sortable: true, editable: true, width: 250, type: 'number' },
+  { title: 'ضمانت نامه پرداخت شده', key: 'bgAmount', sortable: true, editable: true, width: 250, type: 'number' },
+  { title: 'مبلغ وثایق / سفته', key: 'promissoryNoteAmount', sortable: true, editable: true, width: 250, type: 'number' },
+  { title: 'مبلغ وثایق / غیر منقول', key: 'estateAmount', sortable: true, editable: true, width: 250, type: 'number' },
+  { title: 'مبلغ وثایق / سپرده', key: 'depositAmount', sortable: true, editable: true, width: 250, type: 'number' },
+  { title: 'مبلغ وثایق / سایر', key: 'otherCollateralAmount', sortable: true, editable: true, width: 250, type: 'number' },
 ]);
 </script>
 

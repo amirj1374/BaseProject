@@ -16,18 +16,18 @@ const approvalStore = useApprovalStore()
 //   isDialogActive.value = false;
 // });
 const header = ref([
-  { title: 'عنوان هر سطر', key: 'title', sortable: true, editable: false },
-  { title: 'مبلغ تصویبی حد سلانه', key: 'amountYear', sortable: true, editable: true },
-  { title: 'مبلغ تصویبی  موردی', key: 'amountItem', sortable: true, editable: true },
-  { title: 'مانده استفاده شده حد سالانه', key: 'remainYear', sortable: true, editable: true },
-  { title: 'مانده استفاده شده  موردی', key: 'remainItem', sortable: true, editable: true },
-  { title: 'اسناد رسیده تحویل شده', key: 'totalOfRecieved', sortable: true, editable: true },
-  { title: 'اسناد رسیده تحویل نشده', key: 'totalOfUnreceived', sortable: true, editable: true },
-  { title: 'بدهکاران بابت اعتبار اسنادی پرداخت شده', key: 'debtRemain', sortable: true, editable: true },
-  { title: 'مبلغ وثیقه/ سپرده', key: 'depositAmount', sortable: true, editable: true },
-  { title: 'مبلغ وثیقه/ غیر منقول', key: 'estateAmount', sortable: true, editable: true },
-  { title: 'مبلغ وثیقه/ سایر', key: 'otherCollateralAmount', sortable: true, editable: true },
-  { title: 'مبلغ وثیقه/ سفته', key: 'promissoryNoteAmount', sortable: true, editable: true },
+  { title: 'عنوان هر سطر', key: 'title', sortable: true, editable: false, width: 300 },
+  { title: 'مبلغ تصویبی حد سلانه', key: 'annualAmount', sortable: true, editable: true, width: 150, type: 'number' },
+  { title: 'مبلغ تصویبی  موردی', key: 'caseAmount', sortable: true, editable: true, width: 150, type: 'number' },
+  { title: 'مانده استفاده شده حد سالانه', key: 'annualRemain', sortable: true, editable: true, width: 150, type: 'number' },
+  { title: 'مانده استفاده شده  موردی', key: 'caseRemain', sortable: true, editable: true, width: 150, type: 'number' },
+  { title: 'اسناد رسیده تحویل شده', key: 'totalOfReceived', sortable: true, editable: true, width: 150, type: 'number' },
+  { title: 'اسناد رسیده تحویل نشده', key: 'totalOfUnreceived', sortable: true, editable: true, width: 150, type: 'number' },
+  { title: 'بدهکاران بابت اعتبار اسنادی پرداخت شده', key: 'debtRemain', sortable: true, editable: true, width: 150, type: 'number' },
+  { title: 'مبلغ وثیقه/ سپرده', key: 'depositAmount', sortable: true, editable: true, width: 150, type: 'number' },
+  { title: 'مبلغ وثیقه/ غیر منقول', key: 'estateAmount', sortable: true, editable: true, width: 150, type: 'number' },
+  { title: 'مبلغ وثیقه/ سایر', key: 'otherCollateralAmount', sortable: true, editable: true, width: 150, type: 'number' },
+  { title: 'مبلغ وثیقه/ سفته', key: 'promissoryNoteAmount', sortable: true, editable: true, width: 150, type: 'number' },
 ]);
 </script>
 

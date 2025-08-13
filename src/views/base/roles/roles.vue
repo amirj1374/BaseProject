@@ -45,6 +45,16 @@ const header = ref([
     }
   },
   {
+    title: 'حداقل تعداد کاربران',
+    key: 'minUserNumber',
+    sortable: true,
+  },
+  {
+    title: 'حداکثر تعداد کاربران',
+    key: 'maxUserNumber',
+    sortable: true,
+  },
+  {
     title: 'وضعیت',
     key: 'done',
     sortable: true,

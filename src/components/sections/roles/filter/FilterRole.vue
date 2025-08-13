@@ -86,6 +86,8 @@ const submitForm = async () => {
     const updatePayload = {
       id: id.value,
       lotusRoles: lotusRolesPayload,
+      minUserNumber: props.item.minUserNumber,
+      maxUserNumber: props.item.maxUserNumber,
     };
 
     // Call update API using the department-role resource
@@ -160,6 +162,26 @@ onMounted(async () => {
           :error-messages="error"
           clearable
           placeholder="نقش‌های لوتوسی را انتخاب کنید"
+        />
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12" md="3">
+        <v-text-field
+          v-model="props.item.minUserNumber"
+          label="حداقل تعداد کاربران"
+          variant="outlined"
+          type="number"
+          density="comfortable"
+        />
+      </v-col>
+      <v-col cols="12" md="3">
+        <v-text-field
+          v-model="props.item.maxUserNumber"
+          label="حداکثر تعداد کاربران"
+          variant="outlined"
+          type="number"
+          density="comfortable"
         />
       </v-col>
     </v-row>
