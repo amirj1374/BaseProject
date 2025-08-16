@@ -218,6 +218,14 @@
                   :rules="[percentRule]"
                 />
               </v-col>
+              <v-col cols="12" md="6">
+                  <v-checkbox
+                    :model-value="Boolean(formData.considerPreviousDebt)"
+                    @update:model-value="(value: any) => formData.considerPreviousDebt = Boolean(value)"
+                    label="بدهی قبلی لحاظ شود؟"
+                    density="comfortable"
+                  />
+                </v-col>
             </v-row>
             <v-row>
               <v-col cols="12">
@@ -299,7 +307,7 @@ import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import { api } from '@/services/api';
 import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { useApprovalStore } from '@/stores/approval';
-import type { CollateralDto, ContractType, FacilitiesRequest, Facility, FacilityDto } from '@/types/approval/approvalType';
+import type { CollateralDto, ContractType, FacilitiesRequest, FacilityDto } from '@/types/approval/approvalType';
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
 import { useCustomizerStore } from '@/stores/customizer';
@@ -358,7 +366,8 @@ const formData = reactive({
   preferentialRate: 0,
   advancePayment: '',
   contractType: null as ContractType | null,
-  facility: null as FacilityDto | null
+  facility: null as FacilityDto | null,
+  considerPreviousDebt: false
 });
 
 const headers = [
@@ -474,6 +483,7 @@ function editItem(item: FacilitiesRequest) {
   formData.facility = item.facility || null;
   formData.preferentialRate = item.preferentialRate;
   formData.advancePayment = item.advancePayment;
+  formData.considerPreviousDebt = item.considerPreviousDebt;
   dialog.value = true;
 }
 

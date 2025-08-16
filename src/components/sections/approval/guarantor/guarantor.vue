@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, watch } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { api } from '@/services/api';
 import type { FetchGuarantorPayload, GuarantorDto, SaveGeneralPayload, GuarantorInfoDTO } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
 import { useCustomizerStore } from '@/stores/customizer';
+import { IconRefresh } from '@tabler/icons-vue';
 const customizerStore = useCustomizerStore();
 const approvalStore = useApprovalStore();
 const dialog = ref(false);
@@ -299,7 +300,10 @@ defineExpose({ submitData });
           </v-data-table>
         </v-col>
         <v-dialog v-model="dialog" max-width="400">
-          <v-card prepend-icon="mdi-update" title="پیام سیستم">
+          <v-card title="پیام سیستم">
+            <template #prepend>
+              <IconRefresh size="24" />
+            </template>
             <v-card-text>
               <v-alert v-if="success" type="success" variant="tonal" class="my-4" timeout="10000"> کد رهگیری: {{ success }}</v-alert>
             </v-card-text>

@@ -21,8 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { DateConverter } from '@/utils/date-convertor';
+import { computed } from 'vue';
 
 interface Props {
   modelValue?: string | [string, string] | null; // Single date or range
@@ -58,14 +57,14 @@ const props = withDefaults(defineProps<Props>(), {
   clearable: true,
   rules: () => [],
   hideDetails: 'auto',
-  prependInnerIcon: 'mdi-calendar',
+  prependInnerIcon: '',
   appendInnerIcon: '',
   format: 'YYYY-MM-DD',
   displayFormat: 'jYYYY/jMM/jDD',
   minDate: '',
   maxDate: '',
   mode: 'single',
-  icon: 'mdi-calendar'
+  icon: ''
 });
 
 const emit = defineEmits<{

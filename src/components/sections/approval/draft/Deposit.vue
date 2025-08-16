@@ -1,8 +1,8 @@
 <template>
   <v-btn size="large" :base-color="valid ? 'lightsuccess' : 'lighterror'" @click="isDialogActive = true">
     حساب های سپرده
-    <AlertCircleIcon v-if="!valid" style="margin-right: 20px" size="20" />
-    <SquareRoundedCheckFilledIcon v-if="valid" style="margin-right: 20px" size="20" />
+    <IconAlertCircle v-if="!valid" style="margin-right: 20px" size="20" />
+    <IconCircleCheck v-if="valid" style="margin-right: 20px" size="20" />
   </v-btn>
     <v-dialog v-model="isDialogActive" max-width="full" min-height="full">
       <v-card title="حساب های سپرده">
@@ -55,6 +55,7 @@ const error = ref<string | null>(null);
 const snackbarColor = ref('success');
 const isDialogActive = ref(false);
 const valid = ref(false);
+import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-vue';
 
 // Selected items state
 const selectedItems = ref<DepositAccount[]>([]);
@@ -86,7 +87,7 @@ const handleSave = async () => {
     // Ensure we have a valid loanRequestId
     const loanRequestId = approvalStore.loanRequestId;
     if (!loanRequestId) {
-      throw new Error('شناسه درخواست وام یافت نشد');
+      new Error('شناسه درخواست وام یافت نشد');
     }
     
     // The API expects an array of deposit accounts (type definition is incorrect in service)

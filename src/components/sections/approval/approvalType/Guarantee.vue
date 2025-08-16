@@ -179,8 +179,6 @@
                   :rules="[required]"
                 ></v-text-field>
               </v-col>
-            </v-row>
-            <v-row>
               <v-col cols="12" md="4">
                 <MoneyInput
                   v-model="formData.amount"
@@ -193,6 +191,16 @@
                   :rules="[required]"
                 />
               </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="6">
+                  <v-checkbox
+                    :model-value="Boolean(formData.considerPreviousDebt)"
+                    @update:model-value="(value: any) => formData.considerPreviousDebt = Boolean(value)"
+                    label="بدهی قبلی لحاظ شود؟"
+                    density="comfortable"
+                  />
+                </v-col>
             </v-row>
             <v-row>
               <v-col cols="12">
@@ -266,7 +274,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, watch } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { IconTrash, IconX, IconPencil } from '@tabler/icons-vue';
 import { ApprovalTypeOptions } from '@/constants/enums/approval';
 import { useBaseStore } from '@/stores/base';
@@ -274,7 +282,7 @@ import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import { api } from '@/services/api';
 import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { useApprovalStore } from '@/stores/approval';
-import type { CollateralDto, ContractType, FacilitiesRequest, Facility, FacilityDto, GuaranteeRequest } from '@/types/approval/approvalType';
+import type { CollateralDto, ContractType, FacilityDto, GuaranteeRequest } from '@/types/approval/approvalType';
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
 
@@ -330,7 +338,8 @@ const formData = reactive({
   collateral: true,
   percentDeposit: '',
   contractType: null as ContractType | null,
-  facility: null as FacilityDto | null
+  facility: null as FacilityDto | null,
+  considerPreviousDebt: false
 });
 
 const headers = [
@@ -438,6 +447,7 @@ function editItem(item: GuaranteeRequest) {
   formData.contractType = item.contractType || null;
   formData.facility = item.facility || null;
   formData.percentDeposit = item.percentDeposit;
+  formData.considerPreviousDebt = item.considerPreviousDebt;
   dialog.value = true;
 }
 

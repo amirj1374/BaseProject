@@ -3,7 +3,8 @@ import { ref } from 'vue';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import { BooleanEnumOptions, RelationTypeOptions } from '@/types/enums/global';
+import { RelationTypeOptions } from '@/types/enums/global';
+import { IconX } from '@tabler/icons-vue';
 
 interface Document {
   nationalCode: string;
@@ -133,13 +134,13 @@ const handleFileUpload = async () => {
 
     if (response.status === 200) {
       // Update the document in the list
-      const updatedDocs = docs.value.map((d) => {
+
+      docs.value = docs.value.map((d) => {
         if (d.nationalCode === selectedDoc.value?.nationalCode && d.fileType === selectedDoc.value?.fileType) {
           return { ...d, file: response.data.fileUrl };
         }
         return d;
       });
-      docs.value = updatedDocs;
       showUploadDialog.value = false;
       selectedFile.value = null;
       // Refresh the data table
@@ -222,7 +223,7 @@ defineExpose({ submitData });
       <v-card-title class="d-flex justify-space-between align-center">
         <span>نمایش تصویر</span>
         <v-btn variant="text" @click="showImageDialog = false">
-          <v-icon>mdi-close</v-icon>
+          <IconX size="16" />
         </v-btn>
       </v-card-title>
       <v-card-text style="text-align: center" mini-variant>
@@ -238,14 +239,7 @@ defineExpose({ submitData });
             <v-alert type="error" variant="tonal">
               {{ error }}
             </v-alert>
-            <v-btn
-              color="primary"
-              variant="outlined"
-              @click="openInNewTab"
-              class="mt-2"
-            >
-              باز کردن در تب جدید
-            </v-btn>
+            <v-btn color="primary" variant="outlined" @click="openInNewTab" class="mt-2"> باز کردن در تب جدید </v-btn>
           </div>
         </div>
         <div v-else class="loading-container">

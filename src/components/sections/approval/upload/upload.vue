@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import { BooleanEnumOptions, RelationTypeOptions } from '@/types/enums/global';
+import { IconX } from '@tabler/icons-vue';
 
 interface Document {
   nationalCode: string;
@@ -31,33 +31,33 @@ const dataTableRef = ref();
 function fixUrl(url: string): string {
   // Handle different URL formats
   if (!url) return '';
-  
+
   // If it's already a full URL, return as is
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
-  
+
   // If it's a relative path, prepend the base URL
   if (url.startsWith('/')) {
     // You might need to adjust this base URL based on your API configuration
     return `${window.location.origin}${url}`;
   }
-  
+
   // For other cases, try to fix common issues
   return url.replace(/(https?:\/\/[^:]+:\d+)(?!\/)/, '$1/');
 }
 
 function openImageDialog(url: string) {
   console.log('Original URL:', url);
-  
+
   if (!url) {
     error.value = 'آدرس تصویر نامعتبر است';
     return;
   }
-  
+
   const fixedUrl = fixUrl(url);
   console.log('Fixed URL:', fixedUrl);
-  
+
   // Test if the image can be loaded
   const img = new Image();
   img.onload = () => {
@@ -65,7 +65,7 @@ function openImageDialog(url: string) {
     showImageDialog.value = true;
     error.value = null;
   };
-  
+
   img.onerror = () => {
     console.error('Failed to load image:', fixedUrl);
     error.value = 'تصویر قابل بارگذاری نیست. لطفا آدرس را بررسی کنید.';
@@ -73,7 +73,7 @@ function openImageDialog(url: string) {
     imageDialogUrl.value = fixedUrl;
     showImageDialog.value = true;
   };
-  
+
   img.src = fixedUrl;
 }
 
@@ -84,12 +84,6 @@ const headers = [
 const handleUpload = (doc: Document) => {
   selectedDoc.value = doc;
   showUploadDialog.value = true;
-};
-
-const handleView = (doc: Document) => {
-  if (doc.filePath) {
-    window.open(doc.filePath, '_blank');
-  }
 };
 
 const handleFileUpload = async () => {
@@ -107,13 +101,13 @@ const handleFileUpload = async () => {
 
     if (response.status === 200) {
       // Update the document in the list
-      const updatedDocs = docs.value.map((d) => {
+
+      docs.value = docs.value.map((d) => {
         if (d.nationalCode === selectedDoc.value?.nationalCode && d.fileType === selectedDoc.value?.fileType) {
           return { ...d, file: response.data.fileUrl };
         }
         return d;
       });
-      docs.value = updatedDocs;
       showUploadDialog.value = false;
       selectedFile.value = null;
       // Refresh the data table
@@ -204,7 +198,7 @@ defineExpose({ submitData });
       <v-card-title class="d-flex justify-space-between align-center">
         <span>آپلود مدرک</span>
         <v-btn variant="text" @click="showUploadDialog = false">
-          <v-icon>mdi-close</v-icon>
+          <IconX size="16" />
         </v-btn>
       </v-card-title>
       <v-card-text>
@@ -224,14 +218,14 @@ defineExpose({ submitData });
       <v-card-title class="d-flex justify-space-between align-center">
         <span>نمایش تصویر</span>
         <v-btn variant="text" @click="showImageDialog = false">
-          <v-icon>mdi-close</v-icon>
+          <IconX size="16" />
         </v-btn>
       </v-card-title>
       <v-card-text style="text-align: center" mini-variant>
         <div v-if="imageDialogUrl" class="image-container">
-          <img 
-            :src="imageDialogUrl" 
-            alt="تصویر" 
+          <img
+            :src="imageDialogUrl"
+            alt="تصویر"
             style="max-width: 100%; max-height: 400px; border-radius: 8px"
             @error="handleImageError"
             @load="handleImageLoad"
@@ -240,14 +234,7 @@ defineExpose({ submitData });
             <v-alert type="error" variant="tonal">
               {{ error }}
             </v-alert>
-            <v-btn 
-              color="primary" 
-              variant="outlined" 
-              @click="openInNewTab"
-              class="mt-2"
-            >
-              باز کردن در تب جدید
-            </v-btn>
+            <v-btn color="primary" variant="outlined" @click="openInNewTab" class="mt-2"> باز کردن در تب جدید </v-btn>
           </div>
         </div>
         <div v-else class="loading-container">

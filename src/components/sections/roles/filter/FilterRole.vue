@@ -3,6 +3,7 @@ import { api } from '@/services/api';
 import apiService from '@/services/apiService';
 import axiosInstance from '@/services/axiosInstance';
 import { onMounted, ref, watch } from 'vue';
+import { IconDeviceFloppy, IconX } from '@tabler/icons-vue';
 
 const emit = defineEmits(['close']);
 
@@ -108,7 +109,7 @@ const submitForm = async () => {
       // Close the dialog
       emit('close');
     } else {
-      throw new Error(response.statusText || 'خطا در بروزرسانی نقش');
+      new Error(response.statusText || 'خطا در بروزرسانی نقش');
     }
   } catch (err: any) {
     console.error('Error updating role:', err);
@@ -197,7 +198,7 @@ onMounted(async () => {
           :loading="loading"
           :disabled="!selectedLotusRoles || selectedLotusRoles.length === 0"
         >
-          <v-icon start>mdi-content-save</v-icon>
+          <IconDeviceFloppy size="16" class="mr-1" />
           بروزرسانی نقش
         </v-btn>
         <v-btn 
@@ -206,7 +207,7 @@ onMounted(async () => {
           @click="emit('close')"
           :disabled="loading"
         >
-          <v-icon start>mdi-close</v-icon>
+          <IconX size="16" class="mr-1" />
           انصراف
         </v-btn>
       </v-col>
@@ -222,10 +223,6 @@ onMounted(async () => {
 <style scoped>
 .gap-3 {
   gap: 12px;
-}
-
-:deep(.v-field--readonly) {
-  background-color: #f5f5f5;
 }
 
 :deep(.v-field--readonly .v-field__input) {

@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
+import { IconAlertCircle } from '@tabler/icons-vue';
 
 const approvalStore = useApprovalStore();
 const value = ref(0);
@@ -87,7 +88,7 @@ const getInquiry = async () => {
 
   try {
     if (!approvalStore.loanRequestId) {
-      throw new Error('شناسه درخواست نامعتبر است');
+      new Error('شناسه درخواست نامعتبر است');
     }
 
     // --- 1. استعلام چک
@@ -209,7 +210,7 @@ defineExpose({ submitData });
             </template>
             <template v-else>
               <div class="text-center text-error">
-                <v-icon color="error" class="mb-2">mdi-alert-circle</v-icon>
+                <IconAlertCircle color="error" class="mb-2" size="24" />
                 <div>خطا در دریافت اطلاعات</div>
               </div>
             </template>
@@ -244,7 +245,7 @@ defineExpose({ submitData });
             </template>
             <template v-else>
               <div class="text-center text-error">
-                <v-icon color="error" class="mb-2">mdi-alert-circle</v-icon>
+                <IconAlertCircle color="error" class="mb-2" size="24" />
                 <div>خطا در دریافت اطلاعات</div>
               </div>
             </template>
@@ -281,7 +282,7 @@ defineExpose({ submitData });
               </template>
               <template v-else>
                 <div class="text-center text-error">
-                  <v-icon color="error" class="mb-2">mdi-alert-circle</v-icon>
+                  <IconAlertCircle color="error" class="mb-2" size="24" />
                   <div>خطا در دریافت اطلاعات</div>
                 </div>
               </template>
@@ -319,7 +320,7 @@ defineExpose({ submitData });
             </template>
             <template v-else>
               <div class="text-center text-error">
-                <v-icon color="error" class="mb-2">mdi-alert-circle</v-icon>
+                <IconAlertCircle color="error" class="mb-2" size="24" />
                 <div>خطا در دریافت اطلاعات</div>
               </div>
             </template>

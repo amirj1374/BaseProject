@@ -32,7 +32,7 @@
           <v-col cols="12">
             <v-card class="mb-4">
               <v-card-title class="d-flex align-center">
-                <v-icon size="32" class="mr-3" color="primary">mdi-account-circle</v-icon>
+                <IconUserCircle size="32" class="mr-3" color="primary" />
               </v-card-title>
               <v-card-text>
                 <h2 class="text-h4 mb-2">{{ userInfo?.fullName || 'کاربر' }}</h2>
@@ -50,31 +50,21 @@
           <v-col cols="12" md="6">
             <v-card class="mb-4">
               <v-card-title class="d-flex align-center">
-                <!-- <v-icon class="mr-2" color="info">mdi-account-details</v-icon> -->
                 اطلاعات شخصی
               </v-card-title>
               <v-card-text>
                 <v-list>
                   <v-list-item>
-                    <template v-slot:prepend>
-                      <!-- <v-icon>mdi-account</v-icon> -->
-                    </template>
                     <v-list-item-title>نام کاربری</v-list-item-title>
                     <v-list-item-subtitle>{{ userInfo?.username || 'نامشخص' }}</v-list-item-subtitle>
                   </v-list-item>
                   
                   <v-list-item>
-                    <template v-slot:prepend>
-                      <!-- <v-icon>mdi-email</v-icon> -->
-                    </template>
                     <v-list-item-title>ایمیل</v-list-item-title>
                     <v-list-item-subtitle>{{ userInfo?.email || 'نامشخص' }}</v-list-item-subtitle>
                   </v-list-item>
                   
                   <v-list-item>
-                    <template v-slot:prepend>
-                      <!-- <v-icon>mdi-briefcase</v-icon> -->
-                    </template>
                     <v-list-item-title>موقعیت شغلی</v-list-item-title>
                     <v-list-item-subtitle>{{ userInfo?.position || 'نامشخص' }}</v-list-item-subtitle>
                   </v-list-item>
@@ -87,23 +77,16 @@
           <v-col cols="12" md="6">
             <v-card class="mb-4">
               <v-card-title class="d-flex align-center">
-                <!-- <v-icon class="mr-2" color="success">mdi-office-building</v-icon> -->
                 اطلاعات شعبه
               </v-card-title>
               <v-card-text>
                 <v-list>
                   <v-list-item>
-                    <template v-slot:prepend>
-                      <!-- <v-icon>mdi-map-marker</v-icon> -->
-                    </template>
                     <v-list-item-title>نام شعبه</v-list-item-title>
                     <v-list-item-subtitle>{{ userInfo?.branchName || 'نامشخص' }}</v-list-item-subtitle>
                   </v-list-item>
                   
                   <v-list-item>
-                    <template v-slot:prepend>
-                      <!-- <v-icon>mdi-numeric</v-icon> -->
-                    </template>
                     <v-list-item-title>کد شعبه</v-list-item-title>
                     <v-list-item-subtitle>{{ userInfo?.branchCode || 'نامشخص' }}</v-list-item-subtitle>
                   </v-list-item>
@@ -119,7 +102,6 @@
           <v-col cols="12" md="6">
             <v-card class="mb-4">
               <v-card-title class="d-flex align-center">
-                <!-- <v-icon class="mr-2" color="warning">mdi-shield-account</v-icon> -->
                 نقش های کاربری
               </v-card-title>
               <v-card-text>
@@ -143,7 +125,6 @@
           <v-col cols="12" md="6">
             <v-card class="mb-4">
               <v-card-title class="d-flex align-center">
-                <!-- <v-icon class="mr-2" color="error">mdi-shield-key</v-icon> -->
                 نقش های لوتوس
               </v-card-title>
               <v-card-text>
@@ -169,16 +150,12 @@
           <v-col cols="12">
             <v-card>
               <v-card-title class="d-flex align-center">
-                <!-- <v-icon class="mr-2" color="secondary">mdi-clock-outline</v-icon> -->
                 اطلاعات نشست
               </v-card-title>
               <v-card-text>
                 <v-row>
                   <v-col cols="12" md="4">
                     <v-list-item>
-                      <template v-slot:prepend>
-                        <!-- <v-icon>mdi-calendar</v-icon> -->
-                      </template>
                       <v-list-item-title>تاریخ ورود</v-list-item-title>
                       <v-list-item-subtitle>{{ formatDate(userInfo?.authTime) }}</v-list-item-subtitle>
                     </v-list-item>
@@ -186,9 +163,6 @@
                   
                   <v-col cols="12" md="4">
                     <v-list-item>
-                      <template v-slot:prepend>
-                        <!-- <v-icon>mdi-calendar-clock</v-icon> -->
-                      </template>
                       <v-list-item-title>تاریخ انقضا</v-list-item-title>
                       <v-list-item-subtitle>{{ formatDate(userInfo?.expiration) }}</v-list-item-subtitle>
                     </v-list-item>
@@ -196,9 +170,6 @@
                   
                   <v-col cols="12" md="4">
                     <v-list-item>
-                      <template v-slot:prepend>
-                        <!-- <v-icon>mdi-identifier</v-icon> -->
-                      </template>
                       <v-list-item-title>شناسه نشست</v-list-item-title>
                       <v-list-item-subtitle>{{ userInfo?.sessionState || 'نامشخص' }}</v-list-item-subtitle>
                     </v-list-item>
@@ -216,6 +187,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useCustomerInfoStore } from '@/stores/customerInfo';
+import { IconUserCircle } from '@tabler/icons-vue';
 
 const customerInfoStore = useCustomerInfoStore();
 

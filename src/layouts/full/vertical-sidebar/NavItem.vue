@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import IconSet from './IconSet.vue';
+import { IconChevronUp, IconChevronDown } from '@tabler/icons-vue';
 
 const props = defineProps({
   item: {
@@ -42,10 +43,8 @@ const IconComponent = computed(() => {
     </template>
     <v-list-item-title>{{ item.title }}</v-list-item-title>
     <template v-if="item.subItems" #append>
-      <v-icon
-        :icon="isActive ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-        :class="{ 'rotate-icon': isActive }"
-      />
+      <IconChevronUp v-if="isActive" :class="{ 'rotate-icon': isActive }" size="16" />
+      <IconChevronDown v-else size="16" />
     </template>
   </v-list-item>
 </template>

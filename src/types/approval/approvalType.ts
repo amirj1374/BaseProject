@@ -287,6 +287,7 @@ export interface FacilitiesRequest {
   advancePayment: string;
   contractType: ContractType;
   facility?: FacilityDto;
+  considerPreviousDebt: boolean;
 }
 
 export interface GuaranteeRequest {
@@ -302,6 +303,7 @@ export interface GuaranteeRequest {
   percentDeposit: string;
   contractType: ContractType;
   facility?: FacilityDto;
+  considerPreviousDebt: boolean;
 }
 
 export interface LcRequest {

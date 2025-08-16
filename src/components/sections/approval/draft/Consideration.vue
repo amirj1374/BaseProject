@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-vue';
 import { onMounted, ref } from 'vue';
 import { api } from '@/services/api';
 import type { ConsiderationPayload } from '@/types/approval/approvalType';
@@ -66,8 +67,8 @@ async function save() {
     const response = await api.approval.saveConsideration(payload);
 
     if (response.status === 200 && response.data) {
-      const raw = response.data;
       isDialogActive.value = false;
+      valid.value = true;
     } else {
       error.value = `خطا: ${response.statusText}`;
     }
@@ -88,8 +89,8 @@ const submitData = async () => {
 <template>
   <v-btn size="large" :base-color="valid ? 'lightsuccess' : 'lighterror'" @click="isDialogActive = true">
     ملاحظات
-    <AlertCircleIcon v-if="!valid" style="margin-right: 20px" size="20" />
-    <SquareRoundedCheckFilledIcon v-if="valid" style="margin-right: 20px" size="20" />
+    <IconAlertCircle v-if="!valid" style="margin-right: 20px" size="20"/>
+    <IconCircleCheck v-if="valid" style="margin-right: 20px" size="20" />
   </v-btn>
   <v-dialog min-width="full" min-height="full" v-model="isDialogActive">
     <v-card title="ملاحظات">
@@ -125,7 +126,6 @@ const submitData = async () => {
               v-model="formData.creditLimitDate"
               label="حد اعتباریه سالانه / سقف اعتباری مشتری در تاریخ"
               color="black"
-              icon="mdi-calendar"
               density="comfortable"
               hide-details="auto"
               variant="outlined"
@@ -140,23 +140,3 @@ const submitData = async () => {
     </v-card>
   </v-dialog>
 </template>
-
-<style scoped>
-.table-scroll {
-  overflow-x: auto;
-  max-width: 100%;
-}
-
-.error {
-  color: red;
-  margin-top: 0.5em;
-  /* color:goldenrod */
-}
-
-.radioBtnContainer {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-</style>

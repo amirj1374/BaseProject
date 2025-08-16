@@ -5,6 +5,7 @@ declare module '@tabler/icons-vue' {
   export const IconChevronUp: DefineComponent
   export const IconChevronDown: DefineComponent
   export const IconChevronRight: DefineComponent
+  export const IconChevronLeft: DefineComponent
   export const IconArchive: DefineComponent
   export const IconCopy: DefineComponent
   export const IconDownload: DefineComponent
@@ -38,4 +39,15 @@ declare module '@tabler/icons-vue' {
   export const IconMessageQuestion : DefineComponent
   export const IconShieldCancel  : DefineComponent
   export const IconSquareChevronRight : DefineComponent
+  export const IconMinus: DefineComponent
+  export const IconPlus: DefineComponent
+  export const IconPrinter: DefineComponent
+  export const IconMaximize: DefineComponent
+  export const IconMinimize: DefineComponent
+  export const IconFileText: DefineComponent
+  export const IconDeviceFloppy: DefineComponent
+  export const IconUserCircle: DefineComponent
+  export const IconCalendar: DefineComponent
+  export const IconCircleCheck: DefineComponent
+  export const IconRefresh: DefineComponent
 }

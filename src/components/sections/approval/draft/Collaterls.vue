@@ -4,6 +4,7 @@ import { api } from '@/services/api';
 import type { CollateralsInfoPayload } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
 import MoneyInput from '@/components/shared/MoneyInput.vue';
+import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-vue';
 
 const isDialogActive = ref(false);
 const loading = ref(false);
@@ -74,7 +75,37 @@ onMounted(async () => {
   try {
     const response = await api.approval.getCollateralsInfo(approvalStore.loanRequestId);
     if (response.status === 200 && response.data) {
-      formData.value = { ...formData.value, ...response.data };
+      const data = response.data;
+      // Ensure all numeric fields have proper default values
+      formData.value = {
+        ...formData.value,
+        ...data,
+        deposit: {
+          ...formData.value.deposit,
+          ...data.deposit,
+          blockedAmount: Number(data.deposit?.blockedAmount) || 0,
+          assignedAmount: Number(data.deposit?.assignedAmount) || 0
+        },
+        estate: {
+          ...formData.value.estate,
+          ...data.estate,
+          evaluatedPrice: Number(data.estate?.evaluatedPrice) || 0,
+          assignedAmount: Number(data.estate?.assignedAmount) || 0
+        },
+        sharesBond: {
+          ...formData.value.sharesBond,
+          ...data.sharesBond,
+          assignedAmount: Number(data.sharesBond?.assignedAmount) || 0
+        },
+        stock: {
+          ...formData.value.stock,
+          ...data.stock,
+          stockCount: Number(data.stock?.stockCount) || 0,
+          assignedAmount: Number(data.stock?.assignedAmount) || 0,
+          totalAmount: Number(data.stock?.totalAmount) || 0
+        },
+        otherCollateralAmount: Number(data.otherCollateralAmount) || 0
+      };
       validateForm();
     }
   } catch (err: any) {
@@ -186,8 +217,8 @@ const closeDialog = () => {
 <template>
   <v-btn size="large" :base-color="valid ? 'lightsuccess' : 'lighterror'" @click="isDialogActive = true">
     وثایق
-    <AlertCircleIcon v-if="!valid" style="margin-right: 20px" size="20" />
-    <SquareRoundedCheckFilledIcon v-if="valid" style="margin-right: 20px" size="20" />
+    <IconAlertCircle v-if="!valid" style="margin-right: 20px" size="20" />
+    <IconCircleCheck v-if="valid" style="margin-right: 20px" size="20" />
   </v-btn>
   
   <v-dialog v-model="isDialogActive" max-width="1200px" persistent>
@@ -459,22 +490,3 @@ const closeDialog = () => {
     </v-card>
   </v-dialog>
 </template>
-
-<style scoped>
-.table-scroll {
-  overflow-x: auto;
-  max-width: 100%;
-}
-
-.error {
-  color: red;
-  margin-top: 0.5em;
-}
-
-.radioBtnContainer {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-</style>

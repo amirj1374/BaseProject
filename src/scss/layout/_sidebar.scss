@@ -1,6 +1,6 @@
 /* This is for the logo */
 .leftSidebar {
-  border: 0px;
+  border: 0;
   box-shadow: none !important;
 
   .logo {
@@ -15,7 +15,7 @@
   overflow-x: hidden;
 
   .smallCap {
-    padding: 0px 0 0 4px !important;
+    padding: 0 0 0 4px !important;
     font-size: 0.875rem;
     font-weight: 500;
   }
@@ -42,10 +42,6 @@
 
     .v-list-item__append {
       font-size: 0.875rem;
-
-      .v-icon {
-        margin-inline-start: 13px;
-      }
     }
 
     .v-list-item-title {
@@ -67,9 +63,7 @@
       }
     }
 
-    .sidebarchip .v-icon {
-      margin-inline-start: -3px;
-    }
+
 
     .v-list-group {
       background-color: rgba(var(--v-theme-secondary), 0.02);
@@ -114,7 +108,7 @@
   }
 
   .leftPadding {
-    margin-left: 0px;
+    margin-left: 0;
   }
 }
 

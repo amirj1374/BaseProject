@@ -7,93 +7,103 @@
       </div>
       
       <div class="pdf-viewer-controls">
-        <!-- Zoom Controls -->
-        <div class="zoom-controls" v-if="showZoomControls">
-          <v-btn
-            icon="mdi-minus"
-            size="small"
-            variant="text"
-            @click="zoomOut"
-            :disabled="zoom <= minZoom"
-            title="Zoom Out"
-          />
-          <span class="zoom-level">{{ Math.round(zoom * 100) }}%</span>
-          <v-btn
-            icon="mdi-plus"
-            size="small"
-            variant="text"
-            @click="zoomIn"
-            :disabled="zoom >= maxZoom"
-            title="Zoom In"
-          />
-          <v-btn
-            icon="mdi-refresh"
-            size="small"
-            variant="text"
-            @click="resetZoom"
-            title="Reset Zoom"
-          />
-        </div>
+                 <!-- Zoom Controls -->
+         <div class="zoom-controls" v-if="showZoomControls">
+           <v-btn
+             size="small"
+             variant="text"
+             @click="zoomOut"
+             :disabled="zoom <= minZoom"
+             title="Zoom Out"
+           >
+             <IconMinus size="16" />
+           </v-btn>
+           <span class="zoom-level">{{ Math.round(zoom * 100) }}%</span>
+           <v-btn
+             size="small"
+             variant="text"
+             @click="zoomIn"
+             :disabled="zoom >= maxZoom"
+             title="Zoom In"
+           >
+             <IconPlus size="16" />
+           </v-btn>
+           <v-btn
+             size="small"
+             variant="text"
+             @click="resetZoom"
+             title="Reset Zoom"
+           >
+             <IconRefresh size="16" />
+           </v-btn>
+         </div>
 
-        <!-- Navigation Controls -->
-        <div class="navigation-controls" v-if="showNavigationControls">
-          <v-btn
-            icon="mdi-chevron-left"
-            size="small"
-            variant="text"
-            @click="previousPage"
-            :disabled="currentPage <= 1"
-            title="Previous Page"
-          />
-          <span class="page-info">
-            {{ currentPage }} / {{ totalPages }}
-          </span>
-          <v-btn
-            icon="mdi-chevron-right"
-            size="small"
-            variant="text"
-            @click="nextPage"
-            :disabled="currentPage >= totalPages"
-            title="Next Page"
-          />
-        </div>
+                 <!-- Navigation Controls -->
+         <div class="navigation-controls" v-if="showNavigationControls">
+           <v-btn
+             size="small"
+             variant="text"
+             @click="previousPage"
+             :disabled="currentPage <= 1"
+             title="Previous Page"
+           >
+             <IconChevronLeft size="16" />
+           </v-btn>
+           <span class="page-info">
+             {{ currentPage }} / {{ totalPages }}
+           </span>
+           <v-btn
+             size="small"
+             variant="text"
+             @click="nextPage"
+             :disabled="currentPage >= totalPages"
+             title="Next Page"
+           >
+             <IconChevronRight size="16" />
+           </v-btn>
+         </div>
 
-        <!-- Action Controls -->
-        <div class="action-controls">
-          <v-btn
-            v-if="showDownload"
-            icon="mdi-download"
-            size="small"
-            variant="text"
-            @click="downloadPdf"
-            :loading="downloading"
-            title="Download PDF"
-          />
-          <v-btn
-            v-if="showPrint"
-            icon="mdi-printer"
-            size="small"
-            variant="text"
-            @click="printPdf"
-            title="Print PDF"
-          />
-          <v-btn
-            v-if="showFullscreen"
-            :icon="isFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
-            size="small"
-            variant="text"
-            @click="toggleFullscreen"
-            :title="isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'"
-          />
-          <v-btn
-            v-if="showClose"
-            icon="mdi-close"
-            size="small"
-            variant="text"
-            @click="$emit('close')"
-            title="Close"
-          />
-        </div>
+                 <!-- Action Controls -->
+         <div class="action-controls">
+           <v-btn
+             v-if="showDownload"
+             size="small"
+             variant="text"
+             @click="downloadPdf"
+             :loading="downloading"
+             title="Download PDF"
+           >
+             <IconDownload size="16" />
+           </v-btn>
+           <v-btn
+             v-if="showPrint"
+             size="small"
+             variant="text"
+             @click="printPdf"
+             title="Print PDF"
+           >
+             <IconPrinter size="16" />
+           </v-btn>
+           <v-btn
+             v-if="showFullscreen"
+             size="small"
+             variant="text"
+             @click="toggleFullscreen"
+             :title="isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'"
+           >
+             <IconMaximize v-if="!isFullscreen" size="16" />
+             <IconMinimize v-else size="16" />
+           </v-btn>
+           <v-btn
+             v-if="showClose"
+             size="small"
+             variant="text"
+             @click="$emit('close')"
+             title="Close"
+           >
+             <IconX size="16" />
+           </v-btn>
+         </div>
       </div>
     </div>
 
@@ -109,10 +119,10 @@
         <p>{{ loadingText || 'Loading PDF...' }}</p>
       </div>
 
-      <!-- Error State -->
-      <div v-else-if="error" class="pdf-error">
-        <v-icon size="64" color="error">mdi-file-pdf-box</v-icon>
-        <h3>{{ errorTitle || 'Error Loading PDF' }}</h3>
+             <!-- Error State -->
+       <div v-else-if="error" class="pdf-error">
+         <IconFileText size="64" color="error" />
+         <h3>{{ errorTitle || 'Error Loading PDF' }}</h3>
         <p>{{ error }}</p>
         <v-btn
           color="primary"
@@ -129,16 +139,15 @@
           v-if="pdfUrl"
           :src="pdfUrl"
           :style="iframeStyle"
-          frameborder="0"
           @load="onPdfLoad"
           @error="onPdfError"
           :title="title || 'PDF Document'"
         />
         
-        <!-- Fallback for browsers that don't support PDF -->
-        <div v-else class="pdf-fallback">
-          <v-icon size="64" color="grey">mdi-file-pdf-box</v-icon>
-          <h3>PDF Preview Not Available</h3>
+                 <!-- Fallback for browsers that don't support PDF -->
+         <div v-else class="pdf-fallback">
+           <IconFileText size="64" color="grey" />
+           <h3>PDF Preview Not Available</h3>
           <p>Your browser does not support PDF preview.</p>
           <v-btn
             color="primary"
@@ -165,6 +174,19 @@
 
 <script lang="ts" setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { 
+  IconMinus, 
+  IconPlus, 
+  IconRefresh, 
+  IconChevronLeft, 
+  IconChevronRight, 
+  IconDownload, 
+  IconPrinter, 
+  IconMaximize, 
+  IconMinimize, 
+  IconX, 
+  IconFileText 
+} from '@tabler/icons-vue';
 
 // Props
 interface Props {
