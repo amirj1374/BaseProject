@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import { IconAlertCircle } from '@tabler/icons-vue';
+import { useRoute } from 'vue-router';
 
 const approvalStore = useApprovalStore();
 const value = ref(0);
@@ -17,12 +18,12 @@ const IndirectObligationData = ref<any>(null);
 const DirectObligationData = ref<any>(null);
 const sapData = ref<any>(null);
 const canSubmit = ref(false);
-
+const { id } = useRoute().params;
 // Individual retry functions for each inquiry type
 const retryChequeInquiry = async () => {
   isLoadingCheque.value = true;
   try {
-    const res = await api.approval.getInquiryCheque(approvalStore.loanRequestId);
+    const res = await api.approval.getInquiryCheque(approvalStore.loanRequestId, true);
     chequeData.value = res.data;
   } catch (error) {
     console.error('Error retrying cheque inquiry:', error);
@@ -34,7 +35,7 @@ const retryChequeInquiry = async () => {
 const retryIndirectInquiry = async () => {
   isLoadingIndirect.value = true;
   try {
-    const res = await api.approval.getIndirectObligation(approvalStore.loanRequestId);
+    const res = await api.approval.getIndirectObligation(approvalStore.loanRequestId, true);
     IndirectObligationData.value = res.data;
   } catch (error) {
     console.error('Error retrying indirect inquiry:', error);
@@ -46,7 +47,7 @@ const retryIndirectInquiry = async () => {
 const retryDirectInquiry = async () => {
   isLoadingDirect.value = true;
   try {
-    const res = await api.approval.getDirectObligation(approvalStore.loanRequestId);
+    const res = await api.approval.getDirectObligation(approvalStore.loanRequestId, true);
     DirectObligationData.value = res.data;
   } catch (error) {
     console.error('Error retrying direct inquiry:', error);
@@ -60,7 +61,8 @@ const retrySapInquiry = async () => {
   try {
     const res = await api.approval.getSapInquiry({
       loanRequestId: approvalStore.loanRequestId,
-      nationalCode: approvalStore.customerInfo.nationalCode
+      nationalCode: approvalStore.customerInfo.nationalCode,
+      retry: true
     });
     sapData.value = res.data;
   } catch (error) {
@@ -70,7 +72,7 @@ const retrySapInquiry = async () => {
   }
 };
 
-const getInquiry = async () => {
+const getInquiry = async (retry: boolean) => {
   responseStatus.value = 'idle';
   chequeData.value = null;
   IndirectObligationData.value = null;
@@ -93,7 +95,7 @@ const getInquiry = async () => {
 
     // --- 1. استعلام چک
     try {
-      const res = await api.approval.getInquiryCheque(approvalStore.loanRequestId);
+      const res = await api.approval.getInquiryCheque(approvalStore.loanRequestId, retry);
       chequeData.value = res.data;
     } catch {
       errorCount++;
@@ -103,7 +105,7 @@ const getInquiry = async () => {
 
     // --- 2. استعلام غیرمستقیم
     try {
-      const res = await api.approval.getIndirectObligation(approvalStore.loanRequestId);
+      const res = await api.approval.getIndirectObligation(approvalStore.loanRequestId, retry);
       IndirectObligationData.value = res.data;
     } catch {
       errorCount++;
@@ -113,7 +115,7 @@ const getInquiry = async () => {
 
     // --- 3. استعلام مستقیم
     try {
-      const res = await api.approval.getDirectObligation(approvalStore.loanRequestId);
+      const res = await api.approval.getDirectObligation(approvalStore.loanRequestId, retry);
       DirectObligationData.value = res.data;
     } catch {
       errorCount++;
@@ -125,7 +127,8 @@ const getInquiry = async () => {
     try {
       const res = await api.approval.getSapInquiry({
         loanRequestId: approvalStore.loanRequestId,
-        nationalCode: approvalStore.customerInfo.nationalCode
+        nationalCode: approvalStore.customerInfo.nationalCode,
+        retry: retry
       });
       sapData.value = res.data;
     } catch {
@@ -154,7 +157,12 @@ const getInquiry = async () => {
 };
 
 onMounted(() => {
-  getInquiry();
+  if(id) {
+    getInquiry(false);
+  }
+  else {
+    getInquiry(true);
+  }
 });
 
 const submitData = async () => {
@@ -178,6 +186,7 @@ defineExpose({ submitData });
         @click="getInquiry"
         :loading="isLoadingCheque || isLoadingIndirect || isLoadingDirect || isLoadingSap"
         class="me-2"
+        :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
       >
         🔄 استعلام مجدد همه
       </v-btn>
@@ -196,6 +205,7 @@ defineExpose({ submitData });
               variant="tonal"
               @click="retryDirectInquiry"
               :loading="isLoadingDirect"
+              :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
             >
               🔄 تلاش مجدد
             </v-btn>
@@ -230,6 +240,7 @@ defineExpose({ submitData });
               variant="tonal"
               @click="retryIndirectInquiry"
               :loading="isLoadingIndirect"
+              :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
             >
               🔄 تلاش مجدد
             </v-btn>
@@ -266,6 +277,7 @@ defineExpose({ submitData });
                 variant="tonal"
                 @click="retryChequeInquiry"
                 :loading="isLoadingCheque"
+                :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
               >
                 🔄 تلاش مجدد
               </v-btn>
@@ -304,6 +316,7 @@ defineExpose({ submitData });
               variant="tonal"
               @click="retrySapInquiry"
               :loading="isLoadingSap"
+              :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
             >
               🔄 تلاش مجدد
             </v-btn>

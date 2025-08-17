@@ -91,6 +91,7 @@ export interface FetchGuarantorPayload {
 export interface FetchInquiryPayload {
   nationalCode?: string | null;
   loanRequestId: string;
+  retry: boolean;
 }
 
 export interface GuarantorDto {

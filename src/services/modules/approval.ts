@@ -58,23 +58,23 @@ export default (axiosInstance: AxiosInstance) => ({
       timeout: 50000
     });
   },
-  getIndirectObligation(loanRequestId: string) {
+  getIndirectObligation(loanRequestId: string, retry: boolean) {
     return axiosInstance.get('/api/v1/general/indirect-obligation', {
-      params: { loanRequestId },
+      params: { loanRequestId, retry },
       timeout: 50000
     });
   },
 
-  getDirectObligation(loanRequestId: string) {
+  getDirectObligation(loanRequestId: string, retry: boolean) {
     return axiosInstance.get('/api/v1/general/direct-obligation', {
-      params: { loanRequestId },
+      params: { loanRequestId, retry },
       timeout: 50000
     });
   },
 
-  getInquiryCheque(loanRequestId: string) {
+  getInquiryCheque(loanRequestId: string, retry: boolean) {
     return axiosInstance.get('api/v1/inquery/inquiry-cheque', {
-      params: { loanRequestId },
+      params: { loanRequestId, retry },
       timeout: 50000
     });
   },
