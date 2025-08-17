@@ -2,6 +2,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
+import PdfViewer from '@/components/shared/PdfViewer.vue';
 const approvalStore = useApprovalStore()
 const pdfUrl = ref('');
 let pdfObjectUrl: string | null = null;
@@ -28,44 +29,55 @@ onBeforeUnmount(() => {
     URL.revokeObjectURL(pdfObjectUrl);
   }
 });
+
+// Event handlers for PdfViewer
+const onPdfLoad = (pdf: any) => {
+  console.log('PDF loaded successfully:', pdf);
+};
+
+const onPdfError = (error: string) => {
+  console.error('PDF loading error:', error);
+};
+
+const onPdfDownload = (url: string) => {
+  console.log('PDF download initiated:', url);
+};
+
+const onPdfPrint = (url: string) => {
+  console.log('PDF print initiated:', url);
+};
 </script>
 
 <template>
   <div class="approval-section">
-    <v-container fluid>
-      <v-row justify="center">
-        <v-col cols="12" md="12" lg="8">
-          <div class="iframe-container">
-            <iframe
-              v-if="pdfUrl"
-              :src="pdfUrl"
-              type="application/pdf"
-              class="pdf-object"
-            >
-              <p>Your browser does not support PDFs. Please download the PDF to view it.</p>
-            </iframe>
-            <div v-else class="d-flex justify-center align-center" style="height: 80%">
-              <v-progress-circular indeterminate />
-            </div>
+    <h4 class="group-title">نمایش فرم مصوبه</h4>
+    <form class="approval-form">
+      <v-row justify="center" class="mt-2">
+        <v-col cols="12" md="12" lg="12">
+          <PdfViewer
+            v-if="pdfUrl"
+            :src="pdfUrl"
+            title="نمایش فرم مصوبه"
+            height="80vh"
+            :showHeader="true"
+            :showFooter="true"
+            :showZoomControls="true"
+            :showNavigationControls="true"
+            :showDownload="true"
+            :showPrint="true"
+            :showFullscreen="true"
+            :showClose="false"
+            downloadFileName="1016-form.pdf"
+            @load="onPdfLoad"
+            @error="onPdfError"
+            @download="onPdfDownload"
+            @print="onPdfPrint"
+          />
+          <div v-else class="d-flex justify-center align-center" style="height: 80vh">
+            <v-progress-circular indeterminate />
           </div>
         </v-col>
       </v-row>
-    </v-container>
+    </form>
   </div>
 </template>
-
-<style scoped>
-.iframe-container {
-  overflow: hidden;
-}
-
-.pdf-object {
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-</style>

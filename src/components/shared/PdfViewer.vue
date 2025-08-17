@@ -16,7 +16,7 @@
              :disabled="zoom <= minZoom"
              title="Zoom Out"
            >
-             <IconMinus size="16" />
+             <IconMinus size="16" color="white" />
            </v-btn>
            <span class="zoom-level">{{ Math.round(zoom * 100) }}%</span>
            <v-btn
@@ -26,7 +26,7 @@
              :disabled="zoom >= maxZoom"
              title="Zoom In"
            >
-             <IconPlus size="16" />
+             <IconPlus size="16" color="white" />
            </v-btn>
            <v-btn
              size="small"
@@ -34,7 +34,7 @@
              @click="resetZoom"
              title="Reset Zoom"
            >
-             <IconRefresh size="16" />
+             <IconRefresh size="16" color="white" />
            </v-btn>
          </div>
 
@@ -47,7 +47,7 @@
              :disabled="currentPage <= 1"
              title="Previous Page"
            >
-             <IconChevronLeft size="16" />
+             <IconChevronLeft size="16" color="white" />
            </v-btn>
            <span class="page-info">
              {{ currentPage }} / {{ totalPages }}
@@ -59,7 +59,7 @@
              :disabled="currentPage >= totalPages"
              title="Next Page"
            >
-             <IconChevronRight size="16" />
+             <IconChevronRight size="16" color="white" />
            </v-btn>
          </div>
 
@@ -73,7 +73,7 @@
              :loading="downloading"
              title="Download PDF"
            >
-             <IconDownload size="16" />
+             <IconDownload size="16" color="white" />
            </v-btn>
            <v-btn
              v-if="showPrint"
@@ -82,7 +82,7 @@
              @click="printPdf"
              title="Print PDF"
            >
-             <IconPrinter size="16" />
+             <IconPrinter size="16" color="white" />
            </v-btn>
            <v-btn
              v-if="showFullscreen"
@@ -91,8 +91,8 @@
              @click="toggleFullscreen"
              :title="isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'"
            >
-             <IconMaximize v-if="!isFullscreen" size="16" />
-             <IconMinimize v-else size="16" />
+             <IconMaximize v-if="!isFullscreen" size="16" color="white" />
+             <IconMinimize v-else size="16" color="white" />
            </v-btn>
            <v-btn
              v-if="showClose"
@@ -101,7 +101,7 @@
              @click="$emit('close')"
              title="Close"
            >
-             <IconX size="16" />
+             <IconX size="16" color="white" />
            </v-btn>
          </div>
       </div>
@@ -494,7 +494,7 @@ defineExpose({
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: #f5f5f5;
+  background: #fff9f9;
   border-bottom: 1px solid #e0e0e0;
   
   .pdf-viewer-title {

@@ -5,7 +5,6 @@ import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import AppStepper from '@/components/common/AppStepper.vue';
 import { useBaseStore } from '@/stores/base';
-import type { LoanRequestDetail, GuarantorDto } from '@/types/approval/approvalType';
 
 const router = useRouter();
 const approvalStore = useApprovalStore();
@@ -149,7 +148,6 @@ const handleSubmit = async () => {
     if (currentStepComponent && typeof currentStepComponent.submitData === 'function') {
       await currentStepComponent.submitData();
     }
-    
     // Move to next step without calling submitData again
     if (stepper.value < totalSteps) {
       stepper.value++;
