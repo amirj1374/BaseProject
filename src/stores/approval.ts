@@ -108,6 +108,7 @@ export const useApprovalStore = defineStore('approvalStore', {
       this.guarantor = [] as GuarantorDto[]
       this.loanRequestId = ''
       this.trackingCode = ''
+      this.loanRequestStatus = ''
     },
 
     setGuarantor(payload: GuarantorDto[]) {

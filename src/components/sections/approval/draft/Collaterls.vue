@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 import { api } from '@/services/api';
 import type { CollateralsInfoPayload } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
@@ -70,46 +70,48 @@ const isFormComplete = computed(() => {
   );
 });
 
-// Load existing data
-onMounted(async () => {
-  try {
-    const response = await api.approval.getCollateralsInfo(approvalStore.loanRequestId);
-    if (response.status === 200 && response.data) {
-      const data = response.data;
-      // Ensure all numeric fields have proper default values
-      formData.value = {
-        ...formData.value,
-        ...data,
-        deposit: {
-          ...formData.value.deposit,
-          ...data.deposit,
-          blockedAmount: Number(data.deposit?.blockedAmount) || 0,
-          assignedAmount: Number(data.deposit?.assignedAmount) || 0
-        },
-        estate: {
-          ...formData.value.estate,
-          ...data.estate,
-          evaluatedPrice: Number(data.estate?.evaluatedPrice) || 0,
-          assignedAmount: Number(data.estate?.assignedAmount) || 0
-        },
-        sharesBond: {
-          ...formData.value.sharesBond,
-          ...data.sharesBond,
-          assignedAmount: Number(data.sharesBond?.assignedAmount) || 0
-        },
-        stock: {
-          ...formData.value.stock,
-          ...data.stock,
-          stockCount: Number(data.stock?.stockCount) || 0,
-          assignedAmount: Number(data.stock?.assignedAmount) || 0,
-          totalAmount: Number(data.stock?.totalAmount) || 0
-        },
-        otherCollateralAmount: Number(data.otherCollateralAmount) || 0
-      };
-      validateForm();
+// Load existing data when dialog opens
+watch(isDialogActive, async (newValue) => {
+  if (newValue === true) {
+    try {
+      const response = await api.approval.getCollateralsInfo(approvalStore.loanRequestId);
+      if (response.status === 200 && response.data) {
+        const data = response.data;
+        // Ensure all numeric fields have proper default values
+        formData.value = {
+          ...formData.value,
+          ...data,
+          deposit: {
+            ...formData.value.deposit,
+            ...data.deposit,
+            blockedAmount: Number(data.deposit?.blockedAmount) || 0,
+            assignedAmount: Number(data.deposit?.assignedAmount) || 0
+          },
+          estate: {
+            ...formData.value.estate,
+            ...data.estate,
+            evaluatedPrice: Number(data.estate?.evaluatedPrice) || 0,
+            assignedAmount: Number(data.estate?.assignedAmount) || 0
+          },
+          sharesBond: {
+            ...formData.value.sharesBond,
+            ...data.sharesBond,
+            assignedAmount: Number(data.sharesBond?.assignedAmount) || 0
+          },
+          stock: {
+            ...formData.value.stock,
+            ...data.stock,
+            stockCount: Number(data.stock?.stockCount) || 0,
+            assignedAmount: Number(data.stock?.assignedAmount) || 0,
+            totalAmount: Number(data.stock?.totalAmount) || 0
+          },
+          otherCollateralAmount: Number(data.otherCollateralAmount) || 0
+        };
+        validateForm();
+      }
+    } catch (err: any) {
+      console.error('Error loading collaterals data:', err);
     }
-  } catch (err: any) {
-    console.error('Error loading collaterals data:', err);
   }
 });
 
@@ -212,6 +214,11 @@ const closeDialog = () => {
   isDialogActive.value = false;
   resetForm();
 };
+
+// Check if editing is disabled
+const isEditingDisabled = computed(() => {
+  return approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION';
+});
 </script>
 
 <template>
@@ -236,6 +243,7 @@ const closeDialog = () => {
                     label="ملک / املاک متعلق به"
                     variant="outlined"
                     density="comfortable"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -244,6 +252,7 @@ const closeDialog = () => {
                     label="شماره پلاک ثبتی"
                     variant="outlined"
                     density="comfortable"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -252,6 +261,7 @@ const closeDialog = () => {
                     label="نوع کاربری"
                     variant="outlined"
                     density="comfortable"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -262,6 +272,7 @@ const closeDialog = () => {
                     variant="outlined"
                     density="comfortable"
                     suffix="میلیون ریال"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -270,6 +281,7 @@ const closeDialog = () => {
                     label="تاریخ ارزیابی"
                     variant="outlined"
                     density="comfortable"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -280,6 +292,7 @@ const closeDialog = () => {
                     variant="outlined"
                     density="comfortable"
                     suffix="میلیون ریال"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -288,6 +301,7 @@ const closeDialog = () => {
                     label="تاریخ ترهمین"
                     variant="outlined"
                     density="comfortable"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
               </v-row>
@@ -304,6 +318,7 @@ const closeDialog = () => {
                     label="متعلق به"
                     variant="outlined"
                     density="comfortable"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -314,6 +329,7 @@ const closeDialog = () => {
                     variant="outlined"
                     density="comfortable"
                     suffix="میلیون ریال"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -324,6 +340,7 @@ const closeDialog = () => {
                     variant="outlined"
                     density="comfortable"
                     suffix="میلیون ریال"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -332,6 +349,7 @@ const closeDialog = () => {
                     label="تاریخ توثیق"
                     variant="outlined"
                     density="comfortable"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
               </v-row>
@@ -350,6 +368,7 @@ const closeDialog = () => {
                     variant="outlined"
                     density="comfortable"
                     type="number"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -358,6 +377,7 @@ const closeDialog = () => {
                     label="متعلق به"
                     variant="outlined"
                     density="comfortable"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -368,6 +388,7 @@ const closeDialog = () => {
                     variant="outlined"
                     density="comfortable"
                     suffix="میلیون ریال"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -376,6 +397,7 @@ const closeDialog = () => {
                     label="تاریخ توثیق"
                     variant="outlined"
                     density="comfortable"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -386,6 +408,7 @@ const closeDialog = () => {
                     variant="outlined"
                     density="comfortable"
                     suffix="میلیون ریال"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -394,6 +417,7 @@ const closeDialog = () => {
                     label="سهام شرکت"
                     variant="outlined"
                     density="comfortable"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
            
@@ -416,6 +440,7 @@ const closeDialog = () => {
                     variant="outlined"
                     density="comfortable"
                     suffix="میلیون ریال"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
                 <v-col cols="12" md="6">
@@ -424,6 +449,7 @@ const closeDialog = () => {
                     @update:model-value="(value: any) => formData.sharesBond.parsianBankAgency = Boolean(value)"
                     label="سهام شرکت سایر بانک ها"
                     density="comfortable"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
               </v-row>
@@ -443,6 +469,7 @@ const closeDialog = () => {
                     variant="outlined"
                     density="comfortable"
                     suffix="میلیون ریال"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
               </v-row>
@@ -458,6 +485,7 @@ const closeDialog = () => {
                     label="توضیحات"
                     variant="outlined"
                     density="comfortable"
+                    :disabled="isEditingDisabled"
                   />
                 </v-col>
               </v-row>
@@ -478,6 +506,7 @@ const closeDialog = () => {
           text="ذخیره" 
           @click="submitData"
           :loading="loading"
+          :disabled="isEditingDisabled"
         />
         <v-btn 
           color="error" 

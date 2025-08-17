@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, defineAsyncComponent, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, defineAsyncComponent, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
@@ -17,7 +17,20 @@ const showSuccess = ref(false);
 const stepper = ref(1);
 const stepperRef = ref();
 
-const { id } = useRoute().params;
+const route = useRoute();
+const { id } = route.params;
+
+// Watch for id parameter changes
+watch(() => route.params.id, (newId, oldId) => {
+  if (!newId && oldId) {
+    // ID was removed from URL - reset store and go to first step
+    approvalStore.resetAll();
+    stepper.value = 1;
+    error.value = null;
+    showError.value = false;
+    showSuccess.value = false;
+  }
+}, { immediate: true });
 
 onMounted(async () => {
   // Only call API if id parameter exists

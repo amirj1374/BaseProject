@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-vue';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import { api } from '@/services/api';
 import type { ConsiderationPayload } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
@@ -24,28 +24,35 @@ const formData = ref({
   creditLimitDate: ''
 });
 
-onMounted(async () => {
-  const response = await api.approval.getConsideration(approvalStore.loanRequestId);
-  if (response.status === 200 && response.data) {
-    // Handle date conversion if creditLimitDate is a Date object or ISO string
-    const data = response.data;
-    if (data.creditLimitDate) {
-      console.log('Original creditLimitDate from server:', data.creditLimitDate);
-      // Keep the full ISO string format for consistency
-      let dateStr = data.creditLimitDate;
-      if (dateStr instanceof Date) {
-        dateStr = dateStr.toISOString();
-      } else if (typeof dateStr === 'string') {
-        // If it's already an ISO string, keep it as is
-        if (!dateStr.includes('T')) {
-          // If it's just YYYY-MM-DD, convert to full ISO
-          dateStr = dateStr + 'T00:00:00.000Z';
+// Load existing data when dialog opens
+watch(isDialogActive, async (newValue) => {
+  if (newValue === true) {
+    try {
+      const response = await api.approval.getConsideration(approvalStore.loanRequestId);
+      if (response.status === 200 && response.data) {
+        // Handle date conversion if creditLimitDate is a Date object or ISO string
+        const data = response.data;
+        if (data.creditLimitDate) {
+          console.log('Original creditLimitDate from server:', data.creditLimitDate);
+          // Keep the full ISO string format for consistency
+          let dateStr = data.creditLimitDate;
+          if (dateStr instanceof Date) {
+            dateStr = dateStr.toISOString();
+          } else if (typeof dateStr === 'string') {
+            // If it's already an ISO string, keep it as is
+            if (!dateStr.includes('T')) {
+              // If it's just YYYY-MM-DD, convert to full ISO
+              dateStr = dateStr + 'T00:00:00.000Z';
+            }
+          }
+          console.log('Processed creditLimitDate:', dateStr);
+          data.creditLimitDate = dateStr;
         }
+        formData.value = data;
       }
-      console.log('Processed creditLimitDate:', dateStr);
-      data.creditLimitDate = dateStr;
+    } catch (err: any) {
+      console.error('Error loading consideration data:', err);
     }
-    formData.value = data;
   }
 });
 
@@ -84,6 +91,11 @@ async function save() {
 const submitData = async () => {
   await save();
 };
+
+// Check if editing is disabled
+const isEditingDisabled = computed(() => {
+  return approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION';
+});
 </script>
 
 <template>
@@ -97,13 +109,13 @@ const submitData = async () => {
       <v-card-text>
         <v-row>
           <v-col cols="12" md="6">
-            <v-radio-group inline label="بازپرداخت تسهیلات دریافتی قبلی" v-model="formData.previousLoanAppropriate">
+            <v-radio-group inline label="بازپرداخت تسهیلات دریافتی قبلی" v-model="formData.previousLoanAppropriate" :disabled="isEditingDisabled">
               <v-radio label="مناسب نبوده است" :value="false"></v-radio>
               <v-radio label="مناسب بوده است" :value="true"></v-radio>
             </v-radio-group>
           </v-col>
           <v-col cols="12" md="6">
-            <v-radio-group inline label="سفته واخواستی" v-model="formData.havePromissoryNote">
+            <v-radio-group inline label="سفته واخواستی" v-model="formData.havePromissoryNote" :disabled="isEditingDisabled">
               <v-radio label="ندارد" :value="false"></v-radio>
               <v-radio label="دارد" :value="true"></v-radio>
             </v-radio-group>
@@ -119,6 +131,7 @@ const submitData = async () => {
               color="primary"
               label="پیشنهادات در جریان به مبلغ"
               suffix="قبلا ارسال ولیکن هنوز مصوبه دریافت نشده است"
+              :disabled="isEditingDisabled"
             />
           </v-col>
           <v-col cols="12" md="12">
@@ -129,12 +142,13 @@ const submitData = async () => {
               density="comfortable"
               hide-details="auto"
               variant="outlined"
+              :disabled="isEditingDisabled"
             />
           </v-col>
         </v-row>
       </v-card-text>
       <v-card-actions style="display: flex; justify-content: space-evenly; padding: 25px 10px">
-        <v-btn color="primary" variant="elevated" text="ذخیره" @click="submitData" />
+        <v-btn color="primary" variant="elevated" text="ذخیره" @click="submitData" :disabled="isEditingDisabled" />
         <v-btn color="error" variant="elevated" text="انصراف" @click="isDialogActive = false"></v-btn>
       </v-card-actions>
     </v-card>
