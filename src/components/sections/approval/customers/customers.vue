@@ -168,12 +168,10 @@ const submitData = async () => {
     return Promise.reject(error.value);
   }
   try {
+    // Only set customer info without the child component data
+    // Let the child components handle their own data loading
     approvalStore.setCustomerInfo({
-      ...firstItem,
-      facilities: facilitiesData.value[0] || {} as Facility,
-      guarantee: guaranteeData.value[0] || {} as Guarantee,
-      lc: lcData.value[0] || {} as Lc,
-      greenLicense: greenLicenseData.value[0] || {} as GreenLicense
+      ...firstItem
     });
     return Promise.resolve();
   } catch (err) {
@@ -249,7 +247,7 @@ defineExpose({ submitData });
             label="نوع جستجو"
             variant="outlined"
             density="comfortable"
-            :disabled="customizerStore.loading"
+            :disabled="customizerStore.loading || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
             @update:model-value="changePattern"
           />
         </v-col>
@@ -260,7 +258,7 @@ defineExpose({ submitData });
             variant="outlined"
             density="comfortable"
             :items="customerTypes"
-            :disabled="customizerStore.loading"
+            :disabled="customizerStore.loading || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
             @update:model-value="changeCustomerType"
           />
         </v-col>
@@ -270,7 +268,7 @@ defineExpose({ submitData });
             label="شماره مشتری"
             variant="outlined"
             density="comfortable"
-            :disabled="customizerStore.loading"
+            :disabled="customizerStore.loading || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
             :error-messages="errors.cif"
           />
         </v-col>
@@ -283,12 +281,12 @@ defineExpose({ submitData });
             type="number"
             v-digit-limit="11"
             :error-messages="errors.nationalCode"
-            :disabled="customizerStore.loading"
+            :disabled="customizerStore.loading || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
 
           />
         </v-col>
         <v-col cols="12" md="12" class="customer-search-btn">
-          <v-btn color="secondary" @click="search" type="button" :loading="customizerStore.loading" :disabled="customizerStore.loading"> جستجو</v-btn>
+          <v-btn color="secondary" @click="search" type="button" :loading="customizerStore.loading" :disabled="customizerStore.loading || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"> جستجو</v-btn>
         </v-col>
         <v-col cols="12" md="12">
           <v-data-table-virtual
@@ -304,7 +302,7 @@ defineExpose({ submitData });
             ref="dataTableRef"
           >
             <template #item.actions="{ item }">
-              <v-btn v-if="item && Object.keys(item).length > 0" variant="text" color="error" @click="deleteCustomer()">
+              <v-btn v-if="item && Object.keys(item).length > 0" variant="text" color="error" @click="deleteCustomer()" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'">
                 <IconTrash size="20" />
               </v-btn>
             </template>

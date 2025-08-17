@@ -30,6 +30,7 @@ onMounted(async () => {
         // Set basic info
         approvalStore.loanRequestId = res.data.loanRequestId?.toString() || '';
         approvalStore.trackingCode = res.data.trackingCode || '';
+        approvalStore.loanRequestStatus = res.data.loanRequestStatus || '';
         
         // Set customer info - API returns customerInfoDTO
         if (res.data.customerInfoDTO) {

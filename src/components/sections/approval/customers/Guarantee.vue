@@ -2,7 +2,8 @@
   <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">ضمانت نامه</h4>
-      <v-btn color="secondary" @click="openDialog" :disabled="loading || guarantee.length >= 1"> افزودن ضمانت نامه</v-btn>    </div>
+      <v-btn color="secondary" @click="openDialog" :disabled="loading || guarantee.length >= 1 || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"> افزودن ضمانت نامه</v-btn>    
+    </div>
 
     <v-data-table-virtual
       :headers="headers"
@@ -28,10 +29,10 @@
       </template>
       <template #item.actions="{ item }">
         <div class="action-buttons">
-          <v-btn size="small" variant="text" @click="editItem(item)">
+          <v-btn size="small" variant="text" @click="editItem(item)" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'">
             <IconPencil color="blue" size="20" />
           </v-btn>
-          <v-btn size="small" variant="text" @click="deleteItem(item)">
+          <v-btn size="small" variant="text" @click="deleteItem(item)" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'">
             <IconTrash color="red" size="20" />
           </v-btn>
         </div>
@@ -43,7 +44,7 @@
         <v-card-title class="d-flex align-center py-5 px-5">
           <span class="text-h3">{{ isEditing ? 'ویرایش ضمانت نامه' : 'افزودن ضمانت نامه' }}</span>
           <v-spacer></v-spacer>
-          <v-btn icon size="small" variant="text" @click="closeDialog">
+          <v-btn icon size="small" variant="text" @click="closeDialog" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'">
             <IconX color="red" size="20" />
           </v-btn>
         </v-card-title>
@@ -447,6 +448,16 @@ onMounted(() => {
     guarantee.value = [approvalStore.customerInfo.guarantee];
   }
 });
+
+// Watch for customer info changes to load existing data
+watch(() => approvalStore.customerInfo, (newCustomerInfo) => {
+  if (newCustomerInfo?.guarantee && !isObjectEmpty(newCustomerInfo.guarantee)) {
+    guarantee.value = [newCustomerInfo.guarantee];
+  } else {
+    // Reset guarantee when customer changes
+    guarantee.value = [];
+  }
+}, { immediate: true });
 
 watch(guarantee, (newVal) => {
   emit('update:guarantee', newVal);

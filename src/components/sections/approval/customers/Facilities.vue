@@ -2,7 +2,7 @@
   <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">تسهیلات</h4>
-      <v-btn color="secondary" @click="openDialog" :disabled="loading || facilities.length >= 1"> افزودن تسهیلات</v-btn>    </div>
+      <v-btn color="secondary" @click="openDialog" :disabled="loading || facilities.length >= 1 || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"> افزودن تسهیلات</v-btn>    </div>
 
     <v-data-table-virtual
       :headers="headers"
@@ -28,10 +28,10 @@
   </template>
       <template #item.actions="{ item }">
         <div class="action-buttons">
-          <v-btn size="small" variant="text" @click="editItem(item)">
+          <v-btn size="small" variant="text" @click="editItem(item)" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'">
             <IconPencil color="blue" size="20" />
           </v-btn>
-          <v-btn size="small" variant="text" @click="deleteItem(item)">
+          <v-btn size="small" variant="text" @click="deleteItem(item)" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'">
             <IconTrash color="red" size="20" />
           </v-btn>
         </div>
@@ -43,7 +43,7 @@
         <v-card-title class="d-flex align-center py-5 px-5">
           <span class="text-h3">{{ isEditing ? 'ویرایش تسهیلات' : 'افزودن تسهیلات' }}</span>
           <v-spacer></v-spacer>
-          <v-btn size="small" variant="text" @click="closeDialog">
+          <v-btn size="small" variant="text" @click="closeDialog" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'">
             <IconX color="red" size="20" />
           </v-btn>
         </v-card-title>
@@ -464,6 +464,16 @@ onMounted(() => {
     facilities.value = [approvalStore.customerInfo.facilities];
   }
 });
+
+// Watch for customer info changes to load existing data
+watch(() => approvalStore.customerInfo, (newCustomerInfo) => {
+  if (newCustomerInfo?.facilities && !isObjectEmpty(newCustomerInfo.facilities)) {
+    facilities.value = [newCustomerInfo.facilities];
+  } else {
+    // Reset facilities when customer changes
+    facilities.value = [];
+  }
+}, { immediate: true });
 
 watch(facilities, (newVal) => {
   emit('update:facilities', newVal);

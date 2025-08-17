@@ -2,7 +2,7 @@
     <div class="approval-section">
       <div class="section-header">
         <h4 class="section-title">تضامین جواز سبز</h4>
-        <v-btn color="secondary" @click="openDialog" :disabled="loading || greenLicense.length >= 1"> افزودن تضامین جواز سبز</v-btn>    </div>
+        <v-btn color="secondary" @click="openDialog" :disabled="loading || greenLicense.length >= 1 || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"> افزودن تضامین جواز سبز</v-btn>    </div>
   
       <v-data-table-virtual
         :headers="headers"
@@ -25,10 +25,10 @@
     </template>
         <template #item.actions="{ item }">
           <div class="action-buttons">
-            <v-btn size="small" variant="text" @click="editItem(item)">
+            <v-btn size="small" variant="text" @click="editItem(item)" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'">
               <IconPencil color="blue" size="20" />
             </v-btn>
-            <v-btn size="small" variant="text" @click="deleteItem(item)">
+            <v-btn size="small" variant="text" @click="deleteItem(item)" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'">
               <IconTrash color="red" size="20" />
             </v-btn>
           </div>
@@ -40,7 +40,7 @@
           <v-card-title class="d-flex align-center py-5 px-5">
             <span class="text-h3">{{ isEditing ? 'ویرایش تضامین جواز سبز' : 'افزودن تضامین جواز سبز' }}</span>
             <v-spacer></v-spacer>
-            <v-btn size="small" variant="text" @click="closeDialog">
+            <v-btn size="small" variant="text" @click="closeDialog" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'">
               <IconX color="red" size="20" />
             </v-btn>
           </v-card-title>
@@ -137,7 +137,7 @@
           </v-card-text>
           <v-card-actions>
             <div style="display: flex; justify-content: space-evenly; width: 100%;">
-              <v-btn color="primary" @click="saveGreenLicense" :loading="loading" :disabled="!isDirty">
+              <v-btn color="primary" @click="saveGreenLicense" :loading="loading" :disabled="!isDirty || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'">
               {{ 'ذخیره' }}
             </v-btn>
             <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
@@ -367,14 +367,24 @@
   return Object.values(obj).every((v) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0));
 }
   onMounted(() => {
-    if (approvalStore.customerInfo?.greenLicense && !isObjectEmpty(approvalStore.customerInfo.greenLicense)) {
-      greenLicense.value = [approvalStore.customerInfo.greenLicense];
-    }
-  });
-  
-  watch(greenLicense, (newVal) => {
-    emit('update:greenLicense', newVal);
-  }, { deep: true });
+  if (approvalStore.customerInfo?.greenLicense && !isObjectEmpty(approvalStore.customerInfo.greenLicense)) {
+    greenLicense.value = [approvalStore.customerInfo.greenLicense];
+  }
+});
+
+// Watch for customer info changes to load existing data
+watch(() => approvalStore.customerInfo, (newCustomerInfo) => {
+  if (newCustomerInfo?.greenLicense && !isObjectEmpty(newCustomerInfo.greenLicense)) {
+    greenLicense.value = [newCustomerInfo.greenLicense];
+  } else {
+    // Reset greenLicense when customer changes
+    greenLicense.value = [];
+  }
+}, { immediate: true });
+
+watch(greenLicense, (newVal) => {
+  emit('update:greenLicense', newVal);
+}, { deep: true });
   
   function deepEqual(a: any, b: any): boolean {
     return JSON.stringify(a) === JSON.stringify(b);

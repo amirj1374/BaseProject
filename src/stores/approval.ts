@@ -8,6 +8,7 @@ export const useApprovalStore = defineStore('approvalStore', {
     guarantor: [] as GuarantorDto[],
     loanRequestId: '' as string,
     trackingCode: '' as string,
+    loanRequestStatus: '' as string,
   }),
 
   actions: {
@@ -26,6 +27,10 @@ export const useApprovalStore = defineStore('approvalStore', {
     setTrackingCode(payload: string) {
       this.trackingCode = payload
     },
+
+    setLoanRequestStatus(payload: string) {
+      this.loanRequestStatus = payload
+    },  
 
     updateSummaryRequest(summary: SummaryDto) {
       if (!this.loanRequestDetailList) {

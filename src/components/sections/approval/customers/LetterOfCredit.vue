@@ -28,10 +28,10 @@
       </template>
       <template #item.actions="{ item }">
         <div class="action-buttons">
-          <v-btn size="small" variant="text" @click="editItem(item)">
+          <v-btn size="small" variant="text" @click="editItem(item)" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'">
             <IconPencil color="blue" size="20" />
           </v-btn>
-          <v-btn size="small" variant="text" @click="deleteItem(item)">
+          <v-btn size="small" variant="text" @click="deleteItem(item)" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'">
             <IconTrash color="red" size="20" />
           </v-btn>
         </div>
@@ -476,6 +476,16 @@ onMounted(() => {
     lc.value = [approvalStore.customerInfo.lc];
   }
 });
+
+// Watch for customer info changes to load existing data
+watch(() => approvalStore.customerInfo, (newCustomerInfo) => {
+  if (newCustomerInfo?.lc && !isObjectEmpty(newCustomerInfo.lc)) {
+    lc.value = [newCustomerInfo.lc];
+  } else {
+    // Reset lc when customer changes
+    lc.value = [];
+  }
+}, { immediate: true });
 
 watch(lc, (newVal) => {
   emit('update:lc', newVal);
