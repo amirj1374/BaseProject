@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useApprovalStore } from '@/stores/approval';
 import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-vue';
 
@@ -17,6 +17,16 @@ const isDialogActive = ref(false);
 const valid = ref<boolean | null>(false);
 const error = ref<string | null>(null);
 const approvalStore = useApprovalStore()
+
+// Check if editing is disabled
+const isEditingDisabled = computed(() => {
+  return approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION';
+});
+
+// Conditionally set actions based on status
+const tableActions = computed(() => {
+  return isEditingDisabled.value ? [] : ['edit' as const];
+});
 
 // const handleSave = handleSubmit((values) => {
 //   emit('save', {
@@ -59,7 +69,7 @@ const header = ref([
             <CustomDataTable
               :apiResource="`ocp`"
               :headers="header"
-              :actions="['edit']"
+              :actions="tableActions"
               :pagination="false"
               :queryParams="{ loanRequestId: approvalStore.loanRequestId }"
               :height="400"
@@ -68,8 +78,7 @@ const header = ref([
         </v-row>
       </v-card-text>
       <v-card-actions style="display: flex; justify-content: space-evenly">
-        <v-btn color="error" variant="elevated" text="انصراف" @click="isDialogActive = false"></v-btn>
-        <v-btn color="primary" variant="elevated" text="ذخیره" @click="isDialogActive = true" />
+        <v-btn color="error" variant="elevated" text="بستن" @click="isDialogActive = false"></v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

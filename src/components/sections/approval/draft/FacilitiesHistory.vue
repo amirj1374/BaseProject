@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import { useApprovalStore } from '@/stores/approval';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-vue';
 
 // Define props
@@ -17,6 +17,16 @@ const isDialogActive = ref(false);
 const valid = ref(false);
 const error = ref<string | null>(null);
 const approvalStore = useApprovalStore()
+
+// Check if editing is disabled
+const isEditingDisabled = computed(() => {
+  return approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION';
+});
+
+// Conditionally set actions based on status
+const tableActions = computed(() => {
+  return isEditingDisabled.value ? [] : ['edit' as const];
+});
 
 // const handleSave = handleSubmit((values) => {
 //   emit('save', {
@@ -60,7 +70,7 @@ const header = ref([
               :apiResource="`loan-info`"
               :queryParams="{ loanRequestId: approvalStore.loanRequestId }"
               :headers="header"
-              :actions="['edit']"
+              :actions="tableActions"
               :pagination="false"
               :height="400"
             />

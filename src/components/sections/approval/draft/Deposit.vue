@@ -10,7 +10,7 @@
           <CustomDataTable
             ref="dataTableRef"
             :headers="headers"
-            api-resource="deposit-info/get-all-deposit"
+            :apiResource="tableActions"
             :queryParams="{ loanRequestId: approvalStore.loanRequestId }"
             :auto-fetch="true"
             :show-pagination="true"
@@ -18,8 +18,8 @@
             :show-refresh-button="true"
             @selection-change="handleSelectionChange"
             @update:selected-items="handleSelectedItemsUpdate"
-            :selectable="true"
-            :multi-select="true"
+            :selectable="!isEditingDisabled"
+            :multi-select="!isEditingDisabled"
             :selectedItems="selectedItems"
             unique-key="accountNo"
             default-selected="isSelected"
@@ -27,7 +27,7 @@
         </v-card-text>
         <v-card-actions style="display: flex; justify-content: space-evenly">
           <v-btn color="error" variant="elevated" text="بستن" @click="isDialogActive = false"></v-btn>
-          <v-btn color="success" variant="elevated" text="ثبت" @click="handleSave"></v-btn>
+          <v-btn v-if="!isEditingDisabled" color="success" variant="elevated" text="ثبت" @click="handleSave"></v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -38,12 +38,13 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useRouteGuard } from '@/composables/useRouteGuard';
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import { useApprovalStore } from '@/stores/approval';
 import { api } from '@/services/api';
 import type { DepositAccount } from '@/types/approval/approvalType';
+import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-vue';
 
 const { requirePermission } = useRouteGuard();
 const approvalStore = useApprovalStore();
@@ -55,7 +56,16 @@ const error = ref<string | null>(null);
 const snackbarColor = ref('success');
 const isDialogActive = ref(false);
 const valid = ref(false);
-import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-vue';
+
+// Check if editing is disabled
+const isEditingDisabled = computed(() => {
+  return approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION';
+});
+
+// Conditionally set actions based on status
+const tableActions = computed(() => {
+  return isEditingDisabled.value ? 'deposit-info' : 'deposit-info/get-all-deposit' as const;
+});
 
 // Selected items state
 const selectedItems = ref<DepositAccount[]>([]);
