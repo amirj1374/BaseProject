@@ -225,7 +225,9 @@ defineExpose({ submitData, clearAllData });
             label="خلاصه درخواست"
             variant="outlined"
             density="comfortable"
-            :rules="[(v: any) => !!v || 'این فیلد الزامی است']" />
+            :rules="[(v: any) => !!v || 'این فیلد الزامی است']" 
+            :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
+            />
         </v-col>
         <!-- National Code Input -->
         <v-col cols="12" md="6">
@@ -235,6 +237,7 @@ defineExpose({ submitData, clearAllData });
             variant="outlined"
             density="comfortable"
             :rules="[(v: any) => !!v || 'این فیلد الزامی است']"
+            :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
           />
         </v-col>
         <v-col cols="12" md="12">
@@ -245,6 +248,7 @@ defineExpose({ submitData, clearAllData });
             density="comfortable"
             rows="2"
             :rules="[(v: any) => !!v || 'این فیلد الزامی است']"
+            :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
           />
         </v-col>
         <v-divider inset></v-divider>

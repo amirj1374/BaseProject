@@ -251,12 +251,12 @@ defineExpose({ submitData });
             label="نوع جستجو"
             variant="outlined"
             density="comfortable"
-            :disabled="customizerStore.loading"
+            :disabled="customizerStore.loading || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
             @update:model-value="changePattern"
           />
         </v-col>
         <v-col v-if="searchParam === 'cif'" cols="12" md="3">
-          <v-text-field v-model="formData.cif" label="شماره مشتری" variant="outlined" density="comfortable" />
+          <v-text-field v-model="formData.cif" label="شماره مشتری" variant="outlined" density="comfortable" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'" />
         </v-col>
         <v-col v-if="searchParam === 'nationalCode'" cols="12" md="3">
           <v-text-field
@@ -266,14 +266,15 @@ defineExpose({ submitData });
             density="comfortable"
             type="number"
             v-digit-limit="11"
+            :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
           />
         </v-col>
 
         <v-col v-if="hideInput" cols="12" md="4">
-          <v-text-field v-model="formData.GuarantorName" label="نام و نام خانوادگی" variant="outlined" density="comfortable" />
+          <v-text-field v-model="formData.GuarantorName" label="نام و نام خانوادگی" variant="outlined" density="comfortable" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'" />
         </v-col>
         <v-col cols="12" md="12" class="text-center">
-          <v-btn color="secondary" @click="addGuarantor" type="button" :loading="customizerStore.loading"> جستجو</v-btn>
+          <v-btn color="secondary" @click="addGuarantor" type="button" :loading="customizerStore.loading" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"> جستجو</v-btn>
         </v-col>
         <v-col cols="12" md="12">
           <v-data-table
@@ -295,7 +296,7 @@ defineExpose({ submitData });
               {{ new Date(item.createdAt).toLocaleDateString('fa-IR') }}
             </template>
             <template v-slot:item.actions="{ item }">
-              <v-btn size="x-small" @click="deleteGuarantor(item)"> ❌حذف</v-btn>
+              <v-btn size="x-small" @click="deleteGuarantor(item)" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"> ❌حذف</v-btn>
             </template>
           </v-data-table>
         </v-col>

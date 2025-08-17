@@ -2,7 +2,7 @@
   <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">اعتبار اسنادی</h4>
-      <v-btn color="secondary" @click="openDialog" :disabled="loading || lc.length >= 1"> افزودن اعتبار اسنادی</v-btn>    </div>
+      <v-btn color="secondary" @click="openDialog" :disabled="loading || lc.length >= 1 || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"> افزودن اعتبار اسنادی</v-btn>    </div>
 
     <v-data-table-virtual
       :headers="headers"
@@ -200,7 +200,7 @@
         </v-card-text>
         <v-card-actions>
           <div style="display: flex; justify-content: space-evenly; width: 100%;">
-            <v-btn color="primary" @click="saveLc" :loading="loading" :disabled="!isDirty">
+            <v-btn color="primary" @click="saveLc" :loading="loading" :disabled="!isDirty ">
               {{ 'ذخیره' }}
             </v-btn>
             <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
