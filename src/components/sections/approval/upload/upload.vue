@@ -86,6 +86,17 @@ const handleUpload = (doc: Document) => {
   showUploadDialog.value = true;
 };
 
+const handleEdit = (doc: Document) => {
+  // Prevent edit when status is CORRECT_FROM_REGION
+  if (approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION') {
+    error.value = 'امکان ویرایش در این مرحله وجود ندارد';
+    return;
+  }
+  
+  selectedDoc.value = doc;
+  showUploadDialog.value = true;
+};
+
 const handleFileUpload = async () => {
   if (!selectedFile.value || !selectedDoc.value) return;
 
@@ -125,21 +136,41 @@ const handleFileUpload = async () => {
 function getCustomButtons(doc: Document) {
   const hasImage = !!(doc.filePath && doc.filePath.match(/\.(jpg|jpeg|png)$/i));
   const hasFile = !!doc.filePath;
-  return [
-    {
-      label: hasFile ? 'ویرایش' : 'آپلود',
-      color: hasFile ? 'warning' : 'secondary',
-      onClick: () => handleUpload(doc)
+  const isEditDisabled = approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION';
+  
+  const buttons = [];
+  
+  // Upload button (always enabled)
+  if (!hasFile) {
+    buttons.push({
+      label: 'آپلود',
+      color: 'secondary',
+      onClick: () => handleUpload(doc),
+      disabled: false
+    });
+  }
+  
+  // Edit button (disabled when condition is met)
+  if (hasFile) {
+    buttons.push({
+      label: 'ویرایش',
+      color: 'secondary',
+      onClick: () => handleEdit(doc),
+      disabled: isEditDisabled
+    });
+  }
+  
+  // View image button
+  buttons.push({
+    label: 'مشاهده تصویر مدرک',
+    color: 'primary',
+    onClick: () => {
+      if (hasImage) openImageDialog(doc.filePath!);
     },
-    {
-      label: 'مشاهده تصویر مدرک',
-      color: 'primary',
-      onClick: () => {
-        if (hasImage) openImageDialog(doc.filePath!);
-      },
-      disabled: !hasImage
-    }
-  ];
+    disabled: !hasImage
+  });
+  
+  return buttons;
 }
 // Image handling functions
 const handleImageError = () => {

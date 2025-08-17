@@ -54,7 +54,8 @@ export default (axiosInstance: AxiosInstance) => ({
     });
   },
   getSapInquiry(payload: FetchInquiryPayload) {
-    return axiosInstance.post('/api/v1/sap-inquiry', payload, {
+    return axiosInstance.get('/api/v1/sap-inquiry', {
+      params: payload,
       timeout: 50000
     });
   },
