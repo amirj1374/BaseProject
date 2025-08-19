@@ -219,6 +219,21 @@ const closeDialog = () => {
 const isEditingDisabled = computed(() => {
   return approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION';
 });
+
+// Check if collaterals data exists on mount
+onMounted(async () => {
+  try {
+    const response = await api.approval.getCollateralsInfo(approvalStore.loanRequestId);
+    if (response.status === 200 && response.data) {
+      valid.value = true;
+    }
+  } catch (err) {
+    console.log('No existing collaterals data found');
+  }
+});
+
+// Expose validation state to parent
+defineExpose({ valid });
 </script>
 
 <template>

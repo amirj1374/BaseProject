@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-vue';
 import { ref, computed } from 'vue';
 import { useApprovalStore } from '@/stores/approval';
 
@@ -14,7 +13,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const isDialogActive = ref(false);
-const valid = ref<boolean | null>(false);
 const error = ref<string | null>(null);
 const approvalStore = useApprovalStore()
 
@@ -33,7 +31,6 @@ const tableActions = computed(() => {
 //     ...values
 //   });
 //   console.log(values);
-//   valid.value = true;
 //   isDialogActive.value = false;
 // });
 const header = ref([
@@ -51,10 +48,8 @@ const header = ref([
 </script>
 
 <template>
-  <v-btn size="large" :base-color="valid ? 'lightsuccess' : 'lighterror'" @click="isDialogActive = true">
+  <v-btn size="large" @click="isDialogActive = true">
     سوابق ضمانت نامه ریالی
-    <IconAlertCircle v-if="!valid" style="margin-right: 20px" size="20" />
-    <IconCircleCheck v-if="valid" style="margin-right: 20px" size="20" />
   </v-btn>
   <v-dialog max-width="full" min-height="full" v-model="isDialogActive">
     <v-card title="سوابق ضمانت نامه">

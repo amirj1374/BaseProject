@@ -96,6 +96,21 @@ const submitData = async () => {
 const isEditingDisabled = computed(() => {
   return approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION';
 });
+
+// Check if consideration data exists on mount
+onMounted(async () => {
+  try {
+    const response = await api.approval.getConsideration(approvalStore.loanRequestId);
+    if (response.status === 200 && response.data) {
+      valid.value = true;
+    }
+  } catch (err) {
+    console.log('No existing consideration data found');
+  }
+});
+
+// Expose validation state to parent
+defineExpose({ valid });
 </script>
 
 <template>

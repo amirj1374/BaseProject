@@ -157,12 +157,7 @@ const getInquiry = async (retry: boolean) => {
 };
 
 onMounted(() => {
-  if(id) {
     getInquiry(false);
-  }
-  else {
-    getInquiry(true);
-  }
 });
 
 const submitData = async () => {

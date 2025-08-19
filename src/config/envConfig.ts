@@ -6,7 +6,7 @@ const configs: Record<string, EnvConfig> = {
   dev: {
     PORT: 8585,
     NODE_ENV: "development",
-    API_URL: "http://192.168.31.170/back",
+    API_URL: "http://192.168.250.55/back",
     SITE_URL: "/",
   },
   prelive: {

@@ -26,8 +26,8 @@
           />
         </v-card-text>
         <v-card-actions style="display: flex; justify-content: space-evenly">
-          <v-btn color="error" variant="elevated" text="بستن" @click="isDialogActive = false"></v-btn>
           <v-btn v-if="!isEditingDisabled" color="success" variant="elevated" text="ثبت" @click="handleSave"></v-btn>
+          <v-btn color="error" variant="elevated" text="بستن" @click="isDialogActive = false"></v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -70,6 +70,20 @@ const tableActions = computed(() => {
 // Selected items state
 const selectedItems = ref<DepositAccount[]>([]);
 
+// Check if deposit data exists on mount
+onMounted(async () => {
+  try {
+    const response = await (api.approval as any).getDepositInfo(approvalStore.loanRequestId);
+    if (response.status === 200 && response.data && response.data.length > 0) {
+      // Check if any deposit account is selected
+      const hasSelectedAccounts = response.data.some((account: any) => account.isSelected === true);
+      valid.value = hasSelectedAccounts;
+    }
+  } catch (err) {
+    console.log('No existing deposit data found');
+  }
+});
+
 // handle selected changes
 const handleSelectionChange = (items: any[]) => {
   console.log('Selection changed:', items);
@@ -99,7 +113,7 @@ const handleSave = async () => {
     if (!loanRequestId) {
       new Error('شناسه درخواست وام یافت نشد');
     }
-    
+
     // The API expects an array of deposit accounts (type definition is incorrect in service)
     const res = await (api.approval as any).saveDeposit(loanRequestId as string, selectedItems.value);
     if (res.status === 200) {
@@ -121,6 +135,9 @@ const handleSave = async () => {
     showSnackbar.value = true;
   }
 };
+
+// Expose validation state to parent
+defineExpose({ valid });
 // Headers configuration with custom JSON support
 const headers = [
   {
