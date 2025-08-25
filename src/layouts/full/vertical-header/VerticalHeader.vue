@@ -92,9 +92,9 @@ function searchbox() {
     <v-menu :close-on-content-click="false">
       <template v-slot:activator="{ props }">
         <v-btn class="profileBtn text-primary" color="lightprimary" variant="flat" rounded="pill" v-bind="props">
-          <!-- <v-avatar size="30" class="ml-2 py-2">
-            <img src="@/assets/images/profile/user-round.svg" alt="Julia" />
-          </v-avatar> -->
+          <v-avatar size="30" class="ml-2 py-2">
+            <img src="@/assets/images/profile/profile-user-account-svgrepo-com.svg" alt="Julia" />
+          </v-avatar>
           <IconSettings stroke-width="1.5" />
         </v-btn>
       </template>
