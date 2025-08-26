@@ -51,6 +51,6 @@ export default (axiosInstance: AxiosInstance) => ({
   },
 
   getCreditApproval(cartableId: string) {
-    return axiosInstance.get(`/api/v1/credit-approvals/${cartableId}`);
+    return axiosInstance.get(`/api/v1/credit-approvals/summary/${cartableId}`);
   },
 });
