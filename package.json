@@ -3,17 +3,20 @@
   "version": "1.2.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
-    "build-stage": "vue-tsc --noEmit && vite build --base=/vue/free/stage/",
-    "build-prod": "vue-tsc --noEmit && vite build --base=/vue/free/",
+    "dev": "vite --mode dev",
+    "dev:prelive": "vite --mode prelive",
+    "dev:live": "vite --mode live",
+    "build": "vue-tsc --noEmit && vite build --mode dev",
+    "build:dev": "vue-tsc --noEmit && vite build --mode dev",
+    "build:prelive": "vue-tsc --noEmit && vite build --mode prelive",
+    "build:live": "vue-tsc --noEmit && vite build --mode live",
     "preview": "vite preview --port 5050 --host",
+    "preview:dev": "vite preview --port 5050 --host",
+    "preview:prelive": "vite preview --port 5050 --host",
+    "preview:live": "vite preview --port 5050 --host",
     "typecheck": "vue-tsc --noEmit",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-pattern .gitignore",
-    "serve": "vue-cli-service serve",
-    "build:dev": "vue-cli-service build --mode development",
-    "build:prelive": "vue-cli-service build --mode prelive",
-    "build:prod": "vue-cli-service build --mode production"
+    "serve": "vue-cli-service serve"
   },
   "dependencies": {
     "@mdi/js": "^7.4.47",

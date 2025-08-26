@@ -1,9 +1,9 @@
 import axios, { type AxiosInstance } from "axios";
-import envConfig from '@/config/envConfig';
+import { apiConfig } from '@/config/envConfig';
 
 const createAxiosInstance = (): AxiosInstance => {
   const instance = axios.create({
-    baseURL: envConfig.API_URL, // Use the API URL from the environment config
+    baseURL: apiConfig.baseURL,
     timeout: 5000, // Optional: Request timeout in milliseconds
     headers: {
       "Content-Type": "application/json",

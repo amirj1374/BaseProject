@@ -1,5 +1,8 @@
 import type { AxiosInstance } from "axios";
+import { apiConfig } from '@/config/envConfig';
+import axiosInstance from './axiosInstance';
 
+// Original apiService function (for backward compatibility)
 export default (axiosInstance: AxiosInstance, resource: string) => ({
   fetch(filters?: Record<string, any>) {
     return axiosInstance.get(`/api/v1/${resource}`, {
@@ -21,3 +24,49 @@ export default (axiosInstance: AxiosInstance, resource: string) => ({
     return axiosInstance.delete(`/api/v1/${resource}/${id}`);
   },
 });
+
+// Centralized API service (new feature)
+export const centralizedApiService = {
+  // Base URL getter
+  get baseURL() {
+    return apiConfig.baseURL;
+  },
+
+  // User endpoints
+  users: {
+    getAll: () => axiosInstance.get(`${apiConfig.baseURL}/users`),
+    authenticate: (credentials: { username: string; password: string }) => 
+      axiosInstance.post(`${apiConfig.baseURL}/users/authenticate`, credentials),
+    logout: () => axiosInstance.post(`${apiConfig.baseURL}/logout`),
+  },
+
+  // Cartable endpoints
+  cartable: {
+    getCreditApproval: (cartableId: string) => 
+      axiosInstance.get(`${apiConfig.baseURL}/cartable/credit-approval/${cartableId}`),
+    saveCreditApproval: (data: any) => 
+      axiosInstance.post(`${apiConfig.baseURL}/cartable/credit-approval`, data),
+  },
+
+  // Approval endpoints
+  approval: {
+    fetchCurrencies: () => axiosInstance.get(`${apiConfig.baseURL}/approval/currencies`),
+    getCollateral: () => axiosInstance.get(`${apiConfig.baseURL}/approval/collateral`),
+    getRegions: () => axiosInstance.get(`${apiConfig.baseURL}/approval/regions`),
+  },
+
+  // Person endpoints
+  person: {
+    getUserInfo: () => axiosInstance.get(`${apiConfig.baseURL}/person/user-info`),
+    getDepartmentsLevel: () => axiosInstance.get(`${apiConfig.baseURL}/person/departments-level`),
+  },
+
+  // Generic methods for other endpoints
+  get: (endpoint: string) => axiosInstance.get(endpoint),
+  post: (endpoint: string, data?: any) => axiosInstance.post(endpoint, data),
+  put: (endpoint: string, data?: any) => axiosInstance.put(endpoint, data),
+  delete: (endpoint: string) => axiosInstance.delete(endpoint),
+};
+
+// Export both for compatibility
+export { centralizedApiService as apiService };

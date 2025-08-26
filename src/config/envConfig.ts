@@ -1,28 +1,24 @@
 import type { EnvConfig } from '@/types/models/env';
 
-const currentEnv = import.meta.env.VITE_APP_ENV || "dev";
-
-const configs: Record<string, EnvConfig> = {
-  dev: {
-    PORT: 8585,
-    NODE_ENV: "development",
-    API_URL: "http://192.168.31.170/back",
-    SITE_URL: "/",
-  },
-  prelive: {
-    PORT: 8080,
-    NODE_ENV: "preLive",
-    API_URL: "/v1/service/loan",
-    SITE_URL: "/",
-  },
-  prod: {
-    PORT: 80,
-    NODE_ENV: "production",
-    API_URL: "/v1/service/loan",
-    SITE_URL: "/",
-  },
+// Simple configuration - just read from environment files
+const envConfig: EnvConfig = {
+  PORT: parseInt(import.meta.env.VITE_PORT),
+  BASE_URL: import.meta.env.VITE_BASE_URL,
+  APP_TITLE: import.meta.env.VITE_APP_TITLE,
+  ENVIRONMENT: import.meta.env.VITE_APP_ENV
 };
 
-const envConfig: EnvConfig = configs[currentEnv] || configs.dev;
+// Simple API configuration
+export const apiConfig = {
+  baseURL: envConfig.BASE_URL
+};
+
+// Show current environment info
+console.log('🌍 Current Environment:', {
+  environment: envConfig.ENVIRONMENT,
+  baseUrl: envConfig.BASE_URL,
+  appTitle: envConfig.APP_TITLE,
+  port: envConfig.PORT
+});
 
 export default envConfig;

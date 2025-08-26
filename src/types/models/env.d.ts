@@ -1,6 +1,6 @@
 export interface EnvConfig {
-  PORT?: number;
-  NODE_ENV: string;
-  API_URL: string;
-  SITE_URL: string;
+  PORT: number;
+  BASE_URL: string;
+  APP_TITLE: string;
+  ENVIRONMENT: string;
 }
