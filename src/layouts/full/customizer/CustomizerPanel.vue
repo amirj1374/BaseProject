@@ -1,67 +1,52 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { useCustomizerStore } from '@/stores/customizer';
+import { IconSun, IconMoon } from '@tabler/icons-vue';
 
 const customizer = useCustomizerStore();
 
 // Font Family options
 const fontFamily = ref(['vazir', 'yekanLight', 'iranSans', 'kalamehLight']);
 
-// Theme color palette options
+// Theme color palette options (light versions only)
 const colorPalette = ref([
   {
-    themeName: 'OrangeTheme',
-    primary: '#C77E23',
-    secondary: '#16595A',
-    dark: false
-  },
-  {
-    themeName: 'SteelTealGreen',
-    primary: '#607D8B',
-    secondary: '#009688',
-    dark: false
+    themeName: 'ModernTheme',
+    primary: '#6366f1',
+    secondary: '#8b5cf6'
   },
   {
     themeName: 'PurpleTheme',
     primary: '#1e88e5',
-    secondary: '#5e35b1',
-    dark: false
+    secondary: '#5e35b1'
   },
   {
-    themeName: 'RedTheme',
-    primary: '#203461',
-    secondary: '#EC407A',
-    dark: false
-  },
-  {
-    themeName: 'DarkOrangeTheme',
-    primary: '#C77E23',
-    secondary: '#16595A',
-    dark: true
-  },
-  {
-    themeName: 'DarkSteelTealGreen',
+    themeName: 'SteelTealGreen',
     primary: '#607D8B',
-    secondary: '#009688',
-    dark: true
+    secondary: '#009688'
   },
   {
-    themeName: 'DarkPurpleTheme',
-    primary: '#1e88e5',
-    secondary: '#5e35b1',
-    dark: true
+    themeName: 'OrangeTheme',
+    primary: '#C77E23',
+    secondary: '#16595A'
   },
   {
-    themeName: 'DarkRedTheme',
-    primary: '#203461',
-    secondary: '#EC407A',
-    dark: true
+    themeName: 'TealTheme',
+    primary: '#00695C',
+    secondary: '#4DB6AC'
   }
 ]);
 
-// Filtered themes for light and dark
-const lightThemes = colorPalette.value.filter(theme => !theme.dark);
-const darkThemes = colorPalette.value.filter(theme => theme.dark);
+// Function to get current theme name based on mode
+function getCurrentThemeName(baseThemeName: string): string {
+  return customizer.themeMode === 'dark' ? `Dark${baseThemeName}` : baseThemeName;
+}
+
+// Function to handle theme selection
+function selectTheme(baseThemeName: string) {
+  const themeName = getCurrentThemeName(baseThemeName);
+  customizer.SET_THEME(themeName);
+}
 
 // Initial tabs
 const tab = ref('style');
@@ -70,42 +55,62 @@ const tab = ref('style');
 watch(
   () => customizer.fontTheme,
   (newFont) => {
-    // Set the new font value in the CSS custom property (global font)
     document.documentElement.style.setProperty('--font-theme', newFont);
   },
-  { immediate: true } // This ensures that the font is set immediately on page load
+  { immediate: true }
 );
 
 // Watch for changes in the layoutType state from Pinia store
 watch(
   () => customizer.layoutType,
   (newLayout) => {
-    // Apply the new layout class to the body or root element
-    document.body.className = ''; // Reset classes
+    document.body.className = '';
     document.body.classList.add(`layout-${newLayout.toLowerCase()}`);
   },
   { immediate: true }
 );
 
+// Watch for changes in themeMode and automatically switch theme
+watch(
+  () => customizer.themeMode,
+  (newMode) => {
+    // Get the current base theme name (remove 'Dark' prefix if present)
+    const currentTheme = customizer.actTheme;
+    const baseThemeName = currentTheme.startsWith('Dark') ? currentTheme.replace('Dark', '') : currentTheme;
+    
+    // Apply the new theme based on the mode
+    const newThemeName = newMode === 'dark' ? `Dark${baseThemeName}` : baseThemeName;
+    customizer.SET_THEME(newThemeName);
+  }
+);
+
 function clearOption() {
   customizer.inputBg = false;
   customizer.fontTheme = 'vazir';
-  customizer.actTheme = 'DarkRedTheme';
-  customizer.layoutType = 'SideBar'; // Reset layout to default
+  customizer.actTheme = 'PurpleTheme';
+  customizer.layoutType = 'SideBar';
+  customizer.themeMode = 'light';
+}
+
+function getFontDisplayName(font: string): string {
+  const fontNames: Record<string, string> = {
+    vazir: 'بانک پارسیان',
+    yekanLight: 'بانک پارسیان',
+    iranSans: 'بانک پارسیان',
+    kalamehLight: 'بانک پارسیان'
+  };
+  return fontNames[font] || font;
 }
 </script>
 
-<!------------------------------------->
-<!-- Customizer -->
-<!------------------------------------->
 <template>
-  <v-navigation-drawer app temporary elevation="10" location="left" v-model="customizer.Customizer_drawer" width="350">
+  <v-navigation-drawer app temporary elevation="10" location="left" v-model="customizer.Customizer_drawer" width="400">
     <perfect-scrollbar style="height: 100%">
       <v-col cols="12" class="pa-0">
         <div class="pa-5 d-flex justify-space-between align-center">
-          <div class="text-subtitle-1 font-weight-medium">تم های شخصی</div>
+          <div class="text-h6 font-weight-medium">Theme Customization</div>
           <div>
-            <v-btn color="error" variant="outlined" size="small" class="ml-2" @click="clearOption"> بازنشانی</v-btn>
+            <v-btn color="error" variant="outlined" size="small" class="ml-2" @click="clearOption">Reset</v-btn>
             <v-btn
               variant="text"
               color="lightText"
@@ -116,90 +121,141 @@ function clearOption() {
           </div>
         </div>
       </v-col>
+
       <v-card>
         <v-tabs v-model="tab" bg-color="lightprimary" align-tabs="center" fixed-tabs color="primary">
-          <v-tab prepend-icon="$text" value="font"></v-tab>
-          <v-tab prepend-icon="$style" value="style"></v-tab>
+          <v-tab prepend-icon="mdi-palette" value="style">Style</v-tab>
+          <v-tab prepend-icon="mdi-format-font" value="font">Font</v-tab>
         </v-tabs>
 
         <v-card-text>
           <v-tabs-window v-model="tab">
             <v-tabs-window-item value="style">
-              <div>
-                <v-row class="ma-0">
-                  <v-col cols="12" class="pa-0">
-                    <!------------------------------------->
-                    <!-- Light Themes -->
-                    <!------------------------------------->
-                    <v-card-item class="py-5">
-                      <v-card-title class="text-subtitle-1 font-weight-medium mb-4">تم های روشن</v-card-title>
-                      <v-card-text>
-                        <div class="custom-theme-colors">
-                          <div
-                            v-for="color in lightThemes"
-                            :key="color.themeName"
-                            :class="['color-option', { selected: customizer.actTheme === color.themeName }]"
-                            :style="{background: `conic-gradient(${color.primary} 50%, ${color.secondary} 50%)` }"
-                            @click="customizer.SET_THEME(color.themeName)"
-                          ></div>
+              <div class="pa-4">
+                <!-- THEME MODE -->
+                <div class="mb-6">
+                  <h6 class="text-subtitle-1 font-weight-medium mb-3">THEME MODE</h6>
+                  <div class="theme-toggle-container">
+                    <div 
+                      class="theme-toggle"
+                      :class="{ 'dark-mode': customizer.themeMode === 'dark' }"
+                      @click="customizer.SET_THEME_MODE(customizer.themeMode === 'light' ? 'dark' : 'light')"
+                    >
+                      <div class="toggle-slider">
+                        <div class="toggle-icon sun-icon">
+                          <IconSun v-if="customizer.themeMode === 'light'" size="24" stroke-width="2" />
+                          <IconMoon v-else size="24" stroke-width="2" color="white" background-color="black"/>
                         </div>
-                      </v-card-text>
-                    </v-card-item>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-                    <!------------------------------------->
-                    <v-divider></v-divider>
-                    <!------------------------------------->
-                    <!-- Dark Themes -->
-                    <!------------------------------------->
-                    <v-card-item class="py-5">
-                      <v-card-title class="text-subtitle-1 font-weight-medium mb-4">تم های تیره</v-card-title>
-                      <v-card-text>
-                        <div class="custom-theme-colors">
-                          <div
-                            v-for="color in darkThemes"
-                            :key="color.themeName"
-                            :class="['color-option', { selected: customizer.actTheme === color.themeName }]"
-                            :style="{background: `conic-gradient(${color.primary} 50%, ${color.secondary} 50%)` }"
-                            @click="customizer.SET_THEME(color.themeName)"
-                          ></div>
-                        </div>
-                      </v-card-text>
-                    </v-card-item>
-                  </v-col>
-                </v-row>
+                <!-- PRESET COLOR -->
+                <div class="mb-6">
+                  <h6 class="text-subtitle-1 font-weight-medium mb-3">PRESET COLOR</h6>
+                  <div class="custom-theme-colors">
+                    <div
+                      v-for="color in colorPalette"
+                      :key="color.themeName"
+                      :class="['color-option', { selected: customizer.actTheme === getCurrentThemeName(color.themeName) }]"
+                      :style="{ background: `conic-gradient(${color.primary} 50%, ${color.secondary} 50%)` }"
+                      @click="selectTheme(color.themeName)"
+                    >
+                    </div>
+                  </div>
+                </div>
+
+                <!-- INPUT BACKGROUND -->
+                <div class="mb-6">
+                  <h6 class="text-subtitle-1 font-weight-medium mb-3">INPUT BACKGROUND</h6>
+                  <div class="d-flex gap-2">
+                    <v-btn
+                      variant="outlined"
+                      :color="!customizer.inputBg ? 'primary' : 'grey'"
+                      @click="customizer.inputBg = false"
+                      class="flex-1"
+                    >
+                      <div class="input-preview bg-white border"></div>
+                      Default
+                    </v-btn>
+                    <v-btn
+                      variant="outlined"
+                      :color="customizer.inputBg ? 'primary' : 'grey'"
+                      @click="customizer.inputBg = true"
+                      class="flex-1"
+                    >
+                      <div class="input-preview bg-grey-lighten-4 border"></div>
+                      Filled
+                    </v-btn>
+                  </div>
+                </div>
+
+                <!-- LAYOUT TYPE -->
+                <div class="mb-6">
+                  <h6 class="text-subtitle-1 font-weight-medium mb-3">LAYOUT TYPE</h6>
+                  <div class="d-flex gap-2">
+                    <v-btn
+                      variant="outlined"
+                      :color="customizer.layoutType === 'SideBar' ? 'primary' : 'grey'"
+                      @click="customizer.SET_LAYOUT_TYPE('SideBar')"
+                      class="flex-1"
+                    >
+                      <div class="layout-preview sidebar-layout"></div>
+                      Sidebar
+                    </v-btn>
+                    <v-btn
+                      variant="outlined"
+                      :color="customizer.layoutType === 'NavBar' ? 'primary' : 'grey'"
+                      @click="customizer.SET_LAYOUT_TYPE('NavBar')"
+                      class="flex-1"
+                    >
+                      <div class="layout-preview navbar-layout"></div>
+                      Navbar
+                    </v-btn>
+                  </div>
+                </div>
+
+                <!-- SIDEBAR DRAWER -->
+                <div class="mb-6">
+                  <h6 class="text-subtitle-1 font-weight-medium mb-3">SIDEBAR DRAWER</h6>
+                  <div class="d-flex gap-2">
+                    <v-btn
+                      variant="outlined"
+                      :color="!customizer.Sidebar_drawer ? 'primary' : 'grey'"
+                      @click="customizer.SET_SIDEBAR_DRAWER()"
+                      class="flex-1"
+                    >
+                      <div class="sidebar-preview closed"></div>
+                    </v-btn>
+                    <v-btn
+                      variant="outlined"
+                      :color="customizer.Sidebar_drawer ? 'primary' : 'grey'"
+                      @click="customizer.SET_SIDEBAR_DRAWER()"
+                      class="flex-1"
+                    >
+                      <div class="sidebar-preview open"></div>
+                    </v-btn>
+                  </div>
+                </div>
               </div>
             </v-tabs-window-item>
 
             <v-tabs-window-item value="font">
-              <div>
-                <v-row class="ma-0">
-                  <v-col cols="12" class="pa-0">
-                    <!------------------------------------->
-                    <!-- Font Family -->
-                    <!------------------------------------->
-                    <v-card-item class="py-5">
-                      <v-card-title class="text-subtitle-1 font-weight-medium mb-4">انتخاب فونت</v-card-title>
-                      <v-card-text class="pa-0">
-                        <v-radio-group v-model="customizer.fontTheme" hide-details class="custom-font">
-                          <v-radio
-                            v-for="font in fontFamily"
-                            :key="font"
-                            label="بانک پارسیان"
-                            :value="font"
-                            color="primary"
-                            class="mb-5"
-                            :style="{ fontFamily: font }"
-                            @click="customizer.SET_FONT(font)"
-                          ></v-radio>
-                        </v-radio-group>
-                      </v-card-text>
-                    </v-card-item>
-                    <!------------------------------------->
-                    <!-- end Font Family -->
-                    <!------------------------------------->
-                    <v-divider></v-divider>
-                  </v-col>
-                </v-row>
+              <div class="pa-4">
+                <h6 class="text-subtitle-1 font-weight-medium mb-4">FONT SELECTION</h6>
+                <v-radio-group v-model="customizer.fontTheme" hide-details class="custom-font">
+                  <v-radio
+                    v-for="font in fontFamily"
+                    :key="font"
+                    :label="getFontDisplayName(font)"
+                    :value="font"
+                    color="primary"
+                    class="mb-4 font-option"
+                    :style="{ fontFamily: font }"
+                    @click="customizer.SET_FONT(font)"
+                  ></v-radio>
+                </v-radio-group>
               </div>
             </v-tabs-window-item>
           </v-tabs-window>
@@ -209,29 +265,37 @@ function clearOption() {
   </v-navigation-drawer>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .custom-theme-colors {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   justify-content: start;
 
   .color-option {
-    width: 60px;
-    height: 60px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
     cursor: pointer;
     position: relative;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.3s ease;
     transform: rotate(45deg);
+    border: 2px solid beige;
 
     &:hover {
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       transform: scale(1.1) rotate(45deg);
+
+      .color-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
     }
 
     &.selected {
-      border: 3px solid var(--v-theme-primary); // Active color border
+      border: 3px solid var(--v-theme-primary);
+      box-shadow: 0 0 0 3px rgba(var(--v-theme-primary), 0.3);
 
       &::after {
         content: '✔';
@@ -240,72 +304,259 @@ function clearOption() {
         left: 50%;
         transform: translate(-50%, -50%) rotate(-45deg);
         color: white;
-        font-size: 20px;
+        font-size: 18px;
         font-weight: bold;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
       }
+    }
+
+    .color-tooltip {
+      position: absolute;
+      bottom: -45px;
+      left: 50%;
+      transform: translateX(-50%) translateY(5px) rotate(-45deg);
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
   }
 }
 
-.layout-toggle {
-  display: flex;
-  align-items: center;
+.font-option {
+  .v-selection-control__wrapper {
+    padding: 10px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: rgba(var(--v-theme-primary), 0.1);
+    }
+  }
+
+  .v-selection-control--dirty .v-selection-control__wrapper {
+    background-color: rgba(var(--v-theme-primary), 0.15);
+  }
 }
 
-.radio-group {
-  gap: 10px; // Space between toggle buttons
+// Input Background Preview
+.input-preview {
+  width: 20px;
+  height: 12px;
+  border-radius: 2px;
+  margin: 0 auto;
 }
 
-.radio-btn {
-  margin: 0;
-  padding: 0;
-}
-
-// Custom Layout Button
-.custom-layout {
-  width: 70px;
-  height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px dashed #1976d2;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
+// Layout Preview
+.layout-preview {
+  width: 30px;
+  height: 20px;
+  border: 2px solid #ccc;
+  border-radius: 3px;
+  margin: 0 auto;
   position: relative;
+
+  &.boxed-layout::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    border: 1px solid #ccc;
+    border-radius: 1px;
+  }
+
+  &.full-layout::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    background: #1976d2;
+    border-radius: 1px;
+  }
 }
 
-// Sidebar Layout (Left Sidebar)
-.sidebar-layout::before {
-  content: "";
-  width: 40%;
-  height: 80%;
-  background-color: #1976d2;
-  position: absolute;
-  right: 5px;
-  top: 50%;
-  transform: translateY(-50%);
-  border-radius: 5px;
+// RTL Preview
+.rtl-preview {
+  width: 30px;
+  height: 20px;
+  border: 2px dashed #ccc;
+  border-radius: 3px;
+  margin: 0 auto;
+  position: relative;
+
+  &.ltr::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 4px;
+    height: 16px;
+    background: #1976d2;
+    border-radius: 1px;
+  }
+
+  &.rtl::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 4px;
+    height: 16px;
+    background: #1976d2;
+    border-radius: 1px;
+  }
 }
 
-// Navbar Layout (Top Navbar)
-.navbar-layout::before {
-  content: "";
-  width: 80%;
-  height: 30%;
-  background-color: #1976d2;
-  position: absolute;
-  top: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 5px;
+// Sidebar Preview
+.sidebar-preview {
+  width: 30px;
+  height: 20px;
+  border: 2px dashed #ccc;
+  border-radius: 3px;
+  margin: 0 auto;
+  position: relative;
+
+  &.closed::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    background: transparent;
+  }
+
+  &.open::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 4px;
+    height: 16px;
+    background: #1976d2;
+    border-radius: 1px;
+  }
 }
 
-// Selected State
-.v-selection-control--dirty .custom-layout {
-  border: 3px solid #1976d2;
-  background-color: #ffffff;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+// Menu Preview
+.menu-preview {
+  width: 30px;
+  height: 20px;
+  border: 2px dashed #ccc;
+  border-radius: 3px;
+  margin: 0 auto;
+  position: relative;
+
+  &.vertical::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 4px;
+    height: 16px;
+    background: #1976d2;
+    border-radius: 1px;
+  }
+
+  &.horizontal::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 4px;
+    background: #1976d2;
+    border-radius: 1px;
+  }
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.gap-2 {
+  gap: 8px;
+}
+
+// Theme Toggle Styles
+.theme-toggle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.theme-toggle {
+  position: relative;
+  width: 100px;
+  height: 50px;
+  background: rgb(var(--v-theme-primary));
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  &.dark-mode {
+    background: #2c3e50;
+    
+    .toggle-slider {
+      transform: translateX(50px);
+      background: #000000;
+    }
+  }
+
+  .toggle-slider {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 40px;
+    height: 40px;
+    background: #ffffff;
+    border-radius: 50%;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .toggle-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #f39c12;
+  }
+}
+
+.mb-6 {
+  margin-bottom: 24px;
+}
+
+.mb-3 {
+  margin-bottom: 12px;
+}
+
+.mb-4 {
+  margin-bottom: 16px;
 }
 </style>

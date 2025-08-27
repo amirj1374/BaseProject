@@ -6,6 +6,7 @@ import Customizer from './customizer/CustomizerPanel.vue';
 import { useCustomizerStore } from '@/stores/customizer';
 import Loading from '@/components/Loading.vue';
 const customizer = useCustomizerStore();
+import { IconSettings } from '@tabler/icons-vue';
 
 </script>
 
@@ -23,15 +24,15 @@ const customizer = useCustomizerStore();
         <v-container fluid class="page-wrapper">
           <div>
             <RouterView />
-<!--            <v-btn-->
-<!--              class="customizer-btn"-->
-<!--              size="large"-->
-<!--              variant="flat"-->
-<!--              color="secondary"-->
-<!--              @click.stop="customizer.SET_CUSTOMIZER_DRAWER(!customizer.Customizer_drawer)"-->
-<!--            >-->
-<!--              <SettingsIcon class="icon" />-->
-<!--            </v-btn>-->
+            <!-- <v-btn
+              class="customizer-btn"
+              size="small"
+              variant="flat"
+              color="secondary"
+              @click.stop="customizer.SET_CUSTOMIZER_DRAWER(!customizer.Customizer_drawer)"
+            >
+              <IconSettings/>
+            </v-btn> -->
           </div>
         </v-container>
       </v-main>

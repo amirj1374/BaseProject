@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useCustomizerStore } from '@/stores/customizer';
 // Icon Imports
-import { IconMenu2, IconSearch, IconBell, IconSettings } from '@tabler/icons-vue';
+import { IconMenu2, IconSearch, IconBell, IconSettings, IconPalette } from '@tabler/icons-vue';
 
 // dropdown imports
 import NotificationDD from './NotificationDD.vue';
@@ -41,29 +41,40 @@ function searchbox() {
       <IconMenu2 size="20" stroke-width="1.5" />
     </v-btn>
 
-    <!-- search mobile -->
     <v-btn
-      class="hidden-lg-and-up text-secondary mr-3"
+      class="hidden-md-and-down text-secondary mr-2"
       color="lightsecondary"
       icon
       rounded="sm"
       variant="flat"
+      @click.stop="customizer.SET_CUSTOMIZER_DRAWER(!customizer.Customizer_drawer)"
       size="small"
-      @click="searchbox"
     >
-      <IconSearch size="17" stroke-width="1.5" />
+      <IconPalette size="20" stroke-width="1.5" />
     </v-btn>
+    <!-- search mobile -->
+<!--    <v-btn-->
+<!--      class="hidden-lg-and-up text-secondary mr-3"-->
+<!--      color="lightsecondary"-->
+<!--      icon-->
+<!--      rounded="sm"-->
+<!--      variant="flat"-->
+<!--      size="small"-->
+<!--      @click="searchbox"-->
+<!--    >-->
+<!--      <IconSearch size="17" stroke-width="1.5" />-->
+<!--    </v-btn>-->
 
-    <v-sheet v-if="showSearch" class="search-sheet v-col-12">
-      <Searchbar :closesearch="searchbox" />
-    </v-sheet>
+<!--    <v-sheet v-if="showSearch" class="search-sheet v-col-12">-->
+<!--      <Searchbar :closesearch="searchbox" />-->
+<!--    </v-sheet>-->
 
     <!-- ---------------------------------------------- -->
     <!-- Search part -->
     <!-- ---------------------------------------------- -->
-    <v-sheet class="mx-3 v-col-3 v-col-xl-2 v-col-lg-4 d-none d-lg-block">
-      <Searchbar />
-    </v-sheet>
+<!--    <v-sheet class="mx-3 v-col-3 v-col-xl-2 v-col-lg-4 d-none d-lg-block">-->
+<!--      <Searchbar />-->
+<!--    </v-sheet>-->
 
     <!---/Search part -->
 

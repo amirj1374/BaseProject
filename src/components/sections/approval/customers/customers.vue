@@ -333,17 +333,6 @@ defineExpose({ submitData });
 <style lang="scss" scoped>
 @import '@/scss/components/approval';
 
-:deep(th) {
-  background-color: rgb(var(--v-theme-containerBg)) !important;
-  font-weight: 600;
-}
-
-.customer-search-btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 @media (forced-colors: active) {
   .v-btn {
     forced-color-adjust: none;

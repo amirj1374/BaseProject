@@ -144,41 +144,6 @@
             </v-card>
           </v-col>
         </v-row>
-
-        <!-- Session Information -->
-        <v-row>
-          <v-col cols="12">
-            <v-card>
-              <v-card-title class="d-flex align-center">
-                اطلاعات نشست
-              </v-card-title>
-              <v-card-text>
-                <v-row>
-                  <v-col cols="12" md="4">
-                    <v-list-item>
-                      <v-list-item-title>تاریخ ورود</v-list-item-title>
-                      <v-list-item-subtitle>{{ formatDate(userInfo?.authTime) }}</v-list-item-subtitle>
-                    </v-list-item>
-                  </v-col>
-                  
-                  <v-col cols="12" md="4">
-                    <v-list-item>
-                      <v-list-item-title>تاریخ انقضا</v-list-item-title>
-                      <v-list-item-subtitle>{{ formatDate(userInfo?.expiration) }}</v-list-item-subtitle>
-                    </v-list-item>
-                  </v-col>
-                  
-                  <v-col cols="12" md="4">
-                    <v-list-item>
-                      <v-list-item-title>شناسه نشست</v-list-item-title>
-                      <v-list-item-subtitle>{{ userInfo?.sessionState || 'نامشخص' }}</v-list-item-subtitle>
-                    </v-list-item>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
       </div>
     </v-container>
   </div>

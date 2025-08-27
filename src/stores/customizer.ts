@@ -11,7 +11,8 @@ export const useCustomizerStore = defineStore({
     inputBg: config.inputBg,
     layoutType: config.layoutType,
     actTheme: config.actTheme,
-    loading: config.loading
+    loading: config.loading,
+    themeMode: 'light' // 'light' or 'dark'
   }),
 
   getters: {
@@ -38,6 +39,9 @@ export const useCustomizerStore = defineStore({
     },
     SET_LAYOUT_TYPE(payload: string) {
       this.layoutType = payload;
+    },
+    SET_THEME_MODE(payload: string) {
+      this.themeMode = payload;
     }
   }
 

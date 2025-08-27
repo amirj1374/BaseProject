@@ -931,18 +931,18 @@ const handleFilterApply = (filterData: any) => {
                       density="compact"
                     />
                   </template>
-                  <template v-slot:item="{ item, columns, index }">
-                    <tr :style="{ background: index % 2 === 0 ? '#fff' : '#f5f7fa' }">
-                      <td
-                        v-for="column in columns"
-                        :key="column.key"
-                        :style="{
-                          ...getColumnStyle(column, item),
-                          ...(column.width
-                            ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' }
-                            : {})
-                        }"
-                      >
+                                     <template v-slot:item="{ item, columns, index }">
+                     <tr :style="{ background: index % 2 === 0 ? 'rgb(var(--v-theme-surface))' : 'rgb(var(--v-theme-lightprimary))' }">
+                       <td
+                         v-for="column in columns"
+                         :key="column.key"
+                         :style="{
+                           ...getColumnStyle(column, item),
+                           ...(column.width
+                             ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' }
+                             : {})
+                         }"
+                       >
                         <!-- Selection Checkbox -->
                         <template v-if="column.key === 'selection'">
                           <v-checkbox
@@ -1054,16 +1054,16 @@ const handleFilterApply = (filterData: any) => {
             density="compact"
           />
         </template>
-        <template v-slot:item="{ item, columns, index }">
-          <tr :style="{ background: index % 2 === 0 ? '#fff' : '#f5f7fa' }">
-            <td
-              v-for="column in columns"
-              :key="column.key"
-              :style="{
-                ...getColumnStyle(column, item),
-                ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
-              }"
-            >
+                 <template v-slot:item="{ item, columns, index }">
+           <tr :style="{ background: index % 2 === 0 ? 'rgb(var(--v-theme-surface))' : 'rgb(var(--v-theme-lightprimary))' }">
+             <td
+               v-for="column in columns"
+               :key="column.key"
+               :style="{
+                 ...getColumnStyle(column, item),
+                 ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
+               }"
+             >
               <!-- Selection Checkbox -->
               <template v-if="column.key === 'selection'">
                 <v-checkbox
@@ -1237,9 +1237,10 @@ const handleFilterApply = (filterData: any) => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: white;
+  background: rgb(var(--v-theme-surface));
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgb(var(--v-theme-borderLight));
 }
 
 /* Grouped Table Styles */
@@ -1281,28 +1282,28 @@ const handleFilterApply = (filterData: any) => {
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e3ebeb 100%);
+  background: linear-gradient(135deg, rgb(var(--v-theme-lightprimary)) 0%, rgb(var(--v-theme-lightsecondary)) 100%);
   cursor: pointer;
   transition: all 0.3s ease;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid rgb(var(--v-theme-borderLight));
 }
 
 .group-header:hover {
-  background: linear-gradient(135deg, #e3f2fd 0%, #e3ebeb 100%);
+  background: linear-gradient(135deg, rgb(var(--v-theme-primary200)) 0%, rgb(var(--v-theme-secondary200)) 100%);
 }
 
 .group-header.expanded {
-  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+  background: linear-gradient(135deg, rgb(var(--v-theme-lightsuccess)) 0%, rgb(var(--v-theme-success)) 100%);
 }
 
 .group-label {
   font-weight: 600;
-  color: #2c3e50;
+  color: rgb(var(--v-theme-darkText));
   flex: 1;
 }
 
 .group-items {
-  background: white;
+  background: rgb(var(--v-theme-surface));
 }
 
 .group-table {
@@ -1316,11 +1317,11 @@ const handleFilterApply = (filterData: any) => {
 }
 
 .group-table :deep(.v-data-table__thead) {
-  background: #f8f9fa !important;
+  background: rgb(var(--v-theme-lightprimary)) !important;
 }
 
 .group-table :deep(.v-data-table__tbody tr:hover) {
-  background: #f5f7fa !important;
+  background: rgb(var(--v-theme-primary200)) !important;
 }
 
 .group-table :deep(.v-data-table__tbody) {
@@ -1329,15 +1330,15 @@ const handleFilterApply = (filterData: any) => {
 
 .pagination-wrapper {
   flex-shrink: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
-  background: white;
+  border-top: 1px solid rgb(var(--v-theme-borderLight));
+  background: rgb(var(--v-theme-surface));
   z-index: 2;
 }
 
 .page-title {
   margin-bottom: 16px;
   padding: 16px 0 8px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid rgb(var(--v-theme-borderLight));
 }
 
 .title-text {
@@ -1365,16 +1366,16 @@ const handleFilterApply = (filterData: any) => {
 :deep(.v-data-table__wrapper table thead) {
   position: sticky;
   top: 0;
-  background: white;
+  background: rgb(var(--v-theme-surface));
   z-index: 1;
   box-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.04);
 }
 
 :deep(.v-data-table__wrapper tbody tr:nth-child(even)) {
-  background: #f5f7fa !important;
+  background: rgb(var(--v-theme-lightprimary)) !important;
 }
 
 :deep(.v-data-table__wrapper tbody tr:nth-child(odd)) {
-  background: #fff !important;
+  background: rgb(var(--v-theme-surface)) !important;
 }
 </style>

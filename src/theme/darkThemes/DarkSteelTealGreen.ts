@@ -1,10 +1,10 @@
 import type { ThemeTypes } from '@/types/themeTypes/ThemeType';
 
 const DarkSteelTealGreen: ThemeTypes = {
-  name: 'SteelTealGreen',
-  dark: false,
+  name: 'DarkSteelTealGreen',
+  dark: true,
   variables: {
-    'border-color': '#1e88e5',
+    'border-color': '#607D8B',
     'carousel-control-size': 10
   },
   colors: {
@@ -15,26 +15,26 @@ const DarkSteelTealGreen: ThemeTypes = {
     accent: '#FFAB91',
     warning: '#ffc107',
     error: '#f44336',
-    lightprimary: '#ECEFF1',
-    lightsecondary: '#E0F2F1',
-    lightsuccess: '#b9f6ca',
-    lighterror: '#f9d8d8',
-    lightwarning: '#fff8e1',
-    darkText: '#212121',
-    lightText: '#616161',
-    darkprimary: '#546E7A',
-    darksecondary: '#00897B',
-    borderLight: '#d0d0d0',
-    inputBorder: '#787878',
-    containerBg: '#ECEFF1',
-    surface: '#fff',
-    'on-surface-variant': '#fff',
+    lightprimary: '#2A2A2A',
+    lightsecondary: '#1A2A2A',
+    lightsuccess: '#1B3A1B',
+    lighterror: '#3A1B1B',
+    lightwarning: '#3A2F1B',
+    darkText: '#FFFFFF',
+    lightText: '#B0B0B0',
+    darkprimary: '#90A4AE',
+    darksecondary: '#4DB6AC',
+    borderLight: '#404040',
+    inputBorder: '#606060',
+    containerBg: '#1A1A1A',
+    surface: '#121212',
+    'on-surface-variant': '#E0E0E0',
     facebook: '#4267b2',
     twitter: '#1da1f2',
     linkedin: '#0e76a8',
-    gray100: '#fafafa',
-    primary200: '#E0F2F1',
-    secondary200: '#E0F2F1',
+    gray100: '#2A2A2A',
+    primary200: '#2A2A2A',
+    secondary200: '#1A2A2A',
     white: '#FFFFFF'
   }
 };
