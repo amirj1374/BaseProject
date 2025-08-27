@@ -4,22 +4,22 @@ import type { UserInfoResponse } from '@/types/models/userInfo';
 
 const userApi = (axiosInstance: AxiosInstance) => ({
   getUserInfo(): Promise<{ data: UserInfoResponse }> {
-    return axiosInstance.get('/api/v1/token');
+    return axiosInstance.get('api/v1/token');
   },
   getDepartmentsLevel() {
-    return axiosInstance.get("/api/v1/department-role/levels");
+    return axiosInstance.get("api/v1/department-role/levels");
   },
   fetch(page: number, limit: number) {
-    return axiosInstance.get(`/api/v1/person-requests`, { params: { page, limit } });
+    return axiosInstance.get(`api/v1/person-requests`, { params: { page, limit } });
   },
   create(data: PersonDTO) {
-    return axiosInstance.post("/personTransaction-requests", data);
+    return axiosInstance.post("api/v1/personTransaction-requests", data);
   },
   update(id: string, data: PersonDTO) {
-    return axiosInstance.put(`/personTransaction-requests/${id}`, data);
+    return axiosInstance.put(`api/v1/personTransaction-requests/${id}`, data);
   },
   delete(id: string) {
-    return axiosInstance.delete(`/personTransaction-requests/${id}`);
+    return axiosInstance.delete(`api/v1/personTransaction-requests/${id}`);
   },
 });
 

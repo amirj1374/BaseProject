@@ -5,7 +5,7 @@ import axiosInstance from './axiosInstance';
 // Original apiService function (for backward compatibility)
 export default (axiosInstance: AxiosInstance, resource: string) => ({
   fetch(filters?: Record<string, any>) {
-    return axiosInstance.get(`/api/v1/${resource}`, {
+    return axiosInstance.get(`api/v1/${resource}`, {
       params: { 
         ...filters,
       }
@@ -13,15 +13,15 @@ export default (axiosInstance: AxiosInstance, resource: string) => ({
   },
 
   create(data: Record<string, any>) {
-    return axiosInstance.post(`/api/v1/${resource}`, data);
-  },
+    return axiosInstance.post(`api/v1/${resource}`, data);
+  },  
 
   update(data: Record<string, any>) {
-    return axiosInstance.put(`/api/v1/${resource}`, data);
+    return axiosInstance.put(`api/v1/${resource}`, data);
   },
 
   delete(id: string | Record<string, any>) {
-    return axiosInstance.delete(`/api/v1/${resource}/${id}`);
+    return axiosInstance.delete(`api/v1/${resource}/${id}`);
   },
 });
 
@@ -34,38 +34,43 @@ export const centralizedApiService = {
 
   // User endpoints
   users: {
-    getAll: () => axiosInstance.get(`${apiConfig.baseURL}/users`),
+    getAll: () => axiosInstance.get('api/v1/users'),
     authenticate: (credentials: { username: string; password: string }) => 
-      axiosInstance.post(`${apiConfig.baseURL}/users/authenticate`, credentials),
-    logout: () => axiosInstance.post(`${apiConfig.baseURL}/logout`),
+      axiosInstance.post('api/v1/users/authenticate', credentials),
+    logout: () => axiosInstance.post('api/v1/logout'),
   },
 
   // Cartable endpoints
   cartable: {
     getCreditApproval: (cartableId: string) => 
-      axiosInstance.get(`${apiConfig.baseURL}/cartable/credit-approval/${cartableId}`),
+      axiosInstance.get(`api/v1/cartable/credit-approval/${cartableId}`),
     saveCreditApproval: (data: any) => 
-      axiosInstance.post(`${apiConfig.baseURL}/cartable/credit-approval`, data),
+      axiosInstance.post('api/v1/cartable/credit-approval', data),
   },
 
   // Approval endpoints
-  approval: {
-    fetchCurrencies: () => axiosInstance.get(`${apiConfig.baseURL}/approval/currencies`),
-    getCollateral: () => axiosInstance.get(`${apiConfig.baseURL}/approval/collateral`),
-    getRegions: () => axiosInstance.get(`${apiConfig.baseURL}/approval/regions`),
+  asd: {
+    fetchCurrencies: () => axiosInstance.get('api/v1/approval/currencies'),
+    getCollateral: () => axiosInstance.get('api/v1/approval/collateral'),
+    getRegions: () => axiosInstance.get('api/v1/approval/regions'),
   },
 
   // Person endpoints
   person: {
-    getUserInfo: () => axiosInstance.get(`${apiConfig.baseURL}/person/user-info`),
-    getDepartmentsLevel: () => axiosInstance.get(`${apiConfig.baseURL}/person/departments-level`),
+    getUserInfo: () => axiosInstance.get('api/v1/person/user-info'),
+    getDepartmentsLevel: () => axiosInstance.get('api/v1/person/departments-level'),
   },
 
-  // Generic methods for other endpoints
-  get: (endpoint: string) => axiosInstance.get(endpoint),
-  post: (endpoint: string, data?: any) => axiosInstance.post(endpoint, data),
-  put: (endpoint: string, data?: any) => axiosInstance.put(endpoint, data),
-  delete: (endpoint: string) => axiosInstance.delete(endpoint),
+  // Token endpoint
+  token: {
+    getToken: () => axiosInstance.get('api/v1/token'),
+  },
+
+  // // Generic methods for other endpoints
+  // get: (endpoint: string) => axiosInstance.get(endpoint),
+  // post: (endpoint: string, data?: any) => axiosInstance.post(endpoint, data),
+  // put: (endpoint: string, data?: any) => axiosInstance.put(endpoint, data),
+  // delete: (endpoint: string) => axiosInstance.delete(endpoint),
 };
 
 // Export both for compatibility

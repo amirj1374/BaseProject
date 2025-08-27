@@ -14,60 +14,60 @@ import type {
 
 export default (axiosInstance: AxiosInstance) => ({
   fetchCustomer(data: FetchCustomerPayload) {
-    return axiosInstance.get(`/api/v1/customer-info/pure`, { params: data });
+    return axiosInstance.get(`api/v1/customer-info/pure`, { params: data });
   },
   getLoanRequestDetail(loanRequestId: string) {
-    return axiosInstance.get(`/api/v1/loan-requests`, { params: {loanRequestId},});
+    return axiosInstance.get(`api/v1/loan-requests`, { params: {loanRequestId},});
   },
   fetchSummary(data: SummaryDto) {
-    return axiosInstance.post(`/api/v1/loan-requests/summary-request`, data);
+    return axiosInstance.post(`api/v1/loan-requests/summary-request`, data);
   },
   fetchGuarantor(data: FetchGuarantorPayload) {
-    return axiosInstance.get(`/api/v1/guarantor/pure`, { params:data });
+    return axiosInstance.get(`api/v1/guarantor/pure`, { params:data });
   },
   fetchCurrencies() {
-    return axiosInstance.post("/api/v1/general/currencies",);
+    return axiosInstance.post("api/v1/general/currencies",);
   },
   getContractType(loanRequestType: string) {
-    return axiosInstance.get("/api/v1/general/get-contract-type", {
+    return axiosInstance.get("api/v1/general/get-contract-type", {
       params: {loanRequestType},
       timeout: 60000
     });
   },
   getFacilities(contractId: number, loanRequestTypeCode: string) {
-    return axiosInstance.get("/api/v1/general/get-facilities", {
+    return axiosInstance.get("api/v1/general/get-facilities", {
       params: {contractId, loanRequestTypeCode}
     });
   },
 
   getCalculatedDay( year: number | null , month: number | null, day: number | null,) {
-    return axiosInstance.post("/api/v1/general/calculate-day", {year, month, day});
+    return axiosInstance.post("api/v1/general/calculate-day", {year, month, day});
   },
 
   getCollateral() {
-    return axiosInstance.get("/api/v1/general/collateral");
+    return axiosInstance.get("api/v1/general/collateral");
   },
 
   saveGeneral(data: SaveGeneralPayload) {
-    return axiosInstance.post(`/api/v1/general`, data, {
+    return axiosInstance.post(`api/v1/general`, data, {
       timeout: 60000
     });
   },
   getSapInquiry(payload: FetchInquiryPayload) {
-    return axiosInstance.get('/api/v1/sap-inquiry', {
+    return axiosInstance.get('api/v1/sap-inquiry', {
       params: payload,
       timeout: 50000
     });
   },
   getIndirectObligation(loanRequestId: string, retry: boolean) {
-    return axiosInstance.get('/api/v1/general/indirect-obligation', {
+    return axiosInstance.get('api/v1/general/indirect-obligation', {
       params: { loanRequestId, retry },
       timeout: 50000
     });
   },
 
   getDirectObligation(loanRequestId: string, retry: boolean) {
-    return axiosInstance.get('/api/v1/general/direct-obligation', {
+    return axiosInstance.get('api/v1/general/direct-obligation', {
       params: { loanRequestId, retry },
       timeout: 50000
     });
@@ -81,36 +81,36 @@ export default (axiosInstance: AxiosInstance) => ({
   },
 
   getAllDeposit(loanRequestId: string) {
-    return axiosInstance.get('/api/v1/deposit-info/get-all-deposit', {params: {loanRequestId}});
+    return axiosInstance.get('api/v1/deposit-info/get-all-deposit', {params: {loanRequestId}});
   },
 
   saveDeposit(loanRequestId: string, depositList: DepositAccount) {
-    return axiosInstance.post('/api/v1/deposit-info/save-selected-deposit', { loanRequestId, depositList });
+    return axiosInstance.post('api/v1/deposit-info/save-selected-deposit', { loanRequestId, depositList });
   },
 
   getConsideration(loanRequestId: string) {
-    return axiosInstance.get('/api/v1/consideration', {
+    return axiosInstance.get('api/v1/consideration', {
       params: { loanRequestId }
     });
   },
 
   getCollateralsInfo(loanRequestId: string) {
-    return axiosInstance.get('/api/v1/collaterals-info', {
+    return axiosInstance.get('api/v1/collaterals-info', {
       params: { loanRequestId }
     });
   },
   editCollateralsInfo(payload: CollateralsInfoPayload) {
-    return axiosInstance.put('/api/v1/collaterals-info', payload);
+    return axiosInstance.put('api/v1/collaterals-info', payload);
   },
 
     saveConsideration(payload: ConsiderationPayload) {
-      return axiosInstance.post('/api/v1/consideration',payload);
+      return axiosInstance.post('api/v1/consideration',payload);
     },
   deleteTransaction(id: string) {
-    return axiosInstance.delete(`/personTransaction-requests/${id}`);
+    return axiosInstance.delete(`api/v1/personTransaction-requests/${id}`);
   },
   getLcProduct(lcContractType: string) {
-    return axiosInstance.get(`/api/v1/general/product-type?lcContractType=${lcContractType}`);
+    return axiosInstance.get(`api/v1/general/product-type?lcContractType=${lcContractType}`);
   },
 
   getAllDoc(loanRequestId: string) {
@@ -118,7 +118,7 @@ export default (axiosInstance: AxiosInstance) => ({
   },
 
   saveDoc(formData: FormData) {
-    return axiosInstance.post('/api/v1/general/save-doc', formData, {
+    return axiosInstance.post('api/v1/general/save-doc', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -144,6 +144,6 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.get("api/v1/cartable-report");
   },
   getApprovalEdit(loanRequestId: string) {
-    return axiosInstance.get(`/api/v1/general/more-detail?loanRequestId=${loanRequestId}`);
+    return axiosInstance.get(`api/v1/general/more-detail?loanRequestId=${loanRequestId}`);
   },
 });

@@ -4,53 +4,53 @@ import { stubTrue } from 'lodash-es';
 
 export default (axiosInstance: AxiosInstance) => ({
   getCartable(trackingCode: string) {
-    return axiosInstance.get("/api/v1/cartable", { params: {trackingCode},});
+    return axiosInstance.get("api/v1/cartable", { params: {trackingCode},});
   },
 
   saveCartable(trackingCode: string) {
-    return axiosInstance.post("/api/v1/cartable", {trackingCode});
+    return axiosInstance.post("api/v1/cartable", {trackingCode});
   },
 
   getCartableDetail(id: number) {
-    return axiosInstance.get(`/api/v1/cartable/${id}`);
+    return axiosInstance.get(`api/v1/cartable/${id}`);
   },
 
   getValidRoles(id: number) {
-    return axiosInstance.get(`/api/v1/cartable/${id}/get-valid-roles`);
+    return axiosInstance.get(`api/v1/cartable/${id}/get-valid-roles`);
   },
 
   getValidUser(payload: ValidUserPayload) {
-    return axiosInstance.get(`/api/v1/cartable/${payload.id}/get-valid-users?actionType=${payload.actionType}&roleName=${payload.roleName}`,{
+    return axiosInstance.get(`api/v1/cartable/${payload.id}/get-valid-users?actionType=${payload.actionType}&roleName=${payload.roleName}`,{
       timeout: 40000,
     });
   },
   submitReference(payload: SubmitReferencePayload) {
-    return axiosInstance.post("/api/v1/cartable/submit", payload);
+    return axiosInstance.post("api/v1/cartable/submit", payload);
   },
   getSamapRole() {
-    return axiosInstance.get("/api/v1/role/samap");
+    return axiosInstance.get("api/v1/role/samap");
   },
   getLotusRole() {
-    return axiosInstance.get("/api/v1/role/lotus");
+    return axiosInstance.get("api/v1/role/lotus");
   },
 
   submitSign(payload: SubmitSignPayload) {
-    return axiosInstance.post("/api/v1/cartable/sign", payload);
+    return axiosInstance.post("api/v1/cartable/sign", payload);
   },
   
   getLoanRequestId(cartableId: string) {
-    return axiosInstance.get(`/api/v1/cartable/${cartableId}/loan-request/id`);
+    return axiosInstance.get(`api/v1/cartable/${cartableId}/loan-request/id`);
   },
 
   getCreditApprovalReport(cartableId: string) {
-    return axiosInstance.get(`/api/v1/credit-approvals/report/base?cartableId=${cartableId}`);
+    return axiosInstance.get(`api/v1/credit-approvals/report/base?cartableId=${cartableId}`);
   },
   
   saveCreditApproval(payload: any) {
-    return axiosInstance.post(`/api/v1/credit-approvals`, payload);
+    return axiosInstance.post(`api/v1/credit-approvals`, payload);
   },
 
   getCreditApproval(cartableId: string) {
-    return axiosInstance.get(`/api/v1/credit-approvals/summary/${cartableId}`);
+    return axiosInstance.get(`api/v1/credit-approvals/summary/${cartableId}`);
   },
 });

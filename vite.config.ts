@@ -57,7 +57,7 @@ export default defineConfig(({ command, mode }) => {
     },
     server: {
       host: true, // Allow external connections (same as --host)
-      port: parseInt(env.VITE_PORT), // Read from environment file
+      port: parseInt(env.VITE_PORT) || 5050, // Use env port or fallback to 5050
     },
     // Dynamic base URL based on environment
     base: env.VITE_BASE_URL || '/',
