@@ -84,6 +84,10 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.get('api/v1/deposit-info/get-all-deposit', {params: {loanRequestId}});
   },
 
+  getActiveDeposit(loanRequestId: string) {
+    return axiosInstance.get('api/v1/deposit-info', {params: {loanRequestId}});
+  },
+
   saveDeposit(loanRequestId: string, depositList: DepositAccount) {
     return axiosInstance.post('api/v1/deposit-info/save-selected-deposit', { loanRequestId, depositList });
   },

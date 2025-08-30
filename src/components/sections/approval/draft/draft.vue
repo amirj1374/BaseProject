@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, computed, watch } from 'vue';
+import { api } from '@/services/api';
+import { useApprovalStore } from '@/stores/approval';
 import Facilities from '@/components/sections/approval/draft/FacilitiesHistory.vue';
 import NunRialFacilitiesHistory from '@/components/sections/approval/draft/NunRialFacilitiesHistory.vue';
 import type { CurrenciesDto } from '@/types/approval/approvalType';
@@ -12,6 +14,7 @@ import OcpHistory from '@/components/sections/approval/draft/OcpHistory.vue';
 import Collaterls from '@/components/sections/approval/draft/Collaterls.vue';
 
 
+const approvalStore = useApprovalStore();
 const currencies = ref<CurrenciesDto[]>([]);
 const facilitiesData = ref();
 const guaranteeData = ref();
@@ -57,6 +60,42 @@ const showValidationErrors = () => {
 };
 
 onMounted(async () => {
+  try {
+    // Check if we have a valid loanRequestId
+    if (!approvalStore.loanRequestId) {
+      console.log('No loanRequestId available, skipping deposit validation');
+      return;
+    }
+
+    // Call getActiveDeposit API with loanRequestId
+    const response = await api.approval.getActiveDeposit(approvalStore.loanRequestId);
+    
+    if (response.status === 200) {
+      // If we have active deposits, set deposit as valid
+      isDepositValid.value = true;
+      // Also set the Deposit component's valid state
+      if (depositRef.value) {
+        depositRef.value.valid = true;
+      }
+      console.log('Active deposits found, deposit validation set to true');
+    } else {
+      // If no active deposits, keep validation as false
+      isDepositValid.value = false;
+      // Also set the Deposit component's valid state
+      if (depositRef.value) {
+        depositRef.value.valid = false;
+      }
+      console.log('No active deposits found, deposit validation remains false');
+    }
+  } catch (error) {
+    console.error('Error fetching active deposits:', error);
+    // On error, keep validation as false
+    isDepositValid.value = false;
+    // Also set the Deposit component's valid state
+    if (depositRef.value) {
+      depositRef.value.valid = false;
+    }
+  }
 });
 
 // Watch validation state changes from child components

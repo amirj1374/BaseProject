@@ -108,9 +108,9 @@ function getFontDisplayName(font: string): string {
     <perfect-scrollbar style="height: 100%">
       <v-col cols="12" class="pa-0">
         <div class="pa-5 d-flex justify-space-between align-center">
-          <div class="text-h6 font-weight-medium">Theme Customization</div>
+          <div class="text-h6 font-weight-medium">شخصی سازی</div>
           <div>
-            <v-btn color="error" variant="outlined" size="small" class="ml-2" @click="clearOption">Reset</v-btn>
+            <v-btn color="error" variant="outlined" size="small" class="ml-2" @click="clearOption">بارنشانی</v-btn>
             <v-btn
               variant="text"
               color="lightText"
@@ -124,8 +124,8 @@ function getFontDisplayName(font: string): string {
 
       <v-card>
         <v-tabs v-model="tab" bg-color="lightprimary" align-tabs="center" fixed-tabs color="primary">
-          <v-tab prepend-icon="mdi-palette" value="style">Style</v-tab>
-          <v-tab prepend-icon="mdi-format-font" value="font">Font</v-tab>
+          <v-tab prepend-icon="mdi-palette" value="style">ظاهر</v-tab>
+          <v-tab prepend-icon="mdi-format-font" value="font">فونت</v-tab>
         </v-tabs>
 
         <v-card-text>
@@ -134,7 +134,7 @@ function getFontDisplayName(font: string): string {
               <div class="pa-4">
                 <!-- THEME MODE -->
                 <div class="mb-6">
-                  <h6 class="text-subtitle-1 font-weight-medium mb-3">THEME MODE</h6>
+                  <h6 class="text-subtitle-1 font-weight-medium mb-3">حالت روز / شب</h6>
                   <div class="theme-toggle-container">
                     <div 
                       class="theme-toggle"
@@ -153,7 +153,7 @@ function getFontDisplayName(font: string): string {
 
                 <!-- PRESET COLOR -->
                 <div class="mb-6">
-                  <h6 class="text-subtitle-1 font-weight-medium mb-3">PRESET COLOR</h6>
+                  <h6 class="text-subtitle-1 font-weight-medium mb-3">رنگ بندی</h6>
                   <div class="custom-theme-colors">
                     <div
                       v-for="color in colorPalette"
@@ -166,84 +166,84 @@ function getFontDisplayName(font: string): string {
                   </div>
                 </div>
 
-                <!-- INPUT BACKGROUND -->
-                <div class="mb-6">
-                  <h6 class="text-subtitle-1 font-weight-medium mb-3">INPUT BACKGROUND</h6>
-                  <div class="d-flex gap-2">
-                    <v-btn
-                      variant="outlined"
-                      :color="!customizer.inputBg ? 'primary' : 'grey'"
-                      @click="customizer.inputBg = false"
-                      class="flex-1"
-                    >
-                      <div class="input-preview bg-white border"></div>
-                      Default
-                    </v-btn>
-                    <v-btn
-                      variant="outlined"
-                      :color="customizer.inputBg ? 'primary' : 'grey'"
-                      @click="customizer.inputBg = true"
-                      class="flex-1"
-                    >
-                      <div class="input-preview bg-grey-lighten-4 border"></div>
-                      Filled
-                    </v-btn>
-                  </div>
-                </div>
+<!--                &lt;!&ndash; INPUT BACKGROUND &ndash;&gt;-->
+<!--                <div class="mb-6">-->
+<!--                  <h6 class="text-subtitle-1 font-weight-medium mb-3">INPUT BACKGROUND</h6>-->
+<!--                  <div class="d-flex gap-2">-->
+<!--                    <v-btn-->
+<!--                      variant="outlined"-->
+<!--                      :color="!customizer.inputBg ? 'primary' : 'grey'"-->
+<!--                      @click="customizer.inputBg = false"-->
+<!--                      class="flex-1"-->
+<!--                    >-->
+<!--                      <div class="input-preview bg-white border"></div>-->
+<!--                      Default-->
+<!--                    </v-btn>-->
+<!--                    <v-btn-->
+<!--                      variant="outlined"-->
+<!--                      :color="customizer.inputBg ? 'primary' : 'grey'"-->
+<!--                      @click="customizer.inputBg = true"-->
+<!--                      class="flex-1"-->
+<!--                    >-->
+<!--                      <div class="input-preview bg-grey-lighten-4 border"></div>-->
+<!--                      Filled-->
+<!--                    </v-btn>-->
+<!--                  </div>-->
+<!--                </div>-->
 
-                <!-- LAYOUT TYPE -->
-                <div class="mb-6">
-                  <h6 class="text-subtitle-1 font-weight-medium mb-3">LAYOUT TYPE</h6>
-                  <div class="d-flex gap-2">
-                    <v-btn
-                      variant="outlined"
-                      :color="customizer.layoutType === 'SideBar' ? 'primary' : 'grey'"
-                      @click="customizer.SET_LAYOUT_TYPE('SideBar')"
-                      class="flex-1"
-                    >
-                      <div class="layout-preview sidebar-layout"></div>
-                      Sidebar
-                    </v-btn>
-                    <v-btn
-                      variant="outlined"
-                      :color="customizer.layoutType === 'NavBar' ? 'primary' : 'grey'"
-                      @click="customizer.SET_LAYOUT_TYPE('NavBar')"
-                      class="flex-1"
-                    >
-                      <div class="layout-preview navbar-layout"></div>
-                      Navbar
-                    </v-btn>
-                  </div>
-                </div>
+<!--                &lt;!&ndash; LAYOUT TYPE &ndash;&gt;-->
+<!--                <div class="mb-6">-->
+<!--                  <h6 class="text-subtitle-1 font-weight-medium mb-3">LAYOUT TYPE</h6>-->
+<!--                  <div class="d-flex gap-2">-->
+<!--                    <v-btn-->
+<!--                      variant="outlined"-->
+<!--                      :color="customizer.layoutType === 'SideBar' ? 'primary' : 'grey'"-->
+<!--                      @click="customizer.SET_LAYOUT_TYPE('SideBar')"-->
+<!--                      class="flex-1"-->
+<!--                    >-->
+<!--                      <div class="layout-preview sidebar-layout"></div>-->
+<!--                      Sidebar-->
+<!--                    </v-btn>-->
+<!--                    <v-btn-->
+<!--                      variant="outlined"-->
+<!--                      :color="customizer.layoutType === 'NavBar' ? 'primary' : 'grey'"-->
+<!--                      @click="customizer.SET_LAYOUT_TYPE('NavBar')"-->
+<!--                      class="flex-1"-->
+<!--                    >-->
+<!--                      <div class="layout-preview navbar-layout"></div>-->
+<!--                      Navbar-->
+<!--                    </v-btn>-->
+<!--                  </div>-->
+<!--                </div>-->
 
-                <!-- SIDEBAR DRAWER -->
-                <div class="mb-6">
-                  <h6 class="text-subtitle-1 font-weight-medium mb-3">SIDEBAR DRAWER</h6>
-                  <div class="d-flex gap-2">
-                    <v-btn
-                      variant="outlined"
-                      :color="!customizer.Sidebar_drawer ? 'primary' : 'grey'"
-                      @click="customizer.SET_SIDEBAR_DRAWER()"
-                      class="flex-1"
-                    >
-                      <div class="sidebar-preview closed"></div>
-                    </v-btn>
-                    <v-btn
-                      variant="outlined"
-                      :color="customizer.Sidebar_drawer ? 'primary' : 'grey'"
-                      @click="customizer.SET_SIDEBAR_DRAWER()"
-                      class="flex-1"
-                    >
-                      <div class="sidebar-preview open"></div>
-                    </v-btn>
-                  </div>
-                </div>
+<!--                &lt;!&ndash; SIDEBAR DRAWER &ndash;&gt;-->
+<!--                <div class="mb-6">-->
+<!--                  <h6 class="text-subtitle-1 font-weight-medium mb-3">SIDEBAR DRAWER</h6>-->
+<!--                  <div class="d-flex gap-2">-->
+<!--                    <v-btn-->
+<!--                      variant="outlined"-->
+<!--                      :color="!customizer.Sidebar_drawer ? 'primary' : 'grey'"-->
+<!--                      @click="customizer.SET_SIDEBAR_DRAWER()"-->
+<!--                      class="flex-1"-->
+<!--                    >-->
+<!--                      <div class="sidebar-preview closed"></div>-->
+<!--                    </v-btn>-->
+<!--                    <v-btn-->
+<!--                      variant="outlined"-->
+<!--                      :color="customizer.Sidebar_drawer ? 'primary' : 'grey'"-->
+<!--                      @click="customizer.SET_SIDEBAR_DRAWER()"-->
+<!--                      class="flex-1"-->
+<!--                    >-->
+<!--                      <div class="sidebar-preview open"></div>-->
+<!--                    </v-btn>-->
+<!--                  </div>-->
+<!--                </div>-->
               </div>
             </v-tabs-window-item>
 
             <v-tabs-window-item value="font">
               <div class="pa-4">
-                <h6 class="text-subtitle-1 font-weight-medium mb-4">FONT SELECTION</h6>
+                <h6 class="text-subtitle-1 font-weight-medium mb-4">انتخاب فونت</h6>
                 <v-radio-group v-model="customizer.fontTheme" hide-details class="custom-font">
                   <v-radio
                     v-for="font in fontFamily"

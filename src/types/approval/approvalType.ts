@@ -209,7 +209,7 @@ export interface CollateralsInfoPayload {
   stock: StockDTO;
   otherCollateralAmount: number;
   id: number;
-  description: string
+  description: string;
 }
 
 export interface DepositDTO {
@@ -395,6 +395,10 @@ export interface LoanRequestDTO {
 export interface GuarantorInfoDTO {
   nationalCode: string;
   guarantorName: string;
+  createdAt: string;
+  label?: string;
+  sapInquiryStatus?: boolean;
+  value?: string;
 }
 
 export interface LoanRequestDetailDTO {

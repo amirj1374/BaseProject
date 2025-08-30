@@ -163,7 +163,11 @@ const submitData = async () => {
       .filter((guarantor) => guarantor.nationalCode && guarantor.guarantorName)
       .map((guarantor) => ({
         nationalCode: guarantor.nationalCode!,
-        guarantorName: guarantor.guarantorName!
+        guarantorName: guarantor.guarantorName!,
+        createdAt: guarantor.createdAt!,
+        label: guarantor.label!,
+        sapInquiryStatus: guarantor.sapInquiryStatus!,
+        value: guarantor.value!
       }));
 
     // Get loan request details from store

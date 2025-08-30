@@ -178,7 +178,7 @@ defineExpose({ submitData });
       <v-btn 
         color="secondary"
         variant="tonal" 
-        @click="getInquiry"
+        @click="getInquiry(true)"
         :loading="isLoadingCheque || isLoadingIndirect || isLoadingDirect || isLoadingSap"
         class="me-2"
         :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
