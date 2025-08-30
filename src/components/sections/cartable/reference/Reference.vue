@@ -3,6 +3,7 @@ import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
 import { api } from '@/services/api';
 import type { ActionData, SubmitReferencePayload, ValidRole } from '@/types/cartable/cartableTypes';
 import { onMounted, ref, watch, computed } from 'vue';
+import ApprovalRequestViewer from '../sign/ApprovalRequestViewer.vue';
 const tableRef = ref();
 const emit = defineEmits(['close']);
 
@@ -17,9 +18,21 @@ const selectedDate = ref<string | null>(null);
 const props = defineProps<{
   item: any;
   onSuccess?: () => void;
+  expertReportUrl?: string;
 }>();
 
 const id = ref(props.item?.id ?? '');
+
+const downloadExpertReport = () => {
+  if (props.expertReportUrl) {
+    const link = document.createElement('a');
+    link.href = props.expertReportUrl;
+    link.download = 'expert-report.pdf'; // You can customize the filename
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+};
 
 const fetchValidUsers = async (selectedValue: string) => {
   const res = await api.cartable.getValidRoles(Number(selectedValue));
@@ -247,9 +260,22 @@ watch(validUserOptions, (newOptions) => {
       </v-col>
     </v-row>
     <v-row>
+      <v-col cols="12" md="12">
+        <ApprovalRequestViewer :loan-request-id="props.item.loanRequestId" />
+      </v-col>
+    </v-row>
+    <v-row>
       <v-col cols="12" md="12" style="display: flex; justify-content: center; gap: 10px">
         <v-btn type="submit" color="primary" :loading="loading">تایید</v-btn>
         <v-btn color="error" @click="emit('close')">انصراف</v-btn>
+        <v-btn 
+          v-if="props.item.expertReportUrl" 
+          color="info" 
+          @click="downloadExpertReport"
+          prepend-icon="mdi-download"
+        >
+          دانلود گزارش کارشناسی
+        </v-btn>
       </v-col>
     </v-row>
   </form>

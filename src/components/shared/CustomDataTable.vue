@@ -145,9 +145,82 @@ const groupedHeaders = computed(() => {
     ...(props.selectable ? [selectionHeader] : []),
     ...props.headers,
   ];
-  return hasAnyActions.value
-    ? [...base, { title: 'عملیات', key: 'actions', sortable: false }]
-    : base;
+  
+  if (!hasAnyActions.value) {
+    return base;
+  }
+  
+  // Calculate dynamic width based on actual button sizes (same logic as normalHeaders)
+  let totalWidth = 0;
+  
+  // CRUD actions (edit, delete, view, create)
+  if (props.actions) {
+    props.actions.forEach(action => {
+      switch (action) {
+        case 'edit':
+          totalWidth += 140; // "ویرایش ✏️" button width
+          break;
+        case 'delete':
+          totalWidth += 120; // "حذف ❌" button width
+          break;
+        case 'view':
+          totalWidth += 140; // "🔍 نمایش" button width
+          break;
+        case 'create':
+          totalWidth += 120; // Create button width
+          break;
+      }
+    });
+  }
+  
+  // Route actions
+  if (props.routes) {
+    Object.keys(props.routes).forEach(routeKey => {
+      totalWidth += 120; // Route button width (key.toUpperCase())
+    });
+  }
+  
+  // Download actions
+  if (props.downloadLink) {
+    Object.keys(props.downloadLink).forEach(key => {
+      totalWidth += 120; // Download button width
+    });
+  }
+  
+  // Custom actions
+  if (props.customActions) {
+    props.customActions.forEach(action => {
+      totalWidth += 140; // Custom action button width
+    });
+  }
+  
+  // Custom buttons
+  if (props.customButtonsFn) {
+    // For dynamic buttons, estimate based on typical button count
+    totalWidth += 240; // 2 buttons * 120px each
+  } else if (props.customButtons) {
+    props.customButtons.forEach(button => {
+      totalWidth += 120; // Custom button width
+    });
+  }
+  
+  // Add spacing between buttons (8px margin per button)
+  const buttonCount = (props.actions?.length || 0) + 
+                     (props.routes ? Object.keys(props.routes).length : 0) + 
+                     (props.downloadLink ? Object.keys(props.downloadLink).length : 0) + 
+                     (props.customActions?.length || 0) + 
+                     (props.customButtons?.length || (props.customButtonsFn ? 2 : 0));
+  
+  const spacingWidth = Math.max(buttonCount - 1, 0) * 8; // 8px margin between buttons
+  totalWidth += spacingWidth;
+  
+  // Add padding for the cell
+  totalWidth += 32; // 16px padding on each side
+  
+  // Ensure minimum width
+  const actionWidth = Math.max(totalWidth, 200);
+  
+  return [...base, { title: 'عملیات', key: 'actions', sortable: false, width: actionWidth }];
 });
 
 const normalHeaders = computed(() => {
@@ -155,9 +228,82 @@ const normalHeaders = computed(() => {
     ...(props.selectable ? [selectionHeader] : []),
     ...props.headers,
   ];
-  return hasAnyActions.value
-    ? [...base, { title: 'عملیات', key: 'actions', sortable: false, width: props.customActions?.length ? props.customActions.length * 120 : 650 }]
-    : base;
+  
+  if (!hasAnyActions.value) {
+    return base;
+  }
+  
+  // Calculate dynamic width based on actual button sizes
+  let totalWidth = 0;
+  
+  // CRUD actions (edit, delete, view, create)
+  if (props.actions) {
+    props.actions.forEach(action => {
+      switch (action) {
+        case 'edit':
+          totalWidth += 140; // "ویرایش ✏️" button width
+          break;
+        case 'delete':
+          totalWidth += 120; // "حذف ❌" button width
+          break;
+        case 'view':
+          totalWidth += 140; // "🔍 نمایش" button width
+          break;
+        case 'create':
+          totalWidth += 120; // Create button width
+          break;
+      }
+    });
+  }
+  
+  // Route actions
+  if (props.routes) {
+    Object.keys(props.routes).forEach(routeKey => {
+      totalWidth += 120; // Route button width (key.toUpperCase())
+    });
+  }
+  
+  // Download actions
+  if (props.downloadLink) {
+    Object.keys(props.downloadLink).forEach(key => {
+      totalWidth += 120; // Download button width
+    });
+  }
+  
+  // Custom actions
+  if (props.customActions) {
+    props.customActions.forEach(action => {
+      totalWidth += 140; // Custom action button width
+    });
+  }
+  
+  // Custom buttons
+  if (props.customButtonsFn) {
+    // For dynamic buttons, estimate based on typical button count
+    totalWidth += 240; // 2 buttons * 120px each
+  } else if (props.customButtons) {
+    props.customButtons.forEach(button => {
+      totalWidth += 120; // Custom button width
+    });
+  }
+  
+  // Add spacing between buttons (8px margin per button)
+  const buttonCount = (props.actions?.length || 0) + 
+                     (props.routes ? Object.keys(props.routes).length : 0) + 
+                     (props.downloadLink ? Object.keys(props.downloadLink).length : 0) + 
+                     (props.customActions?.length || 0) + 
+                     (props.customButtons?.length || (props.customButtonsFn ? 2 : 0));
+  
+  const spacingWidth = Math.max(buttonCount - 1, 0) * 8; // 8px margin between buttons
+  totalWidth += spacingWidth;
+  
+  // Add padding for the cell
+  totalWidth += 32; // 16px padding on each side
+  
+  // Ensure minimum width
+  const actionWidth = Math.max(totalWidth, 200);
+  
+  return [...base, { title: 'عملیات', key: 'actions', sortable: false, width: actionWidth }];
 });
 
 // Helper function to get unique value from item

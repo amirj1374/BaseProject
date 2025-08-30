@@ -3,16 +3,32 @@ import jalaali from 'jalaali-js';
 
 export class DateConverter {
   // Convert Gregorian to Shamsi
-  static toShamsi(dateStr: string): string {
-    const date = new Date(dateStr);
-    const { gy, gm, gd } = {
-      gy: date.getFullYear(),
-      gm: date.getMonth() + 1, // JS months are 0-based
-      gd: date.getDate(),
-    };
+  static toShamsi(dateStr: string | null | undefined): string {
+    // Handle null, undefined, or empty string
+    if (!dateStr || dateStr === '') {
+      return '';
+    }
 
-    const { jy, jm, jd } = jalaali.toJalaali(gy, gm, gd);
-    return `${jy}/${String(jm).padStart(2, '0')}/${String(jd).padStart(2, '0')}`;
+    try {
+      const date = new Date(dateStr);
+      
+      // Check if the date is valid
+      if (isNaN(date.getTime())) {
+        return '';
+      }
+
+      const { gy, gm, gd } = {
+        gy: date.getFullYear(),
+        gm: date.getMonth() + 1, // JS months are 0-based
+        gd: date.getDate(),
+      };
+
+      const { jy, jm, jd } = jalaali.toJalaali(gy, gm, gd);
+      return `${jy}/${String(jm).padStart(2, '0')}/${String(jd).padStart(2, '0')}`;
+    } catch (error) {
+      console.error('Error converting date to Shamsi:', error, dateStr);
+      return '';
+    }
   }
 
   // Convert Shamsi to Gregorian

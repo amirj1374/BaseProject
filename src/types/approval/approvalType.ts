@@ -275,7 +275,7 @@ export interface LoanRequestDetail {
 
 export interface FacilitiesRequest {
   id: number;
-  approvalType: string;
+  approvalType?: string;
   currency: string;
   amount: number;
   repaymentType: string;
@@ -293,7 +293,7 @@ export interface FacilitiesRequest {
 
 export interface GuaranteeRequest {
   id: number;
-  approvalType: string;
+  approvalType?: string;
   currency: string;
   amount: number;
   year?: string;

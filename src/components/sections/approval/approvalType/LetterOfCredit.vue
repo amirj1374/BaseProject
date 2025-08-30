@@ -2,7 +2,7 @@
   <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">اعتبار اسنادی</h4>
-      <v-btn color="secondary" @click="openDialog" :disabled="loading || lc.length >= 1"> افزودن اعتبار اسنادی</v-btn>
+      <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="loading || lc.length >= 1"> افزودن اعتبار اسنادی</v-btn>
     </div>
 
     <v-data-table-virtual
@@ -42,9 +42,9 @@
       <template #item.actions="{ item }">
         <div class="d-flex gap-2">
           <v-btn size="small" variant="text" @click="editItem(item)">
-            <IconPencil color="blue" size="20" />
+            <IconPencil  color="blue" size="20" />
           </v-btn>
-          <v-btn size="small" variant="text" @click="deleteItem(item)">
+          <v-btn v-if="!props.readonly" size="small" variant="text" @click="deleteItem(item)">
             <IconTrash color="red" size="20" />
           </v-btn>
         </div>
@@ -54,7 +54,7 @@
     <v-dialog v-model="dialog" max-width="800px">
       <v-card>
         <v-card-title class="d-flex align-center py-5 px-5">
-          <span class="text-h3">{{ isEditing ? 'ویرایش اعتبار اسنادی' : 'افزودن اعتبار اسنادی' }}</span>
+          <span v-if="!props.readonly" class="text-h3">{{ isEditing ? 'ویرایش اعتبار اسنادی' : 'افزودن اعتبار اسنادی' }}</span>
           <v-spacer></v-spacer>
           <v-btn size="small" variant="text" @click="closeDialog">
             <IconX color="red" size="20" />
@@ -71,6 +71,7 @@
                   variant="outlined"
                   density="comfortable"
                   :rules="[required]"
+                  :disabled="props.readonly"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -84,6 +85,7 @@
                   item-value="code"
                   :items="baseStore.currency"
                   :rules="[required]"
+                    :disabled="props.readonly"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -94,6 +96,7 @@
                   density="comfortable"
                   :items="LcTypeOptions || []"
                   :rules="[required]"
+                    :disabled="props.readonly"
                 />
               </v-col>
             </v-row>
@@ -118,6 +121,7 @@
                   color="primary"
                   label="ماه"
                   type="number"
+                  :disabled="props.readonly"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="2">
@@ -129,10 +133,11 @@
                   color="primary"
                   label="روز"
                   type="number"
+                  :disabled="props.readonly"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="2">
-                <v-btn size="x-large" color="secondary" variant="outlined" @click="dayCalculate"> محاسبه</v-btn>
+                <v-btn size="x-large" :disabled="props.readonly" color="secondary" variant="outlined" @click="dayCalculate"> محاسبه</v-btn>
               </v-col>
               <v-col cols="12" md="4">
                 <v-text-field
@@ -144,6 +149,7 @@
                   readonly
                   suffix="روز"
                   :rules="[required]"
+                    :disabled="props.readonly"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -158,6 +164,7 @@
                   hide-details="auto"
                :suffix="dynamicSuffix"
                   :rules="[required]"
+                    :disabled="props.readonly"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -172,6 +179,7 @@
                   min="1"
                   max="100"
                   :rules="[percentRule]"
+                    :disabled="props.readonly"
 
                 />
               </v-col>
@@ -187,6 +195,7 @@
                   min="1"
                   max="100"
                   :rules="[percentRule]"
+                    :disabled="props.readonly"
                 />
               </v-col>
             </v-row>
@@ -199,12 +208,13 @@
                   density="comfortable"
                   :items="CreditTypeOptions || []"
                   :rules="[required]"
+                    :disabled="props.readonly"
                 />
               </v-col>
             </v-row>
             <v-row>
               <v-col cols="12">
-                <v-btn color="primary" variant="tonal" @click="showCollateralInputDialog = true" class="mb-4"> افزودن وثیقه </v-btn>
+                <v-btn color="primary" variant="tonal" :disabled="props.readonly" @click="showCollateralInputDialog = true" class="mb-4"> افزودن وثیقه </v-btn>
               </v-col>
             </v-row>
             <v-data-table-virtual
@@ -232,7 +242,7 @@
               <template v-slot:item.actions="{ index }">
                 <v-tooltip location="top" text="حذف وثیقه">
                   <template v-slot:activator="{ props: tooltipProps }">
-                    <v-btn variant="text" size="small" color="error" v-bind="tooltipProps" @click="removeCollateralItem(index)"> ❌ </v-btn>
+                    <v-btn v-if="!props.readonly" variant="text" size="small" color="error" v-bind="tooltipProps" @click="removeCollateralItem(index)"> ❌ </v-btn>
                   </template>
                 </v-tooltip>
               </template>
@@ -241,10 +251,11 @@
         </v-card-text>
         <v-card-actions>
           <div style="display: flex; justify-content: space-evenly; width: 100%">
-            <v-btn color="primary" @click="saveLc" :loading="loading" :disabled="!isFormValid || !collateralRequired">
+            <v-btn v-if="!props.readonly" color="primary" @click="saveLc" :loading="loading" :disabled="!isFormValid || !collateralRequired">
               {{ 'ذخیره' }}
             </v-btn>
-            <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
+            <v-btn v-if="!props.readonly" color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
+            <v-btn v-if="props.readonly" color="primary" variant="text" @click="closeDialog"> بستن</v-btn>
           </div>
         </v-card-actions>
       </v-card>
@@ -320,6 +331,7 @@ const collateralTableItems = computed(() =>
 
 const props = defineProps<{
   loading?: boolean;
+  readonly?: boolean;
 }>();
 const emit = defineEmits<{
   (e: 'save', data: LcRequest): void;

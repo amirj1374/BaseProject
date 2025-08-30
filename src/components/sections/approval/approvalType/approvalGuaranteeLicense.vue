@@ -2,7 +2,7 @@
     <div class="approval-section">
       <div class="section-header">
         <h4 class="section-title">تضامین جواز سبز</h4>
-        <v-btn color="secondary" @click="openDialog" :disabled="loading || greenLicense.length >= 1"> افزودن تضامین جواز سبز</v-btn>    </div>
+        <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="loading || greenLicense.length >= 1"> افزودن تضامین جواز سبز</v-btn>    </div>
   
       <v-data-table-virtual
         :headers="headers"
@@ -28,7 +28,7 @@
             <v-btn size="small" variant="text" @click="editItem(item)">
               <IconPencil color="blue" size="20" />
             </v-btn>
-            <v-btn size="small" variant="text" @click="deleteItem(item)">
+            <v-btn v-if="!props.readonly" size="small" variant="text" @click="deleteItem(item)">
               <IconTrash color="red" size="20" />
             </v-btn>
           </div>
@@ -38,7 +38,7 @@
       <v-dialog v-model="dialog" max-width="800px">
         <v-card>
           <v-card-title class="d-flex align-center py-5 px-5">
-            <span class="text-h3">{{ isEditing ? 'ویرایش تضامین جواز سبز' : 'افزودن تضامین جواز سبز' }}</span>
+            <span v-if="!props.readonly" class="text-h3">{{ isEditing ? 'ویرایش تضامین جواز سبز' : 'افزودن تضامین جواز سبز' }}</span>
             <v-spacer></v-spacer>
             <v-btn size="small" variant="text" @click="closeDialog">
               <IconX color="red" size="20" />
@@ -55,6 +55,7 @@
                     variant="outlined"
                     density="comfortable"
                     :rules="[required]"
+                    :disabled="props.readonly"
                   />
                 </v-col>
                 <v-col cols="12" md="4">
@@ -68,6 +69,7 @@
                     item-value="code"
                     :items="baseStore.currency"
                     :rules="[required]"
+                    :disabled="props.readonly"
                   />
                 </v-col>
                 <v-col cols="12" md="4">
@@ -80,6 +82,7 @@
                     hide-details="auto"
                     :rules="[required]"
                     :suffix="dynamicSuffix"
+                    :disabled="props.readonly"
                   />
                 </v-col>
               </v-row>
@@ -88,7 +91,8 @@
                   <v-btn 
                     color="primary" 
                     variant="tonal" 
-                    @click="showCollateralInputDialog = true" 
+                    @click="showCollateralInputDialog = true"
+                    :disabled="props.readonly" 
                     class="mb-4"
                   > 
                     افزودن وثیقه 
@@ -128,6 +132,7 @@
                         color="error" 
                         v-bind="tooltipProps" 
                         @click="removeCollateralItem(index)"
+                        :disabled="props.readonly"
                       >
                         ❌
                       </v-btn>
@@ -139,10 +144,11 @@
           </v-card-text>
           <v-card-actions>
             <div style="display: flex; justify-content: space-evenly; width: 100%;">
-              <v-btn color="primary" @click="saveGreenLicense" :loading="loading" :disabled="!isFormValid || !collateralRequired">
+              <v-btn v-if="!props.readonly" color="primary" @click="saveGreenLicense" :loading="loading" :disabled="!isFormValid || !collateralRequired">
               {{ 'ذخیره' }}
             </v-btn>
-            <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
+            <v-btn v-if="!props.readonly" color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
+            <v-btn v-if="props.readonly" color="primary" variant="text" @click="closeDialog"> بستن</v-btn>
             </div>
           </v-card-actions>
         </v-card>
@@ -237,8 +243,9 @@
   });
   
   const props = defineProps<{
-    loading?: boolean;
-  }>();
+  loading?: boolean;
+  readonly?: boolean;
+}>();
   const emit = defineEmits<{
     (e: 'save', data: GreenLicense): void;
     (e: 'delete', item: GreenLicense): void;

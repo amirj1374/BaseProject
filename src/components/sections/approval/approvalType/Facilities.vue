@@ -2,7 +2,7 @@
   <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">تسهیلات</h4>
-      <v-btn color="secondary" @click="openDialog" :disabled="customizerStore.loading || facilities.length >= 1"> افزودن تسهیلات</v-btn>
+      <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="customizerStore.loading || facilities.length >= 1"> افزودن تسهیلات</v-btn>
     </div>
 
     <v-data-table-virtual
@@ -38,7 +38,7 @@
           <v-btn size="small" variant="text" @click="editItem(item)">
             <IconPencil color="blue" size="20" />
           </v-btn>
-          <v-btn size="small" variant="text" @click="deleteItem(item)">
+          <v-btn v-if="!props.readonly" size="small" variant="text" @click="deleteItem(item)">
             <IconTrash color="red" size="20" />
           </v-btn>
         </div>
@@ -65,6 +65,7 @@
                   variant="outlined"
                   density="comfortable"
                   :rules="[required]"
+                  :disabled="props.readonly"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -78,6 +79,7 @@
                   item-value="code"
                   :items="baseStore.currency"
                   :rules="[required]"
+                  :disabled="props.readonly"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -88,6 +90,7 @@
                   density="comfortable"
                   :items="RepaymentTypeOptions || []"
                   :rules="[required]"
+                  :disabled="props.readonly"
                 />
               </v-col>
             </v-row>
@@ -108,6 +111,7 @@
                     formData.facility = null;
                     fetchFacilities(val);
                   }"
+                  :disabled="props.readonly"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="12" md="8">
@@ -122,6 +126,7 @@
                   clearable
                   return-object
                   :rules="[required]"
+                  :disabled="props.readonly"
                 ></v-autocomplete>
               </v-col>
             </v-row>
@@ -135,6 +140,7 @@
                   color="primary"
                   label="سال"
                   type="number"
+                  :disabled="props.readonly"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="2">
@@ -146,6 +152,7 @@
                   color="primary"
                   label="ماه"
                   type="number"
+                  :disabled="props.readonly"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="2">
@@ -157,10 +164,11 @@
                   color="primary"
                   label="روز"
                   type="number"
+                  :disabled="props.readonly"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="2">
-                <v-btn size="x-large" color="secondary" variant="outlined" @click="dayCalculate"> محاسبه</v-btn>
+                <v-btn size="x-large" :disabled="props.readonly" color="secondary" variant="outlined" @click="dayCalculate"> محاسبه</v-btn>
               </v-col>
               <v-col cols="12" md="4">
                 <v-text-field
@@ -172,6 +180,7 @@
                   readonly
                   suffix="روز"
                   :rules="[required]"
+                  :disabled="props.readonly"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -186,6 +195,7 @@
                   hide-details="auto"
                 :suffix="dynamicSuffix"
                   :rules="[required]"
+                  :disabled="props.readonly"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -201,6 +211,7 @@
                   :rules="[percentRule]"
                   min="1"
                   max="100"
+                  :disabled="props.readonly"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -215,6 +226,7 @@
                   type="number"
                   min="1"
                   max="100"
+                  :disabled="props.readonly"
                   :rules="[percentRule]"
                 />
               </v-col>
@@ -224,12 +236,14 @@
                     @update:model-value="(value: any) => formData.considerPreviousDebt = Boolean(value)"
                     label="بدهی قبلی لحاظ شود؟"
                     density="comfortable"
+                    :disabled="props.readonly"
+                    v-if="formData.approvalType === 'CASE'"
                   />
                 </v-col>
             </v-row>
             <v-row>
               <v-col cols="12">
-                <v-btn color="primary" variant="tonal" @click="showCollateralInputDialog = true" class="mb-4"> افزودن وثیقه </v-btn>
+                <v-btn color="primary" variant="tonal" :disabled="props.readonly" @click="showCollateralInputDialog = true" class="mb-4"> افزودن وثیقه </v-btn>
               </v-col>
             </v-row>
             <v-data-table-virtual
@@ -345,7 +359,11 @@ const percentRule = (v: string) =>  (Number(v) >= 0 && Number(v) <= 100) || 'د�
 
 const props = defineProps<{
   loading?: boolean;
+  readonly?: boolean;
 }>();
+
+// Computed property for disabled state
+const isDisabled = computed(() => props.readonly || props.loading);
 const emit = defineEmits<{
   (e: 'save', data: FacilitiesRequest): void;
   (e: 'delete', item: FacilitiesRequest): void;
@@ -470,7 +488,7 @@ function resetForm() {
 function editItem(item: FacilitiesRequest) {
   isEditing.value = true;
   editingId.value = item.id;
-  formData.approvalType = item.approvalType;
+  formData.approvalType = item.approvalType || '';
   formData.currency = item.currency;
   formData.amount = item.amount;
   formData.repaymentType = item.repaymentType;

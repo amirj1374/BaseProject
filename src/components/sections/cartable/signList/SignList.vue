@@ -26,7 +26,7 @@
             </v-chip>
           </template>
           <template #item.actionDoneAt="{ value }">
-            <span>{{ DateConverter.toShamsi(value) || '-' }}</span>
+            <span>{{ value ? DateConverter.toShamsi(value) : '-' }}</span>
           </template>
           <template #no-data>
             <div class="py-6 text-center">رکوردی یافت نشد</div>

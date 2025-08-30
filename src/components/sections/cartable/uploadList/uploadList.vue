@@ -72,6 +72,15 @@ function fixUrl(url: string): string {
   return url.replace(/(https?:\/\/[^:]+:\d+)(?!\/)/, '$1/');
 }
 
+// Group header template function to show nationalCode and fullName
+const getGroupHeaderTemplate = (groupKey: string | number, groupItems: any[]): string => {
+  if (groupItems.length > 0) {
+    const firstItem = groupItems[0];
+    return ` نام و نام خانوادگی :  ${firstItem.fullName}  -  کد ملی : ${firstItem.nationalCode} (${groupItems.length} مدرک)`;
+  }
+  return `${groupKey} (${groupItems.length} مدرک)`;
+};
+
 function openImageDialog(url: string) {
   console.log('Original URL:', url);
 
@@ -103,8 +112,6 @@ function openImageDialog(url: string) {
 }
 
 const headers = [
-  { title: 'نام و نام خانوادگی', key: 'fullName' },
-  { title: 'کد ملی', key: 'nationalCode' },
   { title: 'نوع', key: 'relationType', translate: true, options: RelationTypeOptions },
   { title: 'عنوان مدرک', key: 'fileName' }
 ];
@@ -214,6 +221,7 @@ defineExpose({ submitData });
         :default-expanded="true"
         :page-size="50"
         :download-link="downloadLink"
+          :group-header-template="getGroupHeaderTemplate"
       />
     </form>
   </div>

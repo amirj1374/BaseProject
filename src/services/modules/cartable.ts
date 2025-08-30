@@ -58,4 +58,8 @@ export default (axiosInstance: AxiosInstance) => ({
   getCreditApproval(cartableId: string) {
     return axiosInstance.get(`api/v1/credit-approvals/summary/${cartableId}`);
   },
+
+  getLoanRequestDetail(loanRequestId: string) {
+    return axiosInstance.get(`api/v1/general/more-approval-detail?loanRequestId=${loanRequestId}`);
+  },
 });

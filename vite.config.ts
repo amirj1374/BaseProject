@@ -58,6 +58,10 @@ export default defineConfig(({ command, mode }) => {
     server: {
       host: true, // Allow external connections (same as --host)
       port: parseInt(env.VITE_PORT) || 5050, // Use env port or fallback to 5050
+      headers: {
+        'Cross-Origin-Embedder-Policy': 'unsafe-none',
+        'Cross-Origin-Opener-Policy': 'unsafe-none'
+      }
     },
     // Dynamic base URL based on environment
     base: env.VITE_BASE_URL || '/',
