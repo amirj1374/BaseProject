@@ -8,6 +8,7 @@ import { IconMenu2, IconSearch, IconBell, IconSettings, IconPalette } from '@tab
 import NotificationDD from './NotificationDD.vue';
 import ProfileDD from './ProfileDD.vue';
 import Searchbar from './SearchBarPanel.vue';
+import LogoUser from '../logo/LogoUser.vue';
 
 const customizer = useCustomizerStore();
 const showSearch = ref(false);
@@ -103,10 +104,10 @@ function searchbox() {
     <v-menu :close-on-content-click="false">
       <template v-slot:activator="{ props }">
         <v-btn class="profileBtn text-primary" color="lightprimary" variant="flat" rounded="pill" v-bind="props">
-          <v-avatar size="30" class="ml-2 py-2">
-            <img src="@/assets/images/profile/profile-user-account-svgrepo-com.svg" alt="Julia" />
+          <v-avatar size="30" class="ml-2 d-flex align-items-center">
+            <LogoUser/>
           </v-avatar>
-          <IconSettings stroke-width="1.5" />
+          <IconSettings stroke-width="2.5" />
         </v-btn>
       </template>
       <v-sheet rounded="md" width="330" elevation="12">

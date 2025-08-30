@@ -130,6 +130,7 @@ const handleFileUpload = async () => {
     error.value = err.message || 'خطا در آپلود فایل';
   } finally {
     uploading.value = false;
+    selectedFile.value = null;
   }
 };
 

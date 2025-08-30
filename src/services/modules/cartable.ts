@@ -1,4 +1,5 @@
 import type { SubmitReferencePayload, SubmitSignPayload, ValidUserPayload } from "@/types/cartable/cartableTypes";
+import type { CreditApprovalFinancialSummaryDTO, CreditApprovalLastDecisionDTO } from '@/types/preApproval/preApprovalTypes';
 import type { AxiosInstance } from "axios";
 import { stubTrue } from 'lodash-es';
 
@@ -46,8 +47,12 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.get(`api/v1/credit-approvals/report/base?cartableId=${cartableId}`);
   },
   
-  saveCreditApproval(payload: any) {
-    return axiosInstance.post(`api/v1/credit-approvals`, payload);
+  saveCreditApproval(cartableId: string , payload: CreditApprovalFinancialSummaryDTO) {
+    return axiosInstance.post(`api/v1/credit-approvals/financial-summary/${cartableId} `, payload);
+  },
+
+  saveLastDecision(cartableId: string , payload: CreditApprovalLastDecisionDTO) {
+    return axiosInstance.post(`api/v1/credit-approvals/last-decision/${cartableId}`, payload);
   },
 
   getCreditApproval(cartableId: string) {

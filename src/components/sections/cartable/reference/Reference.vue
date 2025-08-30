@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
 import { api } from '@/services/api';
 import type { ActionData, SubmitReferencePayload, ValidRole } from '@/types/cartable/cartableTypes';
 import { onMounted, ref, watch, computed } from 'vue';
@@ -12,6 +13,7 @@ const snackbarMessage = ref<string>('');
 const snackbarColor = ref<string>('');
 const snackbar = ref<boolean>(false);
 const error = ref<string>('');
+const selectedDate = ref<string | null>(null);
 const props = defineProps<{
   item: any;
   onSuccess?: () => void;
@@ -61,6 +63,15 @@ const description = ref('');
 const loading = ref(false);
 
 const submitForm = async () => {
+  // Validate user selection before submitting
+  if (userSelectionError.value) {
+    error.value = userSelectionError.value;
+    snackbarMessage.value = error.value;
+    snackbarColor.value = 'error';
+    snackbar.value = true;
+    return;
+  }
+  
   try {
     loading.value = true;
     const payload: SubmitReferencePayload = {
@@ -72,6 +83,7 @@ const submitForm = async () => {
       description: description.value,
       actionType: selectedAction.value?.actionType ?? '',
       usernameList: selectedValidUser.value.map(user => user.username), // Extract usernames from selected users array
+      correctionDeadline : selectedDate?.value ?? undefined,
     };
     const response = await api.cartable.submitReference(payload);
     if (response.status === 200) {
@@ -97,6 +109,42 @@ const percent = ref<number | null>(null);
 
 const validUserOptions = ref<any[]>([]);
 const selectedValidUser = ref<any[]>([]); // Changed from any | null to any[]
+
+// Validation for user selection
+const userSelectionError = computed(() => {
+  if (!selectedRole.value) return '';
+  
+  const minUsers = selectedRole.value.minUserNumber || 0;
+  const maxUsers = selectedRole.value.maxUserNumber || 0;
+  const selectedCount = selectedValidUser.value.length;
+  
+  if (minUsers > 0 && selectedCount < minUsers) {
+    return `حداقل ${minUsers} کاربر باید انتخاب شود`;
+  }
+  
+  if (maxUsers > 0 && selectedCount > maxUsers) {
+    return `حداکثر ${maxUsers} کاربر می‌تواند انتخاب شود`;
+  }
+  
+  return '';
+});
+
+const userSelectionHelperText = computed(() => {
+  if (!selectedRole.value) return '';
+  
+  const minUsers = selectedRole.value.minUserNumber || 0;
+  const maxUsers = selectedRole.value.maxUserNumber || 0;
+  
+  if (minUsers > 0 && maxUsers > 0) {
+    return `انتخاب ${minUsers} تا ${maxUsers} کاربر`;
+  } else if (minUsers > 0) {
+    return `حداقل ${minUsers} کاربر`;
+  } else if (maxUsers > 0) {
+    return `حداکثر ${maxUsers} کاربر`;
+  }
+  
+  return '';
+});
 
 const handleValidUser = async (role: ValidRole) => {
   if (!role || !selectedAction.value) return;
@@ -170,6 +218,10 @@ watch(validUserOptions, (newOptions) => {
           multiple
           chips
           closable-chips
+          :error-messages="userSelectionError"
+          :hint="userSelectionHelperText"
+          persistent-hint
+          :color="userSelectionError ? 'error' : 'primary'"
         />
       </v-col>
     </v-row>
@@ -184,8 +236,20 @@ watch(validUserOptions, (newOptions) => {
       </v-col>
     </v-row>
     <v-row>
+      <v-col cols="12" md="6">
+        <ShamsiDatePicker
+          v-if="selectedRole?.canSetCorrectionDeadline === true"
+          v-model="selectedDate"
+          label="تاریخ مهلت اصلاح شعبه"
+          variant="outlined"
+          clearable
+        />
+      </v-col>
+    </v-row>
+    <v-row>
       <v-col cols="12" md="12" style="display: flex; justify-content: center; gap: 10px">
         <v-btn type="submit" color="primary" :loading="loading">تایید</v-btn>
+        <v-btn color="error" @click="emit('close')">انصراف</v-btn>
       </v-col>
     </v-row>
   </form>

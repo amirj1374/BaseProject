@@ -1,5 +1,5 @@
 import axios, { type AxiosInstance } from "axios";
-import type { PersonDTO } from '@/types/models/person';
+import type { CustomizerDTO, PersonDTO } from '@/types/models/person';
 import type { UserInfoResponse } from '@/types/models/userInfo';
 
 const userApi = (axiosInstance: AxiosInstance) => ({
@@ -21,6 +21,9 @@ const userApi = (axiosInstance: AxiosInstance) => ({
   delete(id: string) {
     return axiosInstance.delete(`api/v1/personTransaction-requests/${id}`);
   },
+  setCustomizer(data: CustomizerDTO) {
+    return axiosInstance.post(`api/v1/customizer`, data);
+  }
 });
 
 export default userApi;

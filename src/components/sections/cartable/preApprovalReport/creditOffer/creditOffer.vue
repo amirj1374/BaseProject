@@ -1,73 +1,162 @@
 <template>
-  <div class="credit-offer">
-    <h3>مشخصات پيشنهاد اعتباري</h3>
-    <p>Loan Request ID: {{ props.loanRequestId }}</p>
-    <p>Cartable ID: {{ props.cartableId }}</p>
-    <p>Current Step: {{ props.currentStep }} / {{ props.totalSteps }}</p>
-    
-    <!-- Add your component content here -->
-    <div class="content">
-      <p>محتوای مشخصات پيشنهاد اعتباري</p>
-    </div>
+  <div class="approval-section">
+    <v-form ref="formRef" v-model="isValid" lazy-validation>
+      <!-- Credit Approval Last Decision Section -->
+      <v-row>
+        <v-col cols="12">
+          <h3 class="text-h6 mb-4">تصمیم نهایی اعتبار</h3>
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col cols="12" md="6">
+          <v-text-field
+            v-model="lastDecisionForm.finalApprovalReference"
+            label="مرجع تصویب نهایی"
+            variant="outlined"
+            density="comfortable"
+            placeholder="شماره مرجع تصویب نهایی"
+          />
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-text-field
+            v-model="lastDecisionForm.attachedByLetterNo"
+            label="منضم به نامه شماره"
+            variant="outlined"
+            density="comfortable"
+            placeholder="شماره نامه ضمیمه"
+          />
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col cols="12" md="6">
+          <ShamsiDatePicker
+            v-model="lastDecisionForm.attachedByLetterNoDate"
+            label="تاریخ نامه"
+            variant="outlined"
+            density="comfortable"
+            mode="single"
+            format="YYYY-MM-DD"
+            displayFormat="jYYYY/jMM/jDD"
+            placeholder="تاریخ نامه را انتخاب کنید"
+          />
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-textarea
+            v-model="lastDecisionForm.regionOrCorpBankingSuggestion"
+            label="پیشنهاد سرپرستی منطقه/ مدیریت بانکداری شرکتی"
+            variant="outlined"
+            density="comfortable"
+            placeholder="پیشنهادات و توضیحات"
+            rows="3"
+            auto-grow
+          />
+        </v-col>
+      </v-row>
+    </v-form>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref } from 'vue';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { api } from '@/services/api';
+import { usePreApprovalStore } from '@/stores/preApproval';
+import type { CreditApprovalLastDecisionDTO } from '@/types/preApproval/preApprovalTypes';
+import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
 
-// Define props for the component
-const props = defineProps({
-  loanRequestId: {
-    type: String,
-    required: true
-  },
-  cartableId: {
-    type: String,
-    required: true
-  },
-  currentStep: {
-    type: Number,
-    required: true
-  },
-  totalSteps: {
-    type: Number,
-    required: true
+const props = defineProps<{ cartableId: string; loanRequestId: string; currentStep: number; totalSteps: number; loanRequestTypeOptions?: string[] }>();
+
+const preApprovalStore = usePreApprovalStore();
+const formRef = ref();
+const isValid = ref(false);
+
+// Last Decision form data
+const lastDecisionForm = ref({
+  // مرجع تصویب نهایی
+  finalApprovalReference: '',
+  // منضم به نامه شماره
+  attachedByLetterNo: '',
+  // تاریخ نامه
+  attachedByLetterNoDate: '',
+  // پیشنهاد سرپرستی منطقه/ مدیریت بانکداری شرکتی
+  regionOrCorpBankingSuggestion: '',
+});
+
+onMounted(async () => {
+  try {
+    preApprovalStore.setLoading(true);
+    const res = await api.cartable.getCreditApproval(props.cartableId);
+    if (res?.status === 200 && res.data) {
+      // Set data to store
+      preApprovalStore.setPreApprovalData({
+        creditApprovalFinancialSummaryDTO: res.data.creditApprovalFinancialSummaryDTO,
+        creditApprovalLastDecisionDTO: res.data.creditApprovalLastDecisionDTO
+      });
+
+      // Populate last decision form with store data
+      const lastDecisionData = res.data.creditApprovalLastDecisionDTO;
+      if (lastDecisionData) {
+        lastDecisionForm.value = {
+          finalApprovalReference: lastDecisionData.finalApprovalReference || '',
+          attachedByLetterNo: lastDecisionData.attachedByLetterNo || '',
+          attachedByLetterNoDate: lastDecisionData.attachedByLetterNoDate || '',
+          regionOrCorpBankingSuggestion: lastDecisionData.regionOrCorpBankingSuggestion || '',
+        };
+      }
+
+      console.log('Credit approval data loaded to store and form:', res.data);
+    }
+  } catch (e) {
+    console.error('Error loading credit approval data:', e);
+    preApprovalStore.setError('خطا در بارگذاری اطلاعات');
+  } finally {
+    preApprovalStore.setLoading(false);
   }
 });
 
-console.log('CreditOffer component received props:', props);
-
-// Submit data method for stepper
 const submitData = async () => {
+  const result = await formRef.value?.validate();
+  if (result?.valid === false) return Promise.reject('لطفاً خطاهای فرم را برطرف کنید');
   try {
-    // Add your validation and submission logic here
-    console.log('Submitting credit offer data for loan request:', props.loanRequestId);
-    
-    // Example: Validate data before proceeding
-    // if (!someRequiredData) {
-    //   throw new Error('اطلاعات الزامی وارد نشده است');
-    // }
-    
-    return Promise.resolve();
-  } catch (error) {
-    return Promise.reject(error);
+    // Use local form data for submission
+    const payload = {
+      ...lastDecisionForm.value,
+      cartableId: parseInt(props.cartableId),
+      // Add required fields with default values
+      createdAt: null,
+      updatedAt: null,
+      createdBy: null,
+      updatedBy: null,
+      id: null,
+    } as unknown as CreditApprovalLastDecisionDTO;
+
+    // Call saveLastDecision API
+    const res = await api.cartable.saveLastDecision(props.cartableId, payload);
+
+    if (res?.status === 200 && res.data) {
+      console.log('Last decision data saved successfully:', res.data);
+
+      // Update store with the response data ONLY on successful submit
+      preApprovalStore.setPreApprovalData({
+        creditApprovalLastDecisionDTO: res.data
+      });
+
+      return Promise.resolve();
+    }
+
+    return Promise.reject('خطا در ثبت اطلاعات');
+  } catch (e) {
+    console.error('Error saving last decision data:', e);
+    return Promise.reject('خطا در ثبت اطلاعات');
   }
 };
 
-// Expose the submitData method for the stepper
 defineExpose({ submitData });
 </script>
 
 <style scoped>
-.credit-offer {
-  padding: 20px;
-}
-
-.content {
-  margin-top: 20px;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+.credit-approval-form {
+  padding: 8px;
 }
 </style>

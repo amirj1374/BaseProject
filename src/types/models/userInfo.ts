@@ -1,3 +1,5 @@
+import type { CustomizerDTO } from '@/types/models/person';
+
 export interface UserInfoResponse {
   name: string;
   sub: string;
@@ -23,4 +25,5 @@ export interface UserInfoResponse {
   email: string | null;
   roles: string[];
   lotusRoles: string[];
+  customizer: CustomizerDTO
 } 

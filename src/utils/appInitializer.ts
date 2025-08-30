@@ -3,6 +3,37 @@ import { useBaseStore } from '@/stores/base';
 import { useCustomerInfoStore } from '@/stores/customerInfo';
 import { useCustomizerStore } from '@/stores/customizer';
 
+// Validation arrays
+const validThemes = [
+  'ModernTheme', 'PurpleTheme', 'SteelTealGreen', 'OrangeTheme', 'TealTheme',
+  'DarkModernTheme', 'DarkPurpleTheme', 'DarkSteelTealGreen', 'DarkOrangeTheme', 'DarkTealTheme'
+];
+
+const validLayoutTypes = ['SideBar', 'NavBar'];
+const validFontThemes = ['vazir', 'yekanLight', 'iranSans', 'kalamehLight'];
+const validThemeModes = ['light', 'dark'];
+
+// Validation functions
+function validateTheme(theme: string): string {
+  return validThemes.includes(theme) ? theme : 'PurpleTheme';
+}
+
+function validateLayoutType(layout: string): string {
+  return validLayoutTypes.includes(layout) ? layout : 'SideBar';
+}
+
+function validateFontTheme(font: string): string {
+  return validFontThemes.includes(font) ? font : 'vazir';
+}
+
+function validateThemeMode(mode: string): string {
+  return validThemeModes.includes(mode) ? mode : 'light';
+}
+
+function validateInputBg(inputBg: boolean): boolean {
+  return typeof inputBg === 'boolean' ? inputBg : false;
+}
+
 // Global initialization promise
 let initializationPromise: Promise<any> | null = null;
 let resolveInit: ((value: any) => void) | null = null;
@@ -44,6 +75,15 @@ export async function startInitialization() {
     const userInfo = await api.user.getUserInfo();
     customerInfoStore.setUserInfo(userInfo.data);
     
+    // Set and validate customizer settings
+    if (userInfo.data.customizer) {
+      customizer.actTheme = validateTheme(userInfo.data.customizer.actTheme);
+      customizer.fontTheme = validateFontTheme(userInfo.data.customizer.fontTheme);
+      customizer.inputBg = validateInputBg(userInfo.data.customizer.inputBg);
+      customizer.themeMode = validateThemeMode(userInfo.data.customizer.themeMode);
+      customizer.layoutType = validateLayoutType(userInfo.data.customizer.layoutType || 'SideBar');
+    }
+
     const currency = await api.approval.fetchCurrencies();
     baseStore.setCurrencyList(currency.data);
     

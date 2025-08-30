@@ -167,6 +167,7 @@ onMounted(async () => {
           :error-messages="error"
           clearable
           placeholder="نقش‌های لوتوسی را انتخاب کنید"
+          :disabled="props.item.canAssignLotusRole === false"
         />
       </v-col>
     </v-row>
@@ -178,6 +179,7 @@ onMounted(async () => {
           variant="outlined"
           type="number"
           density="comfortable"
+          :disabled="props.item.canSetMinMaxUser === false"
         />
       </v-col>
       <v-col cols="12" md="3">
@@ -187,6 +189,8 @@ onMounted(async () => {
           variant="outlined"
           type="number"
           density="comfortable"
+          :disabled="props.item.canSetMinMaxUser === false"
+
         />
       </v-col>
     </v-row>

@@ -23,12 +23,16 @@ export interface ValidRole {
   roleName: string;
   roleCode: number;
   roleDescription: string;
+  minUserNumber?: number;
+  maxUserNumber?: number;
+  canSetCorrectionDeadline?: boolean;
 }
 
 export interface ActionData {
   actionType: string;
   actionName: string;
   validRoles: ValidRole[];
+ 
 }
 
 export interface RoleDTO {
@@ -53,6 +57,7 @@ export interface SubmitReferencePayload {
   description: string;
   actionType: string;
   usernameList: string[];
+  correctionDeadline ?: string;
 }
 
 export interface SubmitSignPayload {

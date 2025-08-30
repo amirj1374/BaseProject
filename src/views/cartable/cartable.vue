@@ -79,7 +79,8 @@ const header = ref([
     key: 'customerGroup',
     sortable: true,
     width: 200,
-  },  {
+  },
+  {
     title: 'نوع مشتری',
     key: 'customerType',
     sortable: true,
@@ -108,6 +109,14 @@ const header = ref([
     editable: true,
     width: 200,
   },
+  {
+    title: 'تاریخ مهلت اصلاح شعبه',
+    key: 'correctionDeadline',
+    sortable: true,
+    editable: true,
+    isDate: true,
+    width: 200,
+  }
 ]);
 
 const tableRef = ref();

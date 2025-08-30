@@ -214,21 +214,53 @@
             placeholder="مثال: 1403/05/01" 
           />
         </v-col>
+        <v-col cols="12" md="3">
+          <v-text-field 
+            v-model="form.letterNo" 
+            label="شماره نامه" 
+            variant="outlined" 
+            density="comfortable" 
+          />
+        </v-col>
+        <v-col cols="12" md="3">
+          <ShamsiDatePicker 
+            v-model="form.letterDate" 
+            label="تاریخ نامه" 
+            variant="outlined" 
+            density="comfortable" 
+            mode="single"
+            format="YYYY-MM-DD"
+            displayFormat="jYYYY/jMM/jDD"
+          />
+        </v-col>
+        <v-col cols="12" md="3">
+          <v-text-field 
+            v-model="form.reqDescription" 
+            label="توضیحات" 
+            variant="outlined" 
+            density="comfortable"
+          />
+        </v-col>
       </v-row>
     </v-form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { api } from '@/services/api';
+import { usePreApprovalStore } from '@/stores/preApproval';
+import type { CreditApprovalFinancialSummaryDTO } from '@/types/preApproval/preApprovalTypes';
+import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
 
 const props = defineProps<{ cartableId: string; loanRequestId: string; currentStep: number; totalSteps: number; loanRequestTypeOptions?: string[] }>();
 
+const preApprovalStore = usePreApprovalStore();
 const formRef = ref();
 const isValid = ref(false);
 
-const form = ref<any>({
+// Local form data - only updates store on submit
+const form = ref({
   // تعداد اشتغال موجود
   employmentCount: null,
   // صادرات
@@ -269,6 +301,12 @@ const form = ref<any>({
   debtOutstanding: null,
   // بازدید
   lastVisit: '',
+  // شماره نامه
+  letterNo: '',
+  // تاریخ نامه
+  letterDate: '',
+  // توضیحات
+  reqDescription: '',
 });
 
 const nonNegative = (v: any) => v == null || v === '' || Number(v) >= 0 || 'باید ≥ 0 باشد';
@@ -276,12 +314,52 @@ const ratio = (v: any) => v == null || v === '' || (Number(v) >= 0 && Number(v) 
 
 onMounted(async () => {
   try {
+    preApprovalStore.setLoading(true);
     const res = await api.cartable.getCreditApproval(props.cartableId);
     if (res?.status === 200 && res.data) {
-      form.value = { ...form.value, ...res.data };
+      // Set data to store
+      preApprovalStore.setPreApprovalData({
+        creditApprovalFinancialSummaryDTO: res.data.creditApprovalFinancialSummaryDTO,
+        creditApprovalLastDecisionDTO: res.data.creditApprovalLastDecisionDTO
+      });
+      
+      // Populate local form with store data
+      const financialData = res.data.creditApprovalFinancialSummaryDTO;
+      if (financialData) {
+        form.value = {
+          employmentCount: financialData.employmentCount || null,
+          exportValue: financialData.exportValue || null,
+          operatingRevenue: financialData.operatingRevenue || null,
+          operatingCosts: financialData.operatingCosts || null,
+          goodsPurchased: financialData.goodsPurchased || null,
+          operatingProfit: financialData.operatingProfit || null,
+          netProfit: financialData.netProfit || null,
+          currentRatio: financialData.currentRatio || null,
+          otherRatio: financialData.otherRatio || null,
+          tradeReceivables: financialData.tradeReceivables || null,
+          inventoryValue: financialData.inventoryValue || null,
+          totalAssets: financialData.totalAssets || null,
+          shareholdersEquity: financialData.shareholdersEquity || null,
+          retainedEarnings: financialData.retainedEarnings || null,
+          debtRatio: financialData.debtRatio || null,
+          hasReturnedChecks: financialData.hasReturnedChecks || false,
+          guaranteeOutstanding: financialData.guaranteeOutstanding || null,
+          creditOutstanding: financialData.creditOutstanding || null,
+          debtOutstanding: financialData.debtOutstanding || null,
+          lastVisit: financialData.lastVisit || '',
+          letterNo: financialData.letterNo || '',
+          letterDate: financialData.letterDate || '',
+          reqDescription: financialData.reqDescription || '',
+        };
+      }
+      
+      console.log('Credit approval data loaded to store and form:', res.data);
     }
   } catch (e) {
-    // ignore load failure silently
+    console.error('Error loading credit approval data:', e);
+    preApprovalStore.setError('خطا در بارگذاری اطلاعات');
+  } finally {
+    preApprovalStore.setLoading(false);
   }
 });
 
@@ -289,19 +367,36 @@ const submitData = async () => {
   const result = await formRef.value?.validate();
   if (result?.valid === false) return Promise.reject('لطفاً خطاهای فرم را برطرف کنید');
   try {
-    // If backend expects cartableId, attach it
-    const payload = { ...form.value, cartableId: props.cartableId };
-    // If save API exists
-    // @ts-ignore
-    if (api.cartable.saveCreditApproval) {
-      // @ts-ignore
-      const res = await api.cartable.saveCreditApproval(payload);
-      if (res?.status === 200) return Promise.resolve();
-      return Promise.reject('خطا در ثبت اطلاعات');
+    // Use local form data for submission
+    const payload = {
+      ...form.value,
+      cartableId: parseInt(props.cartableId),
+      // Add required fields with default values
+      createdAt: null,
+      updatedAt: null,
+      createdBy: null,
+      updatedBy: null,
+      id: null,
+    } as unknown as CreditApprovalFinancialSummaryDTO;
+
+    // Call saveCreditApproval API
+    const res = await api.cartable.saveCreditApproval(props.cartableId, payload);
+    
+    if (res?.status === 200 && res.data) {
+      console.log('Credit approval data saved successfully:', res.data);
+      
+      // Update store with the response data ONLY on successful submit
+      preApprovalStore.setPreApprovalData({
+        creditApprovalFinancialSummaryDTO: res.data.creditApprovalFinancialSummaryDTO || res.data,
+        creditApprovalLastDecisionDTO: res.data.creditApprovalLastDecisionDTO
+      });
+      
+      return Promise.resolve();
     }
-    // Fallback: resolve without saving if API not available
-    return Promise.resolve();
+    
+    return Promise.reject('خطا در ثبت اطلاعات');
   } catch (e) {
+    console.error('Error saving credit approval data:', e);
     return Promise.reject('خطا در ثبت اطلاعات');
   }
 };

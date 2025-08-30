@@ -55,16 +55,8 @@ const steps = [
     section: defineAsyncComponent(() => import('./depositStatus/depositStatus.vue'))
   },
   {
-    title: 'وضعيت تسهيلات و تعهدات مشتري',
-    section: defineAsyncComponent(() => import('./facilityStatus/facilityStatus.vue'))
-  },
-  {
     title: 'مصوبات اخیر',
     section: defineAsyncComponent(() => import('./recentApproval/recentApproval.vue'))
-  },
-  {
-    title: 'ساير شرايط و ملاحظات',
-    section: defineAsyncComponent(() => import('./comments/comments.vue'))
   },
   {
     title: 'مشاهده گزارش پیش مصوبه',

@@ -1,13 +1,40 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useCustomizerStore } from '@/stores/customizer';
 import { IconSun, IconMoon } from '@tabler/icons-vue';
+import { api } from '@/services/api';
+import type { CustomizerDTO } from '@/types/models/person';
 
 const customizer = useCustomizerStore();
 
 // Font Family options
 const fontFamily = ref(['vazir', 'yekanLight', 'iranSans', 'kalamehLight']);
+const snackbarMessage = ref('')
+const snackbarColor = ref('')
+const snackbar = ref(false);
 
+// Valid theme names for validation
+const validThemes = [
+  'ModernTheme',
+  'PurpleTheme', 
+  'SteelTealGreen',
+  'OrangeTheme',
+  'TealTheme',
+  'DarkModernTheme',
+  'DarkPurpleTheme',
+  'DarkSteelTealGreen',
+  'DarkOrangeTheme',
+  'DarkTealTheme'
+];
+
+// Valid layout types
+const validLayoutTypes = ['SideBar', 'NavBar'];
+
+// Valid font themes
+const validFontThemes = ['vazir', 'yekanLight', 'iranSans', 'kalamehLight'];
+
+// Valid theme modes
+const validThemeModes = ['light', 'dark'];
 // Theme color palette options (light versions only)
 const colorPalette = ref([
   {
@@ -41,7 +68,57 @@ const colorPalette = ref([
 function getCurrentThemeName(baseThemeName: string): string {
   return customizer.themeMode === 'dark' ? `Dark${baseThemeName}` : baseThemeName;
 }
+const payload: CustomizerDTO = {
+  fontTheme: customizer.fontTheme,
+  inputBg: customizer.inputBg,
+  layoutType: customizer.layoutType,
+  actTheme: customizer.actTheme,
+  themeMode : customizer.themeMode,
+};
+// Validation functions
+function validateTheme(theme: string): string {
+  return validThemes.includes(theme) ? theme : 'PurpleTheme';
+}
 
+function validateLayoutType(layout: string): string {
+  return validLayoutTypes.includes(layout) ? layout : 'SideBar';
+}
+
+function validateFontTheme(font: string): string {
+  return validFontThemes.includes(font) ? font : 'vazir';
+}
+
+function validateThemeMode(mode: string): string {
+  return validThemeModes.includes(mode) ? mode : 'light';
+}
+
+function validateInputBg(inputBg: boolean): boolean {
+  return typeof inputBg === 'boolean' ? inputBg : false;
+}
+
+async function setCustomizer() {
+  try {
+    // Validate and update payload with current values
+    payload.fontTheme = validateFontTheme(customizer.fontTheme);
+    payload.inputBg = validateInputBg(customizer.inputBg);
+    payload.layoutType = validateLayoutType(customizer.layoutType);
+    payload.actTheme = validateTheme(customizer.actTheme);
+    payload.themeMode = validateThemeMode(customizer.themeMode);
+    
+    const res = await api.user.setCustomizer(payload);
+    
+    if (res) {
+      snackbarMessage.value = 'تنظیمات با موفقیت ذخیره شد';
+      snackbarColor.value = 'success';
+      snackbar.value = true;
+    }
+  } catch (error) {
+    console.error('Error saving customizer settings:', error);
+    snackbarMessage.value = 'خطا در ذخیره تنظیمات';
+    snackbarColor.value = 'error';
+    snackbar.value = true;
+  }
+}
 // Function to handle theme selection
 function selectTheme(baseThemeName: string) {
   const themeName = getCurrentThemeName(baseThemeName);
@@ -101,6 +178,21 @@ function getFontDisplayName(font: string): string {
   };
   return fontNames[font] || font;
 }
+
+// Function to validate current customizer settings
+function validateCurrentSettings() {
+  // Validate current settings in the store
+  customizer.fontTheme = validateFontTheme(customizer.fontTheme);
+  customizer.inputBg = validateInputBg(customizer.inputBg);
+  customizer.layoutType = validateLayoutType(customizer.layoutType);
+  customizer.actTheme = validateTheme(customizer.actTheme);
+  customizer.themeMode = validateThemeMode(customizer.themeMode);
+}
+
+// Validate settings when component mounts
+onMounted(() => {
+  validateCurrentSettings();
+});
 </script>
 
 <template>
@@ -261,8 +353,16 @@ function getFontDisplayName(font: string): string {
           </v-tabs-window>
         </v-card-text>
       </v-card>
+      <div class="d-flex py-5 align-center justify-center">
+        <v-btn variant="tonal" color="primary" @click="setCustomizer">
+          تایید
+        </v-btn>
+      </div>
     </perfect-scrollbar>
   </v-navigation-drawer>
+  <v-snackbar v-if="snackbar" v-model="snackbar" :color="snackbarColor" timeout="2500">
+    {{ snackbarMessage }}
+  </v-snackbar>
 </template>
 
 <style lang="scss" scoped>
