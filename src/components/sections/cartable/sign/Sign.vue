@@ -46,12 +46,12 @@ const download1016Report = () => {
 const getExpertReportIsSeenValue = (): boolean | null => {
   const hasPermission = permissionsStore.hasMenuPermission('reviewExpertReport');
   const hasExpertReportUrl = props.item.expertReportUrl;
-  
+
   // Condition is false: send null
   if (!(!hasExpertReportUrl && hasPermission)) {
     return null;
   }
-  
+
   // Condition is true: check switch state
   return Boolean(props.item.expertReportIsSeen);
 };
@@ -63,7 +63,7 @@ const submitForm = async () => {
       cartableId: Number(id.value),
       comment: description.value,
       agreed: Boolean(agreed.value),
-      expertReportIsSeen: getExpertReportIsSeenValue(),
+      expertReportIsSeen: getExpertReportIsSeenValue()
     };
     const response = await api.cartable.submitSign(payload);
     if (response.status === 200) {
@@ -96,29 +96,23 @@ const submitForm = async () => {
         </v-radio-group>
       </v-col>
       <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('reviewExpertReport')">
-        <v-btn  color="info" @click="downloadExpertReport" variant="tonal"> دانلود گزارش کارشناسی </v-btn>
+        <v-btn color="info" @click="downloadExpertReport" variant="tonal"> دانلود گزارش کارشناسی </v-btn>
       </v-col>
       <v-col cols="12" md="3" v-if="props.item.report1016Url && permissionsStore.hasMenuPermission('create1016')">
         <v-btn color="info" @click="download1016Report" variant="tonal"> دانلود گزارش 1016 </v-btn>
       </v-col>
       <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('reviewExpertReport')">
-        <v-switch 
-            v-model="props.item.expertReportIsSeen" 
-            inset 
-            color="primary" 
-            hide-details 
-            class="me-2" 
-          />
-          <span>گزارش کارشناسی مشاهده شد</span>
+        <v-switch v-model="props.item.expertReportIsSeen" inset color="primary" hide-details class="me-2" />
+        <span>گزارش کارشناسی مشاهده شد</span>
       </v-col>
-              <v-col cols="12" md="12">
-          <ApprovalRequestViewer :loan-request-id="props.item.loanRequestId" />
-        </v-col>
       <v-col cols="12" md="12">
-        <v-textarea  v-model="description" label="توضیحات" variant="outlined" clearable />
+        <ApprovalRequestViewer :loan-request-id="props.item.loanRequestId" />
+      </v-col>
+      <v-col cols="12" md="12">
+        <v-textarea v-model="description" label="توضیحات" variant="outlined" clearable />
       </v-col>
     </v-row>
-    
+
     <v-row>
       <v-col cols="12" md="12" style="display: flex; justify-content: center; gap: 10px">
         <v-btn type="submit" color="primary" :loading="loading">تایید</v-btn>

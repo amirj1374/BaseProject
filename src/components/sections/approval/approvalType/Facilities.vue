@@ -271,7 +271,7 @@
               <template v-slot:item.actions="{ index }">
                 <v-tooltip location="top" text="حذف وثیقه">
                   <template v-slot:activator="{ props: tooltipProps }">
-                    <v-btn variant="text" size="small" color="error" v-bind="tooltipProps" @click="removeCollateralItem(index)"> ❌ </v-btn>
+                    <v-btn :disabled="props.readonly" variant="text" size="small" color="error" v-bind="tooltipProps" @click="removeCollateralItem(index)"> ❌ </v-btn>
                   </template>
                 </v-tooltip>
               </template>
@@ -280,10 +280,11 @@
         </v-card-text>
         <v-card-actions>
           <div style="display: flex; justify-content: space-evenly; width: 100%">
-            <v-btn color="primary" @click="saveFacility" :loading="loading" :disabled="!isFormValid || !collateralRequired">
+            <v-btn v-if="!props.readonly" color="primary" @click="saveFacility" :loading="loading" :disabled="!isFormValid || !collateralRequired">
               {{ 'ذخیره' }}
             </v-btn>
-            <v-btn color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
+            <v-btn v-if="!props.readonly" color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
+            <v-btn v-if="props.readonly" color="error" variant="text" @click="closeDialog"> بستن</v-btn>
           </div>
         </v-card-actions>
       </v-card>

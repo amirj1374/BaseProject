@@ -255,7 +255,8 @@
               {{ 'ذخیره' }}
             </v-btn>
             <v-btn v-if="!props.readonly" color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
-            <v-btn v-if="props.readonly" color="primary" variant="text" @click="closeDialog"> بستن</v-btn>
+            <v-btn v-if="props.readonly" color="error" variant="text" @click="closeDialog"> بستن</v-btn>
+
           </div>
         </v-card-actions>
       </v-card>
