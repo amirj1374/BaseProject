@@ -55,6 +55,11 @@ const MainRoutes = {
       name: 'preApprovalReport',
       path: '/preApprovalReport/:id',
       component: () => import('@/components/sections/cartable/preApprovalReport/preApprovalReport.vue')
+    },
+    {
+      name: 'directiveReport',
+      path: '/directiveReport/:id',
+      component: () => import('@/components/sections/cartable/directiveReport/directiveReport.vue')
     }
   ]
 };

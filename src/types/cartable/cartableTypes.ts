@@ -64,6 +64,7 @@ export interface SubmitSignPayload {
   cartableId: number;
   comment: string;
   agreed: boolean;
+  expertReportIsSeen: boolean | null;
 }
 
 type CartableAction = 'CREATED' | 'UPDATED' | 'DELETED'; // Extend as needed

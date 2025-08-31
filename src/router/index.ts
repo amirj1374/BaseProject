@@ -46,6 +46,7 @@ const routePermissions: Record<string, string> = {
   '/base/role-managment': 'admin',
   '/base/department-managment': 'admin',
   '/preApprovalReport': 'preApprovalReport',
+  '/directiveReport': 'directiveReport',
   '/report': 'cartableReport'
 };
 

@@ -16,6 +16,7 @@ export function useRouteGuard() {
       '/base/role-managment': 'admin',
       '/base/department-managment': 'admin',
       '/preApprovalReport': 'preApprovalReport',
+      '/directiveReport': 'directiveReport',
       '/report': 'cartableReport'
     };
 

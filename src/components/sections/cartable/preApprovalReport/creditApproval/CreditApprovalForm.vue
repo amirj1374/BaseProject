@@ -156,7 +156,6 @@
             v-model.number="form.debtRatio" 
             type="number" 
             step="0.01" 
-            :rules="[ratio]" 
             label="نسبت بدهی" 
             variant="outlined" 
             density="comfortable" 
@@ -241,6 +240,17 @@
             density="comfortable"
           />
         </v-col>
+        <v-col cols="12" md="3">
+          <DescriptionInput
+    v-model="form.otherConditionsAndObservations"
+    label="پیشنهادات و توضیحات"
+    placeholder="لطفا توضیحات را وارد کنید..."
+    :start-number="1"
+    :auto-numbering="true"
+    :rows="6"
+    :maxlength="2000"
+  />
+        </v-col>
       </v-row>
     </v-form>
   </div>
@@ -252,6 +262,7 @@ import { api } from '@/services/api';
 import { usePreApprovalStore } from '@/stores/preApproval';
 import type { CreditApprovalFinancialSummaryDTO } from '@/types/preApproval/preApprovalTypes';
 import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
+import DescriptionInput from '@/components/shared/DescriptionInput.vue';
 
 const props = defineProps<{ cartableId: string; loanRequestId: string; currentStep: number; totalSteps: number; loanRequestTypeOptions?: string[] }>();
 
@@ -307,6 +318,8 @@ const form = ref({
   letterDate: '',
   // توضیحات
   reqDescription: '',
+  // توضیحات پروژه
+  otherConditionsAndObservations: '',
 });
 
 const nonNegative = (v: any) => v == null || v === '' || Number(v) >= 0 || 'باید ≥ 0 باشد';
@@ -350,6 +363,7 @@ onMounted(async () => {
           letterNo: financialData.letterNo || '',
           letterDate: financialData.letterDate || '',
           reqDescription: financialData.reqDescription || '',
+          otherConditionsAndObservations: financialData.otherConditionsAndObservations || '',
         };
       }
       

@@ -210,7 +210,7 @@
                     label="بدهی قبلی لحاظ شود؟"
                     density="comfortable"
                       :disabled="props.readonly"
-                         v-if="formData.approvalType === 'CASE'"
+                         v-if="formData.approvalType === 'ANNUAL_LIMIT'"
                   />
                 </v-col>
             </v-row>

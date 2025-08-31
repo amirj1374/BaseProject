@@ -20,11 +20,15 @@ const validThemes = [
   'SteelTealGreen',
   'OrangeTheme',
   'TealTheme',
+  'SilverTheme',
+  'RedTheme',
   'DarkModernTheme',
   'DarkPurpleTheme',
   'DarkSteelTealGreen',
   'DarkOrangeTheme',
-  'DarkTealTheme'
+  'DarkTealTheme',
+  'DarkSilverTheme',
+  'DarkRedTheme'
 ];
 
 // Valid layout types
@@ -61,6 +65,16 @@ const colorPalette = ref([
     themeName: 'TealTheme',
     primary: '#00695C',
     secondary: '#4DB6AC'
+  },
+  {
+    themeName: 'SilverTheme',
+    primary: '#64748b',
+    secondary: '#94a3b8'
+  },
+  {
+    themeName: 'RedTheme',
+    primary: '#203461',
+    secondary: '#EC407A'
   }
 ]);
 

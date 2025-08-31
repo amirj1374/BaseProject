@@ -12,6 +12,7 @@ import { CartableStatusTypeOptions, CustomerTypeOptions } from '@/types/enums/gl
 import { usePermissionsStore } from '@/stores/permissions';
 import SignList from '@/components/sections/cartable/signList/SignList.vue';
 import type { CustomerDto } from '@/types/approval/approvalType';
+import DirectiveReport from '@/components/sections/cartable/directiveReport/directiveReport.vue';
 
 const permissionsStore = usePermissionsStore();
 
@@ -122,6 +123,9 @@ const tableRef = ref();
 const route = {
   'گزارش پیش مصوبه': 'preApprovalReport/{id}'
 };
+const directiveRoute = {
+  'گزارش ابلاغیه': 'directiveReport/{id}'
+}
 
 function handleReferenceSuccess() {
   tableRef.value?.fetchData();
@@ -181,7 +185,10 @@ function handleReferenceSuccess() {
           component: LoanRequestHistory
         }
       ]"
-      :routes="permissionsStore.hasMenuPermission('preApprovalReport') ? route : {}"
+      :routes="{
+        ...(permissionsStore.hasMenuPermission('preApprovalReport') ? route : {}),
+        ...(permissionsStore.hasMenuPermission('addDirectiveFile') ? directiveRoute : {})
+      }"
     />
   </div>
 </template>

@@ -29,6 +29,7 @@ export interface CreditApprovalFinancialSummaryDTO {
     letterNo: string;
     letterDate: string;
     reqDescription: string;
+    otherConditionsAndObservations: string;
   }
   
   export interface CreditApprovalLastDecisionDTO {
@@ -49,4 +50,9 @@ export interface CreditApprovalFinancialSummaryDTO {
     creditApprovalLastDecisionDTO: CreditApprovalLastDecisionDTO | null;
     loading: boolean;
     error: string | null;
+  }
+
+  export interface CreditSuggestionData {
+    templateBody: string;
+    conditions: string;
   }
