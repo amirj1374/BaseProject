@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { api } from '@/services/api';
 import type { SubmitSignPayload } from '@/types/cartable/cartableTypes';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import ApprovalRequestViewer from './ApprovalRequestViewer.vue';
+import { usePermissionsStore } from '@/stores/permissions';
 
 const emit = defineEmits(['close']);
-
+const permissionsStore = usePermissionsStore();
 const snackbarMessage = ref<string>('');
 const snackbarColor = ref<string>('');
 const snackbar = ref<boolean>(false);
@@ -29,6 +30,7 @@ const downloadExpertReport = () => {
     document.body.removeChild(link);
   }
 };
+
 const submitForm = async () => {
   try {
     loading.value = true;
@@ -71,7 +73,7 @@ const submitForm = async () => {
         <v-btn v-if="!props.item.expertReportUrl" color="info" @click="downloadExpertReport" variant="tonal"> دانلود گزارش کارشناسی </v-btn>
       </v-col>
       <v-col cols="12" md="3">
-        <v-btn v-if="!props.item.expertReportUrl" color="info" @click="downloadExpertReport" variant="tonal"> دانلود گزارش 1016 </v-btn>
+        <v-btn v-if="!props.item.expertReportUrl && permissionsStore.hasMenuPermission('create1016')" color="info" @click="downloadExpertReport" variant="tonal"> دانلود گزارش 1016 </v-btn>
       </v-col>
               <v-col cols="12" md="12">
           <ApprovalRequestViewer :loan-request-id="props.item.loanRequestId" />
