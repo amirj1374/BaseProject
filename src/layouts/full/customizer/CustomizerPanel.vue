@@ -230,8 +230,8 @@ onMounted(() => {
 
       <v-card>
         <v-tabs v-model="tab" bg-color="lightprimary" align-tabs="center" fixed-tabs color="primary">
-          <v-tab prepend-icon="mdi-palette" value="style">ظاهر</v-tab>
-          <v-tab prepend-icon="mdi-format-font" value="font">فونت</v-tab>
+          <v-tab  value="style">ظاهر</v-tab>
+          <v-tab  value="font">فونت</v-tab>
         </v-tabs>
 
         <v-card-text>

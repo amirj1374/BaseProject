@@ -5,8 +5,8 @@ import { useCustomizerStore } from '@/stores/customizer';
 
 // Validation arrays
 const validThemes = [
-  'ModernTheme', 'PurpleTheme', 'SteelTealGreen', 'OrangeTheme', 'TealTheme',
-  'DarkModernTheme', 'DarkPurpleTheme', 'DarkSteelTealGreen', 'DarkOrangeTheme', 'DarkTealTheme'
+  'ModernTheme', 'PurpleTheme', 'SteelTealGreen', 'OrangeTheme', 'TealTheme', 'SilverTheme', 'RedTheme',
+  'DarkModernTheme', 'DarkPurpleTheme', 'DarkSteelTealGreen', 'DarkOrangeTheme', 'DarkTealTheme', 'DarkSilverTheme', 'DarkRedTheme'
 ];
 
 const validLayoutTypes = ['SideBar', 'NavBar'];
