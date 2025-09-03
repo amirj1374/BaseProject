@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useCustomizerStore } from '@/stores/customizer';
+import { useCustomerInfoStore } from '@/stores/customerInfo';
+import sidebarItems, { getFilteredSidebarItems } from '../vertical-sidebar/sidebarItem';
+import Logo from '../logo/LogoMain.vue';
 // Icon Imports
-import { IconMenu2, IconSearch, IconBell, IconSettings, IconPalette } from '@tabler/icons-vue';
+import { IconMenu2, IconSearch, IconBell, IconSettings, IconPalette, IconChevronDown } from '@tabler/icons-vue';
 
 // dropdown imports
 import NotificationDD from './NotificationDD.vue';
@@ -11,15 +14,31 @@ import Searchbar from './SearchBarPanel.vue';
 import LogoUser from '../logo/LogoUser.vue';
 
 const customizer = useCustomizerStore();
+const customerInfo = useCustomerInfoStore();
 const showSearch = ref(false);
+
 function searchbox() {
   showSearch.value = !showSearch.value;
 }
+
+// Use filtered menu items based on user permissions
+const headerMenu = computed(() => {
+  // Only filter menu items if user info is loaded
+  if (customerInfo.isUserInfoLoaded) {
+    return getFilteredSidebarItems();
+  }
+  // Return all items if user info is not loaded yet
+  return sidebarItems;
+});
 </script>
 
 <template>
   <v-app-bar elevation="0" height="80">
+    <!-- <div class="pa-5">
+      <Logo />
+    </div> -->
     <v-btn
+    v-if="customizer.menuOrientation === 'vertical'"
       class="hidden-md-and-down text-secondary"
       color="lightsecondary"
       icon
@@ -43,7 +62,7 @@ function searchbox() {
     </v-btn>
 
     <v-btn
-      class="hidden-md-and-down text-secondary mr-2"
+      class="hidden-md-and-down text-secondary mr-2 ml-2"
       color="lightsecondary"
       icon
       rounded="sm"
@@ -53,6 +72,71 @@ function searchbox() {
     >
       <IconPalette size="20" stroke-width="1.5" />
     </v-btn>
+
+    <!-- Menu Items Section - Simple buttons -->
+    <div class="header-menu-container" v-if="customizer.menuOrientation === 'horizontal'">
+      <template v-for="(item, i) in headerMenu" :key="i">
+        <!-- Single Menu Item -->
+        <v-btn
+          v-if="!item.children && !item.header && !item.divider"
+          :to="item.type === 'external' ? '' : item.to"
+          :href="item.type === 'external' ? item.to : ''"
+          :target="item.type === 'external' ? '_blank' : ''"
+          variant="text"
+          :disabled="item.disabled"
+          class="header-menu-btn mr-3"
+          color="primary"
+        >
+          <component :is="item.icon" v-if="item.icon" class="mr-2" size="18" />
+          <span>{{ item.title }}</span>
+          <v-chip
+            v-if="item.chip"
+            :color="item.chipColor"
+            :size="item.chipIcon ? 'small' : 'default'"
+            :variant="item.chipVariant"
+            :prepend-icon="item.chipIcon"
+            class="ml-2"
+          >
+            {{ item.chip }}
+          </v-chip>
+        </v-btn>
+
+        <!-- Menu Item with Dropdown -->
+        <v-menu v-else-if="item.children && item.children.length > 0" offset-y>
+          <template v-slot:activator="{ props }">
+            <v-btn
+              v-bind="props"
+              variant="text"
+              :disabled="item.disabled"
+              class="header-menu-btn"
+              color="primary mr-3"
+            >
+              <component :is="item.icon" v-if="item.icon" class="mr-2" size="18" />
+              <span class="mr-2">{{ item.title }}</span>
+              <IconChevronDown size="20" class="ml-2" stroke-width="1.5" />
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item
+              v-for="(child, childIndex) in item.children"
+              :key="childIndex"
+              :to="child.type === 'external' ? '' : child.to"
+              :href="child.type === 'external' ? child.to : ''"
+              :target="child.type === 'external' ? '_blank' : ''"
+              :disabled="child.disabled"
+            >
+              <template v-slot:prepend v-if="child.icon">
+                <component :is="child.icon" size="18" />
+              </template>
+              <v-list-item-title>{{ child.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+
+        <!-- Divider -->
+        <v-divider v-else-if="item.divider" vertical class="mx-2" />
+      </template>
+    </div>
     <!-- search mobile -->
 <!--    <v-btn-->
 <!--      class="hidden-lg-and-up text-secondary mr-3"-->
@@ -116,3 +200,30 @@ function searchbox() {
     </v-menu>
   </v-app-bar>
 </template>
+
+<style scoped>
+.header-menu-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 16px;
+}
+
+.header-menu-btn {
+  text-transform: none;
+  font-weight: 500;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.header-menu-btn:hover {
+  background-color: rgb(var(--v-theme-primary), 0.1);
+  transform: translateY(-1px);
+}
+
+.header-menu-btn:active {
+  transform: translateY(0);
+}
+</style>

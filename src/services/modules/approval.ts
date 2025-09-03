@@ -1,5 +1,6 @@
 import type { AxiosInstance } from "axios";
 import type {
+  addCreditApprovalDescriptionPayload,
   CollateralsInfoPayload,
   ConsiderationPayload,
   DepositAccount,
@@ -117,10 +118,6 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.get(`api/v1/general/product-type?lcContractType=${lcContractType}`);
   },
 
-  getAllDoc(loanRequestId: string) {
-    return axiosInstance.get(`api/v1/general/get-all-doc?loanRequestId=${loanRequestId}`);
-  },
-
   saveDoc(formData: FormData) {
     return axiosInstance.post('api/v1/general/save-doc', formData, {
       headers: {
@@ -149,5 +146,9 @@ export default (axiosInstance: AxiosInstance) => ({
   },
   getApprovalEdit(loanRequestId: string) {
     return axiosInstance.get(`api/v1/general/more-detail?loanRequestId=${loanRequestId}`);
+  },
+
+  addCreditApprovalDescription(payload: addCreditApprovalDescriptionPayload) {
+    return axiosInstance.post(`api/v1/credit-suggestions /add-Credit-Approval-Description`,payload);
   },
 });

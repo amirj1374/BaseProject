@@ -166,12 +166,14 @@ watch(() => props.modelValue, (isVisible) => {
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue-darken-1" variant="text" @click="closeDialog">
-          انصراف
-        </v-btn>
-        <v-btn color="primary" variant="elevated" @click="handleSave">
-          ذخیره
-        </v-btn>
+        <div style="display: flex; justify-content: space-evenly; width: 100%">
+          <v-btn color="primary" variant="outlined" @click="handleSave">
+            ذخیره
+          </v-btn>
+          <v-btn color="error" variant="tonal" @click="closeDialog">
+            انصراف
+          </v-btn>
+        </div>
       </v-card-actions>
     </v-card>
   </v-dialog>

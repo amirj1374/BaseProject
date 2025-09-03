@@ -212,6 +212,12 @@ export interface CollateralsInfoPayload {
   description: string;
 }
 
+
+export interface addCreditApprovalDescriptionPayload {
+  cartableId : number;
+  Description : string;
+}
+
 export interface DepositDTO {
   customerName: string;
   blockedAmount: number;

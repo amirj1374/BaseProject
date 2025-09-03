@@ -1060,6 +1060,7 @@ const handleFilterApply = (filterData: any) => {
                 <v-data-table
                   :headers="groupedHeaders"
                   :items="group.items"
+                  :items-per-page="itemsPerPage"
                   hide-default-footer
                   class="elevation-1 group-table"
                   no-data-text="رکوردی یافت نشد"
@@ -1182,6 +1183,7 @@ const handleFilterApply = (filterData: any) => {
         v-else
         :headers="normalHeaders"
         :items="items"
+        :items-per-page="itemsPerPage"
         hide-default-footer
         class="elevation-1"
         no-data-text="رکوردی یافت نشد"

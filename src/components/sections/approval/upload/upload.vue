@@ -48,15 +48,12 @@ function fixUrl(url: string): string {
 }
 
 function openImageDialog(url: string) {
-  console.log('Original URL:', url);
-
   if (!url) {
     error.value = 'آدرس تصویر نامعتبر است';
     return;
   }
 
   const fixedUrl = fixUrl(url);
-  console.log('Fixed URL:', fixedUrl);
 
   // Test if the image can be loaded
   const img = new Image();
@@ -135,7 +132,7 @@ const handleFileUpload = async () => {
 };
 
 function getCustomButtons(doc: Document) {
-  const hasImage = !!(doc.filePath && doc.filePath.match(/\.(jpg|jpeg|png)$/i));
+  const hasImage = !!(doc.filePath && doc.filePath.match(/\.(jpg|jpeg|png|pdf)$/i));
   const hasFile = !!doc.filePath;
   const isEditDisabled = approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION';
   
@@ -216,7 +213,7 @@ defineExpose({ submitData });
         :auto-fetch="true"
         :show-pagination="true"
         :custom-buttons-fn="getCustomButtons"
-        :height="600"
+        :height="1500"
         group-by="groupByItem"
         :default-expanded="true"
         :page-size="100"

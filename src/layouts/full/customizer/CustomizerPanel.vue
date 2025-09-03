@@ -39,6 +39,9 @@ const validFontThemes = ['vazir', 'yekanLight', 'iranSans', 'kalamehLight'];
 
 // Valid theme modes
 const validThemeModes = ['light', 'dark'];
+
+// Valid menu orientations
+const validMenuOrientations = ['vertical', 'horizontal'];
 // Theme color palette options (light versions only)
 const colorPalette = ref([
   {
@@ -87,7 +90,8 @@ const payload: CustomizerDTO = {
   inputBg: customizer.inputBg,
   layoutType: customizer.layoutType,
   actTheme: customizer.actTheme,
-  themeMode : customizer.themeMode,
+  themeMode: customizer.themeMode,
+  menuOrientation: customizer.menuOrientation,
 };
 // Validation functions
 function validateTheme(theme: string): string {
@@ -106,6 +110,10 @@ function validateThemeMode(mode: string): string {
   return validThemeModes.includes(mode) ? mode : 'light';
 }
 
+function validateMenuOrientation(orientation: string): string {
+  return validMenuOrientations.includes(orientation) ? orientation : 'vertical';
+}
+
 function validateInputBg(inputBg: boolean): boolean {
   return typeof inputBg === 'boolean' ? inputBg : false;
 }
@@ -118,6 +126,7 @@ async function setCustomizer() {
     payload.layoutType = validateLayoutType(customizer.layoutType);
     payload.actTheme = validateTheme(customizer.actTheme);
     payload.themeMode = validateThemeMode(customizer.themeMode);
+    payload.menuOrientation = validateMenuOrientation(customizer.menuOrientation);
     
     const res = await api.user.setCustomizer(payload);
     
@@ -172,6 +181,29 @@ watch(
     // Apply the new theme based on the mode
     const newThemeName = newMode === 'dark' ? `Dark${baseThemeName}` : baseThemeName;
     customizer.SET_THEME(newThemeName);
+  }
+);
+
+// Watch for changes in menuOrientation and apply layout changes
+watch(
+  () => customizer.menuOrientation,
+  (newOrientation) => {
+    document.body.classList.remove('menu-vertical', 'menu-horizontal');
+    document.body.classList.add(`menu-${newOrientation}`);
+    
+    if (newOrientation === 'horizontal') {
+      customizer.SET_LAYOUT_TYPE('NavBar');
+    } else {
+      customizer.SET_LAYOUT_TYPE('SideBar');
+      // Force re-render of layout elements without page reload
+      setTimeout(() => {
+        // Force sidebar to re-render by toggling its state
+        customizer.Sidebar_drawer = false;
+        setTimeout(() => {
+          customizer.Sidebar_drawer = true;
+        }, 50);
+      }, 100);
+    }
   }
 );
 
@@ -322,28 +354,30 @@ onMounted(() => {
 <!--                  </div>-->
 <!--                </div>-->
 
-<!--                &lt;!&ndash; SIDEBAR DRAWER &ndash;&gt;-->
-<!--                <div class="mb-6">-->
-<!--                  <h6 class="text-subtitle-1 font-weight-medium mb-3">SIDEBAR DRAWER</h6>-->
-<!--                  <div class="d-flex gap-2">-->
-<!--                    <v-btn-->
-<!--                      variant="outlined"-->
-<!--                      :color="!customizer.Sidebar_drawer ? 'primary' : 'grey'"-->
-<!--                      @click="customizer.SET_SIDEBAR_DRAWER()"-->
-<!--                      class="flex-1"-->
-<!--                    >-->
-<!--                      <div class="sidebar-preview closed"></div>-->
-<!--                    </v-btn>-->
-<!--                    <v-btn-->
-<!--                      variant="outlined"-->
-<!--                      :color="customizer.Sidebar_drawer ? 'primary' : 'grey'"-->
-<!--                      @click="customizer.SET_SIDEBAR_DRAWER()"-->
-<!--                      class="flex-1"-->
-<!--                    >-->
-<!--                      <div class="sidebar-preview open"></div>-->
-<!--                    </v-btn>-->
-<!--                  </div>-->
-<!--                </div>-->
+              
+
+                <!-- Menu Orientation -->
+                <div class="mb-6">
+                  <h6 class="text-subtitle-1 font-weight-medium mb-3">انوع منو</h6>
+                  <div class="d-flex gap-2">
+                    <v-btn
+                      variant="outlined"
+                      :color="!customizer.Sidebar_drawer ? 'primary' : 'grey'"
+                      @click="customizer.SET_MENU_ORIENTATION('vertical')"
+                      class="flex-1"
+                    >
+                      <div class="sidebar-preview closed"></div>
+                    </v-btn>
+                    <v-btn
+                      variant="outlined"
+                      :color="customizer.Sidebar_drawer ? 'primary' : 'grey'"
+                       @click="customizer.SET_MENU_ORIENTATION('horizontal')"
+                      class="flex-1"
+                    >
+                      <div class="sidebar-preview open"></div>
+                    </v-btn>
+                  </div>
+                </div>
               </div>
             </v-tabs-window-item>
 
@@ -535,8 +569,8 @@ onMounted(() => {
 
 // Sidebar Preview
 .sidebar-preview {
-  width: 30px;
-  height: 20px;
+  width: 45px;
+  height: 30px;
   border: 2px dashed #ccc;
   border-radius: 3px;
   margin: 0 auto;
@@ -546,10 +580,11 @@ onMounted(() => {
     content: '';
     position: absolute;
     top: 2px;
-    left: 2px;
     right: 2px;
-    bottom: 2px;
-    background: transparent;
+    width: 6px;
+    height: 23px;
+    background: #027efb;
+    border-radius: 1px;
   }
 
   &.open::before {
@@ -557,9 +592,9 @@ onMounted(() => {
     position: absolute;
     top: 2px;
     right: 2px;
-    width: 4px;
-    height: 16px;
-    background: #1976d2;
+    width: 36px;
+    height: 6px;
+    background: #027efb;
     border-radius: 1px;
   }
 }

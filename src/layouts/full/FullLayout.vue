@@ -6,7 +6,6 @@ import Customizer from './customizer/CustomizerPanel.vue';
 import { useCustomizerStore } from '@/stores/customizer';
 import Loading from '@/components/Loading.vue';
 const customizer = useCustomizerStore();
-import { IconSettings } from '@tabler/icons-vue';
 
 </script>
 
@@ -17,7 +16,8 @@ import { IconSettings } from '@tabler/icons-vue';
       :class="[customizer.fontTheme, customizer.mini_sidebar ? 'mini-sidebar' : '', customizer.inputBg ? 'inputWithbg' : '']"
     >
       <Customizer />
-      <VerticalSidebarVue/>
+      <!-- Show sidebar when menu orientation is vertical -->
+      <VerticalSidebarVue v-if="customizer.menuOrientation === 'vertical'"/>
       <VerticalHeaderVue/>
       <v-main>
         <Loading/>

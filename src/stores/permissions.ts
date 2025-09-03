@@ -78,6 +78,10 @@ export const usePermissionsStore = defineStore({
       {
         menuKey: 'reviewExpertReport',
         requiredRoles: ['SMP_REVIEW_EXPERT_RPT']
+      },
+      {
+        menuKey: 'creditApprovalReport',
+        requiredRoles: ['SMP_CREDIT_APPROVAL_RPT']
       }
     ] as MenuPermission[]
   }),

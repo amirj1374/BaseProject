@@ -12,15 +12,20 @@ export const useCustomizerStore = defineStore({
     layoutType: config.layoutType,
     actTheme: config.actTheme,
     loading: config.loading,
-    themeMode: 'light' // 'light' or 'dark'
+    themeMode: 'light', // 'light' or 'dark'
+    menuOrientation: 'vertical' // 'vertical' or 'horizontal'
   }),
 
   getters: {
     getActTheme: (state) => state.actTheme,
   },
   actions: {
-    SET_SIDEBAR_DRAWER() {
-      this.Sidebar_drawer = !this.Sidebar_drawer;
+    SET_SIDEBAR_DRAWER(payload?: boolean) {
+      if (payload !== undefined) {
+        this.Sidebar_drawer = payload;
+      } else {
+        this.Sidebar_drawer = !this.Sidebar_drawer;
+      }
     },
     SET_MINI_SIDEBAR(payload: boolean) {
       this.mini_sidebar = payload;
@@ -42,6 +47,9 @@ export const useCustomizerStore = defineStore({
     },
     SET_THEME_MODE(payload: string) {
       this.themeMode = payload;
+    },
+    SET_MENU_ORIENTATION(payload: string) {
+      this.menuOrientation = payload;
     }
   }
 

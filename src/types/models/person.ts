@@ -10,5 +10,6 @@ export interface CustomizerDTO {
   inputBg: boolean,
   layoutType: string,
   actTheme: string,
-  themeMode: string
+  themeMode: string,
+  menuOrientation: string
 }
