@@ -171,6 +171,10 @@ const submitData = async () => {
     // Only set customer info without the child component data
     // Let the child components handle their own data loading
     approvalStore.setCustomerInfo({
+      facilities: facilitiesData.value[0],
+      guarantee: guaranteeData.value[0],
+      lc: lcData.value[0],
+      greenLicense: greenLicenseData.value[0],
       ...firstItem
     });
     return Promise.resolve();

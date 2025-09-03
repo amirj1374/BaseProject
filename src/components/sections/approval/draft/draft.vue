@@ -70,7 +70,7 @@ onMounted(async () => {
     // Call getActiveDeposit API with loanRequestId
     const response = await api.approval.getActiveDeposit(approvalStore.loanRequestId);
     
-    if (response.status === 200) {
+    if (response.status === 200 && response.data.content.length > 0) {
       // If we have active deposits, set deposit as valid
       isDepositValid.value = true;
       // Also set the Deposit component's valid state
