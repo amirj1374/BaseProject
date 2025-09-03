@@ -106,6 +106,27 @@ export interface GuarantorDto {
   value?: string | null;
   sapInquiryStatus?: boolean | null;
   loanRequestId?: string | null;
+  sapInquiry?: {
+    value?: string | null;
+    label?: string | null;
+    changeDate?: string | null;
+    collateral?: string | null;
+    createdAt?: string | null;
+    createdBy?: string | null;
+    directObligationAmount?: string | null;
+    guarantorInfo?: string | null;
+    guarantorInfoId?: string | null;
+    id?: string | null;
+    inDirectObligationAllOfThem?: string | null;
+    inDirectObligationAmount?: string | null;
+    loanRequest?: string | null;
+    loanRequestId?: string | null;
+    mainCustomer?: string | null;
+    nationalCode?: string | null;
+    obligationDate?: string | null;
+    updatedAt?: string | null;
+    updatedBy?: string | null;
+  } | null;
 }
 
 export interface CurrenciesDto {
@@ -212,10 +233,9 @@ export interface CollateralsInfoPayload {
   description: string;
 }
 
-
 export interface addCreditApprovalDescriptionPayload {
-  cartableId : number;
-  Description : string;
+  cartableId: number;
+  Description: string;
 }
 
 export interface DepositDTO {

@@ -44,6 +44,7 @@ onMounted(() => {
   // Initialize data from store if it exists
   if (approvalStore.guarantor && approvalStore.guarantor.length > 0) {
     data.value = approvalStore.guarantor;
+    console.log('data', data.value);
     canSubmit.value = true;
   }
 });

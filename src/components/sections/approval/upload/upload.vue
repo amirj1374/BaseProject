@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { useCustomizerStore } from '@/stores/customizer';
 import { IconX } from '@tabler/icons-vue';
 
 interface Document {
@@ -15,17 +16,17 @@ interface Document {
   filePath: string | null;
   loanRequestId: number;
 }
-
+const customizerStore = useCustomizerStore();
 const docs = ref<Document[]>([]);
-const loading = ref(false);
 const error = ref<string | null>(null);
 const approvalStore = useApprovalStore();
 const showUploadDialog = ref(false);
 const selectedDoc = ref<Document | null>(null);
 const selectedFile = ref<File | null>(null);
-const uploading = ref(false);
 const showImageDialog = ref(false);
 const imageDialogUrl = ref<string | null>(null);
+const isPdf = ref<boolean>(false);
+const description= ref<string | null>(null);
 const dataTableRef = ref();
 
 function fixUrl(url: string): string {
@@ -52,10 +53,18 @@ function openImageDialog(url: string) {
     error.value = 'آدرس تصویر نامعتبر است';
     return;
   }
-
   const fixedUrl = fixUrl(url);
+  isPdf.value = /\.pdf$/i.test(fixedUrl);
 
-  // Test if the image can be loaded
+  // If it's a PDF, skip image preloading and open directly
+  if (isPdf.value) {
+    imageDialogUrl.value = fixedUrl;
+    showImageDialog.value = true;
+    error.value = null;
+    return;
+  }
+
+  // Test if the image can be loaded (for images only)
   const img = new Image();
   img.onload = () => {
     imageDialogUrl.value = fixedUrl;
@@ -73,7 +82,12 @@ function openImageDialog(url: string) {
 
   img.src = fixedUrl;
 }
-
+watch(() => showUploadDialog.value, (newDialog) => {
+  if (newDialog === false) {
+    selectedFile.value = null 
+    description.value = null
+  }
+});
 const headers = [
   { title: 'عنوان مدرک', key: 'fileName' },
   { title: 'توضیحات', key: 'description' }
@@ -89,7 +103,6 @@ const handleEdit = (doc: Document) => {
     error.value = 'امکان ویرایش در این مرحله وجود ندارد';
     return;
   }
-  
   selectedDoc.value = doc;
   showUploadDialog.value = true;
 };
@@ -98,18 +111,16 @@ const handleFileUpload = async () => {
   if (!selectedFile.value || !selectedDoc.value) return;
 
   try {
+    customizerStore.loading = true;
     const formData = new FormData();
     formData.append('file', selectedFile.value);
     formData.append('customerNumber', selectedDoc.value.nationalCode);
     formData.append('docTypeCode', selectedDoc.value.fileType);
-    formData.append('description', selectedDoc.value.description || 'asdasdasd');
+    formData.append('description',description.value || '');
     formData.append('loanRequestId', selectedDoc.value.loanRequestId.toString());
-
     const response = await api.approval.saveDoc(formData);
-
     if (response.status === 200) {
       // Update the document in the list
-
       docs.value = docs.value.map((d) => {
         if (d.nationalCode === selectedDoc.value?.nationalCode && d.fileType === selectedDoc.value?.fileType) {
           return { ...d, file: response.data.fileUrl };
@@ -125,8 +136,9 @@ const handleFileUpload = async () => {
     }
   } catch (err: any) {
     error.value = err.message || 'خطا در آپلود فایل';
+    customizerStore.loading = false
   } finally {
-    uploading.value = false;
+    customizerStore.loading = false
     selectedFile.value = null;
   }
 };
@@ -193,7 +205,7 @@ const submitData = async () => {
 const getGroupHeaderTemplate = (groupKey: string | number, groupItems: any[]): string => {
   if (groupItems.length > 0) {
     const firstItem = groupItems[0];
-    return ` نام و نام خانوادگی :  ${firstItem.fullName}  -  کد ملی : ${firstItem.nationalCode} (${groupItems.length} مدرک)`;
+    return `  ${firstItem.groupByItem} : (${groupItems.length} مدرک)`;
   }
   return `${groupKey} (${groupItems.length} مدرک)`;
 };
@@ -226,16 +238,17 @@ defineExpose({ submitData });
     <v-card>
       <v-card-title class="d-flex justify-space-between align-center">
         <span>آپلود مدرک</span>
-        <v-btn variant="text" @click="showUploadDialog = false">
+        <v-btn variant="text" @click="showUploadDialog = false" >
           <IconX size="16" />
         </v-btn>
       </v-card-title>
       <v-card-text>
-        <v-file-input v-model="selectedFile" label="انتخاب فایل" accept=".pdf,.jpg,.jpeg,.png" :loading="uploading" :disabled="uploading" />
+        <v-file-input v-model="selectedFile" variant="outlined" label="انتخاب فایل" accept=".pdf,.jpg,.jpeg,.png" :loading="customizerStore.loading" :disabled="customizerStore.loading" />
+        <v-textarea v-model="description" label="توضیحات" rows="3" variant="outlined"></v-textarea>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn color="primary" :loading="uploading" :disabled="!selectedFile || uploading" @click="handleFileUpload" variant="outlined">
+        <v-btn color="primary" :loading="customizerStore.loading" :disabled="!selectedFile || customizerStore.loading" @click="handleFileUpload" variant="outlined">
           آپلود
         </v-btn>
       </v-card-actions>
@@ -252,13 +265,21 @@ defineExpose({ submitData });
       </v-card-title>
       <v-card-text style="text-align: center" mini-variant>
         <div v-if="imageDialogUrl" class="image-container">
-          <img
-            :src="imageDialogUrl"
-            alt="تصویر"
-            style="max-width: 100%; max-height: 400px; border-radius: 8px"
-            @error="handleImageError"
-            @load="handleImageLoad"
-          />
+          <template v-if="!isPdf">
+            <img
+              :src="imageDialogUrl"
+              alt="تصویر"
+              style="max-width: 100%; max-height: 400px; border-radius: 8px"
+              @error="handleImageError"
+              @load="handleImageLoad"
+            />
+          </template>
+          <template v-else>
+            <iframe
+              :src="imageDialogUrl"
+              style="width: 100%; height: 80vh; border: none; border-radius: 8px"
+            ></iframe>
+          </template>
           <div v-if="error" class="error-message mt-3">
             <v-alert type="error" variant="tonal">
               {{ error }}
