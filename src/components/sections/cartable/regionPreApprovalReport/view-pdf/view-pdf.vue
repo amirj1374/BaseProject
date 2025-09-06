@@ -51,6 +51,12 @@
         چاپ گزارش
       </v-btn>
     </div>
+    <v-snackbar v-model="showSuccess" color="success" timeout="3000" location="top">
+      <div class="d-flex align-center">
+        <v-icon class="me-2">mdi-check-circle</v-icon>
+        {{ successMessage }}
+      </div>
+    </v-snackbar>
   </div>
 </template>
 
@@ -58,6 +64,7 @@
 import { ref, computed, onMounted } from 'vue';
 import PdfViewer from '@/components/shared/PdfViewer.vue';
 import { api } from '@/services/api';
+import { useRouter } from 'vue-router';
 
 // Define props for the component
 const props = defineProps({
@@ -87,6 +94,10 @@ const pdfTitle = ref<string>('گزارش منطقه ای پیش مصوبه');
 const generating = ref(false);
 const downloading = ref(false);
 const debugMode = ref(false);
+const showSuccess = ref(false);
+const successMessage = ref('');
+// Router instance
+const router = useRouter();
 
 // Computed properties
 const downloadFileName = computed(() => {
@@ -297,7 +308,15 @@ const submitData = async () => {
     }
     const response = await api.cartable.uploadRegionApprovalReport(props.cartableId);
     if (response.status === 200) {
-      return Promise.resolve('فایل با موفقیت آپلود شد');
+      successMessage.value = 'گزارش با موفقیت آپلود شد';
+      showSuccess.value = true;
+
+      // Route to cartable after a short delay to show the message
+      setTimeout(() => {
+        router.push({ name: 'Cartable' });
+      }, 1000);
+
+      return Promise.resolve('گزارش با موفقیت آپلود شد');
     } else {
       throw new Error(response.statusText || 'خطا در آپلود گزارش');
     }

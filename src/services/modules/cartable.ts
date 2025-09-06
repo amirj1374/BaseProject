@@ -89,7 +89,15 @@ export default (axiosInstance: AxiosInstance) => ({
 
   
   uploadRegionApprovalReport(cartableId: string) {
-    return axiosInstance.post(`api/v1/credit-suggestions/upload-region-approval-letter`, cartableId);
+    return axiosInstance.post(`api/v1/credit-suggestions/upload-region-approval-letter?cartableId=${cartableId}`);
+  },
+
+  uploadDirectiveReport(cartableId: string) {
+    return axiosInstance.post(`api/v1/credit-suggestions/upload-report?cartableId=${cartableId}` );
+  },
+
+  uploadPreApprovalReport(cartableId: string) {
+    return axiosInstance.post(`api/v1/credit-approvals/upload-report?cartableId=${cartableId}` );
   },
 
   addCreditApprovalDescription(payload: addCreditApprovalDescriptionPayload) {

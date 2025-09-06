@@ -11,7 +11,6 @@
             :loading="loading"
             :disabled="loading"
             :rules="[required]"
-            prepend-icon="mdi-paperclip"
             show-size
           />
         </v-col>

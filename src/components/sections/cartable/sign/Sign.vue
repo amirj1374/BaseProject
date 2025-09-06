@@ -20,25 +20,55 @@ const description = ref('');
 const agreed = ref(false);
 const loading = ref(false);
 
-const downloadExpertReport = () => {
+const downloadExpertReport = async () => {
   if (props.item.expertReportUrl) {
-    const link = document.createElement('a');
-    link.href = props.item.expertReportUrl;
-    link.download = 'expert-report.pdf'; // You can customize the filename
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      // Fetch the file
+      const response = await fetch(props.item.expertReportUrl);
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'expert-report.pdf';
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading expert report:', error);
+      // Fallback to opening in new tab
+      window.open(props.item.expertReportUrl, '_blank');
+    }
   }
 };
 
-const download1016Report = () => {
+const download1016Report = async () => {
   if (props.item.report1016Url) {
-    const link = document.createElement('a');
-    link.href = props.item.report1016Url;
-    link.download = '1016-report.pdf'; // You can customize the filename
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      // Fetch the file
+      const response = await fetch(props.item.report1016Url);
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = '1016-report.pdf';
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading 1016 report:', error);
+      // Fallback to opening in new tab
+      window.open(props.item.report1016Url, '_blank');
+    }
   }
 };
 

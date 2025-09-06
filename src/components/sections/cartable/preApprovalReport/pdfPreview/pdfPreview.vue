@@ -51,6 +51,13 @@
         چاپ گزارش
       </v-btn>
     </div>
+    <!-- Success Snackbar -->
+    <v-snackbar v-model="showSuccess" color="success" timeout="3000" location="top">
+      <div class="d-flex align-center">
+        <v-icon class="me-2">mdi-check-circle</v-icon>
+        {{ successMessage }}
+      </div>
+    </v-snackbar>
   </div>
 </template>
 
@@ -58,6 +65,7 @@
 import { ref, computed, onMounted } from 'vue';
 import PdfViewer from '@/components/shared/PdfViewer.vue';
 import { api } from '@/services/api';
+import { useRouter } from 'vue-router';
 
 // Define props for the component
 const props = defineProps({
@@ -86,7 +94,11 @@ const pdfUrl = ref<string>('');
 const pdfTitle = ref<string>('گزارش پیش مصوبه');
 const generating = ref(false);
 const downloading = ref(false);
-const debugMode = ref(false);
+const debugMode = ref(false);// Router instance
+const showSuccess = ref(false);
+const successMessage = ref('');
+const router = useRouter();
+
 
 // Computed properties
 const downloadFileName = computed(() => {
@@ -302,13 +314,22 @@ const submitData = async () => {
     if (!pdfUrl.value) {
       throw new Error('لطفا ابتدا گزارش PDF را تولید کنید');
     }
-    
-    console.log('Submitting PDF preview data for loan request:', props.loanRequestId);
-    
-    // You can add additional validation or submission logic here
-    // For example, saving the PDF URL to the database
-    
-    return Promise.resolve();
+    const response = await api.cartable.uploadPreApprovalReport(props.cartableId);
+
+    if (response.status === 200) {
+      // Show success message
+      successMessage.value = 'گزارش با موفقیت آپلود شد';
+      showSuccess.value = true;
+
+      // Route to cartable after a short delay to show the message
+      setTimeout(() => {
+        router.push({ name: 'Cartable' });
+      }, 1000);
+
+      return Promise.resolve('گزارش با موفقیت آپلود شد');
+    } else {
+      throw new Error('خطا در آپلود گزارش');
+    }
   } catch (error) {
     return Promise.reject(error);
   }
