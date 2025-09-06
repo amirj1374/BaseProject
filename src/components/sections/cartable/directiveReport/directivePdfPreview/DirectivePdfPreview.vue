@@ -103,28 +103,21 @@ const generatePdf = async () => {
   generating.value = true;
 
   try {
-    console.log('Generating PDF for cartable ID:', props.cartableId);
-    console.log('Loan Request ID:', props.loanRequestId);
 
     // Call API to generate PDF report
     const response = await api.cartable.getCreditSuggestionReport(props.cartableId);
 
-    console.log('API Response:', response);
-    console.log('Response data type:', typeof response.data);
-    console.log('Response data:', response.data);
 
     if (response.status === 200 && response.data) {
       // Check if the response is already a blob or base64 data
       if (response.data instanceof Blob) {
         // If it's already a blob, create URL directly
         pdfUrl.value = URL.createObjectURL(response.data);
-        console.log('Created blob URL from response data');
       } else if (typeof response.data === 'string') {
         // If it's a base64 string, convert to blob
         if (response.data.startsWith('data:application/pdf')) {
           // It's already a data URL
           pdfUrl.value = response.data;
-          console.log('Using data URL from response');
         } else {
           // Assume it's base64, convert to blob
           try {
@@ -136,36 +129,28 @@ const generatePdf = async () => {
             const byteArray = new Uint8Array(byteNumbers);
             const blob = new Blob([byteArray], { type: 'application/pdf' });
             pdfUrl.value = URL.createObjectURL(blob);
-            console.log('Created blob URL from base64 data');
           } catch (base64Error) {
-            console.error('Error converting base64 to blob:', base64Error);
             throw new Error('Invalid base64 PDF data');
           }
         }
       } else if (response.data.url) {
         // If the API returns an object with a URL
         pdfUrl.value = response.data.url;
-        console.log('Using URL from response data');
       } else if (response.data.pdfUrl) {
         // Alternative property name
         pdfUrl.value = response.data.pdfUrl;
-        console.log('Using pdfUrl from response data');
       } else {
         // If it's JSON data, we need to make another request to get the actual PDF
-        console.log('Response data structure:', response.data);
-        console.log('Response data keys:', Object.keys(response.data));
         throw new Error('PDF data not found in response. Please check the API response format.');
       }
 
       pdfTitle.value = `گزارش پیش مصوبه - ${props.cartableId}`;
-      console.log('PDF generated successfully:', pdfUrl.value);
     } else {
       throw new Error('Failed to generate PDF report - Invalid response');
     }
   } catch (error) {
     console.error('Error generating PDF:', error);
     // Create a sample PDF for testing purposes
-    console.log('Creating sample PDF for testing...');
     createSamplePdf();
   } finally {
     generating.value = false;
@@ -235,7 +220,6 @@ const createSamplePdf = () => {
     const blob = new Blob([pdfContent], { type: 'application/pdf' });
     pdfUrl.value = URL.createObjectURL(blob);
     pdfTitle.value = `گزارش نمونه - ${props.cartableId}`;
-    console.log('Sample PDF created for testing');
   } catch (error) {
     console.error('Error creating sample PDF:', error);
   }
@@ -259,7 +243,6 @@ const downloadPdf = async () => {
     document.body.removeChild(link);
 
     window.URL.revokeObjectURL(url);
-    console.log('PDF downloaded successfully');
   } catch (error) {
     console.error('Error downloading PDF:', error);
   } finally {
@@ -280,7 +263,6 @@ const printPdf = () => {
 
 // PDF Viewer event handlers
 const onPdfLoad = (pdfData: any) => {
-  console.log('PDF loaded:', pdfData);
 };
 
 const onPdfError = (error: string) => {
@@ -288,11 +270,9 @@ const onPdfError = (error: string) => {
 };
 
 const onPdfDownload = (url: string) => {
-  console.log('PDF download triggered:', url);
 };
 
 const onPdfPrint = (url: string) => {
-  console.log('PDF print triggered:', url);
 };
 
 // Submit data method for stepper
@@ -303,7 +283,6 @@ const submitData = async () => {
       throw new Error('لطفا ابتدا گزارش PDF را تولید کنید');
     }
 
-    console.log('Submitting PDF preview data for loan request:', props.loanRequestId);
 
     // You can add additional validation or submission logic here
     // For example, saving the PDF URL to the database
@@ -316,17 +295,12 @@ const submitData = async () => {
 
 // Lifecycle
 onMounted(() => {
-  console.log('PdfPreview component mounted with props:', props);
 
   // Auto-generate PDF when component mounts if we have the required data
   if (props.cartableId) {
-    console.log('Auto-generating PDF on mount...');
     generatePdf();
   } else {
-    console.log('Missing required data for PDF generation:', {
-      loanRequestId: props.loanRequestId,
-      cartableId: props.cartableId
-    });
+
   }
 });
 
@@ -336,7 +310,6 @@ defineExpose({ submitData });
 // Debug mode toggle
 const toggleDebug = () => {
   debugMode.value = !debugMode.value;
-  console.log('Debug mode:', debugMode.value ? 'enabled' : 'disabled');
 };
 </script>
 

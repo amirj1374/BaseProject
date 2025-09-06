@@ -2,7 +2,6 @@ import type { addCreditApprovalDescriptionPayload } from "@/types/approval/appro
 import type { SubmitReferencePayload, SubmitSignPayload, ValidUserPayload } from "@/types/cartable/cartableTypes";
 import type { CreditApprovalFinancialSummaryDTO, CreditApprovalLastDecisionDTO, CreditSuggestionData } from '@/types/preApproval/preApprovalTypes';
 import type { AxiosInstance } from "axios";
-import { stubTrue } from 'lodash-es';
 
 export default (axiosInstance: AxiosInstance) => ({
   getCartable(trackingCode: string) {
@@ -72,8 +71,25 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post(`api/v1/credit-suggestions/${cartableId}`, payload);
   },
 
+  submitExpertReport(formData: FormData) {
+    return axiosInstance.post(`api/v1/cartable/attach-expert-report`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+
   getCreditSuggestionReport(cartableId: string) {
     return axiosInstance.get(`api/v1/credit-suggestions/report/base?cartableId=${cartableId}`);
+  },
+
+  getRegionApprovalReport(cartableId: string) {
+    return axiosInstance.get(`api/v1/credit-suggestions/region-approval-letter/base?cartableId=${cartableId}`);
+  },
+
+  
+  uploadRegionApprovalReport(cartableId: string) {
+    return axiosInstance.post(`api/v1/credit-suggestions/upload-region-approval-letter`, cartableId);
   },
 
   addCreditApprovalDescription(payload: addCreditApprovalDescriptionPayload) {

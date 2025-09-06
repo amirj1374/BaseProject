@@ -44,7 +44,7 @@ const loanRequestId = ref<string>('');
 const steps = [
   {
     title: 'پیشنهاد اعتباری',
-    section: defineAsyncComponent(() => import('./creditSuggestion/CreditSuggestion.vue'))
+    section: defineAsyncComponent(() => import('@/components/sections/cartable/directiveReport/step-one/step-one.vue'))
   },
   {
     title: 'مشاهده گزارش ابلاغیه',

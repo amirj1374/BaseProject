@@ -11,9 +11,7 @@ import Sign from '@/components/sections/cartable/sign/Sign.vue';
 import { CartableStatusTypeOptions, CustomerTypeOptions } from '@/types/enums/global';
 import { usePermissionsStore } from '@/stores/permissions';
 import SignList from '@/components/sections/cartable/signList/SignList.vue';
-import type { CustomerDto } from '@/types/approval/approvalType';
-import DirectiveReport from '@/components/sections/cartable/directiveReport/directiveReport.vue';
-import CreditSuggestionReport from '@/components/sections/cartable/creditApprovalReport/CreditSuggestionReport.vue';
+import ExpertReport from '@/components/sections/cartable/expertReport/ExpertReport.vue';
 
 const permissionsStore = usePermissionsStore();
 
@@ -128,8 +126,8 @@ const directiveRoute = {
   'گزارش ابلاغیه': 'directiveReport/{id}'
 }
 
-const creditApprovalDescriptionRoute = {
-  'گزارش کارشناسی': 'creditSuggestion/{id}'
+const regionPreApprovalReport = {
+  'گزارش پیش مصوبه منطقه': 'regionPreApprovalReport/{id}'
 }
 
 function handleReferenceSuccess() {
@@ -182,6 +180,17 @@ function handleReferenceSuccess() {
           condition: (item) => item.mainAssignee === true && item.commiteInquiries !== null
         },
         {
+          title: 'گزارش کارشناسی',
+          component: (props) =>
+            h(ExpertReport, {
+              ...props,
+              item: props.item,
+              cartableId: props.item.id,
+              onSuccess: handleReferenceSuccess
+            }),
+          condition: (item) => permissionsStore.hasMenuPermission('uploadExpertReport')
+        },
+        {
           title: '📜 تاریخچه کارتابل',
           component: CartableHistory
         },
@@ -189,22 +198,12 @@ function handleReferenceSuccess() {
           title: '📜 تاریخچه درخواست مصوبه',
           component: LoanRequestHistory
         },
-        {
-          title: 'گزارش پیش مصوبه منطقه',
-          component: (props) =>
-            h(CreditSuggestionReport, {
-              ...props,
-              item: props.item,
-              onSuccess: handleReferenceSuccess
-            }),
-          condition: (item) => permissionsStore.hasMenuPermission('regionPreApprovalReport')
-        },
       ]"
 
       :routes="{
         ...(permissionsStore.hasMenuPermission('preApprovalReport') ? route : {}),
         ...(permissionsStore.hasMenuPermission('directiveReport') ? directiveRoute : {}),
-        ...(permissionsStore.hasMenuPermission('uploadExpertReport') ? creditApprovalDescriptionRoute : {}),
+        ...(permissionsStore.hasMenuPermission('regionPreApprovalReport') ? regionPreApprovalReport : {}),
 
       }"
     />

@@ -28,6 +28,7 @@
 <script lang="ts" setup>
 import { ref, computed, defineAsyncComponent, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { api } from '@/services/api';
 import AppStepper from '@/components/common/AppStepper.vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 
@@ -42,12 +43,12 @@ const loanRequestId = ref<string>('');
 // Steps array for AppStepper
 const steps = [
   {
-    title: 'پیشنهاد کارشناس',
-    section: defineAsyncComponent(() => import('./creditSuggestion/CreditSuggestion.vue'))
+    title: 'پیشنهاد پیش مصوبه منطقه',
+    section: defineAsyncComponent(() => import('./step-one/step-one.vue'))
   },
   {
-    title: 'مشاهده گزارش پیشنهاد کارشناسی',
-    section: defineAsyncComponent(() => import('./creditSuggestionPdfPreview/CreditSuggestionPdfPreview.vue'))
+    title: 'مشاهده گزارش پیش مصوبه منطقه',
+    section: defineAsyncComponent(() => import('./view-pdf/view-pdf.vue'))
   }
 ];
 
@@ -74,7 +75,6 @@ const nextStep = async () => {
     if (currentStepComponent && typeof currentStepComponent.submitData === 'function') {
       await currentStepComponent.submitData();
     } else {
-
     }
 
     if (stepper.value < totalSteps) {
@@ -125,13 +125,13 @@ const breadcrumbs = ref([
     href: '/cartable'
   },
   {
-    title: 'پیشنهاد کارشناسی',
+    title: 'گزارش پیش مصوبه منطقه',
     disabled: false,
     href: '#'
   }
 ]);
 
-const page = ref({ title: 'پیشنهاد کارشناسی' });
+const page = ref({ title: 'گزارش پیش مصوبه منطقه' });
 
 </script>
 

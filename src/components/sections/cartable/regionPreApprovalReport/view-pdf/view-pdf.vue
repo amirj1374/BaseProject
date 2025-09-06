@@ -83,7 +83,7 @@ console.log('PdfPreview component received props:', props);
 
 // Reactive state
 const pdfUrl = ref<string>('');
-const pdfTitle = ref<string>('گزارش پیش مصوبه');
+const pdfTitle = ref<string>('گزارش منطقه ای پیش مصوبه');
 const generating = ref(false);
 const downloading = ref(false);
 const debugMode = ref(false);
@@ -107,7 +107,7 @@ const generatePdf = async () => {
     console.log('Loan Request ID:', props.loanRequestId);
 
     // Call API to generate PDF report
-    const response = await api.cartable.getCreditSuggestionReport(props.cartableId);
+    const response = await api.cartable.getRegionApprovalReport(props.cartableId);
 
     console.log('API Response:', response);
     console.log('Response data type:', typeof response.data);
@@ -145,27 +145,20 @@ const generatePdf = async () => {
       } else if (response.data.url) {
         // If the API returns an object with a URL
         pdfUrl.value = response.data.url;
-        console.log('Using URL from response data');
       } else if (response.data.pdfUrl) {
         // Alternative property name
         pdfUrl.value = response.data.pdfUrl;
-        console.log('Using pdfUrl from response data');
       } else {
         // If it's JSON data, we need to make another request to get the actual PDF
-        console.log('Response data structure:', response.data);
-        console.log('Response data keys:', Object.keys(response.data));
         throw new Error('PDF data not found in response. Please check the API response format.');
       }
 
-      pdfTitle.value = `گزارش پیش مصوبه - ${props.cartableId}`;
-      console.log('PDF generated successfully:', pdfUrl.value);
+      pdfTitle.value = `گزارش منطقه ای پیش مصوبه - ${props.cartableId}`;
     } else {
       throw new Error('Failed to generate PDF report - Invalid response');
     }
   } catch (error) {
-    console.error('Error generating PDF:', error);
     // Create a sample PDF for testing purposes
-    console.log('Creating sample PDF for testing...');
     createSamplePdf();
   } finally {
     generating.value = false;
@@ -302,13 +295,16 @@ const submitData = async () => {
     if (!pdfUrl.value) {
       throw new Error('لطفا ابتدا گزارش PDF را تولید کنید');
     }
-
-    console.log('Submitting PDF preview data for loan request:', props.loanRequestId);
-
+    const response = await api.cartable.uploadRegionApprovalReport(props.cartableId);
+    if (response.status === 200) {
+      return Promise.resolve('فایل با موفقیت آپلود شد');
+    } else {
+      throw new Error(response.statusText || 'خطا در آپلود گزارش');
+    }
+    
     // You can add additional validation or submission logic here
     // For example, saving the PDF URL to the database
 
-    return Promise.resolve();
   } catch (error) {
     return Promise.reject(error);
   }

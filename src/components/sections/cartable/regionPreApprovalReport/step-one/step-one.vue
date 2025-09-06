@@ -1,23 +1,23 @@
 <template>
   <div class="approval-section">
-        <v-form ref="formRef" @submit.prevent="submitForm">
-          <v-row>
-            <v-col cols="12">
-              <DescriptionInput
-                v-model="formData.templateBody"
-                label="متن پیشنهاد گزارش"
-                placeholder="متن پیشنهاد گزارش را وارد کنید..."
-                variant="outlined"
-                :rows="15"
-                :maxlength="2000"
-                counter
-                :rules="[required]"
-                auto-grow
-              />
-            </v-col>
-          </v-row>
-        </v-form>
-    
+    <v-form ref="formRef" @submit.prevent="submitForm">
+      <v-row>
+        <v-col cols="12">
+          <v-textarea
+            v-model="formData.templateBody"
+            label="متن پیشنهاد اعتباری"
+            placeholder="متن پیشنهاد اعتباری را وارد کنید..."
+            variant="outlined"
+            :rows="8"
+            :maxlength="2000"
+            counter
+            :rules="[required]"
+            auto-grow
+          />
+        </v-col>
+      </v-row>
+    </v-form>
+
     <!-- Success Snackbar -->
     <v-snackbar
       v-model="showSuccess"
@@ -30,7 +30,7 @@
         {{ successMessage }}
       </div>
     </v-snackbar>
-    
+
     <!-- Error Snackbar -->
     <v-snackbar
       v-model="showError"
@@ -89,11 +89,11 @@ const errorMessage = ref('');
 // Fetch existing data
 const fetchData = async () => {
   if (!props.cartableId) return;
-  
+
   try {
     loading.value = true;
     const response = await api.cartable.getCreditSuggestion(String(props.cartableId));
-    
+
     if (response.status === 200 && response.data) {
       formData.value = {
         templateBody: response.data.templateBody || '',
@@ -111,22 +111,22 @@ const fetchData = async () => {
 // Submit form
 const submitForm = async () => {
   const { valid } = await formRef.value?.validate();
-  
+
   if (!valid) {
     return;
   }
-  
+
   try {
     loading.value = true;
-    
+
     const payload = {
       cartableId: props.cartableId,
       templateBody: formData.value.templateBody,
       conditions: formData.value.conditions
     };
-    
+
     const response = await api.cartable.submitCreditSuggestion(String(props.cartableId), payload);
-    
+
     if (response.status === 200) {
       successMessage.value = 'پیشنهاد اعتباری با موفقیت ذخیره شد';
       showSuccess.value = true;
@@ -152,30 +152,30 @@ onMounted(() => {
 // Expose submitData method for parent component to call
 const submitData = async () => {
   console.log('submitData called with cartableId:', props.cartableId);
-  
+
   if (!props.cartableId) {
     throw new Error('شناسه کارتابل یافت نشد');
   }
-  
+
   const { valid } = await formRef.value?.validate();
-  
+
   if (!valid) {
     throw new Error('لطفاً خطاهای فرم را برطرف کنید');
   }
-  
+
   try {
     const payload = {
       cartableId: props.cartableId,
       templateBody: formData.value.templateBody,
       conditions: formData.value.conditions
     };
-    
+
     console.log('Submitting payload:', payload);
-    
+
     const response = await api.cartable.submitCreditSuggestion(String(props.cartableId), payload);
-    
+
     console.log('API response:', response);
-    
+
     if (response.status === 200) {
       console.log('Credit suggestion submitted successfully');
       // Don't show success message or close dialog when called from parent
