@@ -60,28 +60,32 @@ export const usePermissionsStore = defineStore({
         requiredRoles: ['SMP_CARTABLE_RPT']
       },
       {
-        menuKey: 'addDirectiveFile',
-        requiredRoles: ['SMP_ADD_DIRECTIVE_FILE']
-      },
-      {
-        menuKey: 'addExpertRptFile',
-        requiredRoles: ['SMP_ADD_EXPERT_RPT_FILE']
-      },
-      {
         menuKey: 'addFile',
         requiredRoles: ['SMP_ADD_FILE']
       },
       {
-        menuKey: 'create1016',
-        requiredRoles: ['SMP_CREATE_1016']
+        menuKey: 'download1016',
+        requiredRoles: ['SMP_DOWNLOAD_1016']
       },
       {
         menuKey: 'reviewExpertReport',
         requiredRoles: ['SMP_REVIEW_EXPERT_RPT']
       },
       {
-        menuKey: 'creditApprovalReport',
-        requiredRoles: ['SMP_CREDIT_APPROVAL_RPT']
+        menuKey: 'downloadExpertReport',
+        requiredRoles: ['SMP_DOWNLOAD_EXPERT_RPT']
+      },
+      {
+        menuKey: 'regionPreApprovalReport',
+        requiredRoles: ['SMP_REGION_PRE_APPROVAL_RPT']
+      },
+      {
+        menuKey: 'directiveReport',
+        requiredRoles: ['SMP_DIRECTIVE_RPT']
+      },
+      {
+        menuKey: 'uploadExpertReport',
+        requiredRoles: ['SMP_UPLOAD_EXPERT_RPT_FILE']
       }
     ] as MenuPermission[]
   }),

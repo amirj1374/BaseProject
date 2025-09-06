@@ -3,28 +3,13 @@
         <v-form ref="formRef" @submit.prevent="submitForm">
           <v-row>
             <v-col cols="12">
-              <v-textarea
-                v-model="formData.templateBody"
-                label="متن پیشنهاد اعتباری"
-                placeholder="متن پیشنهاد اعتباری را وارد کنید..."
-                variant="outlined"
-                :rows="8"
-                :maxlength="2000"
-                counter
-                :rules="[required]"
-                auto-grow
-              />
-            </v-col>
-            
-            <v-col cols="12">
               <DescriptionInput
-                v-model="formData.conditions"
-                label="سایر شرایط و ملاحظات پیشنهاد اعتباری"
-                placeholder="سایر شرایط و ملاحظات را وارد کنید..."
+                v-model="formData.templateBody"
+                label="متن پیشنهاد گزارش"
+                placeholder="متن پیشنهاد گزارش را وارد کنید..."
                 variant="outlined"
-                :start-number="1"
-                :rows="6"
-                :maxlength="1500"
+                :rows="15"
+                :maxlength="2000"
                 counter
                 :rules="[required]"
                 auto-grow

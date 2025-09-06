@@ -3,12 +3,6 @@
     <v-form ref="formRef" v-model="isValid" lazy-validation>
       <!-- Credit Approval Last Decision Section -->
       <v-row>
-        <v-col cols="12">
-          <h3 class="text-h6 mb-4">تصمیم نهایی اعتبار</h3>
-        </v-col>
-      </v-row>
-
-      <v-row>
         <v-col cols="12" md="6">
           <v-text-field
             v-model="lastDecisionForm.finalApprovalReference"

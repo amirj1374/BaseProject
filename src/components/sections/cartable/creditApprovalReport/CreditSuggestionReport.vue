@@ -28,7 +28,6 @@
 <script lang="ts" setup>
 import { ref, computed, defineAsyncComponent, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { api } from '@/services/api';
 import AppStepper from '@/components/common/AppStepper.vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 
@@ -43,12 +42,12 @@ const loanRequestId = ref<string>('');
 // Steps array for AppStepper
 const steps = [
   {
-    title: 'پیشنهاد اعتباری',
+    title: 'پیشنهاد کارشناس',
     section: defineAsyncComponent(() => import('./creditSuggestion/CreditSuggestion.vue'))
   },
   {
-    title: 'مشاهده گزارش ابلاغیه',
-    section: defineAsyncComponent(() => import('./directivePdfPreview/DirectivePdfPreview.vue'))
+    title: 'مشاهده گزارش پیشنهاد کارشناسی',
+    section: defineAsyncComponent(() => import('./creditSuggestionPdfPreview/CreditSuggestionPdfPreview.vue'))
   }
 ];
 
@@ -67,19 +66,17 @@ const nextStep = async () => {
   submitting.value = true;
   try {
     console.log('nextStep called, current step:', stepper.value);
-    
+
     // Try to call submitData on the current step component if it exists
     const currentStepComponent = stepperRef.value?.currentStepComponentRef;
     console.log('currentStepComponent:', currentStepComponent);
-    
+
     if (currentStepComponent && typeof currentStepComponent.submitData === 'function') {
-      console.log('Calling submitData on current step component');
       await currentStepComponent.submitData();
-      console.log('submitData completed successfully');
     } else {
-      console.log('No submitData method found on current step component');
+
     }
-    
+
     if (stepper.value < totalSteps) {
       console.log('Moving to next step');
       stepper.value++;
@@ -128,13 +125,13 @@ const breadcrumbs = ref([
     href: '/cartable'
   },
   {
-    title: 'گزارش ابلاغیه',
+    title: 'پیشنهاد کارشناسی',
     disabled: false,
     href: '#'
   }
 ]);
 
-const page = ref({ title: 'گزارش ابلاغیه' });
+const page = ref({ title: 'پیشنهاد کارشناسی' });
 
 </script>
 

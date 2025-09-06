@@ -139,12 +139,6 @@ const isFormValid = computed(() => {
 
 // submit form
 const submitData = async () => {
-  if (!data.value || data.value.length === 0) {
-    error.value = 'اطلاعات ضامن یافت نشد';
-    showError.value = true;
-    return Promise.reject(error.value);
-  }
-
   // Always call API, but don't show success alert if we already have trackingCode
   const hasExistingTrackingCode = !!approvalStore.trackingCode;
   if (hasExistingTrackingCode) {

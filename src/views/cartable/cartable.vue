@@ -13,7 +13,7 @@ import { usePermissionsStore } from '@/stores/permissions';
 import SignList from '@/components/sections/cartable/signList/SignList.vue';
 import type { CustomerDto } from '@/types/approval/approvalType';
 import DirectiveReport from '@/components/sections/cartable/directiveReport/directiveReport.vue';
-import CreditApprovalReport from '@/components/sections/cartable/creditApprovalReport/CreditApprovalReport.vue';
+import CreditSuggestionReport from '@/components/sections/cartable/creditApprovalReport/CreditSuggestionReport.vue';
 
 const permissionsStore = usePermissionsStore();
 
@@ -129,7 +129,7 @@ const directiveRoute = {
 }
 
 const creditApprovalDescriptionRoute = {
-  'نظر کارشناسی': 'directiveReport/{id}'
+  'گزارش کارشناسی': 'creditSuggestion/{id}'
 }
 
 function handleReferenceSuccess() {
@@ -190,20 +190,21 @@ function handleReferenceSuccess() {
           component: LoanRequestHistory
         },
         {
-          title: '📜 نظر کارشناسی',
+          title: 'گزارش پیش مصوبه منطقه',
           component: (props) =>
-            h(CreditApprovalReport, {
+            h(CreditSuggestionReport, {
               ...props,
               item: props.item,
               onSuccess: handleReferenceSuccess
             }),
-          condition: (item) => permissionsStore.hasMenuPermission('creditApprovalReport')
+          condition: (item) => permissionsStore.hasMenuPermission('regionPreApprovalReport')
         },
       ]"
 
       :routes="{
         ...(permissionsStore.hasMenuPermission('preApprovalReport') ? route : {}),
-        ...(permissionsStore.hasMenuPermission('addDirectiveFile') ? directiveRoute : {}),
+        ...(permissionsStore.hasMenuPermission('directiveReport') ? directiveRoute : {}),
+        ...(permissionsStore.hasMenuPermission('uploadExpertReport') ? creditApprovalDescriptionRoute : {}),
 
       }"
     />

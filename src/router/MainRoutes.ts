@@ -60,6 +60,11 @@ const MainRoutes = {
       name: 'directiveReport',
       path: '/directiveReport/:id',
       component: () => import('@/components/sections/cartable/directiveReport/directiveReport.vue')
+    },
+    {
+      name: 'creditSuggestion',
+      path: '/creditSuggestion/:id',
+      component: () => import('@/components/sections/cartable/creditApprovalReport/CreditSuggestionReport.vue')
     }
   ]
 };

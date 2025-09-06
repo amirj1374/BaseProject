@@ -95,11 +95,11 @@ const submitForm = async () => {
           <v-radio color="error" label="مخالفم" :value="false"></v-radio>
         </v-radio-group>
       </v-col>
-      <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('reviewExpertReport')">
+      <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('downloadExpertReport')">
         <v-btn color="info" @click="downloadExpertReport" variant="tonal"> دانلود گزارش کارشناسی </v-btn>
       </v-col>
-      <v-col cols="12" md="3" v-if="props.item.report1016Url && permissionsStore.hasMenuPermission('create1016')">
-        <v-btn color="info" @click="download1016Report" variant="tonal"> دانلود گزارش 1016 </v-btn>
+      <v-col cols="12" md="3" v-if="props.item.report1016Url && permissionsStore.hasMenuPermission('download1016')">
+        <v-btn color="info" @click="download1016Report" variant="tonal"> دانلود فرم 1016 </v-btn>
       </v-col>
       <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('reviewExpertReport')">
         <v-switch v-model="props.item.expertReportIsSeen" inset color="primary" hide-details class="me-2" />
