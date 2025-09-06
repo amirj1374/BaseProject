@@ -168,13 +168,12 @@ const submitData = async () => {
     return Promise.reject(error.value);
   }
   try {
-    // Only set customer info without the child component data
-    // Let the child components handle their own data loading
+    // Set customer info with all facilities data
     approvalStore.setCustomerInfo({
-      facilities: facilitiesData.value[0],
-      guarantee: guaranteeData.value[0],
-      lc: lcData.value[0],
-      greenLicense: greenLicenseData.value[0],
+      facilities: facilitiesData.value.length > 0 ? facilitiesData.value : undefined,
+      guarantee: guaranteeData.value.length > 0 ? guaranteeData.value : undefined,
+      lc: lcData.value.length > 0 ? lcData.value : undefined,
+      greenLicense: greenLicenseData.value.length > 0 ? greenLicenseData.value : undefined,
       ...firstItem
     });
     return Promise.resolve();

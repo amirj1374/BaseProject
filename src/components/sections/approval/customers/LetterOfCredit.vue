@@ -472,18 +472,28 @@ function isObjectEmpty(obj: any): boolean {
   return Object.values(obj).every((v) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0));
 }
 onMounted(() => {
-  if (approvalStore.customerInfo?.lc && !isObjectEmpty(approvalStore.customerInfo.lc)) {
-    lc.value = [approvalStore.customerInfo.lc];
+  if (approvalStore.customerInfo?.lc) {
+    if (Array.isArray(approvalStore.customerInfo.lc)) {
+      lc.value = approvalStore.customerInfo.lc;
+    } else if (!isObjectEmpty(approvalStore.customerInfo.lc)) {
+      // Handle legacy single lc format
+      lc.value = [approvalStore.customerInfo.lc];
+    }
   }
 });
 
 // Watch for customer info changes to load existing data
 watch(() => approvalStore.customerInfo, (newCustomerInfo) => {
-  if (newCustomerInfo?.lc && !isObjectEmpty(newCustomerInfo.lc)) {
-    lc.value = [newCustomerInfo.lc];
+  if (newCustomerInfo?.lc) {
+    if (Array.isArray(newCustomerInfo.lc)) {
+      lc.value = newCustomerInfo.lc;
+    } else if (!isObjectEmpty(newCustomerInfo.lc)) {
+      // Handle legacy single lc format
+      lc.value = [newCustomerInfo.lc];
+    }
   } else {
-    // Reset lc when customer changes
-    lc.value = [];
+    // Don't reset lc when customer changes - preserve existing data
+    // lc.value = [];
   }
 }, { immediate: true });
 

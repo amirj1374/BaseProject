@@ -460,18 +460,28 @@ function isObjectEmpty(obj: any): boolean {
 }
 
 onMounted(() => {
-  if (approvalStore.customerInfo?.facilities && !isObjectEmpty(approvalStore.customerInfo.facilities)) {
-    facilities.value = [approvalStore.customerInfo.facilities];
+  if (approvalStore.customerInfo?.facilities) {
+    if (Array.isArray(approvalStore.customerInfo.facilities)) {
+      facilities.value = approvalStore.customerInfo.facilities;
+    } else if (!isObjectEmpty(approvalStore.customerInfo.facilities)) {
+      // Handle legacy single facility format
+      facilities.value = [approvalStore.customerInfo.facilities];
+    }
   }
 });
 
 // Watch for customer info changes to load existing data
 watch(() => approvalStore.customerInfo, (newCustomerInfo) => {
-  if (newCustomerInfo?.facilities && !isObjectEmpty(newCustomerInfo.facilities)) {
-    facilities.value = [newCustomerInfo.facilities];
+  if (newCustomerInfo?.facilities) {
+    if (Array.isArray(newCustomerInfo.facilities)) {
+      facilities.value = newCustomerInfo.facilities;
+    } else if (!isObjectEmpty(newCustomerInfo.facilities)) {
+      // Handle legacy single facility format
+      facilities.value = [newCustomerInfo.facilities];
+    }
   } else {
-    // Reset facilities when customer changes
-    facilities.value = [];
+    // Don't reset facilities when customer changes - preserve existing data
+    // facilities.value = [];
   }
 }, { immediate: true });
 

@@ -13,7 +13,21 @@ export const useApprovalStore = defineStore('approvalStore', {
 
   actions: {
     setCustomerInfo(payload: Partial<CustomerDto>) {
-      this.customerInfo = { ...this.customerInfo, ...payload }
+      // Preserve existing facilities, guarantee, lc, and greenLicense arrays
+      const existingFacilities = this.customerInfo.facilities || [];
+      const existingGuarantee = this.customerInfo.guarantee || [];
+      const existingLc = this.customerInfo.lc || [];
+      const existingGreenLicense = this.customerInfo.greenLicense || [];
+      
+      this.customerInfo = { 
+        ...this.customerInfo, 
+        ...payload,
+        // Only update these fields if they are provided in payload
+        facilities: payload.facilities !== undefined ? payload.facilities : existingFacilities,
+        guarantee: payload.guarantee !== undefined ? payload.guarantee : existingGuarantee,
+        lc: payload.lc !== undefined ? payload.lc : existingLc,
+        greenLicense: payload.greenLicense !== undefined ? payload.greenLicense : existingGreenLicense
+      }
     },
 
     setLoanRequestDetailList(payload: LoanRequestDetail) {

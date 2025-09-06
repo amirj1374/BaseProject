@@ -17,10 +17,10 @@ export interface CustomerDto {
   phoneNo?: number;
   branchName?: string;
   clientgroupname?: string;
-  facilities?: Facility;
-  guarantee?: Guarantee;
-  lc?: Lc;
-  greenLicense?: GreenLicense;
+  facilities?: Facility | Facility[];
+  guarantee?: Guarantee | Guarantee[];
+  lc?: Lc | Lc[];
+  greenLicense?: GreenLicense | GreenLicense[];
 }
 
 export interface Facility {

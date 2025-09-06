@@ -444,18 +444,28 @@ function isObjectEmpty(obj: any): boolean {
   return Object.values(obj).every((v) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0));
 }
 onMounted(() => {
-  if (approvalStore.customerInfo?.guarantee && !isObjectEmpty(approvalStore.customerInfo.guarantee)) {
-    guarantee.value = [approvalStore.customerInfo.guarantee];
+  if (approvalStore.customerInfo?.guarantee) {
+    if (Array.isArray(approvalStore.customerInfo.guarantee)) {
+      guarantee.value = approvalStore.customerInfo.guarantee;
+    } else if (!isObjectEmpty(approvalStore.customerInfo.guarantee)) {
+      // Handle legacy single guarantee format
+      guarantee.value = [approvalStore.customerInfo.guarantee];
+    }
   }
 });
 
 // Watch for customer info changes to load existing data
 watch(() => approvalStore.customerInfo, (newCustomerInfo) => {
-  if (newCustomerInfo?.guarantee && !isObjectEmpty(newCustomerInfo.guarantee)) {
-    guarantee.value = [newCustomerInfo.guarantee];
+  if (newCustomerInfo?.guarantee) {
+    if (Array.isArray(newCustomerInfo.guarantee)) {
+      guarantee.value = newCustomerInfo.guarantee;
+    } else if (!isObjectEmpty(newCustomerInfo.guarantee)) {
+      // Handle legacy single guarantee format
+      guarantee.value = [newCustomerInfo.guarantee];
+    }
   } else {
-    // Reset guarantee when customer changes
-    guarantee.value = [];
+    // Don't reset guarantee when customer changes - preserve existing data
+    // guarantee.value = [];
   }
 }, { immediate: true });
 

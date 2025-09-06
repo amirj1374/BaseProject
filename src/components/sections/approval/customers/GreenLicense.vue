@@ -367,18 +367,28 @@
   return Object.values(obj).every((v) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0));
 }
   onMounted(() => {
-  if (approvalStore.customerInfo?.greenLicense && !isObjectEmpty(approvalStore.customerInfo.greenLicense)) {
-    greenLicense.value = [approvalStore.customerInfo.greenLicense];
+  if (approvalStore.customerInfo?.greenLicense) {
+    if (Array.isArray(approvalStore.customerInfo.greenLicense)) {
+      greenLicense.value = approvalStore.customerInfo.greenLicense;
+    } else if (!isObjectEmpty(approvalStore.customerInfo.greenLicense)) {
+      // Handle legacy single greenLicense format
+      greenLicense.value = [approvalStore.customerInfo.greenLicense];
+    }
   }
 });
 
 // Watch for customer info changes to load existing data
 watch(() => approvalStore.customerInfo, (newCustomerInfo) => {
-  if (newCustomerInfo?.greenLicense && !isObjectEmpty(newCustomerInfo.greenLicense)) {
-    greenLicense.value = [newCustomerInfo.greenLicense];
+  if (newCustomerInfo?.greenLicense) {
+    if (Array.isArray(newCustomerInfo.greenLicense)) {
+      greenLicense.value = newCustomerInfo.greenLicense;
+    } else if (!isObjectEmpty(newCustomerInfo.greenLicense)) {
+      // Handle legacy single greenLicense format
+      greenLicense.value = [newCustomerInfo.greenLicense];
+    }
   } else {
-    // Reset greenLicense when customer changes
-    greenLicense.value = [];
+    // Don't reset greenLicense when customer changes - preserve existing data
+    // greenLicense.value = [];
   }
 }, { immediate: true });
 
