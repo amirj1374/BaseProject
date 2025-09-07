@@ -68,6 +68,7 @@ interface Props {
   groupHeaderTemplate?: (groupKey: string | number, groupItems: any[]) => string; // Custom group header template
   defaultExpanded?: boolean; // Whether groups are expanded by default
   defaultSelected?: string; // Property name to check for auto-selection (e.g., 'isSelected')
+  dateWithTimezone?: boolean; // If true, save dates with local timezone offset at midnight
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -79,7 +80,8 @@ const props = withDefaults(defineProps<Props>(), {
   selectedItems: () => [],
   uniqueKey: 'id',
   pageSize: 10,
-  defaultExpanded: false
+  defaultExpanded: false,
+  dateWithTimezone: false
 });
 
 const emit = defineEmits<{
@@ -686,6 +688,26 @@ const openDialog = (item?: any) => {
 
   // Sync form model with editedItem
   formModel.value = { ...editedItem.value };
+
+  // Ensure date fields in edit mode are in Gregorian YYYY-MM-DD for the date picker
+  if (isEditing.value) {
+    try {
+      props.headers.forEach((header) => {
+        if (header.isDate) {
+          const v = formModel.value[header.key];
+          if (typeof v === 'string' && v.includes('/')) {
+            // Convert Shamsi jYYYY/jMM/jDD -> YYYY-MM-DD for picker
+            formModel.value[header.key] = DateConverter.toGregorian(v);
+          } else if (typeof v === 'string' && v.includes('T')) {
+            // Normalize ISO to YYYY-MM-DD for picker
+            formModel.value[header.key] = v.split('T')[0];
+          }
+        }
+      });
+    } catch (e) {
+      console.error('Error normalizing date fields for edit form:', e);
+    }
+  }
 };
 
 const openDeleteDialog = (item: any) => {
@@ -697,12 +719,38 @@ const saveItem = async () => {
   if (!formModel.value) return;
 
   try {
-    // Convert Shamsi dates back to Gregorian before saving
+    // Normalize dates before saving
     const dataToSave = { ...formModel.value };
     props.headers.forEach((header) => {
       if (header.isDate && dataToSave[header.key]) {
         try {
-          dataToSave[header.key] = DateConverter.toGregorian(dataToSave[header.key]);
+          const raw = dataToSave[header.key];
+          if (typeof raw === 'string') {
+            const toIsoWithOffset = (ymd: string) => {
+              const [y, m, d] = ymd.split('-').map(Number);
+              const local = new Date(y, (m || 1) - 1, d || 1, 0, 0, 0, 0);
+              const offsetMin = -local.getTimezoneOffset();
+              const sign = offsetMin >= 0 ? '+' : '-';
+              const abs = Math.abs(offsetMin);
+              const hh = String(Math.floor(abs / 60)).padStart(2, '0');
+              const mm = String(abs % 60).padStart(2, '0');
+              const mm2 = String(m).padStart(2, '0');
+              const dd2 = String(d).padStart(2, '0');
+              return `${y}-${mm2}-${dd2}T00:00:00${sign}${hh}:${mm}`;
+            };
+
+            if (raw.includes('/')) {
+              // Shamsi jYYYY/jMM/jDD -> Gregorian YYYY-MM-DD
+              const greg = DateConverter.toGregorian(raw);
+              dataToSave[header.key] = props.dateWithTimezone ? toIsoWithOffset(greg) : greg;
+            } else if (raw.includes('T')) {
+              // ISO string -> keep as is or trim time if not requested
+              dataToSave[header.key] = props.dateWithTimezone ? raw : raw.split('T')[0];
+            } else {
+              // Already YYYY-MM-DD
+              dataToSave[header.key] = props.dateWithTimezone ? toIsoWithOffset(raw) : raw;
+            }
+          }
         } catch (error) {
           console.error(`Error converting date for field ${header.key}:`, error);
         }

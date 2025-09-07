@@ -5,13 +5,16 @@
       :headers="headers"
       :api-resource="`recently-approved/${props.cartableId}`"
       :auto-fetch="true"
-      :height="350"
+      :height="345"
+      :form-component="FilterRecentApproval"
       :actions="['create', 'edit']"
+      :date-with-timezone="true"
     />
   </div>
 </template>
 <script lang="ts" setup>
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import FilterRecentApproval from '@/components/sections/cartable/preApprovalReport/recentApproval/FilterRecentApproval.vue';
 
 const props = defineProps({
   loanRequestId: {

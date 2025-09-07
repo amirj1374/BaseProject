@@ -119,10 +119,10 @@ const header = ref([
 ]);
 
 const tableRef = ref();
-const route = {
+const preApprovalReport = {
   'گزارش پیش مصوبه': 'preApprovalReport/{id}'
 };
-const directiveRoute = {
+const directiveReport = {
   'گزارش ابلاغیه': 'directiveReport/{id}'
 }
 
@@ -201,8 +201,8 @@ function handleReferenceSuccess() {
       ]"
 
       :routes="{
-        ...(permissionsStore.hasMenuPermission('preApprovalReport') ? route : {}),
-        ...(permissionsStore.hasMenuPermission('directiveReport') ? directiveRoute : {}),
+        ...(permissionsStore.hasMenuPermission('preApprovalReport') ? preApprovalReport : {}),
+        ...(permissionsStore.hasMenuPermission('directiveReport') ? directiveReport : {}),
         ...(permissionsStore.hasMenuPermission('regionPreApprovalReport') ? regionPreApprovalReport : {}),
 
       }"

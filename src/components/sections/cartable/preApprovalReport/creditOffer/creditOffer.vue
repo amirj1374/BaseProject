@@ -34,6 +34,7 @@
             format="YYYY-MM-DD"
             displayFormat="jYYYY/jMM/jDD"
             placeholder="تاریخ نامه را انتخاب کنید"
+            emitWithTimezone
           />
         </v-col>
         <v-col cols="12" md="6">

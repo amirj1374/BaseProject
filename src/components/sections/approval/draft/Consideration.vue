@@ -153,11 +153,11 @@ defineExpose({ valid });
             <ShamsiDatePicker
               v-model="formData.creditLimitDate"
               label="حد اعتباریه سالانه / سقف اعتباری مشتری در تاریخ"
-              color="black"
-              density="comfortable"
+              color="primary"
               hide-details="auto"
               variant="outlined"
               :disabled="isEditingDisabled"
+              emitWithTimezone
             />
           </v-col>
         </v-row>
