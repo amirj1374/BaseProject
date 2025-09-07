@@ -6,6 +6,10 @@ export const useApprovalStore = defineStore('approvalStore', {
     customerInfo: {} as CustomerDto,
     loanRequestDetailList: null as LoanRequestDetail | null,
     guarantor: [] as GuarantorDto[],
+    facilitiesItems: [] as Facility[],
+    guaranteeItems: [] as Guarantee[],
+    lcItems: [] as Lc[],
+    greenLicenseItems: [] as GreenLicense[],
     loanRequestId: '' as string,
     trackingCode: '' as string,
     loanRequestStatus: '' as string,
@@ -13,20 +17,31 @@ export const useApprovalStore = defineStore('approvalStore', {
 
   actions: {
     setCustomerInfo(payload: Partial<CustomerDto>) {
-      // Preserve existing facilities, guarantee, lc, and greenLicense arrays
-      const existingFacilities = this.customerInfo.facilities || [];
-      const existingGuarantee = this.customerInfo.guarantee || [];
-      const existingLc = this.customerInfo.lc || [];
-      const existingGreenLicense = this.customerInfo.greenLicense || [];
-      
-      this.customerInfo = { 
-        ...this.customerInfo, 
-        ...payload,
-        // Only update these fields if they are provided in payload
-        facilities: payload.facilities !== undefined ? payload.facilities : existingFacilities,
-        guarantee: payload.guarantee !== undefined ? payload.guarantee : existingGuarantee,
-        lc: payload.lc !== undefined ? payload.lc : existingLc,
-        greenLicense: payload.greenLicense !== undefined ? payload.greenLicense : existingGreenLicense
+      // Allow arrays to be stored in customerInfo if provided; otherwise keep existing
+      const { facilities, guarantee, lc, greenLicense, ...rest } = payload as any
+      const existing = this.customerInfo
+      this.customerInfo = {
+        ...existing,
+        ...rest,
+        facilities: facilities !== undefined ? facilities : existing?.facilities,
+        guarantee: guarantee !== undefined ? guarantee : existing?.guarantee,
+        lc: lc !== undefined ? lc : existing?.lc,
+        greenLicense: greenLicense !== undefined ? greenLicense : existing?.greenLicense,
+      }
+    },
+
+    setRequestItems(payload: { facilities?: Facility[]; guarantee?: Guarantee[]; lc?: Lc[]; greenLicense?: GreenLicense[] }) {
+      if (payload.facilities !== undefined) {
+        this.facilitiesItems = payload.facilities
+      }
+      if (payload.guarantee !== undefined) {
+        this.guaranteeItems = payload.guarantee
+      }
+      if (payload.lc !== undefined) {
+        this.lcItems = payload.lc
+      }
+      if (payload.greenLicense !== undefined) {
+        this.greenLicenseItems = payload.greenLicense
       }
     },
 
@@ -120,6 +135,10 @@ export const useApprovalStore = defineStore('approvalStore', {
       this.customerInfo = {} as CustomerDto
       this.loanRequestDetailList = null
       this.guarantor = [] as GuarantorDto[]
+      this.facilitiesItems = [] as Facility[]
+      this.guaranteeItems = [] as Guarantee[]
+      this.lcItems = [] as Lc[]
+      this.greenLicenseItems = [] as GreenLicense[]
       this.loanRequestId = ''
       this.trackingCode = ''
       this.loanRequestStatus = ''

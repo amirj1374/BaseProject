@@ -117,15 +117,15 @@ async function addGuarantor() {
         canSubmit.value = true;
       } else {
         error.value = 'این ضامن با این کد ملی قبلاً اضافه شده است';
-        showError.value = true;
+        // showError.value = true;
       }
     } else {
       error.value = `خطا: ${response.statusText}`;
-      showError.value = true;
+      // showError.value = true;
     }
   } catch (err: any) {
     showErrorMessage(err.response?.data?.message || 'خطای سرور.');
-    hideInput.value = true;
+    // hideInput.value = true;
     canSubmit.value = false;
   } finally {
     customizerStore.loading = false;

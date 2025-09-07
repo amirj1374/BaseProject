@@ -168,13 +168,18 @@ const submitData = async () => {
     return Promise.reject(error.value);
   }
   try {
-    // Set customer info with all facilities data
+    // Store single objects (not arrays) for each section
+    const lcObj = lcData.value && lcData.value.length > 0 ? lcData.value[0] : undefined
+    const facilitiesObj = facilitiesData.value && facilitiesData.value.length > 0 ? facilitiesData.value[0] : undefined
+    const guaranteeObj = guaranteeData.value && guaranteeData.value.length > 0 ? guaranteeData.value[0] : undefined
+    const greenLicenseObj = greenLicenseData.value && greenLicenseData.value.length > 0 ? greenLicenseData.value[0] : undefined
+
     approvalStore.setCustomerInfo({
-      facilities: facilitiesData.value.length > 0 ? facilitiesData.value : undefined,
-      guarantee: guaranteeData.value.length > 0 ? guaranteeData.value : undefined,
-      lc: lcData.value.length > 0 ? lcData.value : undefined,
-      greenLicense: greenLicenseData.value.length > 0 ? greenLicenseData.value : undefined,
-      ...firstItem
+      ...firstItem,
+      facilities: facilitiesObj,
+      guarantee: guaranteeObj,
+      lc: lcObj,
+      greenLicense: greenLicenseObj,
     });
     return Promise.resolve();
   } catch (err) {
