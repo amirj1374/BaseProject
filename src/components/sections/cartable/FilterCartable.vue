@@ -3,25 +3,29 @@
     <v-row>
       <!-- Date Range Filter -->
       <v-col cols="12" md="6">
-        <v-text-field
+        <ShamsiDatePicker
           v-model="filterModel.dateFrom"
           label="از تاریخ"
-          type="date"
           variant="outlined"
           density="comfortable"
-          hide-details="auto"
-          clearable
+          mode="single"
+          format="YYYY-MM-DD"
+          displayFormat="jYYYY/jMM/jDD"
+          placeholder="تاریخ را انتخاب کنید"
+          emitWithTimezone
         />
       </v-col>
       <v-col cols="12" md="6">
-        <v-text-field
+        <ShamsiDatePicker
           v-model="filterModel.dateTo"
           label="تا تاریخ"
-          type="date"
           variant="outlined"
           density="comfortable"
-          hide-details="auto"
-          clearable
+          mode="single"
+          format="YYYY-MM-DD"
+          displayFormat="jYYYY/jMM/jDD"
+          placeholder="تاریخ را انتخاب کنید"
+          emitWithTimezone
         />
       </v-col>
 
@@ -95,6 +99,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch, defineProps, defineEmits } from 'vue';
+import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
 
 interface FilterModel {
   dateFrom: string;

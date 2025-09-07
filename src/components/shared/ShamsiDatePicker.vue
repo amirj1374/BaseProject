@@ -43,6 +43,7 @@ interface Props {
   maxDate?: string;
   mode?: 'single' | 'range'; // Single date or range picker
   icon?: string; // Custom calendar icon
+  emitWithTimezone?: boolean; // If true, emit YYYY-MM-DD with timezone offset
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -64,7 +65,8 @@ const props = withDefaults(defineProps<Props>(), {
   minDate: '',
   maxDate: '',
   mode: 'single',
-  icon: ''
+  icon: '',
+  emitWithTimezone: false
 });
 
 const emit = defineEmits<{
@@ -73,23 +75,21 @@ const emit = defineEmits<{
 
 const selectedDate = computed({
   get: () => {
-    // Pass Gregorian date directly to the library, let it handle Shamsi display
+    // Expect/return YYYY-MM-DD (Gregorian) or a tuple in range mode
     if (props.mode === 'range' && Array.isArray(props.modelValue)) {
       return props.modelValue;
-    } else if (typeof props.modelValue === 'string' && props.modelValue) {
-      console.log('Passing Gregorian date to picker:', props.modelValue);
-      // Convert ISO string to local date to avoid timezone issues
+    }
+    if (typeof props.modelValue === 'string' && props.modelValue) {
+      // If an ISO string was passed, normalize to YYYY-MM-DD to avoid timezone shifts
       if (props.modelValue.includes('T')) {
-        const date = new Date(props.modelValue);
-        // Format as YYYY-MM-DD to avoid timezone confusion
-        const localDate = date.getFullYear() + '-' + 
-          String(date.getMonth() + 1).padStart(2, '0') + '-' + 
-          String(date.getDate()).padStart(2, '0');
-        console.log('Converted to local date:', localDate);
-        return localDate;
+        const d = new Date(props.modelValue);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
       }
-      // Otherwise, create a proper date string that the picker can handle
-      return props.modelValue + 'T00:00:00.000Z';
+      // Already in YYYY-MM-DD
+      return props.modelValue;
     }
     return props.modelValue;
   },
@@ -101,34 +101,54 @@ const selectedDate = computed({
 
 const onDateChange = (date: any) => {
   console.log('Date changed:', date);
+  const toIsoWithOffset = (ymd: string) => {
+    // Build a local-time Date at midnight and format with the local offset
+    const [y, m, d] = ymd.split('-').map(Number);
+    const local = new Date(y, (m || 1) - 1, d || 1, 0, 0, 0, 0);
+    const offsetMin = -local.getTimezoneOffset(); // minutes east of UTC
+    const sign = offsetMin >= 0 ? '+' : '-';
+    const abs = Math.abs(offsetMin);
+    const hh = String(Math.floor(abs / 60)).padStart(2, '0');
+    const mm = String(abs % 60).padStart(2, '0');
+    const mm2 = String(m).padStart(2, '0');
+    const dd2 = String(d).padStart(2, '0');
+    return `${y}-${mm2}-${dd2}T00:00:00${sign}${hh}:${mm}`;
+  };
   
   if (props.mode === 'range') {
-    // Handle range mode
+    // Emit as [YYYY-MM-DD, YYYY-MM-DD]
     if (Array.isArray(date) && date.length === 2) {
       const [startDate, endDate] = date;
-      const gregorianStart = startDate && startDate._isAMomentObject ? 
-        startDate.toISOString() : startDate;
-      const gregorianEnd = endDate && endDate._isAMomentObject ? 
-        endDate.toISOString() : endDate;
-      
-      console.log('Range - Start:', gregorianStart, 'End:', gregorianEnd);
-      emit('update:modelValue', [gregorianStart, gregorianEnd]);
+      const normalize = (d: any) => {
+        if (d && d._isAMomentObject && d.isValid()) return d.format('YYYY-MM-DD');
+        if (typeof d === 'string') return d.includes('T') ? d.split('T')[0] : d;
+        return '';
+      };
+      const start = normalize(startDate);
+      const end = normalize(endDate);
+      console.log('Range - Start:', start, 'End:', end);
+      if (start && end) {
+        if (props.emitWithTimezone) {
+          emit('update:modelValue', [toIsoWithOffset(start), toIsoWithOffset(end)] as any);
+        } else {
+          emit('update:modelValue', [start, end] as any);
+        }
+      } else {
+        emit('update:modelValue', null);
+      }
     } else {
       emit('update:modelValue', null);
     }
   } else {
-    // Handle single date mode
+    // Emit single date as YYYY-MM-DD (Gregorian, date-only)
     if (date && date._isAMomentObject && date.isValid()) {
-      // Use Moment's toISOString method to get full ISO format with timezone
-      const gregorianISO = date.toISOString();
-      console.log('Single date - Gregorian for server:', gregorianISO);
-      emit('update:modelValue', gregorianISO);
+      const gregorian = date.format('YYYY-MM-DD');
+      console.log('Single date (YYYY-MM-DD):', gregorian);
+      emit('update:modelValue', props.emitWithTimezone ? toIsoWithOffset(gregorian) : gregorian);
     } else if (typeof date === 'string') {
-      // If it's a string, convert to ISO format
-      const dateObj = new Date(date);
-      const gregorianISO = dateObj.toISOString();
-      console.log('String date converted to ISO:', gregorianISO);
-      emit('update:modelValue', gregorianISO);
+      const normalized = date.includes('T') ? date.split('T')[0] : date;
+      console.log('String date normalized to YYYY-MM-DD:', normalized);
+      emit('update:modelValue', props.emitWithTimezone ? toIsoWithOffset(normalized) : normalized);
     } else {
       emit('update:modelValue', '');
     }
