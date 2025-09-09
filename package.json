@@ -16,7 +16,10 @@
     "preview:live": "vite preview --port 5050 --host",
     "typecheck": "vue-tsc --noEmit",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-pattern .gitignore",
-    "serve": "vue-cli-service serve"
+    "serve": "vue-cli-service serve",
+    "dev:demo": "vite --mode demo",
+    "build:demo": "vue-tsc --noEmit && vite build --mode demo",
+    "preview:demo": "vite preview --port 5050 --host"
   },
   "dependencies": {
     "@mdi/js": "^7.4.47",

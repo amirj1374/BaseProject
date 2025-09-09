@@ -2,6 +2,8 @@ import { api } from '@/services/api';
 import { useBaseStore } from '@/stores/base';
 import { useCustomerInfoStore } from '@/stores/customerInfo';
 import { useCustomizerStore } from '@/stores/customizer';
+import envConfig from '@/config/envConfig';
+import type { UserInfoResponse } from '@/types/models/userInfo';
 
 // Validation arrays
 const validThemes = [
@@ -67,6 +69,62 @@ export async function startInitialization() {
   const customerInfoStore = useCustomerInfoStore();
   const customizer = useCustomizerStore();
   const baseStore = useBaseStore();
+
+  // Demo mode: skip API calls and initialize with safe defaults
+  if (envConfig.ENVIRONMENT === 'demo') {
+    try {
+      const demoUser: UserInfoResponse = {
+        name: 'Demo User',
+        sub: 'demo-sub',
+        emailVerified: false,
+        issuer: null,
+        branchName: 'Demo Branch',
+        preferredUsername: 'demo',
+        nonce: 'demo-nonce',
+        sid: 'demo-sid',
+        branchCode: '000',
+        audience: [],
+        acr: '0',
+        azp: 'demo-app',
+        authTime: new Date().toISOString(),
+        fullName: 'Demo User',
+        position: 'Demo',
+        expiration: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+        sessionState: 'demo-state',
+        issuedAt: new Date().toISOString(),
+        jti: 'demo-jti',
+        authorities: [],
+        username: 'demo',
+        email: null,
+        roles: [],
+        lotusRoles: [],
+        customizer: {
+          fontTheme: customizer.fontTheme,
+          inputBg: customizer.inputBg,
+          layoutType: customizer.layoutType,
+          actTheme: customizer.actTheme,
+          themeMode: customizer.themeMode,
+          menuOrientation: customizer.menuOrientation
+        }
+      };
+
+      customerInfoStore.setUserInfo(demoUser);
+      baseStore.setCurrencyList([]);
+      baseStore.setCollateralList([]);
+      baseStore.setRegionsList([]);
+      baseStore.setDepartmentLevel([]);
+
+      resolveInit?.(demoUser);
+    } catch (error) {
+      customerInfoStore.setError(error instanceof Error ? error.message : 'Demo initialization error');
+      rejectInit?.(error);
+    } finally {
+      customizer.SET_LOADING(false);
+      isInitializing = false;
+    }
+
+    return;
+  }
 
   try {
     customerInfoStore.clearError();

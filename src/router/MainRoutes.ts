@@ -12,6 +12,11 @@ const MainRoutes = {
       component: () => import('@/views/dashboards/default/Dashboard.vue')
     },
     {
+      name: 'Product',
+      path: '/products',
+      component: () => import('@/views/product/product.vue')
+    },
+    {
       name: 'Approval',
       path: '/approval',
       component: () => import('@/views/approval/approval.vue')

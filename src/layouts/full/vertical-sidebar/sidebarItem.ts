@@ -33,6 +33,11 @@ const sidebarItem: menu[] = [
     to: '/',
   },
   {
+    title: 'محصولات',
+    icon: IconHome,
+    to: '/products',
+  },
+  {
     title: 'درخواست مصوبه جدید',
     icon: IconPencilPlus,
     to: '/approval',

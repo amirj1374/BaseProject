@@ -89,14 +89,13 @@ const submitForm = async () => {
 
     // Prepare update payload (always array of objects)
     const updatePayload = {
-      id: id.value,
       lotusRoles: lotusRolesPayload,
       minUserNumber: minUserNumber.value,
       maxUserNumber: maxUserNumber.value,
     };
 
     // Call update API using the department-role resource
-    const response = await apiService(axiosInstance, 'department-role').update(updatePayload);
+    const response = await apiService(axiosInstance, 'department-role').update(id.value, updatePayload);
     
     if (response.status === 200) {
       snackbarMessage.value = 'نقش با موفقیت بروزرسانی شد';

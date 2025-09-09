@@ -758,7 +758,7 @@ const saveItem = async () => {
     });
 
     if (isEditing.value && dataToSave.id) {
-      await api.update(dataToSave);
+      await api.update(dataToSave.id, dataToSave);
       snackbarMessage.value = '✅ آیتم با موفقیت بروزرسانی شد!';
     } else {
       const response = await api.create(dataToSave);

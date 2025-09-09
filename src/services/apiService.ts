@@ -5,7 +5,7 @@ import axiosInstance from './axiosInstance';
 // Original apiService function (for backward compatibility)
 export default (axiosInstance: AxiosInstance, resource: string) => ({
   fetch(filters?: Record<string, any>) {
-    return axiosInstance.get(`api/v1/${resource}`, {
+    return axiosInstance.get(`api/${resource}`, {
       params: { 
         ...filters,
       }
@@ -13,15 +13,15 @@ export default (axiosInstance: AxiosInstance, resource: string) => ({
   },
 
   create(data: Record<string, any>) {
-    return axiosInstance.post(`api/v1/${resource}`, data);
+    return axiosInstance.post(`api/${resource}`, data);
   },  
 
-  update(data: Record<string, any>) {
-    return axiosInstance.put(`api/v1/${resource}`, data);
+  update(id: string | number, data: Record<string, any>) {
+    return axiosInstance.put(`api/${resource}/${id}` , data);
   },
 
   delete(id: string | Record<string, any>) {
-    return axiosInstance.delete(`api/v1/${resource}/${id}`);
+    return axiosInstance.delete(`api/${resource}/${id}`);
   },
 });
 
