@@ -48,7 +48,7 @@ export const usePermissionsStore = defineStore({
         requiredRoles: ['SMP_REPORT']
       },
       {
-        menuKey: 'admin',
+        menuKey: 'flowManagement',
         requiredRoles: ['SMP_CREATE_FLOW_MNG']
       },
       {

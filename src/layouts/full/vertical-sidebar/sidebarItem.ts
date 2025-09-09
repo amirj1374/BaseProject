@@ -59,19 +59,19 @@ const sidebarItem: menu[] = [
   {
     title: 'اطلاعات پایه',
     icon: IconDatabase,
-    permissionKey: 'admin',
+    permissionKey: 'flowManagement',
     children: [
       {
         title: 'مدیریت نقش ها',
         icon: IconBookmarkEdit,
         to: '/base/role-managment',
-        permissionKey: 'admin'
+        permissionKey: 'flowManagement'
       },
       {
         title: 'مدیریت عملیات',
         icon: IconDatabase,
         to: '/base/department-managment',
-        permissionKey: 'admin'
+        permissionKey: 'flowManagement'
       }
     ]
   }

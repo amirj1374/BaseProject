@@ -209,8 +209,4 @@ const headers = [
     width: 150
   }
 ];
-onMounted(() => {
-  // Check if user has permission to access this page
-  requirePermission('admin');
-});
 </script>

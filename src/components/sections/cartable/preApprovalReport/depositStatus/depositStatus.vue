@@ -49,15 +49,9 @@ const headers = [
     title: 'تاریخ افتتاح',
     key: 'openingDate',
     sortable: true,
-    isDate: true,
     width: 250
   },
-  {
-    title: 'نوع حساب',
-    key: 'accountType',
-    sortable: true,
-    width: 250
-  },
+
   {
     title: 'شعبه',
     key: 'branch',
@@ -66,10 +60,9 @@ const headers = [
   },
   {
     title: 'میانگین موجودی شش ماه گذشته',
-    key: 'avgBalanceHalf',
+    key: 'finalBalance',
     sortable: true,
     width: 500,
-    isDate: true
   },
   {
     title: 'مبلغ گردش بدهکار',

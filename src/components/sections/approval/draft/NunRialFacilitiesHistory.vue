@@ -50,6 +50,9 @@ const header = ref([
   { title: 'سود / سررسید گذشته', key: 'overDueInterestRemain', width:250, sortable: true, editable: true, type: 'number' },
   { title: 'وجه التزام / سررسید گذشته', key: 'penaltyAmount', width:250, sortable: true, editable: true, type: 'number' },
   { title: 'مبالغ سفته', key: 'promissoryNoteAmount', sortable: true, width:250, editable: true, type: 'number' },
+  { title: 'مبلغ سپرده', key: 'depositAmount', sortable: true, width:250, editable: true, type: 'number' },
+  { title: 'مبلغ غیر منقول', key: 'estateAmount', sortable: true, width:250, editable: true, type: 'number' },
+  { title: 'مبلغ سایر', key: 'otherCollateralAmount', sortable: true, width:250, editable: true, type: 'number' },
 ]);
 </script>
 

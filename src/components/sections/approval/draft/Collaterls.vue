@@ -5,6 +5,7 @@ import type { CollateralsInfoPayload } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
 import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-vue';
+import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
 
 const isDialogActive = ref(false);
 const loading = ref(false);
@@ -242,15 +243,15 @@ defineExpose({ valid });
     <IconAlertCircle v-if="!valid" style="margin-right: 20px" size="20" />
     <IconCircleCheck v-if="valid" style="margin-right: 20px" size="20" />
   </v-btn>
-  
-  <v-dialog v-model="isDialogActive" max-width="1200px" persistent>
+
+  <v-dialog v-model="isDialogActive" max-width="1200px">
     <v-card title="وثایق">
       <v-card-text>
         <v-form ref="form" v-model="isFormValid" @update:model-value="watchFormValidation">
-               <!-- Estate Section -->
-               <v-card variant="outlined" class="mb-4">
-            <v-card-title class="text-h3 text-center mb-4">املاک</v-card-title>
-            <v-card-text>
+          <!-- Estate Section -->
+          <v-sheet class="section-card mb-4">
+            <div class="section-title text-h3 text-center mb-4">املاک</div>
+            <div class="section-body">
               <v-row>
                 <v-col cols="12" md="6">
                   <v-text-field
@@ -294,8 +295,8 @@ defineExpose({ valid });
                   <v-text-field
                     v-model="formData.estate.evaluationDate"
                     label="تاریخ ارزیابی"
+                    hide-details="auto"
                     variant="outlined"
-                    density="comfortable"
                     :disabled="isEditingDisabled"
                   />
                 </v-col>
@@ -313,19 +314,20 @@ defineExpose({ valid });
                 <v-col cols="12" md="6">
                   <v-text-field
                     v-model="formData.estate.assignedDate"
-                    label="تاریخ ترهمین"
+                    label="تاریخ ترهین"
+                    color="primary"
+                    hide-details="auto"
                     variant="outlined"
-                    density="comfortable"
                     :disabled="isEditingDisabled"
                   />
                 </v-col>
               </v-row>
-            </v-card-text>
-          </v-card>
+            </div>
+          </v-sheet>
           <!-- Deposit Section -->
-          <v-card variant="outlined" class="mb-4">
-            <v-card-title class="text-h3 text-center mb-4">گروه نقد</v-card-title>
-            <v-card-text>
+          <v-sheet class="section-card mb-4">
+            <div class="section-title text-h3 text-center mb-4">گروه نقد</div>
+            <div class="section-body">
               <v-row>
                 <v-col cols="12" md="6">
                   <v-text-field
@@ -362,19 +364,19 @@ defineExpose({ valid });
                   <v-text-field
                     v-model="formData.deposit.assignedDate"
                     label="تاریخ توثیق"
+                    hide-details="auto"
                     variant="outlined"
-                    density="comfortable"
                     :disabled="isEditingDisabled"
                   />
                 </v-col>
               </v-row>
-            </v-card-text>
-          </v-card>
+            </div>
+          </v-sheet>
 
-            <!-- Stock Section -->
-            <v-card variant="outlined" class="mb-4">
-            <v-card-title class="text-h3 text-center mb-4">سهام</v-card-title>
-            <v-card-text>
+          <!-- Stock Section -->
+          <v-sheet class="section-card mb-4">
+            <div class="section-title text-h3 text-center mb-4">سهام</div>
+            <div class="section-body">
               <v-row>
                 <v-col cols="12" md="6">
                   <v-text-field
@@ -435,17 +437,14 @@ defineExpose({ valid });
                     :disabled="isEditingDisabled"
                   />
                 </v-col>
-           
-        
-       
               </v-row>
-            </v-card-text>
-          </v-card>
+            </div>
+          </v-sheet>
 
           <!-- Shares/Bonds Section -->
-          <v-card variant="outlined" class="mb-4">
-            <v-card-title class="text-h3 text-center mb-4">اوراق مشارکت / سرمایه گذاری</v-card-title>
-            <v-card-text>
+          <v-sheet class="section-card mb-4">
+            <div class="section-title text-h3 text-center mb-4">اوراق مشارکت / سرمایه گذاری</div>
+            <div class="section-body">
               <v-row>
                 <v-col cols="12" md="6">
                   <MoneyInput
@@ -461,20 +460,20 @@ defineExpose({ valid });
                 <v-col cols="12" md="6">
                   <v-checkbox
                     :model-value="Boolean(formData.sharesBond.parsianBankAgency)"
-                    @update:model-value="(value: any) => formData.sharesBond.parsianBankAgency = Boolean(value)"
+                    @update:model-value="(value: any) => (formData.sharesBond.parsianBankAgency = Boolean(value))"
                     label="سهام شرکت سایر بانک ها"
                     density="comfortable"
                     :disabled="isEditingDisabled"
                   />
                 </v-col>
               </v-row>
-            </v-card-text>
-          </v-card>
+            </div>
+          </v-sheet>
 
           <!-- Other Collateral Section -->
-          <v-card variant="outlined" class="mb-4">
-            <v-card-title class="text-h3 text-center mb-4">سایر وثایق</v-card-title>
-            <v-card-text>
+          <v-sheet class="section-card mb-4">
+            <div class="section-title text-h3 text-center mb-4">سایر وثایق</div>
+            <div class="section-body">
               <v-row>
                 <v-col cols="12" md="6">
                   <MoneyInput
@@ -488,11 +487,11 @@ defineExpose({ valid });
                   />
                 </v-col>
               </v-row>
-            </v-card-text>
-          </v-card>
-          <v-card variant="outlined" class="mb-4">
-            <v-card-title class="text-h3 text-center mb-4">توضیحات</v-card-title>
-            <v-card-text>
+            </div>
+          </v-sheet>
+          <v-sheet class="section-card mb-4">
+            <div class="section-title text-h3 text-center mb-4">توضیحات</div>
+            <div class="section-body">
               <v-row>
                 <v-col cols="12" md="12">
                   <v-textarea
@@ -504,8 +503,8 @@ defineExpose({ valid });
                   />
                 </v-col>
               </v-row>
-            </v-card-text>
-          </v-card>
+            </div>
+          </v-sheet>
 
           <!-- Error Display -->
           <v-alert v-if="error" type="error" class="mb-4">
@@ -513,24 +512,35 @@ defineExpose({ valid });
           </v-alert>
         </v-form>
       </v-card-text>
-      
+
       <v-card-actions style="display: flex; justify-content: space-evenly; padding: 25px 10px">
-        <v-btn 
-          color="primary" 
-          variant="elevated" 
-          text="ذخیره" 
-          @click="submitData"
-          :loading="loading"
-          :disabled="isEditingDisabled"
-        />
-        <v-btn 
-          color="error" 
-          variant="elevated" 
-          text="انصراف" 
-          @click="closeDialog"
-          :disabled="loading"
-        />
+        <v-btn color="primary" variant="elevated" text="ذخیره" @click="submitData" :loading="loading" :disabled="isEditingDisabled" />
+        <v-btn color="error" variant="elevated" text="انصراف" @click="closeDialog" :disabled="loading" />
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
+
+<style scoped>
+.section-card {
+  background: rgb(var(--v-theme-surface));
+  border: 1px solid rgb(var(--v-theme-borderLight));
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  padding: 12px 16px;
+  overflow: visible; /* allow date picker to overflow */
+}
+
+.section-title {
+  font-weight: 600;
+  color: rgb(var(--v-theme-darkText));
+}
+
+.section-body {
+  overflow: visible;
+}
+
+.section-card :deep(.vpd-picker) {
+  z-index: 5000 !important;
+}
+</style>

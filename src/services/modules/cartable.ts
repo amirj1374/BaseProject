@@ -1,4 +1,4 @@
-import type { addCreditApprovalDescriptionPayload } from "@/types/approval/approvalType";
+import type { addCreditApprovalDescriptionPayload, RecentlyApprovalDTO } from '@/types/approval/approvalType';
 import type { SubmitReferencePayload, SubmitSignPayload, ValidUserPayload } from "@/types/cartable/cartableTypes";
 import type { CreditApprovalFinancialSummaryDTO, CreditApprovalLastDecisionDTO, CreditSuggestionData } from '@/types/preApproval/preApprovalTypes';
 import type { AxiosInstance } from "axios";
@@ -102,5 +102,13 @@ export default (axiosInstance: AxiosInstance) => ({
 
   addCreditApprovalDescription(payload: addCreditApprovalDescriptionPayload) {
     return axiosInstance.post('api/v1/credit-suggestions/add-Credit-Approval-Description', payload);
+  },
+
+  addRecentlyApproved(cartabId: string,payload: RecentlyApprovalDTO) {
+    return axiosInstance.post(`api/v1/recently-approved/${cartabId}`, payload);
+  },
+
+  getRecentlyApproved(cartabId: string) {
+    return axiosInstance.get(`api/v1/recently-approved/${cartabId}?page=0&size=10`);
   },
 });

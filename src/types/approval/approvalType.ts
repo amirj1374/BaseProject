@@ -444,3 +444,9 @@ export interface BranchDto {
   name: string;
   status: boolean;
 }
+
+export interface RecentlyApprovalDTO {
+  recentApprovalsDesc: string,
+  remainDebtParsian: string,
+  creditEstimation: string,
+}

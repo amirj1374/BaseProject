@@ -135,6 +135,6 @@ const onItemDeleted = (item: any) => {
 
 onMounted(() => {
   // Check if user has permission to access this page
-  requirePermission('admin');
+  requirePermission('flowManagement');
 });
 </script>

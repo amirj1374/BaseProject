@@ -43,8 +43,8 @@ const routePermissions: Record<string, string> = {
   '/approval/edit': 'approval_edit',
   '/cartable': 'cartable',
   '/cartable/reference': 'cartable_operation',
-  '/base/role-managment': 'admin',
-  '/base/department-managment': 'admin',
+  '/base/role-managment': 'flowManagement',
+  '/base/department-managment': 'flowManagement',
   '/preApprovalReport': 'preApprovalReport',
   '/directiveReport': 'directiveReport',
   '/report': 'cartableReport'
