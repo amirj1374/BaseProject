@@ -26,10 +26,10 @@ const props = defineProps<{
 const id = ref(props.item?.id ?? '');
 
 const downloadExpertReport = async () => {
-  if (props.expertReportUrl) {
+  if (props.item.expertReportUrl) {
     try {
       // Fetch the file
-      const response = await fetch(props.expertReportUrl);
+      const response = await fetch(props.item.expertReportUrl);
       const blob = await response.blob();
       
       // Create download link
@@ -324,14 +324,6 @@ watch(validUserOptions, (newOptions) => {
       <v-col cols="12" md="12" style="display: flex; justify-content: center; gap: 10px">
         <v-btn type="submit" color="primary" :loading="loading">تایید</v-btn>
         <v-btn color="error" @click="emit('close')">انصراف</v-btn>
-        <v-btn 
-          v-if="props.item.expertReportUrl" 
-          color="info" 
-          @click="downloadExpertReport"
-          prepend-icon="mdi-download"
-        >
-          دانلود گزارش کارشناسی
-        </v-btn>
       </v-col>
     </v-row>
   </form>
