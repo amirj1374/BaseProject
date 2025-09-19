@@ -1,13 +1,37 @@
 <script setup lang="ts">
+/**
+ * CustomDataTable.vue
+ *
+ * A feature-rich data table component with server-side pagination, filtering,
+ * grouping, selection, CRUD actions, custom actions, downloads, and dialogs.
+ *
+ * Key features:
+ * - Server-side pagination and infinite scroll
+ * - Optional grouping with expand/collapse
+ * - Row selection (single/multi) with external v-model
+ * - Dynamic actions column with CRUD/routes/downloads/custom buttons
+ * - Date conversion between Shamsi and Gregorian with optional timezone
+ *
+ * Accessibility:
+ * - Adds ARIA attributes to group headers and busy regions
+ * - Keyboard support for toggling groups and activating selection on rows
+ */
 import { computed, onMounted, ref, watch, shallowRef, onBeforeUnmount } from 'vue';
+import type { Ref } from 'vue';
+import { useTableSelection } from '@/composables/useTableSelection';
 import axiosInstance from '@/services/axiosInstance';
 import apiService from '@/services/apiService';
 import { useRouter } from 'vue-router';
 import type { Component } from 'vue';
 import { DateConverter } from '@/utils/date-convertor';
 import { useDebounceFn } from '@vueuse/core';
+import MoneyInput from '@/components/shared/MoneyInput.vue';
+import { formatNumberWithCommas } from '@/utils/number-formatter';
 import { IconChevronRight, IconChevronDown } from '@tabler/icons-vue';
 
+/**
+ * Table header definition
+ */
 interface Header {
   title: string;
   key: string;
@@ -41,6 +65,9 @@ interface CustomButtonAction {
   disabled?: boolean;
 }
 
+/**
+ * Component props
+ */
 interface Props {
   apiResource: string;
   headers: Header[];
@@ -114,21 +141,28 @@ const tableRef = ref<HTMLElement | null>(null);
 const isLoadingMore = ref(false);
 const hasMore = ref(true);
 
-// Selection state
-const selectedItems = ref<any[]>([]);
-const selectAll = ref(false);
-
-// Grouping state
-const groupedItems = ref<
-  Array<{
-    groupKey: string | number;
-    groupLabel: string;
-    items: any[];
-    isExpanded: boolean;
-    count: number;
-  }>
->([]);
-const expandedGroups = ref<Set<string | number>>(new Set());
+// Selection & grouping using composable (minimal-risk wiring)
+const selection = useTableSelection(items, {
+  multiSelect: props.multiSelect,
+  uniqueKey: props.uniqueKey as any,
+  groupBy: props.groupBy as any,
+  defaultExpanded: props.defaultExpanded
+});
+const selectedItems = selection.selectedItems;
+const selectAll = computed({
+  get: () => selection.allSelected.value,
+  set: (val: boolean) => {
+    if (val) {
+      selection.toggleSelectAll();
+    } else {
+      selection.clearSelection();
+    }
+  }
+});
+const groupedItems = selection.groupedItems as unknown as Ref<
+  Array<{ groupKey: string | number; groupLabel: string; items: any[]; isExpanded: boolean; count: number }>
+>;
+const expandedGroups = selection.expandedGroups;
 
 // Computed flag to determine if any actions should be shown
 const hasAnyActions = computed(() => {
@@ -140,12 +174,32 @@ const hasAnyActions = computed(() => {
   return hasCrudActions || hasRoutes || hasDownloadLinks || hasCustomActions || hasCustomButtons;
 });
 
+// Estimate auto width based on header title and type when width is not provided
+const estimateColumnWidth = (header: Header): number => {
+  const title = header.title || '';
+  const basePadding = 32; // left/right padding
+  const avgCharWidth = 10; // heuristic average per character
+  const typeExtra = header.type && String(header.type).toLowerCase() === 'money' ? 40 : 0;
+  const computed = basePadding + title.length * avgCharWidth + typeExtra;
+  const min = 100;
+  const max = 300;
+  return Math.min(Math.max(computed, min), max);
+};
+
+// Headers with auto width applied when not specified
+const autoHeaders = computed(() => {
+  return props.headers.map((h) => ({
+    ...h,
+    width: h.width ?? estimateColumnWidth(h)
+  }));
+});
+
 const selectionHeader = { title: '', key: 'selection', sortable: false, width: 50 } as const;
 
 const groupedHeaders = computed(() => {
   const base = [
     ...(props.selectable ? [selectionHeader] : []),
-    ...props.headers,
+    ...autoHeaders.value,
   ];
   
   if (!hasAnyActions.value) {
@@ -228,7 +282,7 @@ const groupedHeaders = computed(() => {
 const normalHeaders = computed(() => {
   const base = [
     ...(props.selectable ? [selectionHeader] : []),
-    ...props.headers,
+    ...autoHeaders.value,
   ];
   
   if (!hasAnyActions.value) {
@@ -376,7 +430,7 @@ const groupItems = (items: any[]) => {
   }));
 
   // Sort groups by key
-  groupedItems.value.sort((a, b) => {
+  groupedItems.value.sort((a: { groupKey: string | number }, b: { groupKey: string | number }) => {
     if (typeof a.groupKey === 'string' && typeof b.groupKey === 'string') {
       return a.groupKey.localeCompare(b.groupKey);
     }
@@ -387,74 +441,28 @@ const groupItems = (items: any[]) => {
 // Selection methods
 const toggleSelection = (item: any) => {
   if (!props.selectable) return;
-
-  const itemUniqueValue = getUniqueValue(item);
-  const index = selectedItems.value.findIndex((selected) => getUniqueValue(selected) === itemUniqueValue);
-
-  if (index > -1) {
-    selectedItems.value.splice(index, 1);
-  } else {
-    if (props.multiSelect) {
-      selectedItems.value.push(item);
-    } else {
-      selectedItems.value = [item];
-    }
-  }
-
-  // Emit selection change events
+  selection.toggleSelection(item);
   emit('update:selectedItems', selectedItems.value);
   emit('selection-change', selectedItems.value);
 };
 
 const toggleSelectAll = () => {
   if (!props.selectable || !props.multiSelect) return;
-
-  if (selectAll.value) {
-    selectedItems.value = [];
-  } else {
-    selectedItems.value = [...items.value];
-  }
-  selectAll.value = !selectAll.value;
-
-  // Emit selection change events
+  selection.toggleSelectAll();
   emit('update:selectedItems', selectedItems.value);
   emit('selection-change', selectedItems.value);
 };
 
 // Group toggle function
-const toggleGroup = (groupKey: string | number) => {
-  const group = groupedItems.value.find((g) => g.groupKey === groupKey);
-  if (group) {
-    group.isExpanded = !group.isExpanded;
-
-    if (group.isExpanded) {
-      expandedGroups.value.add(groupKey);
-    } else {
-      expandedGroups.value.delete(groupKey);
-    }
-  }
-};
+const toggleGroup = (groupKey: string | number) => selection.toggleGroup(groupKey);
 
 // Expand all groups
-const expandAllGroups = () => {
-  groupedItems.value.forEach((group) => {
-    group.isExpanded = true;
-    expandedGroups.value.add(group.groupKey);
-  });
-};
+const expandAllGroups = () => selection.expandAllGroups();
 
 // Collapse all groups
-const collapseAllGroups = () => {
-  groupedItems.value.forEach((group) => {
-    group.isExpanded = false;
-    expandedGroups.value.delete(group.groupKey);
-  });
-};
+const collapseAllGroups = () => selection.collapseAllGroups();
 
-const isSelected = (item: any) => {
-  const itemUniqueValue = getUniqueValue(item);
-  return selectedItems.value.some((selected) => getUniqueValue(selected) === itemUniqueValue);
-};
+const isSelected = (item: any) => selection.isSelected(item);
 
 // Computed properties for selection
 const selectedCount = computed(() => selectedItems.value.length);
@@ -462,10 +470,7 @@ const hasSelection = computed(() => selectedItems.value.length > 0);
 
 // Clear selection method
 const clearSelection = () => {
-  selectedItems.value = [];
-  selectAll.value = false;
-
-  // Emit selection change events
+  selection.clearSelection();
   emit('update:selectedItems', selectedItems.value);
   emit('selection-change', selectedItems.value);
 };
@@ -485,7 +490,11 @@ const hasFilterComponent = computed(() => {
   return !!props.filterComponent;
 });
 
-// Modify fetchData to handle pagination correctly
+/**
+ * Fetches data from server using current filters, query params, and pagination.
+ * Converts date fields to Shamsi for display and computes grouping/selection state.
+ * @param queryParams Optional extra query params to merge with filter and pagination
+ */
 const fetchData = async (queryParams?: {}) => {
   loading.value = true;
   error.value = null;
@@ -600,7 +609,9 @@ const handleScroll = async (event: Event) => {
   }
 };
 
-// Load more data
+/**
+ * Loads next page and appends to current items. Preserves selection defaults.
+ */
 const loadMore = async () => {
   if (isLoadingMore.value || !hasMore.value) return;
 
@@ -673,6 +684,9 @@ defineExpose({
   groupItems
 });
 
+/**
+ * Opens the create/edit dialog and normalizes date fields for editing.
+ */
 const openDialog = (item?: any) => {
   editedItem.value = item ? { ...item } : {};
   isEditing.value = !!item;
@@ -715,6 +729,10 @@ const openDeleteDialog = (item: any) => {
   deleteDialog.value = true;
 };
 
+/**
+ * Persists the current form model, converting date fields back to Gregorian
+ * (optionally with timezone) before sending to the API. Refreshes the table.
+ */
 const saveItem = async () => {
   if (!formModel.value) return;
 
@@ -776,6 +794,9 @@ const saveItem = async () => {
   }
 };
 
+/**
+ * Deletes item by id and refreshes the list.
+ */
 const deleteItem = async (id: string) => {
   try {
     await api.delete(id);
@@ -789,6 +810,10 @@ const deleteItem = async (id: string) => {
   }
 };
 
+/**
+ * Navigates to a dynamic route constructed from the provided route template
+ * and the selected item fields. Shows a snackbar if params are missing.
+ */
 const goToRoute = (key: string, item?: any) => {
   if (!props.routes || !props.routes[key] || !item) return;
 
@@ -813,7 +838,10 @@ const goToRoute = (key: string, item?: any) => {
   router.push(routePath);
 };
 
-// Improved download function with proper URL handling
+/**
+ * Downloads a file from a URL present on the item. Tries fetch and falls back
+ * to axios with blob response, handling common server error content types.
+ */
 const download = async (key: string, item: any) => {
   if (!props.downloadLink || !item) return;
 
@@ -961,7 +989,9 @@ const download = async (key: string, item: any) => {
   }
 };
 
-// Handle page change from pagination
+/**
+ * Handles pagination page change and refetches server data.
+ */
 const handlePageChange = (newPage: number) => {
   currentPage.value = newPage;
   debouncedFetchData();
@@ -998,6 +1028,10 @@ const getNestedValue = (obj: any, path: string) => {
   }, obj);
 };
 
+/**
+ * Returns the display value for a cell, applying custom renderer/formatter
+ * and enum translation when configured on the column header.
+ */
 const getTranslatedValue = (value: any, column: any, item: any) => {
   const header = props.headers.find((h) => h.key === column.key);
   if (!header) return value;
@@ -1010,6 +1044,15 @@ const getTranslatedValue = (value: any, column: any, item: any) => {
   // Use custom formatter if provided
   if (header.formatter) {
     return header.formatter(value, item);
+  }
+
+  // Money type formatting with separators
+  if (String(header.type).toLowerCase() === 'money') {
+    try {
+      return formatNumberWithCommas(value ?? 0, 0);
+    } catch (e) {
+      return value;
+    }
   }
 
   if (header.translate) {
@@ -1036,12 +1079,18 @@ const translateValue = (value: string) => {
   return translations[value] || value;
 };
 
+/**
+ * Applies currently edited filters and refetches from the first page.
+ */
 const applyFilter = () => {
   currentPage.value = 1; // Reset to first page when applying new filters
   debouncedFetchData();
   filterDialog.value = false;
 };
 
+/**
+ * Clears filters and refetches from the first page.
+ */
 const resetFilter = () => {
   filterModel.value = {};
   currentPage.value = 1;
@@ -1050,6 +1099,9 @@ const resetFilter = () => {
 };
 
 // Handle filter apply from custom filter component
+/**
+ * Receives filter data from a custom filter component and refetches.
+ */
 const handleFilterApply = (filterData: any) => {
   filterModel.value = filterData;
   currentPage.value = 1;
@@ -1078,7 +1130,7 @@ const handleFilterApply = (filterData: any) => {
   </div>
 
   <!-- Data Table Container (fills parent height) -->
-  <div class="data-table-container" v-bind="$attrs">
+  <div class="data-table-container" v-bind="$attrs" role="region" :aria-busy="loading || isLoadingMore" :aria-live="(loading || isLoadingMore) ? 'polite' : 'off'">
     <template v-if="loading && !isLoadingMore">
       <v-skeleton-loader type="table" :loading="loading" class="mx-auto" max-width="100%" :boilerplate="false" />
     </template>
@@ -1096,7 +1148,18 @@ const handleFilterApply = (filterData: any) => {
           <div class="groups-container">
             <div v-for="group in groupedItems" :key="group.groupKey" class="group-section">
               <!-- Group Header -->
-              <div class="group-header" @click="toggleGroup(group.groupKey)" :class="{ expanded: group.isExpanded }">
+              <div
+                class="group-header"
+                role="button"
+                tabindex="0"
+                @click="toggleGroup(group.groupKey)"
+                @keydown.enter.prevent="toggleGroup(group.groupKey)"
+                @keydown.space.prevent="toggleGroup(group.groupKey)"
+                :aria-expanded="group.isExpanded ? 'true' : 'false'"
+                :aria-controls="`group-panel-${group.groupKey}`"
+                :id="`group-header-${group.groupKey}`"
+                :class="{ expanded: group.isExpanded }"
+              >
                 <IconChevronRight v-if="group.isExpanded" class="me-2" />
                 <IconChevronDown v-else class="me-2" />
                 <span class="group-label">{{ group.groupLabel }}</span>
@@ -1104,7 +1167,7 @@ const handleFilterApply = (filterData: any) => {
               </div>
 
               <!-- Group Items -->
-              <div v-if="group.isExpanded" class="group-items">
+              <div v-if="group.isExpanded" class="group-items" :id="`group-panel-${group.groupKey}`" :aria-labelledby="`group-header-${group.groupKey}`" role="region">
                 <v-data-table
                   :headers="groupedHeaders"
                   :items="group.items"
@@ -1127,7 +1190,7 @@ const handleFilterApply = (filterData: any) => {
                     />
                   </template>
                                      <template v-slot:item="{ item, columns, index }">
-                     <tr :style="{ background: index % 2 === 0 ? 'rgb(var(--v-theme-surface))' : 'rgb(var(--v-theme-lightprimary))' }">
+                    <tr :style="{ background: index % 2 === 0 ? 'rgb(var(--v-theme-surface))' : 'rgb(var(--v-theme-lightprimary))' }" :tabindex="props.selectable ? 0 : -1" @keydown.enter.prevent="props.selectable && toggleSelection(item)">
                        <td
                          v-for="column in columns"
                          :key="column.key"
@@ -1251,7 +1314,7 @@ const handleFilterApply = (filterData: any) => {
           />
         </template>
                  <template v-slot:item="{ item, columns, index }">
-           <tr :style="{ background: index % 2 === 0 ? 'rgb(var(--v-theme-surface))' : 'rgb(var(--v-theme-lightprimary))' }">
+          <tr :style="{ background: index % 2 === 0 ? 'rgb(var(--v-theme-surface))' : 'rgb(var(--v-theme-lightprimary))' }" :tabindex="props.selectable ? 0 : -1" @keydown.enter.prevent="props.selectable && toggleSelection(item)">
              <td
                v-for="column in columns"
                :key="column.key"
@@ -1359,14 +1422,22 @@ const handleFilterApply = (filterData: any) => {
           <template v-else>
             <v-row>
               <v-col v-for="header in props.headers" :key="header.key" cols="12" md="4">
-                <v-text-field
-                  v-model="formModel[header.key]"
-                  :label="header.title"
-                  variant="outlined"
-                  :disabled="header.editable === false"
-                  v-if="!header.hidden"
-                  :type="header.type"
-                />
+                <template v-if="!header.hidden">
+                  <MoneyInput
+                    v-if="String(header.type).toLowerCase() === 'money'"
+                    v-model="formModel[header.key]"
+                    :label="header.title"
+                    :disabled="header.editable === false"
+                  />
+                  <v-text-field
+                    v-else
+                    v-model="formModel[header.key]"
+                    :label="header.title"
+                    variant="outlined"
+                    :disabled="header.editable === false"
+                    :type="header.type"
+                  />
+                </template>
               </v-col>
             </v-row>
           </template>
