@@ -130,7 +130,7 @@ const headers = [
     width: 200
   },
   {
-    title: 'جک / وثیقه',
+    title: 'چک / وثیقه',
     key: 'chequeAmount',
     sortable: true,
     width: 400

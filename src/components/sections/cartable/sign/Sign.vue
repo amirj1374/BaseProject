@@ -17,7 +17,7 @@ const props = defineProps<{
 }>();
 const id = ref(props.item?.id ?? '');
 const description = ref('');
-const agreed = ref(false);
+const actionType = ref('');
 const loading = ref(false);
 
 const downloadExpertReport = async () => {
@@ -92,7 +92,7 @@ const submitForm = async () => {
     const payload: SubmitSignPayload = {
       cartableId: Number(id.value),
       comment: description.value,
-      agreed: Boolean(agreed.value),
+      actionType: actionType.value,
       expertReportIsSeen: getExpertReportIsSeenValue()
     };
     const response = await api.cartable.submitSign(payload);
@@ -120,9 +120,10 @@ const submitForm = async () => {
   <form @submit.prevent="submitForm">
     <v-row>
       <v-col cols="12" md="3">
-        <v-radio-group v-model="agreed" color="primary" class="d-flex flex-column justify-center" direction="center">
-          <v-radio color="success" label="موافقم" :value="true"></v-radio>
-          <v-radio color="error" label="مخالفم" :value="false"></v-radio>
+        <v-radio-group v-model="actionType" color="primary" class="d-flex flex-column justify-center" direction="center">
+          <v-radio color="success" label="موافقم" :value="'AGREED'"></v-radio>
+          <v-radio color="error" label="مخالفم" :value="'DISAGREED'"></v-radio>
+          <v-radio color="warning" label="عودت" :value="'RETURNED'"></v-radio>
         </v-radio-group>
       </v-col>
       <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('downloadExpertReport')">

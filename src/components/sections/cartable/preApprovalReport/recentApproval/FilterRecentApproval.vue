@@ -88,7 +88,7 @@ function reset() {
         <v-text-field v-model="model.estateAmount" label="وثیقه غیر منقول" type="number" variant="outlined" hide-details="auto" />
       </v-col>
       <v-col cols="12" md="4">
-        <v-text-field v-model="model.chequeAmount" label="جک / وثیقه" type="number" variant="outlined" hide-details="auto" />
+        <v-text-field v-model="model.chequeAmount" label="چک / وثیقه" type="number" variant="outlined" hide-details="auto" />
       </v-col>
 
       <v-col cols="12" md="4">

@@ -63,7 +63,7 @@ export interface SubmitReferencePayload {
 export interface SubmitSignPayload {
   cartableId: number;
   comment: string;
-  agreed: boolean;
+  actionType: string;
   expertReportIsSeen: boolean | null;
 }
 

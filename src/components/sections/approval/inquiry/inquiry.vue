@@ -4,6 +4,7 @@ import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import { IconAlertCircle } from '@tabler/icons-vue';
 import { useRoute } from 'vue-router';
+import { formatNumberWithCommas } from '@/utils/number-formatter';
 
 const approvalStore = useApprovalStore();
 const value = ref(0);
@@ -211,7 +212,7 @@ defineExpose({ submitData });
               <div>در حال استعلام تعهدات مستقیم...</div>
             </div>
             <template v-else-if="DirectObligationData">
-              <div><b>مبلغ کل : </b> {{ DirectObligationData?.totalAmount }}</div>
+              <div><b>مبلغ کل : </b> {{ formatNumberWithCommas(DirectObligationData?.totalAmount )}}</div>
             </template>
             <template v-else>
               <div class="text-center text-error">
@@ -247,7 +248,7 @@ defineExpose({ submitData });
             </div>
             <template v-else-if="IndirectObligationData">
               <div><b>نام : </b> {{ IndirectObligationData?.allOfThem || 'نامشخص' }}</div>
-              <div><b>مبلغ کل : </b> {{ IndirectObligationData?.totalAmount || 'نامشخص' }}</div>
+              <div><b>مبلغ کل : </b>{{ formatNumberWithCommas(IndirectObligationData?.totalAmount) }}</div>
             </template>
             <template v-else>
               <div class="text-center text-error">
@@ -285,7 +286,7 @@ defineExpose({ submitData });
               <template v-else-if="chequeData">
                 <div><b>چک برگشتی دارد؟ </b> {{ chequeData?.bouncedCheque || 'ندارد' }}</div>
                 <div><b>تعداد : </b> {{ chequeData?.count || '0' }}</div>
-                <div><b>مبلغ کل : </b> {{ chequeData?.amount || '0' }}</div>
+                <div><b>مبلغ کل : </b> {{ formatNumberWithCommas(chequeData?.amount || '0') }}</div>
               </template>
               <template v-else>
                 <div class="text-center text-error">
@@ -324,7 +325,7 @@ defineExpose({ submitData });
             <template v-else-if="sapData">
               <div><b>برچسب : </b> {{ sapData?.label || 'نامشخص' }}</div>
               <div><b>وثیقه : </b> {{ sapData?.collateral || 'نامشخص' }}</div>
-              <div><b>مبلغ : </b> {{ sapData?.value?.toLocaleString() || 'نامشخص' }}</div>
+              <div><b>مبلغ : </b> {{ formatNumberWithCommas(sapData?.value?.toLocaleString() || 'نامشخص') }}</div>
             </template>
             <template v-else>
               <div class="text-center text-error">
