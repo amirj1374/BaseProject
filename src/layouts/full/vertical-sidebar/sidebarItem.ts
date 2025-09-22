@@ -5,7 +5,8 @@ import {
   IconFileSymlink, 
   IconHome, 
   IconPencilPlus,
-  IconTableShare
+  IconTableShare,
+  IconSettings
 } from '@tabler/icons-vue';
 import { usePermissionsStore } from '@/stores/permissions';
 
@@ -31,6 +32,11 @@ const sidebarItem: menu[] = [
     title: 'داشبورد',
     icon: IconHome,
     to: '/',
+  },
+  {
+    title: 'تست Keycloak',
+    icon: IconSettings,
+    to: '/test-keycloak',
   },
   {
     title: 'درخواست مصوبه جدید',

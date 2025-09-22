@@ -4,7 +4,7 @@ import type { UserInfoResponse } from '@/types/models/userInfo';
 
 const userApi = (axiosInstance: AxiosInstance) => ({
   getUserInfo(): Promise<{ data: UserInfoResponse }> {
-    return axiosInstance.get('api/v1/token');
+    return axiosInstance.get('test');
   },
   getDepartmentsLevel() {
     return axiosInstance.get("api/v1/department-role/levels");

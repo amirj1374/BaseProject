@@ -37,7 +37,7 @@
               <v-card-text>
                 <h2 class="text-h4 mb-2">{{ userInfo?.fullName || 'کاربر' }}</h2>
                 <p class="text-body-1 text-medium-emphasis">
-                  {{ userInfo?.position || 'موقعیت شغلی' }}
+                  خوش آمدید! به داشبورد سیستم مدیریت
                 </p>
               </v-card-text>
             </v-card>
@@ -158,7 +158,6 @@ const customerInfoStore = useCustomerInfoStore();
 
 // Get user info from store
 const userInfo = computed(() => customerInfoStore.getUserInfo);
-
 
 // Format date helper function
 const formatDate = (dateString) => {

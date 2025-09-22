@@ -47,7 +47,8 @@
     "vue3-print-nb": "0.1.4",
     "vuetify": "3.6.5",
     "webpack-plugin-vuetify": "3.0.3",
-    "yup": "1.4.0"
+    "yup": "1.4.0",
+    "@dsb-norge/vue-keycloak-js": "^3.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.1.1",
