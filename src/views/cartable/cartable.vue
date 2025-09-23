@@ -130,6 +130,10 @@ const regionPreApprovalReport = {
   'گزارش پیش مصوبه منطقه': 'regionPreApprovalReport/{id}'
 }
 
+const changeSigner = {
+  'تغییر امضا داران': 'signer/{id}'
+}
+
 function handleReferenceSuccess() {
   tableRef.value?.fetchData();
 }
@@ -204,6 +208,7 @@ function handleReferenceSuccess() {
         ...(permissionsStore.hasMenuPermission('preApprovalReport') ? preApprovalReport : {}),
         ...(permissionsStore.hasMenuPermission('directiveReport') ? directiveReport : {}),
         ...(permissionsStore.hasMenuPermission('regionPreApprovalReport') ? regionPreApprovalReport : {}),
+        ...(permissionsStore.hasMenuPermission('') ? changeSigner : {}),
 
       }"
     />

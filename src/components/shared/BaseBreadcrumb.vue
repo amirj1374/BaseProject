@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { IconChevronRight, IconHome } from '@tabler/icons-vue';
+import type { PropType } from 'vue';
 
 type Breadcrumb = {
   title: string;
-  disabled: boolean;
-  href: string;
+  disabled?: boolean;
+  href?: string;
+  to?: any;
 };
 const props = defineProps({
   title: String,
-  breadcrumbs: Array as () => Breadcrumb[],
+  breadcrumbs: Array as PropType<Breadcrumb[]>,
   icon: String
 });
 </script>
