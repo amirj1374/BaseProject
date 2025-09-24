@@ -31,7 +31,7 @@ const header = ref([
     editable: true,
   },
   {
-    title: 'asdasdasdasdasdasdasdasdasdasdasdasdasd',
+    title: 'توضیحات',
     key: 'description',
     sortable: true,
     editable: true,

@@ -14,7 +14,8 @@ const envConfig: EnvConfig = {
   API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
   BASE_URL: import.meta.env.VITE_BASE_URL,
   APP_TITLE: import.meta.env.VITE_APP_TITLE,
-  ENVIRONMENT: import.meta.env.VITE_APP_ENV
+  ENVIRONMENT: import.meta.env.VITE_APP_ENV,
+  AUTH_MODE: (import.meta.env.VITE_AUTH_MODE as 'keycloak' | 'initializer')
 };
 
 // Simple API configuration
@@ -28,7 +29,8 @@ console.log('🌍 Current Environment:', {
   apiBaseUrl: envConfig.API_BASE_URL,
   baseUrl: envConfig.BASE_URL,
   appTitle: envConfig.APP_TITLE,
-  port: envConfig.PORT
+  port: envConfig.PORT,
+  authMode: envConfig.AUTH_MODE
 });
 
 export default envConfig;
