@@ -97,18 +97,28 @@ export function useTableSelection<T extends Record<string, any> = Record<string,
     } else {
       expandedGroups.value.add(groupKey);
     }
+    
+    // Update the isExpanded property in groupedItems
+    const groupIndex = groupedItems.value.findIndex(group => group.groupKey === groupKey);
+    if (groupIndex !== -1) {
+      groupedItems.value[groupIndex].isExpanded = expandedGroups.value.has(groupKey);
+    }
   };
 
   // Expand all groups
   const expandAllGroups = () => {
     groupedItems.value.forEach(group => {
       expandedGroups.value.add(group.groupKey);
+      group.isExpanded = true;
     });
   };
 
   // Collapse all groups
   const collapseAllGroups = () => {
     expandedGroups.value.clear();
+    groupedItems.value.forEach(group => {
+      group.isExpanded = false;
+    });
   };
 
   // Group items by the specified property
@@ -134,7 +144,7 @@ export function useTableSelection<T extends Record<string, any> = Record<string,
       groupKey,
       groupLabel: getGroupLabel(groupKey, groupItems),
       items: groupItems,
-      isExpanded: options.defaultExpanded || expandedGroups.value.has(groupKey),
+      isExpanded: expandedGroups.value.has(groupKey) || options.defaultExpanded,
       count: groupItems.length
     })) as unknown as GroupedItems<T>[];
 

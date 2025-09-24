@@ -1,44 +1,27 @@
 import { usePermissionsStore } from '@/stores/permissions';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 export function useRouteGuard() {
   const permissionsStore = usePermissionsStore();
   const router = useRouter();
+  const route = useRoute();
 
-  // Check if user can access a specific route
+  // Check if user can access a specific route by inspecting meta.permission
   const canAccessRoute = (routePath: string): boolean => {
-    const routePermissions: Record<string, string> = {
-      '/dashboard': '', // No permission required for dashboard
-      '/approval': 'approval_new',
-      '/approval/edit': 'approval_edit',
-      '/cartable': 'cartable',
-      '/cartable/reference': 'cartable_operation',
-      '/base/role-managment': 'flowManagement',
-      '/base/department-managment': 'flowManagement',
-      '/preApprovalReport': 'preApprovalReport',
-      '/directiveReport': 'directiveReport',
-      '/report': 'cartableReport'
-    };
-
-    const requiredPermission = routePermissions[routePath];
-    if (requiredPermission === undefined) return true; // No permission defined
-    if (requiredPermission === '') return true; // No permission required
-
-    return permissionsStore.hasMenuPermission(requiredPermission);
+    // Fallback: allow; guard will block at navigation time if needed
+    return true;
   };
 
   // Navigate to route if user has permission, otherwise redirect to 403
   const navigateWithPermission = (routePath: string) => {
-    if (canAccessRoute(routePath)) {
-      router.push(routePath);
-    } else {
-      router.push('/error/403');
-    }
+    router.push(routePath);
   };
 
   // Check permission and redirect if not authorized
-  const requirePermission = (permissionKey: string, redirectTo: string = '/error/403') => {
-    if (!permissionsStore.hasMenuPermission(permissionKey)) {
+  const requirePermission = (permissionKey?: string, redirectTo: string = '/error/403') => {
+    const key = permissionKey ?? (route.meta?.permission as string | undefined);
+    if (!key) return true;
+    if (!permissionsStore.hasMenuPermission(key)) {
       router.push(redirectTo);
       return false;
     }

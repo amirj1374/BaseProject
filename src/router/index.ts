@@ -36,19 +36,7 @@ interface AuthStore {
   logout(): void;
 }
 
-// Route permission mapping
-const routePermissions: Record<string, string> = {
-  '/dashboard': '', // No permission required for dashboard
-  '/approval': 'approval_new',
-  '/approval/edit': 'approval_edit',
-  '/cartable': 'cartable',
-  '/cartable/reference': 'cartable_operation',
-  '/base/role-managment': 'flowManagement',
-  '/base/department-managment': 'flowManagement',
-  '/preApprovalReport': 'preApprovalReport',
-  '/directiveReport': 'directiveReport',
-  '/report': 'cartableReport'
-};
+// Route permissions are defined per-route in route meta (meta.permission)
 
 router.beforeEach(async (to, from, next) => {
   // Wait for app initialization to complete before checking permissions
@@ -73,19 +61,15 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  // Check permissions for the route
-  const requiredPermission = routePermissions[to.path];
-  if (requiredPermission !== undefined) {
-    // If permission is empty string, no permission required
-    if (requiredPermission === '') {
-      // No permission required, allow access
-    } else {
-      const hasPermission = permissionsStore.hasMenuPermission(requiredPermission);
-      
-      if (!hasPermission) {
-        // Redirect to a 403 error page
-        return next('/error/403');
-      }
+  // Check permissions from route meta
+  const requiredPermission = to.matched
+    .map((record) => record.meta?.permission as string | undefined)
+    .find((perm) => perm !== undefined);
+
+  if (requiredPermission) {
+    const hasPermission = permissionsStore.hasMenuPermission(requiredPermission);
+    if (!hasPermission) {
+      return next('/error/403');
     }
   }
 

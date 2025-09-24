@@ -1,16 +1,7 @@
 <script setup lang="ts">
-import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
 import { api } from '@/services/api';
 import type { ActionData, SubmitReferencePayload, ValidRole } from '@/types/cartable/cartableTypes';
 import { onMounted, ref, watch, computed } from 'vue';
-import ApprovalRequestViewer from '../sign/ApprovalRequestViewer.vue';
-import { usePermissionsStore } from '@/stores/permissions';
-import ConfirmDialog from '@/components/shared/ConfirmDialog.vue';
-import user from '@/services/modules/user';
-
-const confirmDialog = ref(false);
-const permissionsStore = usePermissionsStore();
-const tableRef = ref();
 const emit = defineEmits(['close']);
 
 const actionsData = ref<ActionData[]>([]);
@@ -28,33 +19,6 @@ const props = defineProps<{
 }>();
 
 const id = ref(props.item?.id ?? '');
-
-const downloadExpertReport = async () => {
-  if (props.item.expertReportUrl) {
-    try {
-      // Fetch the file
-      const response = await fetch(props.item.expertReportUrl);
-      const blob = await response.blob();
-
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'expert-report.pdf';
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading expert report:', error);
-      // Fallback to opening in new tab
-      window.open(props.expertReportUrl, '_blank');
-    }
-  }
-};
-
 const fetchValidUsers = async (selectedValue: string) => {
   const res = await api.cartable.getValidRoles(Number(selectedValue));
   if (res?.data) {
@@ -112,12 +76,12 @@ const submitForm = async () => {
       cartableId: Number(id.value),
       roleDTO: {
         name: selectedRole.value?.roleName ?? '',
-        code: Number(selectedRole.value?.roleCode ?? 0)
+        code: Number(selectedRole.value?.roleCode ?? 0),
       },
       description: description.value,
       actionType: selectedAction.value?.actionType ?? '',
-      usernameList: selectedValidUser.value.map((user) => user.username), // Extract usernames from selected users array
-      correctionDeadline: selectedDate?.value ?? undefined
+      usernameList: selectedValidUser.value.map(user => user.username), // Extract usernames from selected users array
+      correctionDeadline : selectedDate?.value ?? undefined,
     };
     const response = await api.cartable.submitReference(payload);
     if (response.status === 200) {
@@ -139,7 +103,6 @@ const submitForm = async () => {
   }
 };
 
-const percent = ref<number | null>(null);
 
 const validUserOptions = ref<any[]>([]);
 const selectedValidUser = ref<any[]>([]); // Changed from any | null to any[]
@@ -198,38 +161,12 @@ const handleValidUser = async (role: ValidRole) => {
 
 const roleOptions = computed(() =>
   selectedAction.value
-    ? selectedAction.value.validRoles.map((role) => ({
-        ...role,
-        display: `${role.roleDescription} - ${role.departmentLevelName}`
-      }))
+    ? selectedAction.value.validRoles.map(role => ({
+      ...role,
+      display: `${role.roleDescription} - ${role.departmentLevelName}`
+    }))
     : []
 );
-
-const download1016Report = async () => {
-  if (props.item.report1016Url) {
-    try {
-      // Fetch the file
-      const response = await fetch(props.item.report1016Url);
-      const blob = await response.blob();
-
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = '1016-report.pdf';
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading 1016 report:', error);
-      // Fallback to opening in new tab
-      window.open(props.item.report1016Url, '_blank');
-    }
-  }
-};
 
 watch(validUserOptions, (newOptions) => {
   if (newOptions.length > 0) {
@@ -238,7 +175,6 @@ watch(validUserOptions, (newOptions) => {
     selectedValidUser.value = [];
   }
 });
-
 </script>
 
 <template>
@@ -287,56 +223,12 @@ watch(validUserOptions, (newOptions) => {
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="12" md="12">
-        <v-text-field v-model="description" label="توضیحات" variant="outlined" clearable />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12" md="6">
-        <ShamsiDatePicker
-          v-if="selectedRole?.canSetCorrectionDeadline === true"
-          v-model="selectedDate"
-          label="تاریخ مهلت اصلاح شعبه"
-          variant="outlined"
-          clearable
-        />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('downloadExpertReport')">
-        <v-btn color="info" @click="downloadExpertReport" variant="tonal"> دانلود گزارش کارشناسی </v-btn>
-      </v-col>
-      <v-col cols="12" md="3" v-if="props.item.report1016Url && permissionsStore.hasMenuPermission('download1016')">
-        <v-btn color="info" @click="download1016Report" variant="tonal"> دانلود فرم 1016 </v-btn>
-      </v-col>
-      <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('reviewExpertReport')">
-        <v-switch v-model="props.item.expertReportIsSeen" inset color="primary" hide-details class="me-2" />
-        <span>گزارش کارشناسی مشاهده شد</span>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12" md="12">
-        <ApprovalRequestViewer :loan-request-id="props.item.loanRequestId" />
-      </v-col>
-    </v-row>
-    <v-row>
       <v-col cols="12" md="12" style="display: flex; justify-content: center; gap: 10px">
-        <v-btn variant="tonal" @click="confirmDialog = true" color="primary" :loading="loading">تایید</v-btn>
+        <v-btn type="submit" color="primary" :loading="loading">تایید</v-btn>
         <v-btn color="error" @click="emit('close')">انصراف</v-btn>
       </v-col>
     </v-row>
   </form>
-
-  <ConfirmDialog
-    v-model="confirmDialog"
-    confirmText="تایید"
-    :message="`آیا از عملیات ${selectedAction?.actionName} به ${selectedRole?.roleDescription} (${selectedValidUser.map((user) => user.name)}) مطمئن هستید؟`"
-    cancelText="انصراف"
-    :loading="loading"
-    color="primary"
-    @confirm="submitForm"
-  >
-  </ConfirmDialog>
   <v-snackbar v-if="error" v-model="error" color="error" timeout="2500">
     {{ error }}
   </v-snackbar>

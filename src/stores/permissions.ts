@@ -73,7 +73,7 @@ export const usePermissionsStore = defineStore({
       },
       {
         menuKey: 'downloadExpertReport',
-        requiredRoles: ['SMP_DOWNLOAD_EXPERT_RPT']
+        requiredRoles: ['SMP_DOWNLOAD_EXPERT_RPT_FILE']
       },
       {
         menuKey: 'regionPreApprovalReport',

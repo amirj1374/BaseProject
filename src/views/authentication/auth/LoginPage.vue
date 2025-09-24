@@ -48,7 +48,7 @@ import AuthLogin from '../authForms/AuthLogin.vue';
 .colorized-bg-effect {
   //width: 100%;
   border: unset;
-  animation: 7s colorize infinite linear;
+  animation: 6s colorize infinite linear;
   @keyframes colorize {
     0% {
       filter: hue-rotate(0) saturate(0);

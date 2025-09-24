@@ -201,14 +201,14 @@ const groupedHeaders = computed(() => {
     ...(props.selectable ? [selectionHeader] : []),
     ...autoHeaders.value,
   ];
-  
+
   if (!hasAnyActions.value) {
     return base;
   }
-  
+
   // Calculate dynamic width based on actual button sizes (same logic as normalHeaders)
   let totalWidth = 0;
-  
+
   // CRUD actions (edit, delete, view, create)
   if (props.actions) {
     props.actions.forEach(action => {
@@ -228,28 +228,28 @@ const groupedHeaders = computed(() => {
       }
     });
   }
-  
+
   // Route actions
   if (props.routes) {
     Object.keys(props.routes).forEach(routeKey => {
       totalWidth += 120; // Route button width (key.toUpperCase())
     });
   }
-  
+
   // Download actions
   if (props.downloadLink) {
     Object.keys(props.downloadLink).forEach(key => {
       totalWidth += 120; // Download button width
     });
   }
-  
+
   // Custom actions
   if (props.customActions) {
     props.customActions.forEach(action => {
       totalWidth += 140; // Custom action button width
     });
   }
-  
+
   // Custom buttons
   if (props.customButtonsFn) {
     // For dynamic buttons, estimate based on typical button count
@@ -259,23 +259,23 @@ const groupedHeaders = computed(() => {
       totalWidth += 120; // Custom button width
     });
   }
-  
+
   // Add spacing between buttons (8px margin per button)
-  const buttonCount = (props.actions?.length || 0) + 
-                     (props.routes ? Object.keys(props.routes).length : 0) + 
-                     (props.downloadLink ? Object.keys(props.downloadLink).length : 0) + 
-                     (props.customActions?.length || 0) + 
-                     (props.customButtons?.length || (props.customButtonsFn ? 2 : 0));
-  
+  const buttonCount = (props.actions?.length || 0) +
+    (props.routes ? Object.keys(props.routes).length : 0) +
+    (props.downloadLink ? Object.keys(props.downloadLink).length : 0) +
+    (props.customActions?.length || 0) +
+    (props.customButtons?.length || (props.customButtonsFn ? 2 : 0));
+
   const spacingWidth = Math.max(buttonCount - 1, 0) * 8; // 8px margin between buttons
   totalWidth += spacingWidth;
-  
+
   // Add padding for the cell
   totalWidth += 32; // 16px padding on each side
-  
+
   // Ensure minimum width
   const actionWidth = Math.max(totalWidth, 200);
-  
+
   return [...base, { title: 'عملیات', key: 'actions', sortable: false, width: actionWidth }];
 });
 
@@ -284,14 +284,14 @@ const normalHeaders = computed(() => {
     ...(props.selectable ? [selectionHeader] : []),
     ...autoHeaders.value,
   ];
-  
+
   if (!hasAnyActions.value) {
     return base;
   }
-  
+
   // Calculate dynamic width based on actual button sizes
   let totalWidth = 0;
-  
+
   // CRUD actions (edit, delete, view, create)
   if (props.actions) {
     props.actions.forEach(action => {
@@ -311,28 +311,28 @@ const normalHeaders = computed(() => {
       }
     });
   }
-  
+
   // Route actions
   if (props.routes) {
     Object.keys(props.routes).forEach(routeKey => {
       totalWidth += 120; // Route button width (key.toUpperCase())
     });
   }
-  
+
   // Download actions
   if (props.downloadLink) {
     Object.keys(props.downloadLink).forEach(key => {
       totalWidth += 120; // Download button width
     });
   }
-  
+
   // Custom actions
   if (props.customActions) {
     props.customActions.forEach(action => {
       totalWidth += 140; // Custom action button width
     });
   }
-  
+
   // Custom buttons
   if (props.customButtonsFn) {
     // For dynamic buttons, estimate based on typical button count
@@ -342,23 +342,23 @@ const normalHeaders = computed(() => {
       totalWidth += 120; // Custom button width
     });
   }
-  
+
   // Add spacing between buttons (8px margin per button)
-  const buttonCount = (props.actions?.length || 0) + 
-                     (props.routes ? Object.keys(props.routes).length : 0) + 
-                     (props.downloadLink ? Object.keys(props.downloadLink).length : 0) + 
-                     (props.customActions?.length || 0) + 
-                     (props.customButtons?.length || (props.customButtonsFn ? 2 : 0));
-  
+  const buttonCount = (props.actions?.length || 0) +
+    (props.routes ? Object.keys(props.routes).length : 0) +
+    (props.downloadLink ? Object.keys(props.downloadLink).length : 0) +
+    (props.customActions?.length || 0) +
+    (props.customButtons?.length || (props.customButtonsFn ? 2 : 0));
+
   const spacingWidth = Math.max(buttonCount - 1, 0) * 8; // 8px margin between buttons
   totalWidth += spacingWidth;
-  
+
   // Add padding for the cell
   totalWidth += 32; // 16px padding on each side
-  
+
   // Ensure minimum width
   const actionWidth = Math.max(totalWidth, 200);
-  
+
   return [...base, { title: 'عملیات', key: 'actions', sortable: false, width: actionWidth }];
 });
 
@@ -646,7 +646,7 @@ const loadMore = async () => {
 
     items.value = [...items.value, ...formattedItems];
     hasMore.value = currentPage.value < response.data.totalPages;
-    
+
     // Auto-select new items if defaultSelected prop is provided
     if (props.defaultSelected && props.selectable) {
       const newSelectedItems = formattedItems.filter(
@@ -863,21 +863,21 @@ const download = async (key: string, item: any) => {
       },
       credentials: 'include', // Include cookies for authentication
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     // Check if response is actually a file or an error
     const contentType = response.headers.get('content-type');
     const contentLength = response.headers.get('content-length');
-    
+
     console.log('Response headers:', {
       contentType,
       contentLength,
       url: fileUrl
     });
-    
+
     // If content-type is XML, it's likely an error response
     if (contentType && contentType.includes('xml')) {
       const errorText = await response.text();
@@ -886,7 +886,7 @@ const download = async (key: string, item: any) => {
       snackbar.value = true;
       return;
     }
-    
+
     // If content-length is very small, it might be an error
     if (contentLength && parseInt(contentLength) < 1000) {
       const responseText = await response.text();
@@ -897,31 +897,31 @@ const download = async (key: string, item: any) => {
         return;
       }
     }
-    
+
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    
+
     // Create download link
     const link = document.createElement('a');
     link.href = url;
-    
+
     // Extract filename from URL or use default
     const filename = fileUrl.split('/').pop() || 'download';
     link.download = filename;
-    
+
     // Add to DOM, click, and cleanup
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     // Clean up the blob URL
     window.URL.revokeObjectURL(url);
-    
+
     snackbarMessage.value = `✅ دانلود شروع شد`;
     snackbar.value = true;
   } catch (error) {
     console.error('Download error:', error);
-    
+
     // Method 2: Try with axios instance (includes auth headers)
     try {
       const axiosResponse = await axiosInstance.get(fileUrl, {
@@ -930,17 +930,17 @@ const download = async (key: string, item: any) => {
           'Accept': 'application/octet-stream,application/pdf,image/*,*/*',
         }
       });
-      
+
       // Check response type
       const contentType = axiosResponse.headers['content-type'];
       const contentLength = axiosResponse.headers['content-length'];
-      
+
       console.log('Axios response headers:', {
         contentType,
         contentLength,
         url: fileUrl
       });
-      
+
       // If it's XML, convert to text to see the error
       if (contentType && contentType.includes('xml')) {
         const textResponse = await axiosInstance.get(fileUrl, {
@@ -951,26 +951,26 @@ const download = async (key: string, item: any) => {
         snackbar.value = true;
         return;
       }
-      
+
       const blob = new Blob([axiosResponse.data]);
       const url = window.URL.createObjectURL(blob);
-      
+
       const link = document.createElement('a');
       link.href = url;
       const filename = fileUrl.split('/').pop() || 'download';
       link.download = filename;
-      
+
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       window.URL.revokeObjectURL(url);
-      
+
       snackbarMessage.value = `✅ دانلود شروع شد`;
       snackbar.value = true;
     } catch (axiosError: any) {
       console.error('Axios download error:', axiosError);
-      
+
       // Try to get the error response as text
       if (axiosError.response) {
         try {
@@ -982,7 +982,7 @@ const download = async (key: string, item: any) => {
           console.error('Could not get error text:', textError);
         }
       }
-      
+
       snackbarMessage.value = `❌ خطا در دانلود فایل`;
       snackbar.value = true;
     }
@@ -1160,14 +1160,15 @@ const handleFilterApply = (filterData: any) => {
                 :id="`group-header-${group.groupKey}`"
                 :class="{ expanded: group.isExpanded }"
               >
-                <IconChevronRight v-if="group.isExpanded" class="me-2" />
-                <IconChevronDown v-else class="me-2" />
+                <IconChevronDown v-if="group.isExpanded" class="me-2 chevron-icon" />
+                <IconChevronRight v-else class="me-2 chevron-icon" />
                 <span class="group-label">{{ group.groupLabel }}</span>
                 <v-chip size="small" color="primary" class="ms-auto">{{ group.count }}</v-chip>
               </div>
 
               <!-- Group Items -->
-              <div v-if="group.isExpanded" class="group-items" :id="`group-panel-${group.groupKey}`" :aria-labelledby="`group-header-${group.groupKey}`" role="region">
+              <transition name="group-expand" appear>
+                <div v-if="group.isExpanded" class="group-items" :id="`group-panel-${group.groupKey}`" :aria-labelledby="`group-header-${group.groupKey}`" role="region">
                 <v-data-table
                   :headers="groupedHeaders"
                   :items="group.items"
@@ -1189,18 +1190,18 @@ const handleFilterApply = (filterData: any) => {
                       density="compact"
                     />
                   </template>
-                                     <template v-slot:item="{ item, columns, index }">
+                  <template v-slot:item="{ item, columns, index }">
                     <tr :style="{ background: index % 2 === 0 ? 'rgb(var(--v-theme-surface))' : 'rgb(var(--v-theme-lightprimary))' }" :tabindex="props.selectable ? 0 : -1" @keydown.enter.prevent="props.selectable && toggleSelection(item)">
-                       <td
-                         v-for="column in columns"
-                         :key="column.key"
-                         :style="{
+                      <td
+                        v-for="column in columns"
+                        :key="column.key"
+                        :style="{
                            ...getColumnStyle(column, item),
                            ...(column.width
                              ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' }
                              : {})
                          }"
-                       >
+                      >
                         <!-- Selection Checkbox -->
                         <template v-if="column.key === 'selection'">
                           <v-checkbox
@@ -1221,7 +1222,7 @@ const handleFilterApply = (filterData: any) => {
                             size="small"
                             class="mr-2"
                             @click="openDeleteDialog(item)"
-                            >حذف ❌
+                          >حذف ❌
                           </v-btn>
                           <v-btn
                             v-if="props.actions?.includes('view')"
@@ -1229,7 +1230,7 @@ const handleFilterApply = (filterData: any) => {
                             size="small"
                             class="mr-2"
                             @click="goToRoute('view', item)"
-                            >🔍 نمایش
+                          >🔍 نمایش
                           </v-btn>
                           <template v-for="(routePath, routeKey) in props.routes" :key="routeKey">
                             <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(routeKey, item)">
@@ -1283,7 +1284,8 @@ const handleFilterApply = (filterData: any) => {
                     </tr>
                   </template>
                 </v-data-table>
-              </div>
+                </div>
+              </transition>
             </div>
           </div>
         </div>
@@ -1313,16 +1315,16 @@ const handleFilterApply = (filterData: any) => {
             density="compact"
           />
         </template>
-                 <template v-slot:item="{ item, columns, index }">
+        <template v-slot:item="{ item, columns, index }">
           <tr :style="{ background: index % 2 === 0 ? 'rgb(var(--v-theme-surface))' : 'rgb(var(--v-theme-lightprimary))' }" :tabindex="props.selectable ? 0 : -1" @keydown.enter.prevent="props.selectable && toggleSelection(item)">
-             <td
-               v-for="column in columns"
-               :key="column.key"
-               :style="{
+            <td
+              v-for="column in columns"
+              :key="column.key"
+              :style="{
                  ...getColumnStyle(column, item),
                  ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
                }"
-             >
+            >
               <!-- Selection Checkbox -->
               <template v-if="column.key === 'selection'">
                 <v-checkbox
@@ -1338,10 +1340,10 @@ const handleFilterApply = (filterData: any) => {
                   ویرایش ✏️
                 </v-btn>
                 <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="mr-2" @click="openDeleteDialog(item)"
-                  >حذف ❌
+                >حذف ❌
                 </v-btn>
                 <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
-                  >🔍 نمایش
+                >🔍 نمایش
                 </v-btn>
                 <template v-for="(routePath, routeKey) in props.routes" :key="routeKey">
                   <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(routeKey, item)">
@@ -1551,7 +1553,7 @@ const handleFilterApply = (filterData: any) => {
   padding: 12px 16px;
   background: linear-gradient(135deg, rgb(var(--v-theme-lightprimary)) 0%, rgb(var(--v-theme-lightsecondary)) 100%);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-bottom: 1px solid rgb(var(--v-theme-borderLight));
 }
 
@@ -1571,6 +1573,43 @@ const handleFilterApply = (filterData: any) => {
 
 .group-items {
   background: rgb(var(--v-theme-surface));
+  overflow: hidden;
+}
+
+/* Group expansion transitions */
+.group-expand-enter-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 0;
+  opacity: 0;
+}
+
+.group-expand-enter-to {
+  max-height: 1000px;
+  opacity: 1;
+}
+
+.group-expand-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 1000px;
+  opacity: 1;
+}
+
+.group-expand-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* Chevron icon rotation */
+.chevron-icon {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.group-header.expanded .chevron-icon {
+  transform: rotate(0deg);
+}
+
+.group-header:not(.expanded) .chevron-icon {
+  transform: rotate(-90deg);
 }
 
 .group-table {

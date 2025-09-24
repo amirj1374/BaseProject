@@ -144,32 +144,32 @@ const headers = [
     title: 'شماره حساب',
     key: 'accountNo',
     sortable: true,
-    width: 200
+ 
   },
   {
     title: 'عنوان حساب',
     key: 'accountTitle',
     sortable: true,
-    width: 200
+ 
   },
   {
     title: 'تاریخ افتتاح',
     key: 'openingDate',
     sortable: true,
     isDate: true,
-    width: 200
+ 
   },
   {
     title: 'نوع حساب',
     key: 'accountType',
     sortable: true,
-    width: 200
+ 
   },
   {
     title: 'شعبه',
     key: 'branch',
     sortable: true,
-    width: 200
+ 
   },
   {
     title: 'میانگین موجودی شش ماه گذشته',
