@@ -5,6 +5,10 @@ import type { ActionData, SubmitReferencePayload, ValidRole } from '@/types/cart
 import { onMounted, ref, watch, computed } from 'vue';
 import ApprovalRequestViewer from '../sign/ApprovalRequestViewer.vue';
 import { usePermissionsStore } from '@/stores/permissions';
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue';
+import user from '@/services/modules/user';
+
+const confirmDialog = ref(false);
 const permissionsStore = usePermissionsStore();
 const tableRef = ref();
 const emit = defineEmits(['close']);
@@ -31,7 +35,7 @@ const downloadExpertReport = async () => {
       // Fetch the file
       const response = await fetch(props.item.expertReportUrl);
       const blob = await response.blob();
-      
+
       // Create download link
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -39,7 +43,7 @@ const downloadExpertReport = async () => {
       link.download = 'expert-report.pdf';
       document.body.appendChild(link);
       link.click();
-      
+
       // Cleanup
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
@@ -101,19 +105,19 @@ const submitForm = async () => {
     snackbar.value = true;
     return;
   }
-  
+
   try {
     loading.value = true;
     const payload: SubmitReferencePayload = {
       cartableId: Number(id.value),
       roleDTO: {
         name: selectedRole.value?.roleName ?? '',
-        code: Number(selectedRole.value?.roleCode ?? 0),
+        code: Number(selectedRole.value?.roleCode ?? 0)
       },
       description: description.value,
       actionType: selectedAction.value?.actionType ?? '',
-      usernameList: selectedValidUser.value.map(user => user.username), // Extract usernames from selected users array
-      correctionDeadline : selectedDate?.value ?? undefined,
+      usernameList: selectedValidUser.value.map((user) => user.username), // Extract usernames from selected users array
+      correctionDeadline: selectedDate?.value ?? undefined
     };
     const response = await api.cartable.submitReference(payload);
     if (response.status === 200) {
@@ -143,28 +147,28 @@ const selectedValidUser = ref<any[]>([]); // Changed from any | null to any[]
 // Validation for user selection
 const userSelectionError = computed(() => {
   if (!selectedRole.value) return '';
-  
+
   const minUsers = selectedRole.value.minUserNumber || 0;
   const maxUsers = selectedRole.value.maxUserNumber || 0;
   const selectedCount = selectedValidUser.value.length;
-  
+
   if (minUsers > 0 && selectedCount < minUsers) {
     return `حداقل ${minUsers} کاربر باید انتخاب شود`;
   }
-  
+
   if (maxUsers > 0 && selectedCount > maxUsers) {
     return `حداکثر ${maxUsers} کاربر می‌تواند انتخاب شود`;
   }
-  
+
   return '';
 });
 
 const userSelectionHelperText = computed(() => {
   if (!selectedRole.value) return '';
-  
+
   const minUsers = selectedRole.value.minUserNumber || 0;
   const maxUsers = selectedRole.value.maxUserNumber || 0;
-  
+
   if (minUsers > 0 && maxUsers > 0) {
     return `انتخاب ${minUsers} تا ${maxUsers} کاربر`;
   } else if (minUsers > 0) {
@@ -172,17 +176,17 @@ const userSelectionHelperText = computed(() => {
   } else if (maxUsers > 0) {
     return `حداکثر ${maxUsers} کاربر`;
   }
-  
+
   return '';
 });
 
 const handleValidUser = async (role: ValidRole) => {
   if (!role || !selectedAction.value) return;
   const res = await api.cartable.getValidUser({
-  id: Number(id.value),
-  actionType: selectedAction.value.actionType,
-  roleName: String(role.roleName)
-});
+    id: Number(id.value),
+    actionType: selectedAction.value.actionType,
+    roleName: String(role.roleName)
+  });
   if (res?.data) {
     validUserOptions.value = res.data;
     selectedValidUser.value = []; // Reset to empty array instead of null
@@ -194,13 +198,12 @@ const handleValidUser = async (role: ValidRole) => {
 
 const roleOptions = computed(() =>
   selectedAction.value
-    ? selectedAction.value.validRoles.map(role => ({
+    ? selectedAction.value.validRoles.map((role) => ({
         ...role,
         display: `${role.roleDescription} - ${role.departmentLevelName}`
       }))
     : []
 );
-
 
 const download1016Report = async () => {
   if (props.item.report1016Url) {
@@ -208,7 +211,7 @@ const download1016Report = async () => {
       // Fetch the file
       const response = await fetch(props.item.report1016Url);
       const blob = await response.blob();
-      
+
       // Create download link
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -216,7 +219,7 @@ const download1016Report = async () => {
       link.download = '1016-report.pdf';
       document.body.appendChild(link);
       link.click();
-      
+
       // Cleanup
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
@@ -235,6 +238,7 @@ watch(validUserOptions, (newOptions) => {
     selectedValidUser.value = [];
   }
 });
+
 </script>
 
 <template>
@@ -284,12 +288,7 @@ watch(validUserOptions, (newOptions) => {
     </v-row>
     <v-row>
       <v-col cols="12" md="12">
-        <v-text-field
-          v-model="description"
-          label="توضیحات"
-          variant="outlined"
-          clearable
-        />
+        <v-text-field v-model="description" label="توضیحات" variant="outlined" clearable />
       </v-col>
     </v-row>
     <v-row>
@@ -322,11 +321,22 @@ watch(validUserOptions, (newOptions) => {
     </v-row>
     <v-row>
       <v-col cols="12" md="12" style="display: flex; justify-content: center; gap: 10px">
-        <v-btn type="submit" color="primary" :loading="loading">تایید</v-btn>
+        <v-btn variant="tonal" @click="confirmDialog = true" color="primary" :loading="loading">تایید</v-btn>
         <v-btn color="error" @click="emit('close')">انصراف</v-btn>
       </v-col>
     </v-row>
   </form>
+
+  <ConfirmDialog
+    v-model="confirmDialog"
+    confirmText="تایید"
+    :message="`آیا از عملیات ${selectedAction?.actionName} به ${selectedRole?.roleDescription} (${selectedValidUser.map((user) => user.name)}) مطمئن هستید؟`"
+    cancelText="انصراف"
+    :loading="loading"
+    color="primary"
+    @confirm="submitForm"
+  >
+  </ConfirmDialog>
   <v-snackbar v-if="error" v-model="error" color="error" timeout="2500">
     {{ error }}
   </v-snackbar>
