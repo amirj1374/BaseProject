@@ -15,13 +15,23 @@
       </div>
     </div>
   </transition>
+  <!-- Debug info -->
+  <div v-if="customizer.loading" style="position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; z-index: 10000;">
+    Loading: {{ customizer.loading }}
+  </div>
 </template>
 
 <script setup lang="ts">
 import { Vue3Lottie } from 'vue3-lottie';
 import { useCustomizerStore } from '@/stores/customizer';
+import { watch } from 'vue';
 
 const customizer = useCustomizerStore();
+
+// Debug watcher
+watch(() => customizer.loading, (newVal, oldVal) => {
+  console.log('🔄 Loading state changed:', { from: oldVal, to: newVal });
+}, { immediate: true });
 </script>
 
 <style scoped>

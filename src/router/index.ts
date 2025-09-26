@@ -3,10 +3,15 @@ import MainRoutes from './MainRoutes';
 import AuthRoutes from './AuthRoutes';
 import { useAuthStore } from '@/stores/auth';
 import { usePermissionsStore } from '@/stores/permissions';
+import envConfig from '@/config/envConfig';
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/',
+      redirect: '/main'
+    },
     {
       path: '/test-keycloak',
       component: () => import('@/views/test-keycloak.vue'),
@@ -45,6 +50,11 @@ interface AuthStore {
 router.beforeEach(async (to, from, next) => {
   // Skip auth checks for test page
   if (to.path === '/test-keycloak') {
+    return next();
+  }
+
+  // Skip all auth checks in dev mode
+  if (envConfig.AUTH_MODE === 'dev') {
     return next();
   }
 

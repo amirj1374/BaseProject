@@ -57,6 +57,13 @@ export async function initializeApp() {
   // Mark as initializing
   isInitializing = true;
 
+  // In dev mode, resolve immediately
+  if (envConfig.AUTH_MODE === 'dev') {
+    console.log('🔧 Dev mode: resolving initialization immediately');
+    resolveInit?.({ dev: true });
+    isInitializing = false;
+  }
+
   return initializationPromise;
 }
 
@@ -70,8 +77,8 @@ export async function startInitialization() {
   const customizer = useCustomizerStore();
   const baseStore = useBaseStore();
 
-  // Demo mode: skip API calls and initialize with safe defaults
-  if (envConfig.ENVIRONMENT === 'demo') {
+  // Demo mode or dev auth mode: skip API calls and initialize with safe defaults
+  if (envConfig.ENVIRONMENT === 'demo' || envConfig.AUTH_MODE === 'dev') {
     try {
       const demoUser: UserInfoResponse = {
         name: 'Demo User',

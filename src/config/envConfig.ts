@@ -15,7 +15,7 @@ const envConfig: EnvConfig = {
   BASE_URL: import.meta.env.VITE_BASE_URL,
   APP_TITLE: import.meta.env.VITE_APP_TITLE,
   ENVIRONMENT: import.meta.env.VITE_APP_ENV,
-  AUTH_MODE: (import.meta.env.VITE_AUTH_MODE as 'keycloak' | 'initializer')
+  AUTH_MODE: (import.meta.env.VITE_AUTH_MODE as 'keycloak' | 'initializer' | 'dev')
 };
 
 // Simple API configuration

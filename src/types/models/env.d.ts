@@ -4,5 +4,5 @@ export interface EnvConfig {
   BASE_URL: string;
   APP_TITLE: string;
   ENVIRONMENT: string;
-  AUTH_MODE?: 'keycloak' | 'initializer';
+  AUTH_MODE?: 'keycloak' | 'initializer' | 'dev';
 }

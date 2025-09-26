@@ -8,7 +8,6 @@ import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';
 import VueApexCharts from 'vue3-apexcharts';
 import DigitLimit from '@/directives/v-digit-limit'
 import { vPermission } from '@/directives/v-permission';
-import { fakeBackend } from '@/utils/helpers/fake-backend';
 
 // print
 import print from 'vue3-print-nb';
@@ -22,7 +21,6 @@ import envConfig from '@/config/envConfig'
 import { initializeApp, startInitialization } from '@/utils/appInitializer'
 
 const app = createApp(App);
-fakeBackend();
 const pinia = createPinia();
 app.use(pinia);
 
@@ -30,14 +28,32 @@ app.use(pinia);
 const authMode = envConfig.AUTH_MODE ?? 'keycloak';
 
 async function bootstrap() {
+  console.log('🚀 Bootstrap starting with authMode:', authMode);
+  
   if (authMode === 'keycloak') {
     // Setup Keycloak first so router guards can rely on it
     setupKeycloak(app);
   } else {
     // App initializer flow
+    console.log('📱 Initializing app...');
     await initializeApp();
     // Kick off actual data loading in background; router can await if needed
     startInitialization();
+    
+    // In dev mode, immediately set loading to false to show content
+    if (authMode === 'dev') {
+      console.log('🔧 Dev mode: setting loading to false');
+      const { useCustomizerStore } = await import('@/stores/customizer');
+      const customizer = useCustomizerStore();
+      customizer.SET_LOADING(false);
+      console.log('✅ Loading set to false, current state:', customizer.loading);
+      
+      // Force loading to false after a short delay to override any components that set it to true
+      setTimeout(() => {
+        customizer.SET_LOADING(false);
+        console.log('🔄 Forced loading to false again');
+      }, 100);
+    }
   }
 
   app.use(router);
