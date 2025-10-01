@@ -15,11 +15,6 @@
           :items-per-page="5"
           :hide-default-footer="true"
         >
-          <template #item.isAgreed="{ value }">
-            <v-chip :color="value === true ? 'success' : value === false ? 'error' : 'grey'" size="small" variant="tonal">
-              {{ value === true ? 'بله' : value === false ? 'خیر' : 'نامشخص' }}
-            </v-chip>
-          </template>
           <template #item.actionDone="{ value }">
             <v-chip :color="value === true ? 'success' : value === false ? 'warning' : 'grey'" size="small" variant="tonal">
               {{ value === true ? 'انجام شد' : value === false ? 'انجام نشده' : 'نامشخص' }}
@@ -61,7 +56,7 @@ const headers = [
   { title: 'نام کاربری', key: 'username', sortable: false },
   { title: 'نام', key: 'name', sortable: false },
   { title: 'توضیحات', key: 'comment', sortable: false },
-  { title: 'موافقت', key: 'isAgreed', sortable: false },
+  { title: 'نام اقدام', key: 'actionTypeName', sortable: false },
   { title: 'وضعیت اقدام', key: 'actionDone', sortable: false },
   { title: 'تاریخ اقدام', key: 'actionDoneAt', sortable: false },
 ];

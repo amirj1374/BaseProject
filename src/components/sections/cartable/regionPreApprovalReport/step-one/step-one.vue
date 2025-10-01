@@ -1,6 +1,6 @@
 <template>
   <div class="approval-section">
-    <v-form ref="formRef" @submit.prevent="submitForm">
+    <v-form ref="formRef">
       <v-row>
         <v-col cols="12">
           <v-textarea
@@ -109,40 +109,6 @@ const fetchData = async () => {
 };
 
 // Submit form
-const submitForm = async () => {
-  const { valid } = await formRef.value?.validate();
-
-  if (!valid) {
-    return;
-  }
-
-  try {
-    loading.value = true;
-
-    const payload = {
-      cartableId: props.cartableId,
-      templateBody: formData.value.templateBody,
-      conditions: formData.value.conditions
-    };
-
-    const response = await api.cartable.submitCreditSuggestion(String(props.cartableId), payload);
-
-    if (response.status === 200) {
-      successMessage.value = 'پیشنهاد اعتباری با موفقیت ذخیره شد';
-      showSuccess.value = true;
-      props.onSuccess?.();
-      emit('close');
-    } else {
-      throw new Error(response.statusText || 'خطا در ذخیره اطلاعات');
-    }
-  } catch (error: any) {
-    console.error('Error submitting credit suggestion:', error);
-    errorMessage.value = error?.message || 'خطا در ذخیره پیشنهاد اعتباری';
-    showError.value = true;
-  } finally {
-    loading.value = false;
-  }
-};
 
 // Load data on mount
 onMounted(() => {
@@ -165,14 +131,13 @@ const submitData = async () => {
 
   try {
     const payload = {
-      cartableId: props.cartableId,
-      templateBody: formData.value.templateBody,
-      conditions: formData.value.conditions
+      cartableId: Number(props.cartableId),
+      description: formData.value.templateBody,
     };
 
     console.log('Submitting payload:', payload);
 
-    const response = await api.cartable.submitCreditSuggestion(String(props.cartableId), payload);
+    const response = await api.cartable.submitCreditSuggestionDescription(payload);
 
     console.log('API response:', response);
 

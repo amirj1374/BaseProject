@@ -56,3 +56,9 @@ export interface CreditApprovalFinancialSummaryDTO {
     templateBody: string;
     conditions: string;
   }
+
+
+export interface CreditSuggestionDescriptionData {
+  description: string;
+  cartableId: number
+}

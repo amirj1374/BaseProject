@@ -124,15 +124,15 @@ const preApprovalReport = {
 };
 const directiveReport = {
   'گزارش ابلاغیه': 'directiveReport/{id}'
-}
+};
 
 const regionPreApprovalReport = {
   'گزارش پیش مصوبه منطقه': 'regionPreApprovalReport/{id}'
-}
+};
 
 const changeSigner = {
   'تغییر امضا داران': 'signer/{id}'
-}
+};
 
 function handleReferenceSuccess() {
   tableRef.value?.fetchData();
@@ -196,20 +196,20 @@ function handleReferenceSuccess() {
         },
         {
           title: '📜 تاریخچه کارتابل',
-          component: CartableHistory
+          component: CartableHistory,
+          condition: (item) => permissionsStore.hasMenuPermission('cartable_history')
         },
         {
           title: '📜 تاریخچه درخواست مصوبه',
-          component: LoanRequestHistory
-        },
+          component: LoanRequestHistory,
+          condition: (item) => permissionsStore.hasMenuPermission('approval_history')
+        }
       ]"
-
       :routes="{
         ...(permissionsStore.hasMenuPermission('preApprovalReport') ? preApprovalReport : {}),
         ...(permissionsStore.hasMenuPermission('directiveReport') ? directiveReport : {}),
         ...(permissionsStore.hasMenuPermission('regionPreApprovalReport') ? regionPreApprovalReport : {}),
-        ...(permissionsStore.hasMenuPermission('') ? changeSigner : {}),
-
+        ...(permissionsStore.hasMenuPermission('changeSigner') ? changeSigner : {})
       }"
     />
   </div>

@@ -131,11 +131,10 @@ const filterModel = reactive<FilterModel>({
 
 // Status options
 const statusOptions = ref([
-  { title: 'فعال', value: 'ACTIVE' },
-  { title: 'غیرفعال', value: 'INACTIVE' },
-  { title: 'در انتظار', value: 'PENDING' },
-  { title: 'تکمیل شده', value: 'COMPLETED' },
-  { title: 'رد شده', value: 'REJECTED' }
+  { title: 'در حال بررسی', value: 'IN_PROGRESS' },
+  { title: 'تایید شده', value: 'ACCEPTED' },
+  { title: 'رد شده', value: 'REJECTED' },
+  { title: 'بسته شده', value: 'CLOSED' },
 ]);
 
 // Watch for external changes to modelValue

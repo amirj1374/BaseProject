@@ -1,6 +1,16 @@
 import type { addCreditApprovalDescriptionPayload, RecentlyApprovalDTO } from '@/types/approval/approvalType';
-import type { SubmitReferencePayload, SubmitSignPayload, ValidUserPayload } from "@/types/cartable/cartableTypes";
-import type { CreditApprovalFinancialSummaryDTO, CreditApprovalLastDecisionDTO, CreditSuggestionData } from '@/types/preApproval/preApprovalTypes';
+import type {
+  SubmitChangeSignerPayload,
+  SubmitReferencePayload,
+  SubmitSignPayload,
+  ValidUserPayload
+} from '@/types/cartable/cartableTypes';
+import type {
+  CreditApprovalFinancialSummaryDTO,
+  CreditApprovalLastDecisionDTO,
+  CreditSuggestionData,
+  CreditSuggestionDescriptionData
+} from '@/types/preApproval/preApprovalTypes';
 import type { AxiosInstance } from "axios";
 
 export default (axiosInstance: AxiosInstance) => ({
@@ -20,6 +30,9 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.get(`api/v1/cartable/${id}/get-valid-roles`);
   },
 
+  getValidSigner(id: number) {
+    return axiosInstance.get(`api/v1/cartable/${id}/valid-signers`);
+  },
   getValidUser(payload: ValidUserPayload) {
     return axiosInstance.get(`api/v1/cartable/${payload.id}/get-valid-users?actionType=${payload.actionType}&roleName=${payload.roleName}`,{
       timeout: 40000,
@@ -27,6 +40,9 @@ export default (axiosInstance: AxiosInstance) => ({
   },
   submitReference(payload: SubmitReferencePayload) {
     return axiosInstance.post("api/v1/cartable/submit", payload);
+  },
+  submitChangeSigner(payload: SubmitChangeSignerPayload, id: number) {
+    return axiosInstance.post(`/api/v1/cartable/${id}/signer`, payload);
   },
   getSamapRole() {
     return axiosInstance.get("api/v1/role/samap");
@@ -69,6 +85,10 @@ export default (axiosInstance: AxiosInstance) => ({
 
   submitCreditSuggestion(cartableId: string, payload: CreditSuggestionData) {
     return axiosInstance.post(`api/v1/credit-suggestions/${cartableId}`, payload);
+  },
+
+  submitCreditSuggestionDescription(payload: CreditSuggestionDescriptionData) {
+    return axiosInstance.post(`api/v1/credit-suggestions/add-Credit-Approval-Description`, payload);
   },
 
   submitExpertReport(formData: FormData) {

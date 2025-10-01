@@ -207,7 +207,7 @@ const getGroupHeaderTemplate = (groupKey: string | number, groupItems: any[]): s
     const firstItem = groupItems[0];
     return `  ${firstItem.groupByItem} : (${groupItems.length} مدرک)`;
   }
-  return `${groupKey} (${groupItems.length} مدرک)`;
+  return `(${groupItems.length} مدرک)`;
 };
 
 defineExpose({ submitData });

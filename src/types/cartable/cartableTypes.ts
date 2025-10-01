@@ -32,7 +32,12 @@ export interface ActionData {
   actionType: string;
   actionName: string;
   validRoles: ValidRole[];
- 
+}
+
+
+export interface SignerData {
+  name: string;
+  username: string;
 }
 
 export interface RoleDTO {
@@ -58,6 +63,12 @@ export interface SubmitReferencePayload {
   actionType: string;
   usernameList: string[];
   correctionDeadline ?: string;
+}
+
+
+export interface SubmitChangeSignerPayload {
+  username: string;
+  id: number;
 }
 
 export interface SubmitSignPayload {

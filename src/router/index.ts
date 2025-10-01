@@ -8,6 +8,7 @@ import { waitForInitialization } from '@/utils/appInitializer';
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+
     {
       path: '/error/403',
       component: () => import('@/views/pages/maintenance/error/Error403Page.vue')
@@ -39,11 +40,16 @@ interface AuthStore {
 // Route permissions are defined per-route in route meta (meta.permission)
 
 router.beforeEach(async (to, from, next) => {
+  // Allow navigation to error and auth routes without initialization to avoid redirect loops
+  if (to.path.startsWith('/error') || to.path.startsWith('/auth')) {
+    return next();
+  }
+
   // Wait for app initialization to complete before checking permissions
   try {
     await waitForInitialization();
   } catch (error) {
-    // If initialization fails, you might want to redirect to an error page
+    // Redirect to error page only if we're not already heading there
     return next('/error/403');
   }
 

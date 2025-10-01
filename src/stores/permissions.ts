@@ -86,6 +86,10 @@ export const usePermissionsStore = defineStore({
       {
         menuKey: 'uploadExpertReport',
         requiredRoles: ['SMP_UPLOAD_EXPERT_RPT_FILE']
+      },
+      {
+        menuKey: 'changeSigner',
+        requiredRoles: ['SMP_CHANGE_SIGNER']
       }
     ] as MenuPermission[]
   }),
