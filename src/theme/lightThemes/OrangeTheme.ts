@@ -26,7 +26,7 @@ const OrangeTheme: ThemeTypes = {
     darksecondary: '#135152',
     borderLight: '#d0d0d0',
     inputBorder: '#787878',
-    containerBg: '#E3EBEB',
+    containerBg: '#fdf3ec',
     surface: '#fff',
     'on-surface-variant': '#fff',
     facebook: '#4267b2',

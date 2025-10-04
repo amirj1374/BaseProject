@@ -26,7 +26,7 @@ const SteelTealGreen: ThemeTypes = {
     darksecondary: '#00897B',
     borderLight: '#d0d0d0',
     inputBorder: '#787878',
-    containerBg: '#ECEFF1',
+    containerBg: '#ecf4f4',
     surface: '#fff',
     'on-surface-variant': '#fff',
     facebook: '#4267b2',

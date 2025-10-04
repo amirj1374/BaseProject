@@ -26,7 +26,7 @@ const RedTheme: ThemeTypes = {
     darksecondary: '#E42A5D',
     borderLight: '#d0d0d0',
     inputBorder: '#787878',
-    containerBg: '#eef2f6',
+    containerBg: '#f1f6ff',
     surface: '#fff',
     'on-surface-variant': '#fff',
     facebook: '#4267b2',

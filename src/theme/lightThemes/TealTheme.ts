@@ -26,7 +26,7 @@ const TealTheme: ThemeTypes = {
     darksecondary: '#00796b',
     borderLight: '#d0d0d0',
     inputBorder: '#787878',
-    containerBg: '#e0f2f1',
+    containerBg: '#effdee',
     surface: '#fff',
     'on-surface-variant': '#fff',
     facebook: '#4267b2',

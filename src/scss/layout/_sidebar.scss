@@ -56,7 +56,7 @@
   /* This is for the dropdown */
   .v-list {
     .v-list-item--active {
-      transition: background-color 5.8s ease, color 5.8s ease; // ✅ Smooth transitions
+      transition: background-color 0.8s ease, color 0.8s ease; // ✅ Smooth transitions
       background-color: rgba(var(--v-theme-secondary), 0.05); // ✅ Active background color
       .v-list-item-title {
         font-weight: 500;
