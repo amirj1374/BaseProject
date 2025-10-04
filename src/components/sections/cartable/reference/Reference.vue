@@ -97,7 +97,7 @@ const fetchValidUsers = async (selectedValue: string) => {
 onMounted(async () => {
   await fetchValidUsers(id.value);
 });
-
+const required = (v: any) => !!v || 'این فیلد الزامی است';
 // When action changes, auto-select its first role (from roleOptions)
 watch(selectedAction, () => {
   if (roleOptions.value.length > 0) {
@@ -205,6 +205,24 @@ const userSelectionHelperText = computed(() => {
   return '';
 });
 
+// Check if all required fields are valid
+const isFormValid = computed(() => {
+  // Check if action is selected
+  if (!selectedAction.value) return false;
+  
+  // Check if role is selected
+  if (!selectedRole.value) return false;
+  
+  // Check if users are selected and meet validation requirements
+  if (userSelectionError.value) return false;
+  
+  // If role has minimum user requirements, ensure users are selected
+  const minUsers = selectedRole.value.minUserNumber || 0;
+  if (minUsers > 0 && selectedValidUser.value.length < minUsers) return false;
+  
+  return true;
+});
+
 const handleValidUser = async (role: ValidRole) => {
   if (!role || !selectedAction.value) return;
   const res = await api.cartable.getValidUser({
@@ -308,6 +326,7 @@ watch(validUserOptions, (newOptions) => {
           :hint="userSelectionHelperText"
           persistent-hint
           :color="userSelectionError ? 'error' : 'primary'"
+          :rules="[required]"
         />
       </v-col>
     </v-row>
@@ -349,7 +368,7 @@ watch(validUserOptions, (newOptions) => {
     </v-row>
     <v-row>
       <v-col cols="12" md="12" style="display: flex; justify-content: center; gap: 10px">
-        <v-btn variant="tonal" @click="confirmDialog = true" color="primary" :loading="loading">تایید</v-btn>
+        <v-btn variant="tonal" @click="confirmDialog = true" color="primary" :loading="loading" :disabled="!isFormValid">تایید</v-btn>
         <v-btn color="error" @click="emit('close')">انصراف</v-btn>
       </v-col>
     </v-row>

@@ -130,9 +130,9 @@ const regionPreApprovalReport = {
   'گزارش پیش مصوبه منطقه': 'regionPreApprovalReport/{id}'
 };
 
-const changeSigner = {
-  'تغییر امضا داران': 'signer/{id}'
-};
+const flowReport = {
+  'گزارش عملیات ' : 'flowReport/{id}'
+}
 
 function handleReferenceSuccess() {
   tableRef.value?.fetchData();
@@ -143,7 +143,8 @@ const getDynamicRoutes = (item: any) => {
   const baseRoutes: Record<string, string> = {
     ...(permissionsStore.hasMenuPermission('preApprovalReport') ? preApprovalReport : {}),
     ...(permissionsStore.hasMenuPermission('directiveReport') ? directiveReport : {}),
-    ...(permissionsStore.hasMenuPermission('regionPreApprovalReport') ? regionPreApprovalReport : {})
+    ...(permissionsStore.hasMenuPermission('regionPreApprovalReport') ? regionPreApprovalReport : {}),
+    ...(permissionsStore.hasMenuPermission('') ? flowReport : {})
   };
 
   // Add changeSigner route only if permission exists AND item allows it

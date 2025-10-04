@@ -10,6 +10,7 @@
         :height="550"
         :actions="['create', 'edit', 'delete']"
         :form-component="CreateActionManagement"
+        :filter-component="FilterActionManagment"
         :show-refresh-button="true"
         @item-created="onItemCreated"
         @item-updated="onItemUpdated"
@@ -29,6 +30,7 @@ import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import CreateActionManagement from '@/components/sections/actionManagement/CreateActionManagement.vue';
 import { ActionTypeOptions, DepartmentTypeOptions } from '@/types/enums/global';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
+import FilterActionManagment from '@/components/sections/actionManagement/FilterActionManagment.vue';
 
 const { requirePermission } = useRouteGuard();
 const breadcrumbs = ref([

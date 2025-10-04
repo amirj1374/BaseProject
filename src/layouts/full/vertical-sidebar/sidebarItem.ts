@@ -56,6 +56,12 @@ const sidebarItem: menu[] = [
     to: '/report',
     permissionKey: 'cartableReport'
   },
+  // {
+  //   title: 'گزارش عملیات',
+  //   icon: IconFileSymlink,
+  //   to: '/flowReport',
+  //   permissionKey: 'cartableReport'
+  // },
   {
     title: 'اطلاعات پایه',
     icon: IconDatabase,
