@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import { ref, h } from 'vue';
+import { ref, h, computed } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import Reference from '@/components/sections/cartable/reference/Reference.vue';
 import CartableHistory from '@/components/sections/cartable/cartableHistory/cartableHistory.vue';
@@ -137,6 +137,22 @@ const changeSigner = {
 function handleReferenceSuccess() {
   tableRef.value?.fetchData();
 }
+
+// Function for routes that can access item data
+const getDynamicRoutes = (item: any) => {
+  const baseRoutes: Record<string, string> = {
+    ...(permissionsStore.hasMenuPermission('preApprovalReport') ? preApprovalReport : {}),
+    ...(permissionsStore.hasMenuPermission('directiveReport') ? directiveReport : {}),
+    ...(permissionsStore.hasMenuPermission('regionPreApprovalReport') ? regionPreApprovalReport : {})
+  };
+
+  // Add changeSigner route only if permission exists AND item allows it
+  if (permissionsStore.hasMenuPermission('changeSigner') && item.canChangeSigner === true) {
+    baseRoutes['تغییر امضا داران'] = 'signer/{id}';
+  }
+
+  return baseRoutes;
+};
 </script>
 
 <template>
@@ -205,12 +221,7 @@ function handleReferenceSuccess() {
           condition: (item) => permissionsStore.hasMenuPermission('approval_history')
         }
       ]"
-      :routes="{
-        ...(permissionsStore.hasMenuPermission('preApprovalReport') ? preApprovalReport : {}),
-        ...(permissionsStore.hasMenuPermission('directiveReport') ? directiveReport : {}),
-        ...(permissionsStore.hasMenuPermission('regionPreApprovalReport') ? regionPreApprovalReport : {}),
-        ...(permissionsStore.hasMenuPermission('changeSigner') ? changeSigner : {})
-      }"
+      :routes="getDynamicRoutes"
     />
   </div>
 </template>

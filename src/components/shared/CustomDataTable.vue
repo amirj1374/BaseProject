@@ -72,7 +72,7 @@ interface Props {
   apiResource: string;
   headers: Header[];
   actions?: ('create' | 'edit' | 'delete' | 'view')[];
-  routes?: Record<string, string>;
+  routes?: Record<string, string> | ((item: any) => Record<string, string>);
   downloadLink?: Record<string, string>;
   formComponent?: Component;
   customActions?: CustomAction[];
@@ -167,12 +167,21 @@ const expandedGroups = selection.expandedGroups;
 // Computed flag to determine if any actions should be shown
 const hasAnyActions = computed(() => {
   const hasCrudActions = Array.isArray(props.actions) && props.actions.length > 0;
-  const hasRoutes = !!props.routes && Object.keys(props.routes).length > 0;
+  const hasRoutes = !!props.routes && (typeof props.routes === 'function' || Object.keys(props.routes).length > 0);
   const hasDownloadLinks = !!props.downloadLink && Object.keys(props.downloadLink).length > 0;
   const hasCustomActions = Array.isArray(props.customActions) && props.customActions.length > 0;
   const hasCustomButtons = (Array.isArray(props.customButtons) && props.customButtons.length > 0) || !!props.customButtonsFn;
   return hasCrudActions || hasRoutes || hasDownloadLinks || hasCustomActions || hasCustomButtons;
 });
+
+// Function to get routes for a specific item
+const getRoutesForItem = (item: any): Record<string, string> => {
+  if (!props.routes) return {};
+  if (typeof props.routes === 'function') {
+    return props.routes(item);
+  }
+  return props.routes;
+};
 
 // Estimate auto width based on header title and type when width is not provided
 const estimateColumnWidth = (header: Header): number => {
@@ -393,50 +402,7 @@ const getGroupValue = (item: any): string | number => {
   return item[props.groupBy] || '';
 };
 
-// Helper function to get group label
-const getGroupLabel = (groupKey: string | number, groupItems: any[]): string => {
-  if (props.groupHeaderTemplate) {
-    return props.groupHeaderTemplate(groupKey, groupItems);
-  }
-
-  return `${groupKey} (${groupItems.length} آیتم)`;
-};
-
-// Function to group items
-const groupItems = (items: any[]) => {
-  if (!props.groupBy) {
-    groupedItems.value = [];
-    return;
-  }
-
-  const groups = new Map<string | number, any[]>();
-
-  // Group items by the specified property
-  items.forEach((item) => {
-    const groupKey = getGroupValue(item);
-    if (!groups.has(groupKey)) {
-      groups.set(groupKey, []);
-    }
-    groups.get(groupKey)!.push(item);
-  });
-
-  // Convert to array format
-  groupedItems.value = Array.from(groups.entries()).map(([groupKey, groupItems]) => ({
-    groupKey,
-    groupLabel: getGroupLabel(groupKey, groupItems),
-    items: groupItems,
-    isExpanded: props.defaultExpanded || expandedGroups.value.has(groupKey),
-    count: groupItems.length
-  }));
-
-  // Sort groups by key
-  groupedItems.value.sort((a: { groupKey: string | number }, b: { groupKey: string | number }) => {
-    if (typeof a.groupKey === 'string' && typeof b.groupKey === 'string') {
-      return a.groupKey.localeCompare(b.groupKey);
-    }
-    return a.groupKey < b.groupKey ? -1 : a.groupKey > b.groupKey ? 1 : 0;
-  });
-};
+// Note: Grouping logic is handled by useTableSelection composable
 
 // Selection methods
 const toggleSelection = (item: any) => {
@@ -538,8 +504,7 @@ const fetchData = async (queryParams?: {}) => {
     totalPages.value = response.data.page.totalPages;
     hasMore.value = currentPage.value < response.data.page.totalPages;
 
-    // Group items if groupBy is specified
-    groupItems(items.value);
+    // Grouping is handled automatically by useTableSelection composable
 
     // Auto-select items if defaultSelected prop is provided
     if (props.defaultSelected && items.value.length > 0 && props.defaultSelected in items.value[0]) {
@@ -676,12 +641,11 @@ defineExpose({
     selectedItems.value = [];
     selectAll.value = false;
   },
-  // Grouping methods
+  // Grouping methods (handled by useTableSelection composable)
   groupedItems,
   toggleGroup,
   expandAllGroups,
-  collapseAllGroups,
-  groupItems
+  collapseAllGroups
 });
 
 /**
@@ -815,9 +779,10 @@ const deleteItem = async (id: string) => {
  * and the selected item fields. Shows a snackbar if params are missing.
  */
 const goToRoute = (key: string, item?: any) => {
-  if (!props.routes || !props.routes[key] || !item) return;
+  const routes = getRoutesForItem(item);
+  if (!routes || !routes[key] || !item) return;
 
-  let routePath = props.routes[key];
+  let routePath = routes[key];
   const missingParams: string[] = [];
 
   routePath = routePath.replace(/\{(\w+)}/g, (_, field) => {
@@ -1163,7 +1128,7 @@ const handleFilterApply = (filterData: any) => {
                 <IconChevronDown v-if="group.isExpanded" class="me-2 chevron-icon" />
                 <IconChevronRight v-else class="me-2 chevron-icon" />
                 <span class="group-label">{{ group.groupLabel }}</span>
-                <v-chip size="small" color="primary" class="ms-auto">{{ group.count }}</v-chip>
+                <v-chip size="small" color="darksecondary" class="ms-auto">{{ group.count }}</v-chip>
               </div>
 
               <!-- Group Items -->
@@ -1232,7 +1197,7 @@ const handleFilterApply = (filterData: any) => {
                             @click="goToRoute('view', item)"
                           >🔍 نمایش
                           </v-btn>
-                          <template v-for="(routePath, routeKey) in props.routes" :key="routeKey">
+                          <template v-for="(routePath, routeKey) in getRoutesForItem(item)" :key="routeKey">
                             <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(routeKey, item)">
                               {{ routeKey.toUpperCase() }}
                             </v-btn>
@@ -1345,7 +1310,7 @@ const handleFilterApply = (filterData: any) => {
                 <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
                 >🔍 نمایش
                 </v-btn>
-                <template v-for="(routePath, routeKey) in props.routes" :key="routeKey">
+                <template v-for="(routePath, routeKey) in getRoutesForItem(item)" :key="routeKey">
                   <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(routeKey, item)">
                     {{ routeKey.toUpperCase() }}
                   </v-btn>
@@ -1562,12 +1527,12 @@ const handleFilterApply = (filterData: any) => {
 }
 
 .group-header.expanded {
-  background: linear-gradient(135deg, rgb(var(--v-theme-lightsuccess)) 0%, rgb(var(--v-theme-success)) 100%);
+  background: rgb(var(--v-theme-lightsecondary))
 }
 
 .group-label {
   font-weight: 600;
-  color: rgb(var(--v-theme-darkText));
+  color: rgb(var(--v-theme-darksecondary));
   flex: 1;
 }
 

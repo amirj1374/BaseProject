@@ -54,6 +54,31 @@ const downloadExpertReport = async () => {
     }
   }
 };
+const downloadDirectiveReport = async () => {
+  if (props.item.expertReportUrl) {
+    try {
+      // Fetch the file
+      const response = await fetch(props.item.formLetterUrl);
+      const blob = await response.blob();
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'expert-report.pdf';
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading expert report:', error);
+      // Fallback to opening in new tab
+      window.open(props.expertReportUrl, '_blank');
+    }
+  }
+};
 
 const fetchValidUsers = async (selectedValue: string) => {
   const res = await api.cartable.getValidRoles(Number(selectedValue));
@@ -303,6 +328,9 @@ watch(validUserOptions, (newOptions) => {
       </v-col>
     </v-row>
     <v-row>
+      <v-col cols="12" md="3" v-if="props.item.formLetterUrl && permissionsStore.hasMenuPermission('downloadDirectiveReport')">
+        <v-btn color="info" @click="downloadDirectiveReport" variant="tonal"> دانلود گزارش ابلاغیه </v-btn>
+      </v-col>
       <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('downloadExpertReport')">
         <v-btn color="info" @click="downloadExpertReport" variant="tonal"> دانلود گزارش کارشناسی </v-btn>
       </v-col>
