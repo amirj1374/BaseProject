@@ -130,7 +130,7 @@ const regionPreApprovalReport = {
 };
 
 const flowReport = {
-  'گزارش عملیات ' : 'flowReport/{id}'
+  'گزارش عملیات ' : 'flowReportDetail/{id}'
 }
 
 function handleReferenceSuccess() {

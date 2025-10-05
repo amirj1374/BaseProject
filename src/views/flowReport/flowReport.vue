@@ -1,41 +1,38 @@
 <template>
   <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
-  <v-row>
-    <v-col cols="12" md="12">
-      <ApprovalRequestViewer :cartable-id="cartableId" />
-    </v-col>
-  </v-row>
   <div class="upload-form">
     <CustomDataTable
-      class="pa-3"
       ref="dataTableRef"
       :headers="headers"
-      api-resource="report/get-flow-report"
-      :queryParams="{ cartableId }"
+      api-resource="report"
       :auto-fetch="true"
       :show-pagination="true"
       :height="550"
-      group-by="commiteName"
-      :page-size="100"
-      :group-header-template="getGroupHeaderTemplate"
+      :show-refresh-button="true"
+      :routes="routes"
+      :filter-component="FilterFlowReport"
     />
   </div>
+  <!-- Success/Error Messages -->
+  <v-snackbar v-model="showSnackbar" :color="snackbarColor" timeout="3000">
+    {{ snackbarMessage }}
+  </v-snackbar>
 </template>
-<script lang="ts" setup>
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import { ref } from 'vue';
-import ApprovalRequestViewer from '@/components/sections/cartable/sign/ApprovalRequestViewer.vue';
-import { useRoute } from 'vue-router';
 
-const { id } = useRoute().params;
-const cartableId = Array.isArray(id) ? id[0] : id;
+<script lang="ts" setup>
+import { onMounted, ref } from 'vue';
+import { useRouteGuard } from '@/composables/useRouteGuard';
+import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { CartableStatusTypeOptions, LoanRequestStatusOptions } from '@/types/enums/global';
+import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
+import ApprovalEdit from '@/components/sections/approval/approvalEdit/approvalEdit.vue';
+import FilterFlowReport from '@/components/sections/flowReport/FilterFlowReport.vue';
+
+const routes = {
+  'جزییات بیشتر⬅️': '/flowReportDetail/{id}'
+};
+const { requirePermission } = useRouteGuard();
 const breadcrumbs = ref([
-  {
-    title: 'درخواست ها',
-    disabled: false,
-    to: { name: 'Cartable' }
-  },
   {
     title: 'گزارش عملیات',
     disabled: false,
@@ -43,41 +40,75 @@ const breadcrumbs = ref([
   }
 ]);
 const page = ref({ title: 'گزارش عملیات' });
+// Reactive data
+const dataTableRef = ref();
+const showSnackbar = ref(false);
+const snackbarMessage = ref('');
+const snackbarColor = ref('success');
+
+// Headers configuration with custom JSON support
 const headers = [
   {
-    title: 'نام امضا دار',
-    key: 'name',
+    title: 'نام شعبه',
+    key: 'branchName',
     sortable: true,
+    width: 200
   },
   {
-    title: 'نام کاربری',
-    key: 'username',
+    title: 'شماره مشتری',
+    key: 'customerCode',
     sortable: true,
-    editable: true,
+    width: 200
   },
   {
-    title: 'توضیحات',
-    key: 'comment',
+    title: 'نام مشتری',
+    key: 'customerName',
     sortable: true,
-    editable: true,
+    width: 200
   },
   {
-    title: 'نوع اقدام',
-    key: 'actionTypeName',
+    title: 'گروه مشتری',
+    key: 'customerGroup',
     sortable: true,
+    width: 200
   },
   {
-    title: 'تاریخ اقدام',
-    key: 'actionDoneAt',
+    title: 'تاریخ ایجاد',
+    key: 'creationDate',
     sortable: true,
+    width: 200,
     isDate: true
   },
-];
-const getGroupHeaderTemplate = (groupKey: string | number, groupItems: any[]): string => {
-  if (groupItems.length > 0) {
-    const firstItem = groupItems[0];
-    return `  ${firstItem.groupByItem} : (${groupItems.length} مدرک)`;
+  {
+    title: 'کاربر ایجاد کننده',
+    key: 'createByName',
+    sortable: true,
+    width: 200
+  },
+  {
+    title: 'کد رهگیری',
+    key: 'trackingCode',
+    sortable: true,
+    width: 200
+  },
+  {
+    title: 'تاریخ درخواست',
+    key: 'requestDate',
+    sortable: true,
+    width: 150,
+    isDate: true
+  },
+  {
+    title: 'وضعیت',
+    key: 'status',
+    sortable: true,
+    width: 150,
+    options: CartableStatusTypeOptions,
+    translate: true
   }
-  return `(${groupItems.length} مدرک)`;
-};
+];
+onMounted(() => {
+  // Check if user has permission to access this page
+  requirePermission('approval_edit');
+});
 </script>
