@@ -188,10 +188,7 @@ const headerMenu = computed(() => {
     <v-menu :close-on-content-click="false">
       <template v-slot:activator="{ props }">
         <v-btn class="profileBtn text-primary" color="lightprimary" variant="flat" rounded="pill" v-bind="props">
-          <v-avatar size="30" class="ml-2 d-flex align-items-center">
-            <LogoUser/>
-          </v-avatar>
-          <IconSettings stroke-width="2.5" />
+          <IconSettings stroke-width="2" />
         </v-btn>
       </template>
       <v-sheet rounded="md" width="330" elevation="12">
