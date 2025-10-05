@@ -19,7 +19,7 @@ const config: ConfigProps = {
   mini_sidebar: false,
   setHorizontalLayout: false, // Horizontal layout
   actTheme: 'OrangeTheme',
-  fontTheme: 'vazir',
+  fontTheme: 'iranSans',
   layoutType: 'SideBar',
   inputBg: false,
   boxed: true,

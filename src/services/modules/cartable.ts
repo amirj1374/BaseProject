@@ -6,6 +6,8 @@ import type {
   ValidUserPayload
 } from '@/types/cartable/cartableTypes';
 import type {
+  ApplicantRequestDTO,
+  ConditionsDTO,
   CreditApprovalFinancialSummaryDTO,
   CreditApprovalLastDecisionDTO,
   CreditSuggestionData,
@@ -67,12 +69,28 @@ export default (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post(`api/v1/credit-approvals/financial-summary/${cartableId} `, payload);
   },
 
+  saveConditions(cartableId: string , payload: ConditionsDTO) {
+    return axiosInstance.post(`api/v1/credit-approvals/conditions/${cartableId} `, payload);
+  },
+
+  saveApplicantRequest(cartableId: string , payload: ApplicantRequestDTO) {
+    return axiosInstance.post(`api/v1/credit-approvals/applicant-request/${cartableId} `, payload);
+  },
+
   saveLastDecision(cartableId: string , payload: CreditApprovalLastDecisionDTO) {
     return axiosInstance.post(`api/v1/credit-approvals/last-decision/${cartableId}`, payload);
   },
 
   getCreditApproval(cartableId: string) {
     return axiosInstance.get(`api/v1/credit-approvals/summary/${cartableId}`);
+  },
+
+  getConditions(cartableId: string) {
+    return axiosInstance.get(`api/v1/credit-approvals/conditions/${cartableId}`);
+  },
+
+  getApplicantRequest(cartableId: string) {
+    return axiosInstance.get(`api/v1/credit-approvals/applicant-request/${cartableId}`);
   },
 
   getLoanRequestDetail(loanRequestId: string) {
@@ -128,10 +146,10 @@ export default (axiosInstance: AxiosInstance) => ({
   },
 
   addRecentlyApproved(cartabId: string,payload: RecentlyApprovalDTO) {
-    return axiosInstance.post(`api/v1/recently-approved/${cartabId}`, payload);
+    return axiosInstance.post(`api/v1/recently-approved/recent-notes/${cartabId}`, payload);
   },
 
   getRecentlyApproved(cartabId: string) {
-    return axiosInstance.get(`api/v1/recently-approved/${cartabId}?page=0&size=10`);
+    return axiosInstance.get(`api/v1/recently-approved/recent-notes/${cartabId}`);
   },
 });

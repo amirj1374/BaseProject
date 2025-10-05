@@ -1128,7 +1128,7 @@ const handleFilterApply = (filterData: any) => {
                 <IconChevronDown v-if="group.isExpanded" class="me-2 chevron-icon" />
                 <IconChevronRight v-else class="me-2 chevron-icon" />
                 <span class="group-label">{{ group.groupLabel }}</span>
-                <v-chip size="small" color="darksecondary" class="ms-auto">{{ group.count }}</v-chip>
+                <v-chip size="small" color="darkprimary" class="ms-auto">{{ group.count }}</v-chip>
               </div>
 
               <!-- Group Items -->

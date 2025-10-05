@@ -92,7 +92,6 @@ const header = ref([
     key: 'branchName',
     sortable: true,
     editable: true,
-    width: 200
   },
   {
     title: 'کد شعبه ثبت کننده درخواست',

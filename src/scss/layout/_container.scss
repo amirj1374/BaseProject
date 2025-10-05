@@ -80,7 +80,7 @@ $sizes: (
 }
 @font-face {
   font-family: 'iranSans';
-  src: url('/src/assets/fonts/IRANSansXMedium.ttf') format('truetype');
+  src: url('/src/assets/fonts/IRANSansWeb.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
 }
@@ -96,6 +96,34 @@ $sizes: (
   font-weight: 300;
   font-style: normal;
 }
+
+@font-face {
+  font-family: 'IranNastaliq';
+  src: url('/src/assets/fonts/IranNastaliq.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Massir';
+  src: url('/src/assets/fonts/A Massir Spray.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+// IranNastaliq font with bigger size
+.iran-nastaliq-large {
+  font-family: 'IranNastaliq', serif;
+  font-size: 24px;
+  line-height: 1.6;
+}
+
+.iran-nastaliq-extra-large {
+  font-family: 'IranNastaliq', serif;
+  font-size: 32px;
+  line-height: 1.5;
+}
+
 body {
   font-family: var(--font-theme), sans-serif;
 }

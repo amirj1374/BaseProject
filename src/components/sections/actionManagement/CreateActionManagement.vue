@@ -76,13 +76,11 @@
 import { api } from '@/services/api';
 import { ActionTypeOptions, DepartmentTypeOptions } from '@/types/enums/global';
 import { ref, reactive, watch, defineProps, defineEmits, onMounted } from 'vue';
-import { useBaseStore } from '@/stores/base';
 import type { SamapRoleDTO } from '@/types/cartable/cartableTypes';
 const roleOptions = ref<SamapRoleDTO[]>([]);
-const baseStore = useBaseStore();
 
 interface FormData {
-    fromDepartmentLevel: string;
+  fromDepartmentLevel: string;
   toDepartmentLevel: string;
   toRole: string;
   fromRole: string;
@@ -111,7 +109,7 @@ const formData = reactive<FormData>({
   toDepartmentLevel: '',
   fromRole: '',
   toRole: '',
-  actionType: '',
+  actionType: ''
 });
 
 // Update form when modelValue changes (for editing)

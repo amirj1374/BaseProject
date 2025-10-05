@@ -56,13 +56,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { api } from '@/services/api';
-import { usePreApprovalStore } from '@/stores/preApproval';
 import type { CreditApprovalLastDecisionDTO } from '@/types/preApproval/preApprovalTypes';
 import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
 
 const props = defineProps<{ cartableId: string; loanRequestId: string; currentStep: number; totalSteps: number; loanRequestTypeOptions?: string[] }>();
 
-const preApprovalStore = usePreApprovalStore();
 const formRef = ref();
 const isValid = ref(false);
 
@@ -80,14 +78,9 @@ const lastDecisionForm = ref({
 
 onMounted(async () => {
   try {
-    preApprovalStore.setLoading(true);
     const res = await api.cartable.getCreditApproval(props.cartableId);
     if (res?.status === 200 && res.data) {
-      // Set data to store
-      preApprovalStore.setPreApprovalData({
-        creditApprovalFinancialSummaryDTO: res.data.creditApprovalFinancialSummaryDTO,
-        creditApprovalLastDecisionDTO: res.data.creditApprovalLastDecisionDTO
-      });
+
 
       // Populate last decision form with store data
       const lastDecisionData = res.data.creditApprovalLastDecisionDTO;
@@ -104,9 +97,7 @@ onMounted(async () => {
     }
   } catch (e) {
     console.error('Error loading credit approval data:', e);
-    preApprovalStore.setError('خطا در بارگذاری اطلاعات');
   } finally {
-    preApprovalStore.setLoading(false);
   }
 });
 
@@ -131,11 +122,6 @@ const submitData = async () => {
 
     if (res?.status === 200 && res.data) {
       console.log('Last decision data saved successfully:', res.data);
-
-      // Update store with the response data ONLY on successful submit
-      preApprovalStore.setPreApprovalData({
-        creditApprovalLastDecisionDTO: res.data
-      });
 
       return Promise.resolve();
     }

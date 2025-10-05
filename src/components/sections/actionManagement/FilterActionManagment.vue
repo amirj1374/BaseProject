@@ -43,6 +43,7 @@
           label="نقش مقصد"
           variant="outlined"
           density="comfortable"
+
         />
       </v-col>
       <v-col cols="12" md="4">
