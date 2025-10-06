@@ -4,6 +4,7 @@ import AuthRoutes from './AuthRoutes';
 import { useAuthStore } from '@/stores/auth';
 import { usePermissionsStore } from '@/stores/permissions';
 import envConfig from '@/config/envConfig';
+import { waitForInitialization } from '@/utils/appInitializer';
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,6 +52,8 @@ router.beforeEach(async (to, from, next) => {
   } catch (error) {
     // Redirect to error page only if we're not already heading there
     return next('/error/403');
+  }
+
   // Skip auth checks for test page
   if (to.path === '/test-keycloak') {
     return next();
