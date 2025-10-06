@@ -36,8 +36,8 @@ const header = ref([
     key: 'updateDate',
     sortable: true,
     editable: true,
+    width: 180,
     isDate: true,
-    width: 250,
     formatter: (value: any, item: any) => {
       if (item.updateDate && item.updateTime) {
         return `${item.updateTime} - ${item.updateDate}`;
@@ -49,41 +49,37 @@ const header = ref([
     title: 'کد رهگیری',
     key: 'trackingCode',
     sortable: true,
-    width: 200
+    width: 200,
   },
   {
     title: 'وضعیت',
     key: 'status',
     sortable: true,
     translate: true,
+    width: 150,
     options: CartableStatusTypeOptions,
-    width: 200
   },
   {
     title: 'نام مشتری',
     key: 'customerName',
     sortable: true,
     editable: true,
-    width: 200
   },
   {
     title: 'کد مشتری',
     key: 'customerCode',
     sortable: true,
     editable: true,
-    width: 200
   },
   {
     title: 'گروه مشتری',
     key: 'customerGroup',
     sortable: true,
-    width: 200
   },
   {
     title: 'نوع مشتری',
     key: 'customerType',
     sortable: true,
-    width: 200,
     translate: true,
     options: CustomerTypeOptions
   },
@@ -92,13 +88,13 @@ const header = ref([
     key: 'branchName',
     sortable: true,
     editable: true,
+    width: 200
   },
   {
     title: 'کد شعبه ثبت کننده درخواست',
     key: 'branchCode',
     sortable: true,
     editable: true,
-    width: 250
   },
   {
     title: 'ایجاد شده توسط',
@@ -153,6 +149,47 @@ const getDynamicRoutes = (item: any) => {
 
   return baseRoutes;
 };
+function getCustomButtons(cartable: Document) {
+  const buttons = [];
+  buttons.push({
+    label: 'بروزرسانی 1',
+    color: 'white',
+    onClick: () => {
+     console.log(cartable)
+    },
+    disabled: false
+  });
+
+  buttons.push({
+    label: 'بروزرسانی 2',
+    color: 'white',
+    onClick: () => {
+     console.log(cartable)
+    },
+    disabled: false
+  });
+
+  buttons.push({
+    label: 'بروزرسانی 3',
+    color: 'white',
+    onClick: () => {
+     console.log(cartable)
+    },
+    disabled: false
+  });
+
+  buttons.push({
+    label: 'بروزرسانی 3',
+    color: 'white',
+    onClick: () => {
+     console.log(cartable)
+    },
+    disabled: false
+  });
+
+
+  return buttons;
+}
 </script>
 
 <template>
@@ -168,6 +205,8 @@ const getDynamicRoutes = (item: any) => {
       :auto-fetch="true"
       :show-pagination="true"
       :show-refresh-button="true"
+      :custom-buttons-fn="getCustomButtons"
+      selectable
       :custom-actions="[
         {
           title: '⚙️ عملیات',
