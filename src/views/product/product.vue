@@ -50,8 +50,52 @@ const tableRef = ref();
 function handleReferenceSuccess() {
   tableRef.value?.fetchData();
 }
-const routes = {
-  'asdasd' : 'asdasdasd'
+const preApprovalReport = {
+  'گزارش پیش مصوبه': 'preApprovalReport/{id}'
+};
+const directiveReport = {
+  'گزارش ابلاغیه': 'directiveReport/{id}'
+};
+
+const regionPreApprovalReport = {
+  'گزارش پیش مصوبه منطقه': 'regionPreApprovalReport/{id}'
+};
+
+const flowReport = {
+  'گزارش عملیات ' : 'flowReport/{id}'
+}
+function getCustomButtons(doc: Document) {
+  
+  const buttons = [];
+  
+  // Upload button (always enabled)
+    buttons.push({
+      label: 'آپلود',
+      color: 'secondary',
+      disabled: false,
+      onClick: () => {
+      },
+    });
+  
+  // Edit button (disabled when condition is met)
+    buttons.push({
+      label: 'ویرایش',
+      color: 'secondary',
+      disabled: false,
+      onClick: () => {
+      },
+    });
+  
+  // View image button
+  buttons.push({
+    label: 'مشاهده تصویر مدرک',
+    color: 'primary',
+    onClick: () => {
+    },
+    disabled: false
+  });
+  
+  return buttons;
 }
 </script>
 
@@ -70,7 +114,54 @@ const routes = {
       :show-refresh-button="true"
       :bulk-mode="true"
       :selectable="true"
-      :routes="routes"
+      :custom-buttons-fn="getCustomButtons"
+      :custom-actions="[
+        {
+          title: '⚙️ عملیات',
+          component: (props) => h(Reference, { ...props, onSuccess: handleReferenceSuccess }),
+        },
+        {
+          title: '✍️امضا',
+          component: (props) => h(Sign, { ...props, onSuccess: handleReferenceSuccess }),
+        },
+        {
+          title: '📑 لیست مدارک',
+          component: (props) =>
+            h(UploadList, {
+              ...props,
+              cartableId: props.item.id,
+              trackingCode: props.item.trackingCode,
+              loanRequestId: props.item.loanRequestId
+            })
+        },
+        {
+          title: '💬 مشاهده نظرات',
+          component: (props) =>
+            h(SignList, {
+              ...props,
+              item: props.item,
+              onSuccess: handleReferenceSuccess
+            }),
+        },
+        {
+          title: 'گزارش کارشناسی',
+          component: (props) =>
+            h(ExpertReport, {
+              ...props,
+              item: props.item,
+              cartableId: props.item.id,
+              onSuccess: handleReferenceSuccess
+            }),
+        },
+        {
+          title: '📜 تاریخچه کارتابل',
+          component: CartableHistory,
+        },
+        {
+          title: '📜 تاریخچه درخواست مصوبه',
+          component: LoanRequestHistory,
+        }
+      ]"
     />
   </div>
 </template>

@@ -1769,10 +1769,14 @@ const handleFilterApply = (filterData: any) => {
 }
 
 .selected-actions {
+  width: 100vw;
   display: flex;
   align-items: center;
   gap: 2px;
   border-radius: 8px;
+  margin-top: 5px;
+  flex-wrap: wrap;
+  flex-direction: row-reverse;
 }
 
 :deep(.v-data-table__wrapper table thead) {
