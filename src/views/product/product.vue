@@ -50,6 +50,9 @@ const tableRef = ref();
 function handleReferenceSuccess() {
   tableRef.value?.fetchData();
 }
+const routes = {
+  'asdasd' : 'asdasdasd'
+}
 </script>
 
 <template>
@@ -65,6 +68,9 @@ function handleReferenceSuccess() {
       :auto-fetch="true"
       :show-pagination="true"
       :show-refresh-button="true"
+      :bulk-mode="true"
+      :selectable="true"
+      :routes="routes"
     />
   </div>
 </template>

@@ -96,6 +96,7 @@ interface Props {
   defaultExpanded?: boolean; // Whether groups are expanded by default
   defaultSelected?: string; // Property name to check for auto-selection (e.g., 'isSelected')
   dateWithTimezone?: boolean; // If true, save dates with local timezone offset at midnight
+  bulkMode?: boolean; // Show action buttons at top with radio selection (single item)
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -108,7 +109,8 @@ const props = withDefaults(defineProps<Props>(), {
   uniqueKey: 'id',
   pageSize: 10,
   defaultExpanded: false,
-  dateWithTimezone: false
+  dateWithTimezone: false,
+  bulkMode: false
 });
 
 const emit = defineEmits<{
@@ -143,11 +145,24 @@ const hasMore = ref(true);
 
 // Selection & grouping using composable (minimal-risk wiring)
 const selection = useTableSelection(items, {
-  multiSelect: props.multiSelect,
+  multiSelect: props.bulkMode ? false : props.multiSelect, // Force single select in bulk mode
   uniqueKey: props.uniqueKey as any,
   groupBy: props.groupBy as any,
   defaultExpanded: props.defaultExpanded
 });
+
+// Override toggleSelection in bulk mode to ensure single selection
+const originalToggleSelection = selection.toggleSelection;
+selection.toggleSelection = (item: any) => {
+  if (props.bulkMode) {
+    // In bulk mode, always clear and select only this item
+    selection.clearSelection();
+    selection.selectedItems.value = [item];
+  } else {
+    // Normal behavior for non-bulk mode
+    originalToggleSelection(item);
+  }
+};
 const selectedItems = selection.selectedItems;
 const selectAll = computed({
   get: () => selection.allSelected.value,
@@ -166,6 +181,11 @@ const expandedGroups = selection.expandedGroups;
 
 // Computed flag to determine if any actions should be shown
 const hasAnyActions = computed(() => {
+  // If bulkMode is true, don't show actions column in table
+  if (props.bulkMode) {
+    return false;
+  }
+  
   const hasCrudActions = Array.isArray(props.actions) && props.actions.length > 0;
   const hasRoutes = !!props.routes && (typeof props.routes === 'function' || Object.keys(props.routes).length > 0);
   const hasDownloadLinks = !!props.downloadLink && Object.keys(props.downloadLink).length > 0;
@@ -440,6 +460,22 @@ const clearSelection = () => {
   emit('update:selectedItems', selectedItems.value);
   emit('selection-change', selectedItems.value);
 };
+
+// Method for single item selection in bulk mode
+const selectSingleItem = (item: any) => {
+  // Clear all selections first
+  selection.clearSelection();
+  // Force select only this item (don't use toggle)
+  selection.selectedItems.value = [item];
+  // Emit the change
+  emit('update:selectedItems', selectedItems.value);
+  emit('selection-change', selectedItems.value);
+};
+
+// Computed for radio group value
+const radioGroupValue = computed(() => {
+  return selectedItems.value.length > 0 ? getUniqueValue(selectedItems.value[0]) : null;
+});
 
 // Memoize computed properties
 const cleanFilterModel = computed(() => {
@@ -1073,6 +1109,7 @@ const handleFilterApply = (filterData: any) => {
   debouncedFetchData();
   filterDialog.value = false;
 };
+
 </script>
 
 <template>
@@ -1091,6 +1128,84 @@ const handleFilterApply = (filterData: any) => {
     <div v-if="props.selectable && hasSelection" class="selection-actions">
       <v-chip color="primary" class="me-2"> {{ selectedCount }} آیتم انتخاب شده </v-chip>
       <v-btn color="orange" size="small" class="me-2" @click="clearSelection"> پاک کردن انتخاب </v-btn>
+    </div>
+
+    <!-- Action Buttons for Selected Items -->
+    <div v-if="props.bulkMode && hasSelection" class="selected-actions">
+      <!-- Individual Actions for Selected Items -->
+      <template v-for="item in selectedItems" :key="getUniqueValue(item)">
+        <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="me-2" @click="openDialog(item)">
+          <span class="me-1">✏️</span>
+          ویرایش
+        </v-btn>
+        
+        <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="me-2" @click="openDeleteDialog(item)">
+          <span class="me-1">🗑️</span>
+          حذف
+        </v-btn>
+        
+        <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="me-2" @click="goToRoute('view', item)">
+          <span class="me-1">👁️</span>
+          نمایش
+        </v-btn>
+        
+        <!-- Route Actions -->
+        <template v-for="(routePath, routeKey) in props.routes" :key="routeKey">
+          <v-btn color="indigo" size="small" class="me-2" @click="goToRoute(routeKey, item)">
+            <span class="me-1">➡️</span>
+            {{ String(routeKey).toUpperCase() }}
+          </v-btn>
+        </template>
+        
+        <!-- Download Actions -->
+        <v-btn v-for="(value, key) in props.downloadLink" size="small" class="me-2" :key="key" @click="download(key, item)">
+          <span class="me-1">⬇️</span>
+          {{ key }}
+        </v-btn>
+        
+        <!-- Custom Actions -->
+        <template v-for="(action, index) in props.customActions" :key="action.title || index">
+          <v-btn
+            v-if="!action.condition || action.condition(item)"
+            color="orange"
+            size="small"
+            class="me-2"
+            @click="openCustomActionDialog(action, item)"
+          >
+            <span class="me-1">⚙️</span>
+            {{ action.title }}
+          </v-btn>
+        </template>
+        
+        <!-- Custom Buttons -->
+        <template v-if="props.customButtonsFn">
+          <v-btn
+            v-for="button in props.customButtonsFn(item)"
+            :key="button.label"
+            :color="button.color || 'primary'"
+            size="small"
+            class="me-2"
+            :disabled="button.disabled"
+            @click="button.onClick(item)"
+          >
+            <span v-if="(button as any).icon" class="me-1">{{ (button as any).icon }}</span>
+            {{ button.label }}
+          </v-btn>
+        </template>
+        <template v-else>
+          <v-btn
+            v-for="button in props.customButtons"
+            :key="button.label"
+            :color="button.color || 'primary'"
+            size="small"
+            class="me-2"
+            @click="button.onClick(item)"
+          >
+            <span v-if="(button as any).icon" class="me-1">{{ (button as any).icon }}</span>
+            {{ button.label }}
+          </v-btn>
+        </template>
+      </template>
     </div>
   </div>
 
@@ -1167,9 +1282,19 @@ const handleFilterApply = (filterData: any) => {
                              : {})
                          }"
                       >
-                        <!-- Selection Checkbox -->
+                        <!-- Selection Checkbox/Radio -->
                         <template v-if="column.key === 'selection'">
+                          <v-radio
+                            v-if="props.bulkMode"
+                            :model-value="radioGroupValue"
+                            :value="getUniqueValue(item)"
+                            @click="selectSingleItem(item)"
+                            :disabled="!props.selectable"
+                            hide-details
+                            density="compact"
+                          />
                           <v-checkbox
+                            v-else
                             :model-value="isSelected(item)"
                             @update:model-value="toggleSelection(item)"
                             :disabled="!props.selectable"
@@ -1290,9 +1415,19 @@ const handleFilterApply = (filterData: any) => {
                  ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
                }"
             >
-              <!-- Selection Checkbox -->
+              <!-- Selection Checkbox/Radio -->
               <template v-if="column.key === 'selection'">
+                <v-radio
+                  v-if="props.bulkMode"
+                  :model-value="radioGroupValue"
+                  :value="getUniqueValue(item)"
+                  @click="selectSingleItem(item)"
+                  :disabled="!props.selectable"
+                  hide-details
+                  density="compact"
+                />
                 <v-checkbox
+                  v-else
                   :model-value="isSelected(item)"
                   @update:model-value="toggleSelection(item)"
                   :disabled="!props.selectable"
@@ -1474,7 +1609,6 @@ const handleFilterApply = (filterData: any) => {
   background: rgb(var(--v-theme-surface));
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgb(var(--v-theme-borderLight));
 }
 
 /* Grouped Table Styles */
@@ -1632,6 +1766,13 @@ const handleFilterApply = (filterData: any) => {
   display: flex;
   align-items: center;
   margin-left: auto;
+}
+
+.selected-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 8px;
 }
 
 :deep(.v-data-table__wrapper table thead) {
