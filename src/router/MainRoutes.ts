@@ -3,7 +3,6 @@ const MainRoutes = {
   meta: {
     requiresAuth: false
   },
-  redirect: '/main/approval',
   component: () => import('@/layouts/full/FullLayout.vue'),
   children: [
     {
