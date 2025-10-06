@@ -47,6 +47,10 @@ const steps = [
     section: defineAsyncComponent(() => import('./creditApproval/CreditApprovalForm.vue'))
   },
   {
+    title: 'درخواست متقاضی',
+    section: defineAsyncComponent(() => import('./applicantRequest/applicantRequest.vue'))
+  },
+  {
     title: 'مشخصات پيشنهاد اعتباري',
     section: defineAsyncComponent(() => import('./creditOffer/creditOffer.vue'))
   },
@@ -57,6 +61,10 @@ const steps = [
   {
     title: 'مصوبات اخیر',
     section: defineAsyncComponent(() => import('./recentApproval/recentApproval.vue'))
+  },
+  {
+    title: 'سایر شرایط و ملاحضات',
+    section: defineAsyncComponent(() => import('./conditions/conditions.vue'))
   },
   {
     title: 'مشاهده گزارش پیش مصوبه',
@@ -141,7 +149,7 @@ onMounted(async () => {
   try {
     const response = await api.cartable.getLoanRequestId(id as string);
     if (response.status === 200 && response.data) {
-      loanRequestId.value = response.data;
+      loanRequestId.value = String(response.data);
       console.log('Loan Request ID:', loanRequestId.value);
     }
   } catch (err) {

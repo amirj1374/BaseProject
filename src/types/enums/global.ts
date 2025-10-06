@@ -191,7 +191,8 @@ export const CustomerTypeOptions = [
 
 // customer type enum
 export const RoleTypeEnum = {
-  SMPUSER	: 'SMPUSER',
+  SMPUSER : 'SMPUSER',
+  SMPUSERREGION : 'SMPUSERREGION',
   SMPADMIN: 'SMPADMIN',
   SMPSIGNER: 'SMPSIGNER',
   SMPCOORDINATOR: 'SMPCOORDINATOR',
@@ -212,7 +213,8 @@ export const RoleTypeEnum = {
 export type RoleType = (typeof RoleTypeEnum)[keyof typeof RoleTypeEnum];
 
 export const RoleTypeOptions = [
-  { title: 'کارشناس سماپ-شعبه/منطقه', value: RoleTypeEnum.SMPUSER},
+  { title: 'کارشناس سماپ-شعبه', value: RoleTypeEnum.SMPUSER},
+  { title: 'کارشناس سماپ-منطقه', value: RoleTypeEnum.SMPUSERREGION},
   { title: 'ادمین سامانه سماپ', value: RoleTypeEnum.SMPADMIN },
   { title: 'امضادار سماپ-شعبه/منطقه', value: RoleTypeEnum.SMPSIGNER },
   { title: 'دبیر سامانه سماپ-شعبه/منطقه', value: RoleTypeEnum.SMPCOORDINATOR },

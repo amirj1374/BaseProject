@@ -26,7 +26,7 @@ const SilverTheme: ThemeTypes = {
     darksecondary: '#64748b', // Slate 500
     borderLight: '#e2e8f0', // Slate 200 - light border
     inputBorder: '#cbd5e1', // Slate 300 - input border
-    containerBg: '#f8fafc', // Slate 50 - container background
+    containerBg: '#e1ecfb', // Slate 50 - container background
     surface: '#ffffff', // White
     'on-surface-variant': '#ffffff', // White
     facebook: '#4267b2',

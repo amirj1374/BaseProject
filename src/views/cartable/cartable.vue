@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import { ref, h } from 'vue';
+import { ref, h, computed } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import Reference from '@/components/sections/cartable/reference/Reference.vue';
 import CartableHistory from '@/components/sections/cartable/cartableHistory/cartableHistory.vue';
@@ -92,7 +92,6 @@ const header = ref([
     key: 'branchName',
     sortable: true,
     editable: true,
-    width: 200
   },
   {
     title: 'کد شعبه ثبت کننده درخواست',
@@ -124,19 +123,36 @@ const preApprovalReport = {
 };
 const directiveReport = {
   'گزارش ابلاغیه': 'directiveReport/{id}'
-}
+};
 
 const regionPreApprovalReport = {
   'گزارش پیش مصوبه منطقه': 'regionPreApprovalReport/{id}'
-}
+};
 
-const changeSigner = {
-  'تغییر امضا داران': 'signer/{id}'
+const flowReport = {
+  'گزارش عملیات ' : 'flowReport/{id}'
 }
 
 function handleReferenceSuccess() {
   tableRef.value?.fetchData();
 }
+
+// Function for routes that can access item data
+const getDynamicRoutes = (item: any) => {
+  const baseRoutes: Record<string, string> = {
+    ...(permissionsStore.hasMenuPermission('preApprovalReport') ? preApprovalReport : {}),
+    ...(permissionsStore.hasMenuPermission('directiveReport') ? directiveReport : {}),
+    ...(permissionsStore.hasMenuPermission('regionPreApprovalReport') ? regionPreApprovalReport : {}),
+    ...(permissionsStore.hasMenuPermission('') ? flowReport : {})
+  };
+
+  // Add changeSigner route only if permission exists AND item allows it
+  if (permissionsStore.hasMenuPermission('changeSigner') && item.canChangeSigner === true) {
+    baseRoutes['تغییر امضا داران'] = 'signer/{id}';
+  }
+
+  return baseRoutes;
+};
 </script>
 
 <template>
@@ -196,21 +212,16 @@ function handleReferenceSuccess() {
         },
         {
           title: '📜 تاریخچه کارتابل',
-          component: CartableHistory
+          component: CartableHistory,
+          condition: (item) => permissionsStore.hasMenuPermission('cartable_history')
         },
         {
           title: '📜 تاریخچه درخواست مصوبه',
-          component: LoanRequestHistory
-        },
+          component: LoanRequestHistory,
+          condition: (item) => permissionsStore.hasMenuPermission('approval_history')
+        }
       ]"
-
-      :routes="{
-        ...(permissionsStore.hasMenuPermission('preApprovalReport') ? preApprovalReport : {}),
-        ...(permissionsStore.hasMenuPermission('directiveReport') ? directiveReport : {}),
-        ...(permissionsStore.hasMenuPermission('regionPreApprovalReport') ? regionPreApprovalReport : {}),
-        ...(permissionsStore.hasMenuPermission('') ? changeSigner : {}),
-
-      }"
+      :routes="getDynamicRoutes"
     />
   </div>
 </template>

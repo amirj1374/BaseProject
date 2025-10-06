@@ -8,7 +8,7 @@ import type { CustomizerDTO } from '@/types/models/person';
 const customizer = useCustomizerStore();
 
 // Font Family options
-const fontFamily = ref(['vazir', 'yekanLight', 'iranSans', 'kalamehLight']);
+const fontFamily = ref(['vazir', 'yekanLight', 'iranSans', 'kalamehLight', 'IranNastaliq', 'Massir']);
 const snackbarMessage = ref('')
 const snackbarColor = ref('')
 const snackbar = ref(false);
@@ -35,7 +35,7 @@ const validThemes = [
 const validLayoutTypes = ['SideBar', 'NavBar'];
 
 // Valid font themes
-const validFontThemes = ['vazir', 'yekanLight', 'iranSans', 'kalamehLight'];
+const validFontThemes = ['vazir', 'yekanLight', 'iranSans', 'kalamehLight', 'IranNastaliq', 'Massir'];
 
 // Valid theme modes
 const validThemeModes = ['light', 'dark'];
@@ -220,7 +220,9 @@ function getFontDisplayName(font: string): string {
     vazir: 'بانک پارسیان',
     yekanLight: 'بانک پارسیان',
     iranSans: 'بانک پارسیان',
-    kalamehLight: 'بانک پارسیان'
+    kalamehLight: 'بانک پارسیان',
+    IranNastaliq: 'بانک پارسیان',
+    Massir: 'بانک پارسیان'
   };
   return fontNames[font] || font;
 }

@@ -54,6 +54,31 @@ const downloadExpertReport = async () => {
     }
   }
 };
+const downloadDirectiveReport = async () => {
+  if (props.item.expertReportUrl) {
+    try {
+      // Fetch the file
+      const response = await fetch(props.item.formLetterUrl);
+      const blob = await response.blob();
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'expert-report.pdf';
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading expert report:', error);
+      // Fallback to opening in new tab
+      window.open(props.expertReportUrl, '_blank');
+    }
+  }
+};
 
 const fetchValidUsers = async (selectedValue: string) => {
   const res = await api.cartable.getValidRoles(Number(selectedValue));
@@ -72,7 +97,7 @@ const fetchValidUsers = async (selectedValue: string) => {
 onMounted(async () => {
   await fetchValidUsers(id.value);
 });
-
+const required = (v: any) => !!v || 'این فیلد الزامی است';
 // When action changes, auto-select its first role (from roleOptions)
 watch(selectedAction, () => {
   if (roleOptions.value.length > 0) {
@@ -180,6 +205,24 @@ const userSelectionHelperText = computed(() => {
   return '';
 });
 
+// Check if all required fields are valid
+const isFormValid = computed(() => {
+  // Check if action is selected
+  if (!selectedAction.value) return false;
+  
+  // Check if role is selected
+  if (!selectedRole.value) return false;
+  
+  // Check if users are selected and meet validation requirements
+  if (userSelectionError.value) return false;
+  
+  // If role has minimum user requirements, ensure users are selected
+  const minUsers = selectedRole.value.minUserNumber || 0;
+  if (minUsers > 0 && selectedValidUser.value.length < minUsers) return false;
+  
+  return true;
+});
+
 const handleValidUser = async (role: ValidRole) => {
   if (!role || !selectedAction.value) return;
   const res = await api.cartable.getValidUser({
@@ -283,6 +326,7 @@ watch(validUserOptions, (newOptions) => {
           :hint="userSelectionHelperText"
           persistent-hint
           :color="userSelectionError ? 'error' : 'primary'"
+          :rules="[required]"
         />
       </v-col>
     </v-row>
@@ -303,6 +347,9 @@ watch(validUserOptions, (newOptions) => {
       </v-col>
     </v-row>
     <v-row>
+      <v-col cols="12" md="3" v-if="props.item.formLetterUrl && permissionsStore.hasMenuPermission('downloadDirectiveReport')">
+        <v-btn color="info" @click="downloadDirectiveReport" variant="tonal"> دانلود گزارش ابلاغیه </v-btn>
+      </v-col>
       <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('downloadExpertReport')">
         <v-btn color="info" @click="downloadExpertReport" variant="tonal"> دانلود گزارش کارشناسی </v-btn>
       </v-col>
@@ -321,7 +368,7 @@ watch(validUserOptions, (newOptions) => {
     </v-row>
     <v-row>
       <v-col cols="12" md="12" style="display: flex; justify-content: center; gap: 10px">
-        <v-btn variant="tonal" @click="confirmDialog = true" color="primary" :loading="loading">تایید</v-btn>
+        <v-btn variant="tonal" @click="confirmDialog = true" color="primary" :loading="loading" :disabled="!isFormValid">تایید</v-btn>
         <v-btn color="error" @click="emit('close')">انصراف</v-btn>
       </v-col>
     </v-row>

@@ -11,7 +11,8 @@ const GreenLicenseComponent = defineAsyncComponent(() => import('@/components/se
 
 // Props
 const props = defineProps<{
-  loanRequestId: string;
+  loanRequestId?: string;
+  cartableId?: string;
 }>();
 
 // Tab Management
@@ -42,12 +43,35 @@ const hasAnyData = computed(() => {
          greenLicenseData.value.length > 0;
 });
 
+// Computed property to determine request type
+const requestType = computed(() => {
+  if (props.loanRequestId) return 'Loan Request';
+  if (props.cartableId) return 'Cartable Request';
+  return 'Unknown';
+});
+
 // Fetch data from API
 const fetchApprovalRequestData = async () => {
   try {
     loading.value = true;
-    const response = await api.cartable.getLoanRequestDetail(props.loanRequestId);
-    if (response.status === 200 && response.data) {
+    
+    // Validate that at least one prop is provided
+    if (!props.loanRequestId && !props.cartableId) {
+      throw new Error('Either loanRequestId or cartableId must be provided');
+    }
+    
+    let response;
+    
+    // Fetch data based on which prop is provided
+    if (props.loanRequestId) {
+      console.log('Fetching loan request detail for ID:', props.loanRequestId);
+      response = await api.cartable.getLoanRequestDetail(props.loanRequestId);
+    } else if (props.cartableId) {
+      console.log('Fetching cartable detail for ID:', props.cartableId);
+      response = await api.cartable.getCarableIdtDetail(props.cartableId);
+    }
+    
+    if (response && response.status === 200 && response.data) {
       const data = response.data;
       facilitiesData.value = data.facilities ? [data.facilities] : [];
       guaranteeData.value = data.guarantee ? [data.guarantee] : [];
@@ -148,8 +172,21 @@ watch([facilitiesRef, guaranteeRef, lcRef, greenLicenseRef], async () => {
   }
 }, { immediate: true });
 
+// Watch for prop changes and refetch data
+watch(
+  () => [props.loanRequestId, props.cartableId],
+  () => {
+    if (props.loanRequestId || props.cartableId) {
+      fetchApprovalRequestData();
+    }
+  },
+  { immediate: true }
+);
+
 onMounted(async () => {
-  await fetchApprovalRequestData();
+  if (props.loanRequestId || props.cartableId) {
+    await fetchApprovalRequestData();
+  }
 });
 </script>
 

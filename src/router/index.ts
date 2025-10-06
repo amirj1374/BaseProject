@@ -8,15 +8,7 @@ import envConfig from '@/config/envConfig';
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/',
-      redirect: '/main'
-    },
-    {
-      path: '/test-keycloak',
-      component: () => import('@/views/test-keycloak.vue'),
-      meta: { requiresAuth: false }
-    },
+
     {
       path: '/error/403',
       component: () => import('@/views/pages/maintenance/error/Error403Page.vue')
@@ -48,6 +40,17 @@ interface AuthStore {
 // Route permissions are defined per-route in route meta (meta.permission)
 
 router.beforeEach(async (to, from, next) => {
+  // Allow navigation to error and auth routes without initialization to avoid redirect loops
+  if (to.path.startsWith('/error') || to.path.startsWith('/auth')) {
+    return next();
+  }
+
+  // Wait for app initialization to complete before checking permissions
+  try {
+    await waitForInitialization();
+  } catch (error) {
+    // Redirect to error page only if we're not already heading there
+    return next('/error/403');
   // Skip auth checks for test page
   if (to.path === '/test-keycloak') {
     return next();

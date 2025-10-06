@@ -6,9 +6,9 @@ const MainRoutes = {
   component: () => import('@/layouts/full/FullLayout.vue'),
   children: [
     {
-      name: 'Dashboard',
       path: '/',
-      meta: { requiresAuth: true, permission: '' },
+      name: 'Dashboard',
+      meta: { requiresAuth: false, permission: '' },
       component: () => import('@/views/dashboards/default/Dashboard.vue')
     },
     {
@@ -85,9 +85,15 @@ const MainRoutes = {
     {
       name: 'changeSigner',
       path: '/signer/:id',
-      meta: { requiresAuth: false, permission: 'cartable' },
+      meta: { requiresAuth: false, permission: 'changeSigner' },
       component: () => import('@/components/sections/cartable/changeSigner/changeSigner.vue')
-    }
+    },
+    {
+      name: 'flowReport',
+      path: '/flowReport/:id',
+      meta: { requiresAuth: false, permission: '' },
+      component: () => import('@/views/flowReport/flowReport.vue')
+    },
   ]
 };
 

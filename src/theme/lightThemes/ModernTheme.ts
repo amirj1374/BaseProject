@@ -26,7 +26,7 @@ const ModernTheme: ThemeTypes = {
     darksecondary: '#7c3aed', // Purple 600
     borderLight: '#e5e7eb', // Gray 200
     inputBorder: '#d1d5db', // Gray 300
-    containerBg: '#f9fafb', // Gray 50
+    containerBg: '#e9f2ff', // Gray 50
     surface: '#ffffff', // White
     'on-surface-variant': '#ffffff', // White
     facebook: '#4267b2',

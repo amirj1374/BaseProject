@@ -5,6 +5,7 @@ import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import Reference from '@/components/sections/cartable/reference/Reference.vue';
 import { useRoute } from 'vue-router';
 import SelectSigner from '@/components/sections/cartable/changeSigner/selectSigner/SelectSigner.vue';
+import { BooleanEnumOptions } from '@/types/enums/global';
 
 const { id } = useRoute().params;
 const breadcrumbs = ref([
@@ -34,28 +35,24 @@ const header = ref([
     editable: true,
   },
   {
-    title: 'نوع عملیات',
-    key: 'actionType',
-    sortable: true,
-    editable: true,
-  },
-  {
-    title: 'نام عملیات',
+    title: 'نام اقدام',
     key: 'actionTypeName',
     sortable: true,
     editable: true,
   },
   {
-    title: 'تایید عملیات',
-    key: 'actionDoneAt',
+    title: 'وضعیت اقدام',
+    key: 'actionDone',
     sortable: true,
     editable: true,
+    translate: true,
+    options: BooleanEnumOptions
   },
 ]);
 
 const tableRef = ref();
 
-function handleReferenceSuccess() {
+function handleChangeSignerSuccess() {
   tableRef.value?.fetchData();
 }
 </script>
@@ -75,7 +72,7 @@ function handleReferenceSuccess() {
       :custom-actions="[
         {
           title: '⚙️ تغییر امضا دار',
-          component: (props) => h(SelectSigner, { ...props, onSuccess: handleReferenceSuccess }),
+          component: (props) => h(SelectSigner, { ...props, id: id, onSuccess: handleChangeSignerSuccess }),
         },
       ]"
     />

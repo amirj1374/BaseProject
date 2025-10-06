@@ -26,7 +26,7 @@ const PurpleTheme: ThemeTypes = {
     darksecondary: '#4527a0',
     borderLight: '#d0d0d0',
     inputBorder: '#787878',
-    containerBg: '#eef2f6',
+    containerBg: '#eef6ff',
     surface: '#fff',
     'on-surface-variant': '#fff',
     facebook: '#4267b2',

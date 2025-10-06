@@ -159,7 +159,7 @@ export function useTableSelection<T extends Record<string, any> = Record<string,
 
   // Get group label
   const getGroupLabel = (groupKey: string | number, groupItems: T[]): string => {
-    return `${String(groupKey)} (${groupItems.length} items)`;
+    return `${String(groupKey)} (${groupItems.length} رکورد)`;
   };
 
   // Watch for changes in items and group them if needed
