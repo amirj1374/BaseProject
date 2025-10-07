@@ -1175,9 +1175,10 @@ const handleFilterApply = (filterData: any) => {
     </div>
 
     <!-- Action Buttons for Selected Items -->
-    <div v-if="props.bulkMode && hasValidSelection" class="selected-actions">
-      <!-- Individual Actions for Selected Items -->
-      <template v-for="item in validSelectedItems" :key="getUniqueValue(item)">
+    <transition name="slide-left" appear>
+      <div v-if="props.bulkMode && hasValidSelection" class="selected-actions">
+        <!-- Individual Actions for Selected Items -->
+        <template v-for="item in validSelectedItems" :key="getUniqueValue(item)">
         <!-- CRUD Actions -->
         <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="me-2" @click="openDialog(item)">
           <span class="me-1">✏️</span>
@@ -1250,7 +1251,8 @@ const handleFilterApply = (filterData: any) => {
           </v-btn>
         </template>
       </template>
-    </div>
+      </div>
+    </transition>
   </div>
 
   <!-- Data Table Container (fills parent height) -->
@@ -1862,5 +1864,30 @@ const handleFilterApply = (filterData: any) => {
 
 :deep(.v-data-table__wrapper tbody tr:nth-child(odd)) {
   background: rgb(var(--v-theme-surface)) !important;
+}
+
+/* Slide transition for bulk mode actions */
+.slide-left-enter-active {
+  transition: all 1.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-left-leave-active {
+  transition: all 1.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-left-enter-from {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.slide-left-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.slide-left-enter-to,
+.slide-left-leave-from {
+  transform: translateX(0);
+  opacity: 1;
 }
 </style>

@@ -53,7 +53,7 @@ const header = ref([
     width: 200,
   },
   {
-    title: 'تاریج ویرایش',
+    title: 'تاریخ ویرایش',
     key: 'updatedAt',
     sortable: true,
     width: 200,

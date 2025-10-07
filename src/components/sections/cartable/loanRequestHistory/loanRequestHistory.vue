@@ -16,6 +16,13 @@ const header = ref([
     width: 200,
   },
   {
+    title: 'نوع درخواست',
+    key: 'requestType',
+    sortable: true,
+    editable: true,
+    width: 200,
+  },
+  {
     title: 'شماره مشتری',
     key: 'cif',
     sortable: true,

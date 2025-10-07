@@ -156,7 +156,7 @@ const getDynamicRoutes = (item: any) => {
   };
 
   // Add changeSigner route only if permission exists AND item allows it
-  if (permissionsStore.hasMenuPermission('changeSigner') && item.canChangeSigner) {
+  if (permissionsStore.hasMenuPermission('changeSigner') && item.canChangeSigner === true) {
     baseRoutes['تغییر امضا داران'] = 'signer/{id}';
   }
 
@@ -259,12 +259,12 @@ function getCustomButtons(cartable: Cartable) {
         {
           title: '⚙️ عملیات',
           component: (props) => h(Reference, { ...props, onSuccess: handleReferenceSuccess }),
-          condition: (item) => item.canSubmit
+          condition: (item) => item.canSubmit === true
         },
         {
           title: '✍️امضا',
           component: (props) => h(Sign, { ...props, onSuccess: handleReferenceSuccess }),
-          condition: (item) => item.hasSignPermission
+          condition: (item) => item.hasSignPermission === true
         },
         {
           title: '📑 لیست مدارک',
@@ -284,7 +284,7 @@ function getCustomButtons(cartable: Cartable) {
               item: props.item,
               onSuccess: handleReferenceSuccess
             }),
-          condition: (item) => item.mainAssignee && item.commiteInquiries !== null
+          condition: (item) => item.mainAssignee === true && item.commiteInquiries !== null
         },
         {
           title: 'گزارش کارشناسی',
