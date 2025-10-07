@@ -89,8 +89,14 @@ const MainRoutes = {
       component: () => import('@/components/sections/cartable/changeSigner/changeSigner.vue')
     },
     {
+      name: 'flowReportDetail',
+      path: '/flowReportDetail/:id',
+      meta: { requiresAuth: false, permission: '' },
+      component: () => import('@/views/flowReportDetail/flowReportDetail.vue')
+    },
+    {
       name: 'flowReport',
-      path: '/flowReport/:id',
+      path: '/flowReport',
       meta: { requiresAuth: false, permission: '' },
       component: () => import('@/views/flowReport/flowReport.vue')
     },

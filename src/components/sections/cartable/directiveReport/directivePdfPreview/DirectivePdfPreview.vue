@@ -95,7 +95,7 @@ const router = useRouter();
 
 // Reactive state
 const pdfUrl = ref<string>('');
-const pdfTitle = ref<string>('گزارش پیش مصوبه');
+const pdfTitle = ref<string>('گزارش ابلاغیه');
 const generating = ref(false);
 const downloading = ref(false);
 const showSuccess = ref(false);
@@ -158,7 +158,7 @@ const generatePdf = async () => {
         throw new Error('PDF data not found in response. Please check the API response format.');
       }
 
-      pdfTitle.value = `گزارش پیش مصوبه - ${props.cartableId}`;
+      pdfTitle.value = `گزارش ابلاغیه - ${props.cartableId}`;
     } else {
       throw new Error('Failed to generate PDF report - Invalid response');
     }

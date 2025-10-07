@@ -92,3 +92,77 @@ export interface CartableHistory {
   updatedAt: string | null;
   updatedBy: string | null;
 }
+
+// Committee inquiry action types
+export type CommitteeActionType = 'AGREED' | 'DISAGREED' | 'RETURNED';
+
+// Committee inquiry interface
+export interface CommitteeInquiry {
+  id: number;
+  username: string;
+  name: string;
+  actionDone: boolean;
+  actionType: CommitteeActionType;
+  actionTypeName: string;
+  comment: string | null;
+  actionDoneAt: string;
+}
+
+// Main Cartable interface based on the provided JSON
+export interface Cartable {
+  // Base fields
+  id: number;
+  trackingCode: string;
+  loanRequestId: number;
+  status: string;
+  
+  // Timestamps
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  updatedBy: string | null;
+  
+  // Dates and times
+  creationDate: string;
+  creationTime: string;
+  updateDate: string;
+  updateTime: string;
+  requestDate: string;
+  signDate: string | null;
+  correctionDeadline: string | null;
+  
+  // User information
+  createdByUsername: string;
+  createByName: string;
+  roleName: string | null;
+  description: string | null;
+  
+  // Branch information
+  branchCode: number;
+  branchName: string;
+  
+  // Customer information
+  customerCode: string;
+  customerName: string;
+  customerGroup: string;
+  customerType: 'Corporate' | 'Individual';
+  
+  // File URLs
+  expertReportUrl: string | null;
+  report1016Url: string | null;
+  formLetterUrl: string | null;
+  formCreditApprovalUrl: string | null;
+  
+  // Permissions and flags
+  hasSignPermission: boolean;
+  canAddComment: boolean;
+  canSubmit: boolean;
+  canChangeSigner: boolean;
+  isExpertSeen: boolean;
+  committeeTask: boolean;
+  mainAssignee: boolean;
+  
+  // Comments and inquiries
+  currentUserComment: string | null;
+  commiteInquiries: CommitteeInquiry[];
+}
