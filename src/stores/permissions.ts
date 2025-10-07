@@ -53,7 +53,7 @@ export const usePermissionsStore = defineStore({
       },
       {
         menuKey: 'preApprovalReport',
-        requiredRoles: ['SMP_PRE_APPROVAL_RPT']
+        requiredRoles: ['SMP_DL_DIRECTIVE_RPT']
       },
       {
         menuKey: 'cartableReport',
@@ -81,11 +81,11 @@ export const usePermissionsStore = defineStore({
       },
       {
         menuKey: 'regionPreApprovalReport',
-        requiredRoles: ['SMP_REGION_PRE_APPROVAL_RPT']
+        requiredRoles: ['SMP_DL_REGION_RPT']
       },
       {
         menuKey: 'directiveReport',
-        requiredRoles: ['SMP_DIRECTIVE_RPT']
+        requiredRoles: ['SMP_DL_DIRECTIVE_RPT']
       },
       {
         menuKey: 'uploadExpertReport',
@@ -94,6 +94,26 @@ export const usePermissionsStore = defineStore({
       {
         menuKey: 'changeSigner',
         requiredRoles: ['SMP_CHANGE_SIGNER']
+      },
+      {
+        menuKey: 'regenerate1016',
+        requiredRoles: ['SMP_REGEN_1016']
+      },
+      {
+        menuKey: 'regenerateRegionApproval',
+        requiredRoles: ['SMP_REGEN_REGION_RPT']
+      },
+      {
+        menuKey: 'regeneratePreApproval',
+        requiredRoles: ['SMP_REGEN_PRE_APPROVAL_RPT']
+      },
+      {
+        menuKey: 'regenerateDirective',
+        requiredRoles: ['SMP_REGEN_DIRECTIVE_RPT']
+      },
+      {
+        menuKey: 'approvalSignerReport',
+        requiredRoles: ['SMP_APPROVAL_SIGNER_RPT']
       }
     ] as MenuPermission[]
   }),
@@ -102,25 +122,21 @@ export const usePermissionsStore = defineStore({
     // Check if user has permission for a specific menu
     hasMenuPermission: (state) => (menuKey: string) => {
       const customerInfo = useCustomerInfoStore();
-      const permission = state.menuPermissions.find(p => p.menuKey === menuKey);
-      
+      const permission = state.menuPermissions.find((p) => p.menuKey === menuKey);
+
       if (!permission) return true; // If no permission defined, allow access
-      
+
       const userRoles = customerInfo.getUserRoles;
       const userLotusRoles = customerInfo.getLotusRoles;
-      
+
       // Check required roles
-      const hasRequiredRole = permission.requiredRoles.some(role => 
-        userRoles.includes(role)
-      );
-      
+      const hasRequiredRole = permission.requiredRoles.some((role) => userRoles.includes(role));
+
       // Check required lotus roles if defined
-      const hasRequiredLotusRole = permission.requiredLotusRoles 
-        ? permission.requiredLotusRoles.some(role => 
-            userLotusRoles.includes(role)
-          )
+      const hasRequiredLotusRole = permission.requiredLotusRoles
+        ? permission.requiredLotusRoles.some((role) => userLotusRoles.includes(role))
         : true;
-      
+
       return hasRequiredRole && hasRequiredLotusRole;
     },
 
@@ -128,21 +144,17 @@ export const usePermissionsStore = defineStore({
     getAvailableMenus: (state) => {
       const customerInfo = useCustomerInfoStore();
       if (!customerInfo.isUserInfoLoaded) return [];
-      
-      return state.menuPermissions.filter(permission => {
+
+      return state.menuPermissions.filter((permission) => {
         const userRoles = customerInfo.getUserRoles;
         const userLotusRoles = customerInfo.getLotusRoles;
-        
-        const hasRequiredRole = permission.requiredRoles.some(role => 
-          userRoles.includes(role)
-        );
-        
-        const hasRequiredLotusRole = permission.requiredLotusRoles 
-          ? permission.requiredLotusRoles.some(role => 
-              userLotusRoles.includes(role)
-            )
+
+        const hasRequiredRole = permission.requiredRoles.some((role) => userRoles.includes(role));
+
+        const hasRequiredLotusRole = permission.requiredLotusRoles
+          ? permission.requiredLotusRoles.some((role) => userLotusRoles.includes(role))
           : true;
-        
+
         return hasRequiredRole && hasRequiredLotusRole;
       });
     },
@@ -150,13 +162,13 @@ export const usePermissionsStore = defineStore({
     // Check if user has any of the specified roles
     hasAnyRole: () => (roles: string[]) => {
       const customerInfo = useCustomerInfoStore();
-      return roles.some(role => customerInfo.hasRole(role));
+      return roles.some((role) => customerInfo.hasRole(role));
     },
 
     // Check if user has any of the specified lotus roles
     hasAnyLotusRole: () => (roles: string[]) => {
       const customerInfo = useCustomerInfoStore();
-      return roles.some(role => customerInfo.hasLotusRole(role));
+      return roles.some((role) => customerInfo.hasLotusRole(role));
     }
   },
 
@@ -168,7 +180,7 @@ export const usePermissionsStore = defineStore({
 
     // Remove menu permission
     removeMenuPermission(menuKey: string) {
-      const index = this.menuPermissions.findIndex(p => p.menuKey === menuKey);
+      const index = this.menuPermissions.findIndex((p) => p.menuKey === menuKey);
       if (index !== -1) {
         this.menuPermissions.splice(index, 1);
       }
@@ -176,7 +188,7 @@ export const usePermissionsStore = defineStore({
 
     // Update menu permission
     updateMenuPermission(menuKey: string, permission: Partial<MenuPermission>) {
-      const index = this.menuPermissions.findIndex(p => p.menuKey === menuKey);
+      const index = this.menuPermissions.findIndex((p) => p.menuKey === menuKey);
       if (index !== -1) {
         this.menuPermissions[index] = { ...this.menuPermissions[index], ...permission };
       }

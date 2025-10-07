@@ -128,7 +128,7 @@ const header = ref([
 
 const tableRef = ref();
 const preApprovalReport = {
-  'گزارش پیش مصوبه': 'preApprovalReport/{id}'
+  'گزارش پیش مصوبه اعتبارات': 'preApprovalReport/{id}'
 };
 const directiveReport = {
   'گزارش ابلاغیه': 'directiveReport/{id}'
@@ -152,11 +152,11 @@ const getDynamicRoutes = (item: any) => {
     ...(permissionsStore.hasMenuPermission('preApprovalReport') ? preApprovalReport : {}),
     ...(permissionsStore.hasMenuPermission('directiveReport') ? directiveReport : {}),
     ...(permissionsStore.hasMenuPermission('regionPreApprovalReport') ? regionPreApprovalReport : {}),
-    ...(permissionsStore.hasMenuPermission('') ? flowReport : {})
+    ...(permissionsStore.hasMenuPermission('approvalSignerReport') ? flowReport : {})
   };
 
   // Add changeSigner route only if permission exists AND item allows it
-  if (permissionsStore.hasMenuPermission('changeSigner') && item.canChangeSigner === true) {
+  if (permissionsStore.hasMenuPermission('changeSigner') && item.canChangeSigner) {
     baseRoutes['تغییر امضا داران'] = 'signer/{id}';
   }
 
@@ -164,71 +164,77 @@ const getDynamicRoutes = (item: any) => {
 };
 function getCustomButtons(cartable: Cartable) {
   const buttons = [];
-  buttons.push({
-    label: '🔄 بروزرسانی فرم 1016',
-    color: 'white',
-    onClick: async () => {
-      try {
-        const response = await api.cartable.regenerate1016(cartable.loanRequestId);
-        console.log('Response:', response);
-        showSnackbar('فرم 1016 با موفقیت بروزرسانی شد', 'success')
-      } catch (error) {
-        console.error('Error in regenerate1016:', error);
-        showSnackbar('خطا در بروزرسانی فرم 1016', 'error')
-      }
-    },
-    disabled: false
-  });
+  if (permissionsStore.hasMenuPermission('regenerate1016')){
+    buttons.push({
+      label: '🔄 بروزرسانی فرم 1016',
+      color: 'white',
+      onClick: async () => {
+        try {
+          const response = await api.cartable.regenerate1016(cartable.loanRequestId);
+          console.log('Response:', response);
+          showSnackbar('فرم 1016 با موفقیت بروزرسانی شد', 'success')
+        } catch (error) {
+          console.error('Error in regenerate1016:', error);
+          showSnackbar('خطا در بروزرسانی فرم 1016', 'error')
+        }
+      },
+      disabled: false
+    });
+  }
 
-  buttons.push({
-    label: '🔄 بروزرسانی پیش مصوبه منطقه',
-    color: 'white',
-    onClick: async () => {
-      try {
-        const response = await api.cartable.regenerateReqionApprovalLetter(cartable.id);
-        console.log('Response:', response);
-        showSnackbar('گزارش پیش مصوبه منطقه با موفقیت بروزرسانی شد', 'success')
-      } catch (error) {
-        console.error('Error in regenerateReqionApprovalLetter:', error);
-        showSnackbar('خطا در بروزرسانی گزارش پیش مصوبه منطقه', 'error')
-      }
-    },
-    disabled: false
-  });
+  if (permissionsStore.hasMenuPermission('regenerateRegionApproval')){
+    buttons.push({
+      label: '🔄 بروزرسانی پیش مصوبه منطقه',
+      color: 'white',
+      onClick: async () => {
+        try {
+          const response = await api.cartable.regenerateReqionApprovalLetter(cartable.id);
+          console.log('Response:', response);
+          showSnackbar('گزارش پیش مصوبه منطقه با موفقیت بروزرسانی شد', 'success')
+        } catch (error) {
+          console.error('Error in regenerateReqionApprovalLetter:', error);
+          showSnackbar('خطا در بروزرسانی گزارش پیش مصوبه منطقه', 'error')
+        }
+      },
+      disabled: false
+    });
+  }
 
-  buttons.push({
-    label: '🔄 بروزرسانی گزارش پیش نویس مصوبه',
-    color: 'white',
-    onClick: async () => {
-      try {
-        const response = await api.cartable.regenerateCreditApprovals(cartable.id);
-        console.log('Response:', response);
-        showSnackbar('گزارش پیش نویس مصوبه با موفقیت بروزرسانی شد', 'success')
-      } catch (error) {
-        console.error('Error in regenerateCreditApprovals:', error);
-        showSnackbar('خطا در بروزرسانی گزارش پیش نویس مصوبه', 'error')
-      }
-    },
-    disabled: false
-  });
+  if (permissionsStore.hasMenuPermission('regeneratePreApproval')){
+    buttons.push({
+      label: '🔄 بروزرسانی گزارش پیش نویس مصوبه',
+      color: 'white',
+      onClick: async () => {
+        try {
+          const response = await api.cartable.regenerateCreditApprovals(cartable.id);
+          console.log('Response:', response);
+          showSnackbar('گزارش پیش نویس مصوبه با موفقیت بروزرسانی شد', 'success')
+        } catch (error) {
+          console.error('Error in regenerateCreditApprovals:', error);
+          showSnackbar('خطا در بروزرسانی گزارش پیش نویس مصوبه', 'error')
+        }
+      },
+      disabled: false
+    });
+  }
 
-  buttons.push({
-    label: '🔄 بروزرسانی گزارش ابلاغیه',
-    color: 'white',
-    onClick: async () => {
-      try {
-        const response = await api.cartable.regenerateCreditSuggestions(cartable.id);
-        console.log('Response:', response);
-        showSnackbar('گزارش ابلاغیه با موفقیت بروزرسانی شد', 'success')
-      } catch (error) {
-        console.error('Error in regenerateCreditSuggestions:', error);
-        showSnackbar('خطا در بروزرسانی گزارش ابلاغیه', 'error')
-      }
-    },
-    disabled: false
-  });
-
-
+  if (permissionsStore.hasMenuPermission('regenerateDirective')){
+    buttons.push({
+      label: '🔄 بروزرسانی گزارش ابلاغیه',
+      color: 'white',
+      onClick: async () => {
+        try {
+          const response = await api.cartable.regenerateCreditSuggestions(cartable.id);
+          console.log('Response:', response);
+          showSnackbar('گزارش ابلاغیه با موفقیت بروزرسانی شد', 'success')
+        } catch (error) {
+          console.error('Error in regenerateCreditSuggestions:', error);
+          showSnackbar('خطا در بروزرسانی گزارش ابلاغیه', 'error')
+        }
+      },
+      disabled: false
+    });
+  }
   return buttons;
 }
 </script>
@@ -253,12 +259,12 @@ function getCustomButtons(cartable: Cartable) {
         {
           title: '⚙️ عملیات',
           component: (props) => h(Reference, { ...props, onSuccess: handleReferenceSuccess }),
-          condition: (item) => item.canSubmit === true
+          condition: (item) => item.canSubmit
         },
         {
           title: '✍️امضا',
           component: (props) => h(Sign, { ...props, onSuccess: handleReferenceSuccess }),
-          condition: (item) => item.hasSignPermission === true
+          condition: (item) => item.hasSignPermission
         },
         {
           title: '📑 لیست مدارک',
@@ -278,7 +284,7 @@ function getCustomButtons(cartable: Cartable) {
               item: props.item,
               onSuccess: handleReferenceSuccess
             }),
-          condition: (item) => item.mainAssignee === true && item.commiteInquiries !== null
+          condition: (item) => item.mainAssignee && item.commiteInquiries !== null
         },
         {
           title: 'گزارش کارشناسی',
