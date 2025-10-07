@@ -454,6 +454,23 @@ const isSelected = (item: any) => selection.isSelected(item);
 const selectedCount = computed(() => selectedItems.value.length);
 const hasSelection = computed(() => selectedItems.value.length > 0);
 
+// Check if selected items are still present in current filtered data
+const validSelectedItems = computed(() => {
+  if (!props.selectable || !props.bulkMode) return selectedItems.value;
+  
+  // Filter selected items to only include those that exist in current items
+  return selectedItems.value.filter(selectedItem => {
+    const uniqueValue = getUniqueValue(selectedItem);
+    return items.value.some(item => getUniqueValue(item) === uniqueValue);
+  });
+});
+
+// Check if we have valid selections for bulk mode
+const hasValidSelection = computed(() => {
+  if (!props.selectable || !props.bulkMode) return hasSelection.value;
+  return validSelectedItems.value.length > 0;
+});
+
 // Clear selection method
 const clearSelection = () => {
   selection.clearSelection();
@@ -587,6 +604,33 @@ watch(
     // Refetch data with new page size
     debouncedFetchData();
   }
+);
+
+// Watch for items changes and clear invalid selections
+watch(
+  () => items.value,
+  (newItems) => {
+    if (props.selectable && props.bulkMode && selectedItems.value.length > 0) {
+      // Check if any selected items are no longer in the current data
+      const invalidSelections = selectedItems.value.filter(selectedItem => {
+        const uniqueValue = getUniqueValue(selectedItem);
+        return !newItems.some(item => getUniqueValue(item) === uniqueValue);
+      });
+      
+      // If there are invalid selections, remove them
+      if (invalidSelections.length > 0) {
+        const validSelections = selectedItems.value.filter(selectedItem => {
+          const uniqueValue = getUniqueValue(selectedItem);
+          return newItems.some(item => getUniqueValue(item) === uniqueValue);
+        });
+        
+        selectedItems.value = validSelections;
+        emit('update:selectedItems', selectedItems.value);
+        emit('selection-change', selectedItems.value);
+      }
+    }
+  },
+  { deep: true }
 );
 
 // Cleanup on component unmount
@@ -1127,13 +1171,13 @@ const handleFilterApply = (filterData: any) => {
     <!-- Selection Actions -->
     <div v-if="props.selectable && hasSelection" class="selection-actions">
       <v-chip color="primary" class="me-2"> {{ selectedCount }} آیتم انتخاب شده </v-chip>
-      <v-btn color="orange" size="small" class="me-2" @click="clearSelection"> پاک کردن انتخاب </v-btn>
+      <v-btn color="error" size="small" class="me-2" @click="clearSelection"> پاک کردن انتخاب </v-btn>
     </div>
 
     <!-- Action Buttons for Selected Items -->
-    <div v-if="props.bulkMode && hasSelection" class="selected-actions">
+    <div v-if="props.bulkMode && hasValidSelection" class="selected-actions">
       <!-- Individual Actions for Selected Items -->
-      <template v-for="item in selectedItems" :key="getUniqueValue(item)">
+      <template v-for="item in validSelectedItems" :key="getUniqueValue(item)">
         <!-- CRUD Actions -->
         <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="me-2" @click="openDialog(item)">
           <span class="me-1">✏️</span>

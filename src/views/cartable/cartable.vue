@@ -165,7 +165,7 @@ const getDynamicRoutes = (item: any) => {
 function getCustomButtons(cartable: Cartable) {
   const buttons = [];
   buttons.push({
-    label: 'بروزرسانی فرم 1016',
+    label: '🔄 بروزرسانی فرم 1016',
     color: 'white',
     onClick: async () => {
       try {
@@ -181,7 +181,7 @@ function getCustomButtons(cartable: Cartable) {
   });
 
   buttons.push({
-    label: 'بروزرسانی پیش مصوبه منطقه',
+    label: '🔄 بروزرسانی پیش مصوبه منطقه',
     color: 'white',
     onClick: async () => {
       try {
@@ -197,7 +197,7 @@ function getCustomButtons(cartable: Cartable) {
   });
 
   buttons.push({
-    label: 'بروزرسانی پیش نویس مصوبه',
+    label: '🔄 بروزرسانی گزارش پیش نویس مصوبه',
     color: 'white',
     onClick: async () => {
       try {
@@ -213,7 +213,7 @@ function getCustomButtons(cartable: Cartable) {
   });
 
   buttons.push({
-    label: 'بروزرسانی گزارش ابلاغیه',
+    label: '🔄 بروزرسانی گزارش ابلاغیه',
     color: 'white',
     onClick: async () => {
       try {
