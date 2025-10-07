@@ -152,4 +152,17 @@ export default (axiosInstance: AxiosInstance) => ({
   getRecentlyApproved(cartabId: string) {
     return axiosInstance.get(`api/v1/recently-approved/recent-notes/${cartabId}`);
   },
+
+  regenerate1016(cartabId: number) {
+    return axiosInstance.post(`api/v1/1016/upload-report?loanRequestId=${cartabId}`);
+  },
+  regenerateReqionApprovalLetter(cartabId: number) {
+    return axiosInstance.post(`api/v1/credit-suggestions/upload-region-approval-letter?cartableId=${cartabId}`);
+  },
+  regenerateCreditApprovals(cartabId: number) {
+    return axiosInstance.post(`api/v1/credit-approvals/upload-report?cartableId=${cartabId}`);
+  },
+  regenerateCreditSuggestions(cartabId: number) {
+    return axiosInstance.post(`api/v1/credit-suggestions/upload-report?cartableId=${cartabId}`);
+  },
 });

@@ -12,8 +12,21 @@ import { CartableStatusTypeOptions, CustomerTypeOptions } from '@/types/enums/gl
 import { usePermissionsStore } from '@/stores/permissions';
 import SignList from '@/components/sections/cartable/signList/SignList.vue';
 import ExpertReport from '@/components/sections/cartable/expertReport/ExpertReport.vue';
+import { api } from '@/services/api';
+import type { Cartable } from '@/types/cartable/cartableTypes';
 
 const permissionsStore = usePermissionsStore();
+
+// Snackbar for notifications
+const snackbar = ref(false);
+const snackbarMessage = ref('');
+const snackbarColor = ref('success');
+
+const showSnackbar = (message: string, color: 'success' | 'error' = 'success') => {
+  snackbarMessage.value = message;
+  snackbarColor.value = color;
+  snackbar.value = true;
+};
 
 const breadcrumbs = ref([
   {
@@ -149,40 +162,68 @@ const getDynamicRoutes = (item: any) => {
 
   return baseRoutes;
 };
-function getCustomButtons(cartable: Document) {
+function getCustomButtons(cartable: Cartable) {
   const buttons = [];
   buttons.push({
-    label: 'بروزرسانی 1',
+    label: 'بروزرسانی فرم 1016',
     color: 'white',
-    onClick: () => {
-     console.log(cartable)
+    onClick: async () => {
+      try {
+        const response = await api.cartable.regenerate1016(cartable.loanRequestId);
+        console.log('Response:', response);
+        showSnackbar('فرم 1016 با موفقیت بروزرسانی شد', 'success')
+      } catch (error) {
+        console.error('Error in regenerate1016:', error);
+        showSnackbar('خطا در بروزرسانی فرم 1016', 'error')
+      }
     },
     disabled: false
   });
 
   buttons.push({
-    label: 'بروزرسانی 2',
+    label: 'بروزرسانی پیش مصوبه منطقه',
     color: 'white',
-    onClick: () => {
-     console.log(cartable)
+    onClick: async () => {
+      try {
+        const response = await api.cartable.regenerateReqionApprovalLetter(cartable.id);
+        console.log('Response:', response);
+        showSnackbar('گزارش پیش مصوبه منطقه با موفقیت بروزرسانی شد', 'success')
+      } catch (error) {
+        console.error('Error in regenerateReqionApprovalLetter:', error);
+        showSnackbar('خطا در بروزرسانی گزارش پیش مصوبه منطقه', 'error')
+      }
     },
     disabled: false
   });
 
   buttons.push({
-    label: 'بروزرسانی 3',
+    label: 'بروزرسانی پیش نویس مصوبه',
     color: 'white',
-    onClick: () => {
-     console.log(cartable)
+    onClick: async () => {
+      try {
+        const response = await api.cartable.regenerateCreditApprovals(cartable.id);
+        console.log('Response:', response);
+        showSnackbar('گزارش پیش نویس مصوبه با موفقیت بروزرسانی شد', 'success')
+      } catch (error) {
+        console.error('Error in regenerateCreditApprovals:', error);
+        showSnackbar('خطا در بروزرسانی گزارش پیش نویس مصوبه', 'error')
+      }
     },
     disabled: false
   });
 
   buttons.push({
-    label: 'بروزرسانی 3',
+    label: 'بروزرسانی گزارش ابلاغیه',
     color: 'white',
-    onClick: () => {
-     console.log(cartable)
+    onClick: async () => {
+      try {
+        const response = await api.cartable.regenerateCreditSuggestions(cartable.id);
+        console.log('Response:', response);
+        showSnackbar('گزارش ابلاغیه با موفقیت بروزرسانی شد', 'success')
+      } catch (error) {
+        console.error('Error in regenerateCreditSuggestions:', error);
+        showSnackbar('خطا در بروزرسانی گزارش ابلاغیه', 'error')
+      }
     },
     disabled: false
   });
@@ -200,13 +241,14 @@ function getCustomButtons(cartable: Document) {
       ref="tableRef"
       :apiResource="`cartable`"
       :headers="header"
-      :height="550"
+      :height="500"
       :filter-component="FilterCartable"
       :auto-fetch="true"
       :show-pagination="true"
       :show-refresh-button="true"
       :custom-buttons-fn="getCustomButtons"
-      selectable
+      :selectable="true"
+      :bulkMode="true"
       :custom-actions="[
         {
           title: '⚙️ عملیات',
@@ -263,6 +305,16 @@ function getCustomButtons(cartable: Document) {
       :routes="getDynamicRoutes"
     />
   </div>
+
+  <!-- Snackbar for notifications -->
+  <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="3000" location="top">
+    {{ snackbarMessage }}
+    <template v-slot:actions>
+      <v-btn color="white" variant="text" @click="snackbar = false">
+        بستن
+      </v-btn>
+    </template>
+  </v-snackbar>
 </template>
 <style scoped>
 .upload-page {
