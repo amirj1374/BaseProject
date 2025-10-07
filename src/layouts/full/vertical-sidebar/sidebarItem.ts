@@ -60,7 +60,7 @@ const sidebarItem: menu[] = [
     title: 'گزارش عملیات',
     icon: IconFileSymlink,
     to: '/flowReport',
-    permissionKey: 'cartableReport'
+    permissionKey: 'approvalSignerReport'
   },
   {
     title: 'اطلاعات پایه',

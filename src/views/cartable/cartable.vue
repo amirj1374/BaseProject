@@ -152,7 +152,7 @@ const getDynamicRoutes = (item: any) => {
     ...(permissionsStore.hasMenuPermission('preApprovalReport') ? preApprovalReport : {}),
     ...(permissionsStore.hasMenuPermission('directiveReport') ? directiveReport : {}),
     ...(permissionsStore.hasMenuPermission('regionPreApprovalReport') ? regionPreApprovalReport : {}),
-    ...(permissionsStore.hasMenuPermission('approvalSignerReport') ? flowReport : {})
+    ...(permissionsStore.hasMenuPermission('') ? flowReport : {})
   };
 
   // Add changeSigner route only if permission exists AND item allows it
