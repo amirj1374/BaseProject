@@ -16,8 +16,8 @@ export default (axiosInstance: AxiosInstance, resource: string) => ({
     return axiosInstance.post(`api/${resource}`, data);
   },  
 
-  update(id: string | number, data: Record<string, any>) {
-    return axiosInstance.put(`api/${resource}/${id}` , data);
+  update(data: Record<string, any>) {
+    return axiosInstance.put(`api/${resource}` , data);
   },
 
   delete(id: string | Record<string, any>) {

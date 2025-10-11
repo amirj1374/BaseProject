@@ -1680,6 +1680,8 @@ const handleFilterApply = (filterData: any) => {
   background: rgb(var(--v-theme-surface));
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform, margin-top;
 }
 
 /* Grouped Table Styles */
@@ -1831,6 +1833,8 @@ const handleFilterApply = (filterData: any) => {
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: height, margin-bottom;
 }
 
 .selection-actions {
@@ -1848,6 +1852,8 @@ const handleFilterApply = (filterData: any) => {
   margin-top: 5px;
   flex-wrap: wrap;
   flex-direction: row-reverse;
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform, opacity, height;
 }
 
 :deep(.v-data-table__wrapper table thead) {
@@ -1866,28 +1872,37 @@ const handleFilterApply = (filterData: any) => {
   background: rgb(var(--v-theme-surface)) !important;
 }
 
-/* Slide transition for bulk mode actions */
+/* Smooth table content transitions */
+:deep(.v-data-table__wrapper) {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+:deep(.v-data-table__wrapper tbody tr) {
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Enhanced slide transition for bulk mode actions */
 .slide-left-enter-active {
-  transition: all 1.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .slide-left-leave-active {
-  transition: all 1.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.6s cubic-bezier(0.55, 0.055, 0.675, 0.19);
 }
 
 .slide-left-enter-from {
-  transform: translateX(-100%);
+  transform: translateX(-100%) scale(0.95);
   opacity: 0;
 }
 
 .slide-left-leave-to {
-  transform: translateX(-100%);
+  transform: translateX(-100%) scale(0.95);
   opacity: 0;
 }
 
 .slide-left-enter-to,
 .slide-left-leave-from {
-  transform: translateX(0);
+  transform: translateX(0) scale(1);
   opacity: 1;
 }
 </style>
