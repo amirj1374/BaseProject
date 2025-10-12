@@ -185,7 +185,7 @@ const hasAnyActions = computed(() => {
   if (props.bulkMode) {
     return false;
   }
-  
+
   const hasCrudActions = Array.isArray(props.actions) && props.actions.length > 0;
   const hasRoutes = !!props.routes && (typeof props.routes === 'function' || Object.keys(props.routes).length > 0);
   const hasDownloadLinks = !!props.downloadLink && Object.keys(props.downloadLink).length > 0;
@@ -457,7 +457,7 @@ const hasSelection = computed(() => selectedItems.value.length > 0);
 // Check if selected items are still present in current filtered data
 const validSelectedItems = computed(() => {
   if (!props.selectable || !props.bulkMode) return selectedItems.value;
-  
+
   // Filter selected items to only include those that exist in current items
   return selectedItems.value.filter(selectedItem => {
     const uniqueValue = getUniqueValue(selectedItem);
@@ -616,14 +616,14 @@ watch(
         const uniqueValue = getUniqueValue(selectedItem);
         return !newItems.some(item => getUniqueValue(item) === uniqueValue);
       });
-      
+
       // If there are invalid selections, remove them
       if (invalidSelections.length > 0) {
         const validSelections = selectedItems.value.filter(selectedItem => {
           const uniqueValue = getUniqueValue(selectedItem);
           return newItems.some(item => getUniqueValue(item) === uniqueValue);
         });
-        
+
         selectedItems.value = validSelections;
         emit('update:selectedItems', selectedItems.value);
         emit('selection-change', selectedItems.value);
@@ -1179,78 +1179,78 @@ const handleFilterApply = (filterData: any) => {
       <div v-if="props.bulkMode && hasValidSelection" class="selected-actions">
         <!-- Individual Actions for Selected Items -->
         <template v-for="item in validSelectedItems" :key="getUniqueValue(item)">
-        <!-- CRUD Actions -->
-        <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="me-2" @click="openDialog(item)">
-          <span class="me-1">✏️</span>
-          ویرایش
-        </v-btn>
-        
-        <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="me-2" @click="openDeleteDialog(item)">
-          <span class="me-1">🗑️</span>
-          حذف
-        </v-btn>
-        
-        <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="me-2" @click="goToRoute('view', item)">
-          <span class="me-1">👁️</span>
-          نمایش
-        </v-btn>
-        
-        <!-- Route Actions -->
-        <template v-for="(routePath, routeKey) in getRoutesForItem(item)" :key="routeKey">
-          <v-btn color="indigo" size="small" class="me-2" @click="goToRoute(routeKey, item)">
-            <span class="me-1">➡️</span>
-            {{ String(routeKey) }}
+          <!-- CRUD Actions -->
+          <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="me-2" @click="openDialog(item)">
+            <span class="me-1">✏️</span>
+            ویرایش
           </v-btn>
-        </template>
-        
-        <!-- Download Actions -->
-        <v-btn v-for="(value, key) in props.downloadLink" size="small" class="me-2" :key="key" @click="download(key, item)">
-          <span class="me-1">⬇️</span>
-          {{ key }}
-        </v-btn>
-        
-        <!-- Custom Actions -->
-        <template v-for="(action, index) in props.customActions" :key="action.title || index">
-          <v-btn
-            v-if="!action.condition || action.condition(item)"
-            color="orange"
-            size="small"
-            class="me-2"
-            @click="openCustomActionDialog(action, item)"
-          >
-            {{ action.title }}
+
+          <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="me-2" @click="openDeleteDialog(item)">
+            <span class="me-1">🗑️</span>
+            حذف
           </v-btn>
-        </template>
-        
-        <!-- Custom Buttons -->
-        <template v-if="props.customButtonsFn">
-          <v-btn
-            v-for="button in props.customButtonsFn(item)"
-            :key="button.label"
-            :color="button.color || 'primary'"
-            size="small"
-            class="me-2"
-            :disabled="button.disabled"
-            @click="button.onClick(item)"
-          >
-            <span v-if="(button as any).icon" class="me-1">{{ (button as any).icon }}</span>
-            {{ button.label }}
+
+          <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="me-2" @click="goToRoute('view', item)">
+            <span class="me-1">👁️</span>
+            نمایش
           </v-btn>
-        </template>
-        <template v-else>
-          <v-btn
-            v-for="button in props.customButtons"
-            :key="button.label"
-            :color="button.color || 'primary'"
-            size="small"
-            class="me-2"
-            @click="button.onClick(item)"
-          >
-            <span v-if="(button as any).icon" class="me-1">{{ (button as any).icon }}</span>
-            {{ button.label }}
+
+          <!-- Route Actions -->
+          <template v-for="(routePath, routeKey) in getRoutesForItem(item)" :key="routeKey">
+            <v-btn color="indigo" size="small" class="me-2" @click="goToRoute(routeKey, item)">
+              <span class="me-1">➡️</span>
+              {{ String(routeKey) }}
+            </v-btn>
+          </template>
+
+          <!-- Download Actions -->
+          <v-btn v-for="(value, key) in props.downloadLink" size="small" class="me-2" :key="key" @click="download(key, item)">
+            <span class="me-1">⬇️</span>
+            {{ key }}
           </v-btn>
+
+          <!-- Custom Actions -->
+          <template v-for="(action, index) in props.customActions" :key="action.title || index">
+            <v-btn
+              v-if="!action.condition || action.condition(item)"
+              color="orange"
+              size="small"
+              class="me-2"
+              @click="openCustomActionDialog(action, item)"
+            >
+              {{ action.title }}
+            </v-btn>
+          </template>
+
+          <!-- Custom Buttons -->
+          <template v-if="props.customButtonsFn">
+            <v-btn
+              v-for="button in props.customButtonsFn(item)"
+              :key="button.label"
+              :color="button.color || 'primary'"
+              size="small"
+              class="me-2"
+              :disabled="button.disabled"
+              @click="button.onClick(item)"
+            >
+              <span v-if="(button as any).icon" class="me-1">{{ (button as any).icon }}</span>
+              {{ button.label }}
+            </v-btn>
+          </template>
+          <template v-else>
+            <v-btn
+              v-for="button in props.customButtons"
+              :key="button.label"
+              :color="button.color || 'primary'"
+              size="small"
+              class="me-2"
+              @click="button.onClick(item)"
+            >
+              <span v-if="(button as any).icon" class="me-1">{{ (button as any).icon }}</span>
+              {{ button.label }}
+            </v-btn>
+          </template>
         </template>
-      </template>
       </div>
     </transition>
   </div>
@@ -1295,143 +1295,143 @@ const handleFilterApply = (filterData: any) => {
               <!-- Group Items -->
               <transition name="group-expand" appear>
                 <div v-if="group.isExpanded" class="group-items" :id="`group-panel-${group.groupKey}`" :aria-labelledby="`group-header-${group.groupKey}`" role="region">
-                <v-data-table
-                  :headers="groupedHeaders"
-                  :items="group.items"
-                  :items-per-page="itemsPerPage"
-                  hide-default-footer
-                  class="elevation-1 group-table"
-                  no-data-text="رکوردی یافت نشد"
-                  hover
-                  :height="'auto'"
-                >
-                  <!-- Custom Header for Selection -->
-                  <template v-slot:header.selection="{ column }">
-                    <v-checkbox
-                      v-if="props.selectable && props.multiSelect"
-                      :model-value="selectAll"
-                      @update:model-value="toggleSelectAll"
-                      :indeterminate="selectedCount > 0 && selectedCount < items.length"
-                      hide-details
-                      density="compact"
-                    />
-                  </template>
-                  <template v-slot:item="{ item, columns, index }">
-                    <tr 
-                      :style="{ 
+                  <v-data-table
+                    :headers="groupedHeaders"
+                    :items="group.items"
+                    :items-per-page="itemsPerPage"
+                    hide-default-footer
+                    class="elevation-1 group-table"
+                    no-data-text="رکوردی یافت نشد"
+                    hover
+                    :height="'auto'"
+                  >
+                    <!-- Custom Header for Selection -->
+                    <template v-slot:header.selection="{ column }">
+                      <v-checkbox
+                        v-if="props.selectable && props.multiSelect"
+                        :model-value="selectAll"
+                        @update:model-value="toggleSelectAll"
+                        :indeterminate="selectedCount > 0 && selectedCount < items.length"
+                        hide-details
+                        density="compact"
+                      />
+                    </template>
+                    <template v-slot:item="{ item, columns, index }">
+                      <tr
+                        :style="{
                         background: isSelected(item) && props.bulkMode 
                           ? 'rgb(var(--v-theme-primary200))' 
                           : index % 2 === 0 
                             ? 'rgb(var(--v-theme-surface))' 
                             : 'rgb(var(--v-theme-lightprimary))',
                         cursor: props.bulkMode && props.selectable ? 'pointer' : 'default'
-                      }" 
-                      :tabindex="props.selectable ? 0 : -1" 
-                      @keydown.enter.prevent="props.selectable && toggleSelection(item)"
-                      @click="props.bulkMode && props.selectable && selectSingleItem(item)"
-                    >
-                      <td
-                        v-for="column in columns"
-                        :key="column.key"
-                        :style="{
+                      }"
+                        :tabindex="props.selectable ? 0 : -1"
+                        @keydown.enter.prevent="props.selectable && toggleSelection(item)"
+                        @click="props.bulkMode && props.selectable && selectSingleItem(item)"
+                      >
+                        <td
+                          v-for="column in columns"
+                          :key="column.key"
+                          :style="{
                            ...getColumnStyle(column, item),
                            ...(column.width
                              ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' }
                              : {})
                          }"
-                      >
-                        <!-- Selection Checkbox/Radio -->
-                        <template v-if="column.key === 'selection'">
-                          <v-radio
-                            v-if="props.bulkMode"
-                            :model-value="radioGroupValue"
-                            :value="getUniqueValue(item)"
-                            @click.stop="selectSingleItem(item)"
-                            :disabled="!props.selectable"
-                            hide-details
-                            density="compact"
-                          />
-                          <v-checkbox
-                            v-else
-                            :model-value="isSelected(item)"
-                            @update:model-value="toggleSelection(item)"
-                            :disabled="!props.selectable"
-                            hide-details
-                            density="compact"
-                          />
-                        </template>
-                        <template v-if="column.key === 'actions' && hasAnyActions">
-                          <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
-                            ویرایش ✏️
-                          </v-btn>
-                          <v-btn
-                            v-if="props.actions?.includes('delete')"
-                            color="red"
-                            size="small"
-                            class="mr-2"
-                            @click="openDeleteDialog(item)"
-                          >حذف ❌
-                          </v-btn>
-                          <v-btn
-                            v-if="props.actions?.includes('view')"
-                            color="purple"
-                            size="small"
-                            class="mr-2"
-                            @click="goToRoute('view', item)"
-                          >🔍 نمایش
-                          </v-btn>
-                          <template v-for="(routePath, routeKey) in getRoutesForItem(item)" :key="routeKey">
-                            <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(routeKey, item)">
-                              {{ routeKey.toUpperCase() }}
-                            </v-btn>
+                        >
+                          <!-- Selection Checkbox/Radio -->
+                          <template v-if="column.key === 'selection'">
+                            <v-radio
+                              v-if="props.bulkMode"
+                              :model-value="radioGroupValue"
+                              :value="getUniqueValue(item)"
+                              @click.stop="selectSingleItem(item)"
+                              :disabled="!props.selectable"
+                              hide-details
+                              density="compact"
+                            />
+                            <v-checkbox
+                              v-else
+                              :model-value="isSelected(item)"
+                              @update:model-value="toggleSelection(item)"
+                              :disabled="!props.selectable"
+                              hide-details
+                              density="compact"
+                            />
                           </template>
-                          <v-btn v-for="(value, key) in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
-                            {{ key }} ⬇️
-                          </v-btn>
-                          <template v-for="(action, index) in props.customActions" :key="action.title || index">
+                          <template v-if="column.key === 'actions' && hasAnyActions">
+                            <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="mr-2" @click="openDialog(item)">
+                              ویرایش ✏️
+                            </v-btn>
                             <v-btn
-                              v-if="!action.condition || action.condition(item)"
-                              color="orange"
+                              v-if="props.actions?.includes('delete')"
+                              color="red"
                               size="small"
                               class="mr-2"
-                              @click="openCustomActionDialog(action, item)"
-                            >
-                              {{ action.title }}
+                              @click="openDeleteDialog(item)"
+                            >حذف ❌
                             </v-btn>
-                          </template>
-                          <template v-if="props.customButtonsFn">
                             <v-btn
-                              v-for="button in props.customButtonsFn(item)"
-                              :key="button.label"
-                              :color="button.color || 'primary'"
+                              v-if="props.actions?.includes('view')"
+                              color="purple"
                               size="small"
                               class="mr-2"
-                              :disabled="button.disabled"
-                              @click="button.onClick(item)"
-                            >
-                              {{ button.label }}
+                              @click="goToRoute('view', item)"
+                            >🔍 نمایش
                             </v-btn>
+                            <template v-for="(routePath, routeKey) in getRoutesForItem(item)" :key="routeKey">
+                              <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(routeKey, item)">
+                                {{ routeKey.toUpperCase() }}
+                              </v-btn>
+                            </template>
+                            <v-btn v-for="(value, key) in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
+                              {{ key }} ⬇️
+                            </v-btn>
+                            <template v-for="(action, index) in props.customActions" :key="action.title || index">
+                              <v-btn
+                                v-if="!action.condition || action.condition(item)"
+                                color="orange"
+                                size="small"
+                                class="mr-2"
+                                @click="openCustomActionDialog(action, item)"
+                              >
+                                {{ action.title }}
+                              </v-btn>
+                            </template>
+                            <template v-if="props.customButtonsFn">
+                              <v-btn
+                                v-for="button in props.customButtonsFn(item)"
+                                :key="button.label"
+                                :color="button.color || 'primary'"
+                                size="small"
+                                class="mr-2"
+                                :disabled="button.disabled"
+                                @click="button.onClick(item)"
+                              >
+                                {{ button.label }}
+                              </v-btn>
+                            </template>
+                            <template v-else>
+                              <v-btn
+                                v-for="button in props.customButtons"
+                                :key="button.label"
+                                :color="button.color || 'primary'"
+                                size="small"
+                                class="mr-2"
+                                @click="button.onClick(item)"
+                              >
+                                {{ button.label }}
+                              </v-btn>
+                            </template>
                           </template>
                           <template v-else>
-                            <v-btn
-                              v-for="button in props.customButtons"
-                              :key="button.label"
-                              :color="button.color || 'primary'"
-                              size="small"
-                              class="mr-2"
-                              @click="button.onClick(item)"
-                            >
-                              {{ button.label }}
-                            </v-btn>
+                            {{ getTranslatedValue(getNestedValue(item, column.key), column, item) }}
                           </template>
-                        </template>
-                        <template v-else>
-                          {{ getTranslatedValue(getNestedValue(item, column.key), column, item) }}
-                        </template>
-                      </td>
-                    </tr>
-                  </template>
-                </v-data-table>
+                        </td>
+                      </tr>
+                    </template>
+                  </v-data-table>
                 </div>
               </transition>
             </div>
@@ -1464,7 +1464,7 @@ const handleFilterApply = (filterData: any) => {
           />
         </template>
         <template v-slot:item="{ item, columns, index }">
-          <tr 
+          <tr
             :style="{
               color: isSelected(item) && props.bulkMode ? 'rgb(var(--v-theme-white))' : 'rgb(var(--v-theme-darkText))',
               background: isSelected(item) && props.bulkMode 
@@ -1473,8 +1473,8 @@ const handleFilterApply = (filterData: any) => {
                   ? 'rgb(var(--v-theme-surface))' 
                   : 'rgb(var(--v-theme-lightprimary))',
               cursor: props.bulkMode && props.selectable ? 'pointer' : 'default'
-            }" 
-            :tabindex="props.selectable ? 0 : -1" 
+            }"
+            :tabindex="props.selectable ? 0 : -1"
             @keydown.enter.prevent="props.selectable && toggleSelection(item)"
             @click="props.bulkMode && props.selectable && selectSingleItem(item)"
           >
@@ -1680,6 +1680,8 @@ const handleFilterApply = (filterData: any) => {
   background: rgb(var(--v-theme-surface));
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform, margin-top;
 }
 
 /* Grouped Table Styles */
@@ -1831,6 +1833,8 @@ const handleFilterApply = (filterData: any) => {
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: height, margin-bottom;
 }
 
 .selection-actions {
@@ -1848,6 +1852,8 @@ const handleFilterApply = (filterData: any) => {
   margin-top: 5px;
   flex-wrap: wrap;
   flex-direction: row-reverse;
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform, opacity, height;
 }
 
 :deep(.v-data-table__wrapper table thead) {
@@ -1866,28 +1872,37 @@ const handleFilterApply = (filterData: any) => {
   background: rgb(var(--v-theme-surface)) !important;
 }
 
-/* Slide transition for bulk mode actions */
+/* Smooth table content transitions */
+:deep(.v-data-table__wrapper) {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+:deep(.v-data-table__wrapper tbody tr) {
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Enhanced slide transition for bulk mode actions */
 .slide-left-enter-active {
-  transition: all 1.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .slide-left-leave-active {
-  transition: all 1.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.6s cubic-bezier(0.55, 0.055, 0.675, 0.19);
 }
 
 .slide-left-enter-from {
-  transform: translateX(-100%);
+  transform: translateX(-100%) scale(0.95);
   opacity: 0;
 }
 
 .slide-left-leave-to {
-  transform: translateX(-100%);
+  transform: translateX(-100%) scale(0.95);
   opacity: 0;
 }
 
 .slide-left-enter-to,
 .slide-left-leave-from {
-  transform: translateX(0);
+  transform: translateX(0) scale(1);
   opacity: 1;
 }
 </style>
