@@ -14,9 +14,9 @@
           hide-details="auto"
           clearable
           @update:model-value="
-            (val: RegionsDto | null) => {
+            (val: string | null) => {
               filterModel.branchCode = '';
-              fetchBranchs(val?.code || null);
+              fetchBranches(val);
             }
           "
         />
@@ -32,6 +32,8 @@
           density="comfortable"
           hide-details="auto"
           clearable
+          :rules="[required]"
+          ref="branchAutocomplete"
         />
       </v-col>
     </v-row>
@@ -40,7 +42,13 @@
     <v-row class="mt-4">
       <v-col cols="12" class="d-flex justify-center gap-2">
         <v-btn color="error" variant="outlined" @click="clearFilters"> پاک کردن فیلترها </v-btn>
-        <v-btn color="primary" @click="applyFilters"> اعمال فیلتر </v-btn>
+        <v-btn 
+          color="primary" 
+          @click="applyFilters"
+          :disabled="!filterModel.branchCode"
+        > 
+          اعمال فیلتر 
+        </v-btn>
       </v-col>
     </v-row>
   </div>
@@ -53,15 +61,25 @@ import type { BranchDto, ContractType, RegionsDto } from '@/types/approval/appro
 import { api } from '@/services/api';
 const branchList = ref<BranchDto[]>([]);
 const baseStore = useBaseStore();
+const branchAutocomplete = ref();
 
-async function fetchBranchs(newRegion: string | null) {
-  console.log(newRegion);
-  if (!newRegion) return;
+const required = (v: any) => !!v || 'انتخاب شعبه الزامی است';
+
+async function fetchBranches(newRegion: string | null) {
+  console.log('fetchBranches called with:', newRegion);
+  if (!newRegion) {
+    console.log('No region selected, clearing branch list');
+    branchList.value = [];
+    return;
+  }
   try {
+    console.log('Calling api.approval.getBranch with:', newRegion);
     const res = await api.approval.getBranch(newRegion);
+    console.log('Branch response:', res.data);
     branchList.value = res.data || [];
   } catch (err) {
-    console.error('Error fetching branchs:', err);
+    console.error('Error fetching branches:', err);
+    branchList.value = [];
   }
 }
 
@@ -96,17 +114,44 @@ watch(
   { immediate: true, deep: true }
 );
 
+// Watch for region changes and fetch branches when region is set but no branches loaded
+watch(
+  () => filterModel.regionBranchCode,
+  (newRegion, oldRegion) => {
+    // If region is selected but branchList is empty, fetch branches
+    if (newRegion && branchList.value.length === 0) {
+      console.log('Region already selected but no branches loaded, fetching branches...');
+      fetchBranches(newRegion);
+    }
+    // If region is cleared, clear branch list
+    else if (!newRegion && oldRegion) {
+      branchList.value = [];
+    }
+  },
+  { immediate: true }
+);
+
 // Clear all filters
 const clearFilters = () => {
   Object.keys(filterModel).forEach((key) => {
     filterModel[key as keyof FilterModel] = '';
   });
+  branchList.value = []; // Clear branch list when clearing filters
   emit('update:modelValue', { ...filterModel });
   emit('apply', { ...filterModel });
 };
 
 // Apply filters
-const applyFilters = () => {
+const applyFilters = async () => {
+  // Validate branch selection
+  const isValid = await branchAutocomplete.value?.validate();
+  
+  if (!isValid || !filterModel.branchCode) {
+    console.log('Branch validation failed - cannot apply filters');
+    return;
+  }
+  
+  console.log('Applying filters with:', filterModel);
   emit('update:modelValue', { ...filterModel });
   emit('apply', { ...filterModel });
 };
