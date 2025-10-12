@@ -13,6 +13,7 @@
           displayFormat="jYYYY/jMM/jDD"
           placeholder="تاریخ را انتخاب کنید"
           emitWithTimezone
+          :error-messages="dateValidationErrors.dateFrom"
         />
       </v-col>
       <v-col cols="12" md="6">
@@ -26,6 +27,7 @@
           displayFormat="jYYYY/jMM/jDD"
           placeholder="تاریخ را انتخاب کنید"
           emitWithTimezone
+          :error-messages="dateValidationErrors.dateTo"
         />
       </v-col>
 
@@ -94,11 +96,16 @@
         </v-btn>
       </v-col>
     </v-row>
+
+    <!-- Error Snackbar -->
+    <v-snackbar v-model="showErrorSnackbar" color="error" timeout="4000">
+      {{ errorMessage }}
+    </v-snackbar>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, defineProps, defineEmits } from 'vue';
+import { ref, reactive, watch, defineProps, defineEmits, computed } from 'vue';
 import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
 
 interface FilterModel {
@@ -137,6 +144,40 @@ const statusOptions = ref([
   { title: 'بسته شده', value: 'CLOSED' },
 ]);
 
+// Date validation
+const dateValidationErrors = ref({
+  dateFrom: [] as string[],
+  dateTo: [] as string[]
+});
+
+// Error snackbar
+const showErrorSnackbar = ref(false);
+const errorMessage = ref('');
+
+// Check if there are date validation errors
+const hasDateValidationErrors = computed(() => {
+  return dateValidationErrors.value.dateFrom.length > 0 || dateValidationErrors.value.dateTo.length > 0;
+});
+
+// Date validation function
+const validateDates = () => {
+  // Reset errors
+  dateValidationErrors.value.dateFrom = [];
+  dateValidationErrors.value.dateTo = [];
+
+  // Check if both dates are provided
+  if (filterModel.dateFrom && filterModel.dateTo) {
+    const fromDate = new Date(filterModel.dateFrom);
+    const toDate = new Date(filterModel.dateTo);
+
+    // Check if dateFrom is after dateTo
+    if (fromDate > toDate) {
+      dateValidationErrors.value.dateFrom = ['تاریخ شروع نمی‌تواند بعد از تاریخ پایان باشد'];
+      dateValidationErrors.value.dateTo = ['تاریخ پایان نمی‌تواند قبل از تاریخ شروع باشد'];
+    }
+  }
+};
+
 // Watch for external changes to modelValue
 watch(() => props.modelValue, (newValue) => {
   if (newValue) {
@@ -144,17 +185,37 @@ watch(() => props.modelValue, (newValue) => {
   }
 }, { immediate: true, deep: true });
 
+// Watch for date changes to validate
+watch([() => filterModel.dateFrom, () => filterModel.dateTo], () => {
+  validateDates();
+}, { deep: true });
+
 // Clear all filters
 const clearFilters = () => {
   Object.keys(filterModel).forEach(key => {
     filterModel[key as keyof FilterModel] = '';
   });
+  // Clear validation errors
+  dateValidationErrors.value.dateFrom = [];
+  dateValidationErrors.value.dateTo = [];
   emit('update:modelValue', { ...filterModel });
   emit('apply', { ...filterModel });
 };
 
 // Apply filters
 const applyFilters = () => {
+  // Validate dates before applying
+  validateDates();
+  
+  // Check if there are validation errors
+  if (hasDateValidationErrors.value) {
+    // Show error message in snackbar
+    errorMessage.value = 'لطفاً تاریخ‌ها را صحیح وارد کنید. تاریخ شروع نمی‌تواند بعد از تاریخ پایان باشد.';
+    showErrorSnackbar.value = true;
+    return;
+  }
+  
+  // Apply filters if validation passes
   emit('update:modelValue', { ...filterModel });
   emit('apply', { ...filterModel });
 };

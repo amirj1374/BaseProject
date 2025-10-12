@@ -378,7 +378,7 @@ watch(validUserOptions, (newOptions) => {
   <ConfirmDialog
     v-model="confirmDialog"
     confirmText="تایید"
-    :message="`آیا از عملیات ${selectedAction?.actionName} به ${selectedRole?.roleDescription} (${selectedValidUser.map((user) => user.name)}) مطمئن هستید؟`"
+    :message="`آیا از عملیات ${selectedAction?.actionName} به ${selectedRole?.roleDescription} (${selectedValidUser.map((user) => user.name)}) اطمینان دارید؟`"
     cancelText="انصراف"
     :loading="loading"
     color="primary"

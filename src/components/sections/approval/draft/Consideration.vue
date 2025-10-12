@@ -33,7 +33,6 @@ watch(isDialogActive, async (newValue) => {
         // Handle date conversion if creditLimitDate is a Date object or ISO string
         const data = response.data;
         if (data.creditLimitDate) {
-          console.log('Original creditLimitDate from server:', data.creditLimitDate);
           // Keep the full ISO string format for consistency
           let dateStr = data.creditLimitDate;
           if (dateStr instanceof Date) {
@@ -53,6 +52,16 @@ watch(isDialogActive, async (newValue) => {
     } catch (err: any) {
       console.error('Error loading consideration data:', err);
     }
+  } else if (newValue === false) {
+    // Reset form fields when dialog closes
+    formData.value = {
+      loanRequestId: approvalStore.loanRequestId,
+      previousLoanAppropriate: false,
+      havePromissoryNote: false,
+      signatory: '',
+      currentOffersAmount: 0,
+      creditLimitDate: ''
+    };
   }
 });
 

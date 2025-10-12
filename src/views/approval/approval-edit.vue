@@ -25,12 +25,14 @@
       <v-card-title class="text-h5">تأیید حذف</v-card-title>
       <v-card-text>
         <v-divider class="my-3"></v-divider>
-        آیا از حذف {{ selectedApproval?.trackingCode }} درخواست اطمینان دارید؟ این عمل قابل بازگشت نیست.
+        آیا از حذف درخواست {{ selectedApproval?.trackingCode }} اطمینان دارید؟
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="grey" variant="text" @click="showDeleteDialog = false"> انصراف </v-btn>
-        <v-btn color="error" variant="text" @click="confirmDelete"> حذف </v-btn>
+        <div class="d-flex w-ful">
+          <v-btn color="grey" variant="text" @click="showDeleteDialog = false"> انصراف </v-btn>
+          <v-btn color="error" variant="text" @click="confirmDelete"> حذف </v-btn>
+        </div>
       </v-card-actions>
     </v-card>
   </v-dialog>
