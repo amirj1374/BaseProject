@@ -120,6 +120,12 @@ const headers = [
     width: 200
   },
   {
+    title: 'نام مشتری',
+    key: 'customerName',
+    sortable: true,
+    width: 200
+  },
+  {
     title: 'شماره مشتری',
     key: 'cif',
     sortable: true,

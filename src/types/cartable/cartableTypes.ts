@@ -63,6 +63,7 @@ export interface SubmitReferencePayload {
   actionType: string;
   usernameList: string[];
   correctionDeadline ?: string;
+  expertReportIsSeen?: boolean;
 }
 
 

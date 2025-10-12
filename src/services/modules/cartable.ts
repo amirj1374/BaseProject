@@ -66,31 +66,31 @@ export default (axiosInstance: AxiosInstance) => ({
   },
   
   saveCreditApproval(cartableId: string , payload: CreditApprovalFinancialSummaryDTO) {
-    return axiosInstance.post(`api/v1/credit-approvals/financial-summary/${cartableId} `, payload);
+    return axiosInstance.post(`api/v1/credit-approvals/${cartableId}/financial-summary`, payload);
   },
 
   saveConditions(cartableId: string , payload: ConditionsDTO) {
-    return axiosInstance.post(`api/v1/credit-approvals/conditions/${cartableId} `, payload);
+    return axiosInstance.post(`api/v1/credit-approvals/${cartableId}/conditions`, payload);
   },
 
   saveApplicantRequest(cartableId: string , payload: ApplicantRequestDTO) {
-    return axiosInstance.post(`api/v1/credit-approvals/applicant-request/${cartableId} `, payload);
+    return axiosInstance.post(`api/v1/credit-approvals/${cartableId}/applicant-request`, payload);
   },
 
   saveLastDecision(cartableId: string , payload: CreditApprovalLastDecisionDTO) {
-    return axiosInstance.post(`api/v1/credit-approvals/last-decision/${cartableId}`, payload);
+    return axiosInstance.post(`api/v1/credit-approvals/${cartableId}/last-decision`, payload);
   },
 
   getCreditApproval(cartableId: string) {
-    return axiosInstance.get(`api/v1/credit-approvals/summary/${cartableId}`);
+    return axiosInstance.get(`api/v1/credit-approvals/${cartableId}/summary`);
   },
 
   getConditions(cartableId: string) {
-    return axiosInstance.get(`api/v1/credit-approvals/conditions/${cartableId}`);
+    return axiosInstance.get(`api/v1/credit-approvals/${cartableId}/conditions`);
   },
 
   getApplicantRequest(cartableId: string) {
-    return axiosInstance.get(`api/v1/credit-approvals/applicant-request/${cartableId}`);
+    return axiosInstance.get(`api/v1/credit-approvals/${cartableId}/applicant-request`);
   },
 
   getLoanRequestDetail(loanRequestId: string) {
@@ -146,11 +146,11 @@ export default (axiosInstance: AxiosInstance) => ({
   },
 
   addRecentlyApproved(cartabId: string,payload: RecentlyApprovalDTO) {
-    return axiosInstance.post(`api/v1/recently-approved/recent-notes/${cartabId}`, payload);
+    return axiosInstance.post(`api/v1/recently-approved/${cartabId}/recent-notes`, payload);
   },
 
   getRecentlyApproved(cartabId: string) {
-    return axiosInstance.get(`api/v1/recently-approved/recent-notes/${cartabId}`);
+    return axiosInstance.get(`api/v1/recently-approved/${cartabId}/recent-notes`);
   },
 
   regenerate1016(cartabId: number) {

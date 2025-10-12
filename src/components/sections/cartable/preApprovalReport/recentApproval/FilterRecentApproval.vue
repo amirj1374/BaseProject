@@ -53,7 +53,7 @@ function reset() {
   <v-form @submit.prevent="apply">
     <v-row>
       <v-col cols="12" md="4">
-        <v-text-field v-model="model.creditApprovalNo" label="شماره مصوبه" variant="outlined" hide-details="auto" />
+        <v-text-field v-model="model.creditApprovalNo" label="شماره مصوبه" variant="outlined" hide-details="auto" type="number"/>
       </v-col>
       <v-col cols="12" md="4">
         <ShamsiDatePicker

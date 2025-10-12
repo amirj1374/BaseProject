@@ -44,6 +44,7 @@ import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import FilterRecentApproval from '@/components/sections/cartable/preApprovalReport/recentApproval/FilterRecentApproval.vue';
 import { onMounted, reactive } from 'vue';
 import { api } from '@/services/api';
+import { number } from 'yup';
 
 onMounted(async () => {
   const response = await api.cartable.getRecentlyApproved(props.cartableId);
@@ -82,6 +83,8 @@ const headers = [
   {
     title: 'شماره مصوبه',
     key: 'creditApprovalNo',
+    type: 'number',
+    editable: true,
     sortable: true,
     width: 250
   },

@@ -310,7 +310,7 @@ export interface FacilitiesRequest {
   day?: string;
   durationDay?: string;
   collaterals: Collaterals[];
-  preferentialRate: number;
+  preferentialRate: string;
   advancePayment: string;
   contractType: ContractType;
   facility?: FacilityDto;

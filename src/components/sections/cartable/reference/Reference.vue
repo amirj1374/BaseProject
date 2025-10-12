@@ -142,7 +142,8 @@ const submitForm = async () => {
       description: description.value,
       actionType: selectedAction.value?.actionType ?? '',
       usernameList: selectedValidUser.value.map((user) => user.username), // Extract usernames from selected users array
-      correctionDeadline: selectedDate?.value ?? undefined
+      correctionDeadline: selectedDate?.value ?? undefined,
+      expertReportIsSeen: props.item.expertReportIsSeen
     };
     const response = await api.cartable.submitReference(payload);
     if (response.status === 200) {
