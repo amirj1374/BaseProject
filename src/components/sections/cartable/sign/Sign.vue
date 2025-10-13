@@ -2,7 +2,7 @@
 import { api } from '@/services/api';
 import type { SubmitSignPayload } from '@/types/cartable/cartableTypes';
 import { onMounted, ref, computed } from 'vue';
-import ApprovalRequestViewer from './ApprovalRequestViewer.vue';
+import ApprovalRequestViewer from '../../../approval/ApprovalRequestViewer.vue';
 import { usePermissionsStore } from '@/stores/permissions';
 
 const emit = defineEmits(['close']);

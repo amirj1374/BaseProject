@@ -7,12 +7,23 @@
     :show-pagination="true"
     :height="550"
     :filter-component="FilterCartable"
+    :custom-actions="customActions"
   />
 </template>
 <script lang="ts" setup>
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import FilterCartable from '@/views/reports/cartableReport/cartableReportFilter.vue';
 import { CartableStatusTypeOptions, CustomerTypeOptions } from '@/types/enums/global';
+import Details from '@/components/sections/report/details/Details.vue';
+import { computed, h} from 'vue';
+
+// Computed property for custom actions to ensure reactivity
+const customActions = computed(() => [
+  {
+    title: '🔍️ نمایش اطلاعات بیشتر',
+    component: (props: any) => h(Details, { ...props }),
+  },
+]);
 
 const headers = [
   {

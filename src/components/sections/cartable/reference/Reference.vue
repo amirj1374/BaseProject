@@ -3,10 +3,9 @@ import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
 import { api } from '@/services/api';
 import type { ActionData, SubmitReferencePayload, ValidRole } from '@/types/cartable/cartableTypes';
 import { onMounted, ref, watch, computed } from 'vue';
-import ApprovalRequestViewer from '../sign/ApprovalRequestViewer.vue';
+import ApprovalRequestViewer from '@/components/approval/ApprovalRequestViewer.vue';
 import { usePermissionsStore } from '@/stores/permissions';
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue';
-import user from '@/services/modules/user';
 
 const confirmDialog = ref(false);
 const permissionsStore = usePermissionsStore();
