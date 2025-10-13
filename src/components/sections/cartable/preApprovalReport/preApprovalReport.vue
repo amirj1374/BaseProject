@@ -63,7 +63,7 @@ const steps = [
     section: defineAsyncComponent(() => import('./recentApproval/recentApproval.vue'))
   },
   {
-    title: 'سایر شرایط و ملاحضات',
+    title: 'سایر شرایط و ملاحظات',
     section: defineAsyncComponent(() => import('./conditions/conditions.vue'))
   },
   {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { api } from '@/services/api';
 import type { SubmitSignPayload } from '@/types/cartable/cartableTypes';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import ApprovalRequestViewer from './ApprovalRequestViewer.vue';
 import { usePermissionsStore } from '@/stores/permissions';
 
@@ -19,6 +19,12 @@ const id = ref(props.item?.id ?? '');
 const description = ref('');
 const actionType = ref('');
 const loading = ref(false);
+
+// Conditional requirement for description when action type is DISAGREED or RETURNED
+const needsComment = computed(() => actionType.value === 'DISAGREED' || actionType.value === 'RETURNED');
+
+// Show field error instead of snackbar for this validation
+const descriptionErrors = computed(() => (needsComment.value && !description.value ? ['این فیلد الزامی است'] : []));
 
 const downloadExpertReport = async () => {
   if (props.item.expertReportUrl) {
@@ -89,6 +95,12 @@ const getExpertReportIsSeenValue = (): boolean | null => {
 const submitForm = async () => {
   try {
     loading.value = true;
+
+    // Guard: require description for DISAGREED or RETURNED (use field error)
+    if (needsComment.value && !description.value) {
+      return;
+    }
+
     const payload: SubmitSignPayload = {
       cartableId: Number(id.value),
       comment: description.value,
@@ -114,6 +126,8 @@ const submitForm = async () => {
     loading.value = false;
   }
 };
+// Form validation (Vuetify rule)
+const required = (v: any) => (needsComment.value ? (!!v || 'این فیلد الزامی است') : true);
 </script>
 
 <template>
@@ -140,7 +154,13 @@ const submitForm = async () => {
         <ApprovalRequestViewer :loan-request-id="props.item.loanRequestId" />
       </v-col>
       <v-col cols="12" md="12">
-        <v-textarea v-model="description" label="توضیحات" variant="outlined" clearable />
+        <v-textarea
+          v-model="description"
+          label="توضیحات"
+          variant="outlined"
+          clearable
+          :error-messages="descriptionErrors"
+        />
       </v-col>
     </v-row>
 
