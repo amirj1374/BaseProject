@@ -23,6 +23,12 @@ const userApi = (axiosInstance: AxiosInstance) => ({
   },
   setCustomizer(data: CustomizerDTO) {
     return axiosInstance.post(`api/v1/customizer`, data);
+  },
+  getLoanRequestCount() {
+    return axiosInstance.get(`api/v1/dashboard/loan-request-counts`);
+  },
+  getCartableCount() {
+    return axiosInstance.get(`/api/v1/dashboard/cartable-status-counts`);
   }
 });
 

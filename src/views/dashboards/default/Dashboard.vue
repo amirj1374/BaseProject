@@ -4,12 +4,7 @@
       <!-- Loading State -->
       <v-row v-if="customerInfoStore.isLoading">
         <v-col cols="12" class="text-center">
-
-          <v-progress-circular
-            indeterminate
-            color="primary"
-            size="64"
-          ></v-progress-circular>
+          <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
           <p class="mt-4">در حال بارگذاری اطلاعات کاربر...</p>
         </v-col>
       </v-row>
@@ -17,11 +12,7 @@
       <!-- Error State -->
       <v-row v-else-if="customerInfoStore.error">
         <v-col cols="12">
-          <v-alert
-            type="error"
-            title="خطا در بارگذاری اطلاعات"
-            :text="customerInfoStore.error"
-          ></v-alert>
+          <v-alert type="error" title="خطا در بارگذاری اطلاعات" :text="customerInfoStore.error"></v-alert>
         </v-col>
       </v-row>
 
@@ -45,24 +36,24 @@
         <v-row>
           <!-- Personal Information -->
           <v-col cols="12" md="6">
-            <v-card>
-              <v-card-text>
-                <total-growth></total-growth>
-              </v-card-text>
-            </v-card>
+            <total-growth></total-growth>
+          </v-col>
+
+          <v-col cols="12" md="6">
+            <data-labels></data-labels>
           </v-col>
 
           <!-- Branch Information -->
-<!--          <v-col cols="12" md="6">-->
-<!--            <v-card class="mb-4">-->
-<!--              <v-card-title class="d-flex align-center">-->
-<!--                اطلاعات شعبه-->
-<!--              </v-card-title>-->
-<!--              <v-card-text>-->
-<!--                <total-pay></total-pay>-->
-<!--              </v-card-text>-->
-<!--            </v-card>-->
-<!--          </v-col>-->
+          <!--          <v-col cols="12" md="6">-->
+          <!--            <v-card class="mb-4">-->
+          <!--              <v-card-title class="d-flex align-center">-->
+          <!--                اطلاعات شعبه-->
+          <!--              </v-card-title>-->
+          <!--              <v-card-text>-->
+          <!--                <total-pay></total-pay>-->
+          <!--              </v-card-text>-->
+          <!--            </v-card>-->
+          <!--          </v-col>-->
         </v-row>
       </div>
     </v-container>
@@ -78,17 +69,17 @@ import TotalEarning from '@/views/dashboards/default/components/TotalEarning.vue
 import TotalPay from '@/views/dashboards/default/components/TotalPay.vue';
 import TotalGrowth from '@/views/dashboards/default/components/TotalGrowth.vue';
 import TotalIncome from '@/views/dashboards/default/components/TotalIncome.vue';
+import DataLabels from '@/views/dashboards/default/components/DataLabels.vue';
 
 const customerInfoStore = useCustomerInfoStore();
 
 // Get user info from store
 const userInfo = computed(() => customerInfoStore.getUserInfo);
 
-
 // Format date helper function
 const formatDate = (dateString) => {
   if (!dateString) return 'نامشخص';
-  
+
   try {
     const date = new Date(dateString);
     return date.toLocaleDateString('fa-IR', {
@@ -106,4 +97,4 @@ const formatDate = (dateString) => {
 
 <style scoped>
 /* Add any custom styles here */
-</style> 
+</style>
