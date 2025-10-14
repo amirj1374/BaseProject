@@ -53,7 +53,7 @@
     </div>
     <v-snackbar v-model="showSuccess" color="success" timeout="3000" location="top">
       <div class="d-flex align-center">
-        <v-icon class="me-2">mdi-check-circle</v-icon>
+        <v-icon class="me-2" :icon="icons.checkCircle"></v-icon>
         {{ successMessage }}
       </div>
     </v-snackbar>
@@ -65,6 +65,7 @@ import { ref, computed, onMounted } from 'vue';
 import PdfViewer from '@/components/shared/PdfViewer.vue';
 import { api } from '@/services/api';
 import { useRouter } from 'vue-router';
+import { icons } from '@/plugins/mdi-icon';
 
 // Define props for the component
 const props = defineProps({

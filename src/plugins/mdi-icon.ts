@@ -4,7 +4,14 @@ import {
   mdiEyeOff,
   mdiEye,
   mdiFormatSize,
-  mdiPaletteSwatchVariant
+  mdiPaletteSwatchVariant,
+  mdiFileDownload,
+  mdiCheckCircle,
+  mdiAlertCircle,
+  mdiPencil,
+  mdiDelete,
+  mdiArrowRight,
+  mdiCog
 } from '@mdi/js';
 
 export const icons = {
@@ -13,5 +20,12 @@ export const icons = {
   eyeOff: mdiEyeOff,
   eye: mdiEye,
   text: mdiFormatSize,
-  style: mdiPaletteSwatchVariant
+  style: mdiPaletteSwatchVariant,
+  download: mdiFileDownload,
+  checkCircle: mdiCheckCircle,
+  alertCircle: mdiAlertCircle,
+  pencil: mdiPencil,
+  delete: mdiDelete,
+  arrowRight: mdiArrowRight,
+  cog: mdiCog
 };

@@ -32,8 +32,30 @@
           density="comfortable"
           hide-details="auto"
           clearable
-          :rules="[required]"
+          :rules="[branchCodeValidation]"
           ref="branchAutocomplete"
+        />
+      </v-col>
+      <v-col cols="12" md="6">
+        <v-text-field
+          v-model="filterModel.trackingCode"
+          label="کد رهگیری"
+          variant="outlined"
+          density="comfortable"
+          hide-details="auto"
+          clearable
+          placeholder="کد رهگیری"
+        />
+      </v-col>
+      <v-col cols="12" md="6">
+        <v-text-field
+          v-model="filterModel.customerCode"
+          label="کد مشتری"
+          variant="outlined"
+          density="comfortable"
+          hide-details="auto"
+          clearable
+          placeholder="کد مشتری"
         />
       </v-col>
     </v-row>
@@ -45,7 +67,7 @@
         <v-btn 
           color="primary" 
           @click="applyFilters"
-          :disabled="!filterModel.branchCode"
+          :disabled="!canApplyFilters"
         > 
           اعمال فیلتر 
         </v-btn>
@@ -55,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, defineProps, defineEmits } from 'vue';
+import { ref, reactive, watch, computed, defineProps, defineEmits } from 'vue';
 import { useBaseStore } from '@/stores/base';
 import type { BranchDto, ContractType, RegionsDto } from '@/types/approval/approvalType';
 import { api } from '@/services/api';
@@ -63,7 +85,16 @@ const branchList = ref<BranchDto[]>([]);
 const baseStore = useBaseStore();
 const branchAutocomplete = ref();
 
-const required = (v: any) => !!v || 'انتخاب شعبه الزامی است';
+// Conditional validation for branchCode
+const branchCodeValidation = (v: any) => {
+  // Only validate branchCode if it's actually being used (not empty)
+  // This allows the field to be optional but validates when filled
+  if (v && v.trim() !== '') {
+    return true; // Valid if branchCode is provided
+  }
+  // Always allow empty branchCode - validation happens at apply time
+  return true;
+};
 
 async function fetchBranches(newRegion: string | null) {
   console.log('fetchBranches called with:', newRegion);
@@ -86,6 +117,8 @@ async function fetchBranches(newRegion: string | null) {
 interface FilterModel {
   branchCode: string;
   regionBranchCode: string;
+  trackingCode: string;
+  customerCode: string;
 }
 
 const props = defineProps<{
@@ -101,6 +134,22 @@ const emit = defineEmits<{
 const filterModel = reactive<FilterModel>({
   regionBranchCode: '',
   branchCode: '',
+  trackingCode: '',
+  customerCode: '',
+});
+
+// Computed property to determine if filters can be applied
+const canApplyFilters = computed(() => {
+  // Allow filtering if any of these conditions are met:
+  // 1. branchCode is selected (regardless of region)
+  // 2. trackingCode is provided
+  // 3. customerCode is provided
+  
+  return !!(
+    filterModel.branchCode ||
+    filterModel.trackingCode ||
+    filterModel.customerCode
+  );
 });
 
 // Watch for external changes to modelValue
@@ -143,14 +192,7 @@ const clearFilters = () => {
 
 // Apply filters
 const applyFilters = async () => {
-  // Validate branch selection
-  const isValid = await branchAutocomplete.value?.validate();
-  
-  if (!isValid || !filterModel.branchCode) {
-    console.log('Branch validation failed - cannot apply filters');
-    return;
-  }
-  
+  // No validation blocking - allow all valid filter combinations
   console.log('Applying filters with:', filterModel);
   emit('update:modelValue', { ...filterModel });
   emit('apply', { ...filterModel });

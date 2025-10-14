@@ -26,7 +26,7 @@
       location="top"
     >
       <div class="d-flex align-center">
-        <v-icon class="me-2">mdi-check-circle</v-icon>
+        <v-icon class="me-2" :icon="icons.checkCircle"></v-icon>
         {{ successMessage }}
       </div>
     </v-snackbar>
@@ -39,7 +39,7 @@
       location="top"
     >
       <div class="d-flex align-center">
-        <v-icon class="me-2">mdi-alert-circle</v-icon>
+        <v-icon class="me-2" :icon="icons.alertCircle"></v-icon>
         {{ errorMessage }}
       </div>
     </v-snackbar>
@@ -50,6 +50,7 @@
 import { ref, onMounted } from 'vue';
 import { api } from '@/services/api';
 import DescriptionInput from '@/components/shared/DescriptionInput.vue';
+import { icons } from '@/plugins/mdi-icon';
 
 interface Props {
   cartableId?: string | number;

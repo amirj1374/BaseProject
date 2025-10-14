@@ -6,6 +6,7 @@ import { onMounted, ref, watch, computed } from 'vue';
 import ApprovalRequestViewer from '@/components/approval/ApprovalRequestViewer.vue';
 import { usePermissionsStore } from '@/stores/permissions';
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue';
+import DownloadButton from '@/components/shared/DownloadButton.vue';
 
 const confirmDialog = ref(false);
 const permissionsStore = usePermissionsStore();
@@ -28,56 +29,6 @@ const props = defineProps<{
 
 const id = ref(props.item?.id ?? '');
 
-const downloadExpertReport = async () => {
-  if (props.item.expertReportUrl) {
-    try {
-      // Fetch the file
-      const response = await fetch(props.item.expertReportUrl);
-      const blob = await response.blob();
-
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'expert-report.pdf';
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading expert report:', error);
-      // Fallback to opening in new tab
-      window.open(props.expertReportUrl, '_blank');
-    }
-  }
-};
-const downloadDirectiveReport = async () => {
-  if (props.item.expertReportUrl) {
-    try {
-      // Fetch the file
-      const response = await fetch(props.item.formLetterUrl);
-      const blob = await response.blob();
-
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'expert-report.pdf';
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading expert report:', error);
-      // Fallback to opening in new tab
-      window.open(props.expertReportUrl, '_blank');
-    }
-  }
-};
 
 const fetchValidUsers = async (selectedValue: string) => {
   const res = await api.cartable.getValidRoles(Number(selectedValue));
@@ -248,31 +199,6 @@ const roleOptions = computed(() =>
     : []
 );
 
-const download1016Report = async () => {
-  if (props.item.report1016Url) {
-    try {
-      // Fetch the file
-      const response = await fetch(props.item.report1016Url);
-      const blob = await response.blob();
-
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = '1016-report.pdf';
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading 1016 report:', error);
-      // Fallback to opening in new tab
-      window.open(props.item.report1016Url, '_blank');
-    }
-  }
-};
 
 watch(validUserOptions, (newOptions) => {
   if (newOptions.length > 0) {
@@ -348,13 +274,40 @@ watch(validUserOptions, (newOptions) => {
     </v-row>
     <v-row>
       <v-col cols="12" md="3" v-if="props.item.formLetterUrl && permissionsStore.hasMenuPermission('downloadDirectiveReport')">
-        <v-btn color="info" @click="downloadDirectiveReport" variant="tonal"> دانلود گزارش ابلاغیه </v-btn>
+        <DownloadButton 
+          :url="props.item.formLetterUrl"
+          title="دانلود گزارش ابلاغیه"
+          color="secondary"
+          variant="tonal"
+          filename="directive-report.pdf"
+        />
       </v-col>
       <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('downloadExpertReport')">
-        <v-btn color="info" @click="downloadExpertReport" variant="tonal"> دانلود گزارش کارشناسی </v-btn>
+        <DownloadButton 
+          :url="props.item.expertReportUrl"
+          title="دانلود گزارش کارشناسی"
+          color="secondary"
+          variant="tonal"
+          filename="expert-report.pdf"
+        />
       </v-col>
       <v-col cols="12" md="3" v-if="props.item.report1016Url && permissionsStore.hasMenuPermission('download1016')">
-        <v-btn color="info" @click="download1016Report" variant="tonal"> دانلود فرم 1016 </v-btn>
+        <DownloadButton 
+          :url="props.item.report1016Url"
+          title="دانلود فرم 1016"
+          color="secondary"
+          variant="tonal"
+          filename="form-1016.pdf"
+        />
+      </v-col>
+      <v-col cols="12" md="3" v-if="props.item.formCreditApprovalUrl && permissionsStore.hasMenuPermission('formCreditApprovalUrl')">
+        <DownloadButton 
+          :url="props.item.formCreditApprovalUrl"
+          title="دانلود فرم پیش مصوبه اعتبارات"
+          color="secondary"
+          variant="tonal"
+          filename="credit-approval-form.pdf"
+        />
       </v-col>
       <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('reviewExpertReport')">
         <v-switch v-model="props.item.expertReportIsSeen" inset color="primary" hide-details class="me-2" />
