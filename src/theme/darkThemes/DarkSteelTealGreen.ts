@@ -35,7 +35,17 @@ const DarkSteelTealGreen: ThemeTypes = {
     gray100: '#2A2A2A',
     primary200: '#2A2A2A',
     secondary200: '#1A2A2A',
-    white: '#FFFFFF'
+    white: '#FFFFFF',
+    // Additional color variations
+    primary300: '#B0BEC5',
+    primary400: '#82a9bc',
+    primary500: '#6b8897',
+    primary600: '#394a53',
+    primary700: '#222d32',
+    primary800: '#090d0e',
+    secondary400: '#2A4A4A',
+    secondary600: '#4DB6AC',
+    secondary800: '#00897B'
   }
 };
 

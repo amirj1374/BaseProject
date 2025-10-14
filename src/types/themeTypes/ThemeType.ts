@@ -32,5 +32,15 @@ export type ThemeTypes = {
     primary200?: string;
     secondary200?: string;
     white?: string;
+    // Additional color variations
+    primary300?: string;
+    primary400?: string;
+    primary500?: string;
+    primary600?: string;
+    primary700?: string;
+    primary800: string;
+    secondary400?: string;
+    secondary600?: string;
+    secondary800?: string;
   };
 };

@@ -35,7 +35,19 @@ const SilverTheme: ThemeTypes = {
     gray100: '#f8fafc', // Slate 50
     primary200: '#e2e8f0', // Slate 200
     secondary200: '#f1f5f9', // Slate 100
-    white: '#FFFFFF'
+    white: '#FFFFFF',
+    // Additional color variations
+    primary300: '#94a3b8',
+    primary400: '#6589ba',
+    primary500: '#516785',
+    primary600: '#303e53',
+    primary700: '#1e2733',
+    primary800: '#080b10',
+
+
+    secondary400: '#cbd5e1', // Slate 300
+    secondary600: '#64748b', // Slate 500
+    secondary800: '#475569' // Slate 600
   }
 };
 

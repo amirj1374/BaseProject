@@ -35,7 +35,17 @@ const DarkSilverTheme: ThemeTypes = {
     gray100: '#0f172a', // Slate 900
     primary200: '#334155', // Slate 700
     secondary200: '#475569', // Slate 600
-    white: '#1e293b' // Slate 800
+    white: '#1e293b', // Slate 800
+    // Additional color variations
+    primary300: '#94a3b8',
+    primary400: '#6589ba',
+    primary500: '#516785',
+    primary600: '#303e53',
+    primary700: '#1e2733',
+    primary800: '#080b10',
+    secondary400: '#64748b', // Slate 500
+    secondary600: '#94a3b8', // Slate 400
+    secondary800: '#64748b' // Slate 500
   }
 };
 

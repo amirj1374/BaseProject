@@ -35,7 +35,18 @@ const DarkPurpleTheme: ThemeTypes = {
     gray100: '#2A2A2A',
     primary200: '#1B2A3A',
     secondary200: '#2A1B3A',
-    white: '#FFFFFF'
+    white: '#FFFFFF',
+    // Additional color variations
+    primary300: '#9fd0f3',
+    primary400: '#87bbef',
+    primary500: '#5c9fed',
+    primary600: '#2567af',
+    primary700: '#144a8f',
+    primary800: '#093260',
+
+    secondary400: '#4A2A5A',
+    secondary600: '#7B1FA2',
+    secondary800: '#512DA8'
   }
 };
 

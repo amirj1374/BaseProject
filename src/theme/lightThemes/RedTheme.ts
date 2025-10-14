@@ -35,7 +35,18 @@ const RedTheme: ThemeTypes = {
     gray100: '#fafafa',
     primary200: '#90caf9',
     secondary200: '#FDE8EF',
-    white: '#FFFFFF'
+    white: '#FFFFFF',
+    // Additional color variations
+    primary300: '#77a2fa',
+    primary400: '#407ce1',
+    primary500: '#1c549f',
+    primary600: '#062d5e',
+    primary700: '#051e39',
+    primary800: '#01050b',
+
+    secondary400: '#F8BBD9',
+    secondary600: '#D81B60',
+    secondary800: '#C2185B'
   }
 };
 

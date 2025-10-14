@@ -78,14 +78,14 @@ const chartOptions1 = computed(() => {
       }
     },
     colors: [
+      currentTheme.value.colors.primary800,
+      currentTheme.value.colors.primary700,
+      currentTheme.value.colors.primary600,
+      currentTheme.value.colors.primary500,
+      currentTheme.value.colors.primary400,
       currentTheme.value.colors.primary,
-      currentTheme.value.colors.secondary,
-      currentTheme.value.colors.secondary200,
+      currentTheme.value.colors.primary300,
       currentTheme.value.colors.primary200,
-      currentTheme.value.colors.darkprimary,
-      currentTheme.value.colors.darksecondary,
-      currentTheme.value.colors.info,
-      '#FF6B6B',
     ],
     responsive: [
       {

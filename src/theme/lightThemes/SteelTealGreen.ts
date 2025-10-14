@@ -35,7 +35,18 @@ const SteelTealGreen: ThemeTypes = {
     gray100: '#fafafa',
     primary200: '#E0F2F1',
     secondary200: '#E0F2F1',
-    white: '#FFFFFF'
+    white: '#FFFFFF',
+    // Additional color variations
+    primary300: '#B0BEC5',
+    primary400: '#82a9bc',
+    primary500: '#6b8897',
+    primary600: '#394a53',
+    primary700: '#222d32',
+    primary800: '#090d0e',
+
+    secondary400: '#4DB6AC',
+    secondary600: '#00695C',
+    secondary800: '#004D40'
   }
 };
 

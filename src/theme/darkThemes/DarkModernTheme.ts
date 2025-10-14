@@ -35,7 +35,18 @@ const DarkModernTheme: ThemeTypes = {
     gray100: '#1f2937', // Gray 800
     primary200: '#312e81', // Indigo 800
     secondary200: '#5b21b6', // Purple 800
-    white: '#FFFFFF'
+    white: '#FFFFFF',
+    // Additional color variations  
+    primary300: '#c7d2fe',
+    primary400: '#7590f1',
+    primary500: '#4338ca',
+    primary600: '#352a9f',
+    primary700: '#22215e',
+    primary800: '#0b0b5a',
+
+    secondary400: '#581c87', // Purple 800
+    secondary600: '#6b21a8', // Purple 700
+    secondary800: '#4c1d95' // Purple 900
   }
 };
 
