@@ -114,6 +114,10 @@ export const usePermissionsStore = defineStore({
       {
         menuKey: 'approvalSignerReport',
         requiredRoles: ['SMP_APPROVAL_SIGNER_RPT']
+      },
+      {
+        menuKey: 'downloadApprovalReport',
+        requiredRoles: ['SMP_DL_APPROVAL_RPT']
       }
     ] as MenuPermission[]
   }),

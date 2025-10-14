@@ -90,7 +90,7 @@ const required = (v: any) => (needsComment.value ? (!!v || 'این فیلد ال
           <v-radio color="warning" label="عودت" :value="'RETURNED'"></v-radio>
         </v-radio-group>
       </v-col>
-      <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('downloadExpertReport')">
+        <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('downloadExpertReport')">
         <DownloadButton 
           :url="props.item.expertReportUrl"
           title="دانلود گزارش کارشناسی"
@@ -117,7 +117,7 @@ const required = (v: any) => (needsComment.value ? (!!v || 'این فیلد ال
           filename="directive-report.pdf"
         />
       </v-col>
-      <v-col cols="12" md="3" v-if="props.item.formCreditApprovalUrl && permissionsStore.hasMenuPermission('formCreditApprovalUrl')">
+      <v-col cols="12" md="3" v-if="props.item.formCreditApprovalUrl && permissionsStore.hasMenuPermission('downloadApprovalReport')">
         <DownloadButton 
           :url="props.item.formCreditApprovalUrl"
           title="دانلود فرم پیش مصوبه اعتبارات"

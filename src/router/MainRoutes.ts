@@ -21,7 +21,7 @@ const MainRoutes = {
     {
       name: 'ApprovalDetail',
       path: '/approval/:id',
-      meta: { requiresAuth: false, permission: 'approval_new' },
+      meta: { requiresAuth: false, permission: 'approval_edit' },
       component: () => import('@/views/approval/approval.vue')
     },
     {

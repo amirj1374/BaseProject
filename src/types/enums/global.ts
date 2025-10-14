@@ -208,6 +208,14 @@ export const RoleTypeEnum = {
   SMPCOORDINATORCM: 'SMPCOORDINATORCM',
   SMPALTSIGNERCC: 'SMPALTSIGNERCC',
   SMPALTCOORDINATORCC: 'SMPALTCOORDINATORCC',
+  SMPCOORDINATORREGION: 'SMPCOORDINATORREGION',
+  SMPCOORDINATORPLANCC: 'SMPCOORDINATORPLANCC',
+  SMPCOORDINATORKBCC: 'SMPCOORDINATORKBCC',
+  SMPCOORDINATORCORPCC: 'SMPCOORDINATORCORPCC',
+  SMPCOORDINATORRETAILCC: 'SMPCOORDINATORRETAILCC',
+  SMPCMSIGNERMEMBER: 'SMPCMSIGNERMEMBER',
+  SMPREGIONSIGNERMEMBER: 'SMPREGIONSIGNERMEMBER',
+  SMPBRANCHSIGNERMEMBER: 'SMPBRANCHSIGNERMEMBER',
 } as const;
 
 export type RoleType = (typeof RoleTypeEnum)[keyof typeof RoleTypeEnum];
@@ -216,8 +224,8 @@ export const RoleTypeOptions = [
   { title: 'کارشناس سماپ-شعبه', value: RoleTypeEnum.SMPUSER},
   { title: 'کارشناس سماپ-منطقه', value: RoleTypeEnum.SMPUSERREGION},
   { title: 'ادمین سامانه سماپ', value: RoleTypeEnum.SMPADMIN },
-  { title: 'امضادار سماپ-شعبه/منطقه', value: RoleTypeEnum.SMPSIGNER },
-  { title: 'دبیر سامانه سماپ-شعبه/منطقه', value: RoleTypeEnum.SMPCOORDINATOR },
+  { title: 'امضادار سماپ-شعبه', value: RoleTypeEnum.SMPSIGNER },
+  { title: 'دبیر سامانه سماپ-شعبه', value: RoleTypeEnum.SMPCOORDINATOR },
   { title: 'امضادار سماپ-کمیته مرکزی', value: RoleTypeEnum.SMPSIGNERCC },
   { title: 'دبیر سماپ-کمیته مرکزی', value: RoleTypeEnum.SMPCOORDINATORCC },
   { title: 'امضادار سماپ-کمیته عالی', value: RoleTypeEnum.SMPSIGNERSC },
@@ -230,4 +238,12 @@ export const RoleTypeOptions = [
   { title: 'دبیر سماپ-مدیریت اعتبارات', value: RoleTypeEnum.SMPCOORDINATORCM },
   { title: 'جانشین امضادار سماپ-کمیته مرکزی', value: RoleTypeEnum.SMPALTSIGNERCC },
   { title: 'جانشین دبیر سماپ-کمیته مرکزی', value: RoleTypeEnum.SMPALTCOORDINATORCC },
+  { title: 'دبیر سامانه سماپ-منطقه', value: RoleTypeEnum.SMPCOORDINATORREGION },
+  { title: 'دبیر سماپ-کمیته مرکز-اداره طرح', value: RoleTypeEnum.SMPCOORDINATORPLANCC },
+  { title: 'دبیر سماپ-کمیته مرکز-اداره دانش بنیان', value: RoleTypeEnum.SMPCOORDINATORKBCC },
+  { title: 'دبیر سماپ-کمیته مرکز-اداره کلان', value: RoleTypeEnum.SMPCOORDINATORCORPCC },
+  { title: 'دبیر سماپ- کمیته مرکز-اداره خرد', value: RoleTypeEnum.SMPCOORDINATORRETAILCC },
+  { title: 'عضو امضادار مدیریت اعتبارات', value: RoleTypeEnum.SMPCMSIGNERMEMBER },
+  { title: 'عضو امضادار منطقه', value: RoleTypeEnum.SMPREGIONSIGNERMEMBER },
+  { title: 'عضو امضادار شعیه', value: RoleTypeEnum.SMPBRANCHSIGNERMEMBER },
 ];

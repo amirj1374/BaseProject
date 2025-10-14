@@ -227,7 +227,7 @@ onBeforeUnmount(() => {
 
   <div class="actions">
     <div class="d-flex gap-2" v-if="stepper < totalSteps">
-      <v-btn v-if="id && approvalStore.trackingCode" color="success" @click="handleSave" :loading="submitting"> ذخیره و خروج</v-btn>
+      <v-btn v-if="id && approvalStore.trackingCode" color="primary" @click="handleSave" :loading="submitting"> ذخیره و خروج</v-btn>
       <v-btn color="secondary" @click="handleSubmit" :loading="submitting"> مرحله بعد</v-btn>
     </div>
     <v-btn v-else color="secondary" @click="handleCartable" :loading="submitting"> ایجاد کارتابل</v-btn>
