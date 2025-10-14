@@ -11,11 +11,11 @@ const isLoading = ref<boolean>(true)
 const loadError = ref<string | null>(null)
 
 const select = ref({ state: 'امروز', abbr: 'FL' });
-const items = [
-  { state: 'روزانه', abbr: 'FL' },
-  { state: 'ماهانه', abbr: 'GA' },
-  { state: 'سالانه', abbr: 'NE' }
-];
+// const items = [
+//   { state: 'روزانه', abbr: 'FL' },
+//   { state: 'ماهانه', abbr: 'GA' },
+//   { state: 'سالانه', abbr: 'NE' }
+// ];
 
 // Persian labels for series names
 const seriesLabels: Record<string, string> = {
@@ -154,25 +154,25 @@ const lineChart1 = computed(() => ({
       <v-card-text>
         <v-row>
           <v-col cols="12" sm="9">
-            <span class="text-subtitle-2 text-disabled font-weight-bold">آمار درخواست های تسهیلات</span>
-            <h3 class="text-h3 mt-1">بر اساس نوع تسهیلات</h3>
+            <span class="text-subtitle-2 text-disabled font-weight-bold">آمار پرونده های ثبت شده</span>
+            <h3 class="text-h3 mt-1">بر اساس نوع مصوبه</h3>
           </v-col>
-          <v-col cols="12" sm="3">
-            <v-select
-              color="primary"
-              variant="outlined"
-              hide-details
-              v-model="select"
-              :items="items"
-              item-title="state"
-              item-value="abbr"
-              label="Select"
-              persistent-hint
-              return-object
-              single-line
-            >
-            </v-select>
-          </v-col>
+<!--          <v-col cols="12" sm="3">-->
+<!--            <v-select-->
+<!--              color="primary"-->
+<!--              variant="outlined"-->
+<!--              hide-details-->
+<!--              v-model="select"-->
+<!--              :items="items"-->
+<!--              item-title="state"-->
+<!--              item-value="abbr"-->
+<!--              label="Select"-->
+<!--              persistent-hint-->
+<!--              return-object-->
+<!--              single-line-->
+<!--            >-->
+<!--            </v-select>-->
+<!--          </v-col>-->
         </v-row>
         <div class="mt-4">
           <template v-if="isLoading">

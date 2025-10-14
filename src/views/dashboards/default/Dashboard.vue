@@ -23,7 +23,6 @@
           <v-col cols="12">
             <v-card class="mb-4">
               <v-card-title class="d-flex align-center">
-                <IconUserCircle size="32" class="mr-3" color="primary" />
               </v-card-title>
               <v-card-text>
                 <total-income></total-income>
@@ -35,12 +34,20 @@
         <!-- User Information Cards -->
         <v-row>
           <!-- Personal Information -->
-          <v-col cols="12" md="6">
-            <total-growth></total-growth>
+          <v-col cols="12" md="6" class="d-flex">
+            <v-card class="w-100 h-100">
+              <v-card-text class="pa-0">
+                <total-growth />
+              </v-card-text>
+            </v-card>
           </v-col>
 
-          <v-col cols="12" md="6">
-            <data-labels></data-labels>
+          <v-col cols="12" md="6" class="d-flex">
+            <v-card class="w-100 h-100">
+              <v-card-text class="pa-0">
+                <data-labels />
+              </v-card-text>
+            </v-card>
           </v-col>
 
           <!-- Branch Information -->
@@ -96,5 +103,13 @@ const formatDate = (dateString) => {
 </script>
 
 <style scoped>
+.equal-height {
+  display: flex;
+  align-items: stretch;
+}
+
+.equal-height > * {
+  flex: 1;
+}
 /* Add any custom styles here */
 </style>

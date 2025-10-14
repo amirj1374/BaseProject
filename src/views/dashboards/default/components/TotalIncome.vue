@@ -1,9 +1,27 @@
 <script setup lang="ts">
-import { IconBuildingStore, IconTableShare } from '@tabler/icons-vue';
+import { IconBuildingStore, IconTableShare } from '@tabler/icons-vue'
+import { useCustomerInfoStore } from '@/stores/customerInfo'
+import { RoleTypeOptions } from '@/types/enums/global'
+
+// 🟢 store
+const customerInfoStore = useCustomerInfoStore()
+
+// 🟢 build a map of valid roles
+const roleTitleMap = Object.fromEntries(
+  RoleTypeOptions.map(opt => [opt.value, opt.title])
+)
+
+// 🟢 translate + filter only valid roles
+const translateRoles = (roles: string[] = []): string[] =>
+  roles
+    .filter(role => role in roleTitleMap)
+    .map(role => roleTitleMap[role])
 </script>
+
 
 <template>
   <div class="total-income">
+    <!-- Role -->
     <v-card elevation="0" class="bubble-shape-sm overflow-hidden bubble-warning">
       <v-card-text class="pa-5">
         <div class="d-flex align-center ga-4">
@@ -11,13 +29,20 @@ import { IconBuildingStore, IconTableShare } from '@tabler/icons-vue';
             <IconBuildingStore stroke-width="1.5" width="25" class="ti-icon" />
           </v-btn>
           <div>
-            <h4 class="text-h4 font-weight-medium">700,000 ریال</h4>
-            <span class="text-subtitle-2 text-disabled font-weight-medium">نام و نام خوادگی</span>
+            <h3 class="text-h3 font-weight-medium">
+              {{
+                customerInfoStore.userInfo?.lotusRoles
+                  ? translateRoles(customerInfoStore.userInfo.lotusRoles).join('، ')
+                  : '-'
+              }}
+            </h3>
+            <span class="text-subtitle-1 text-disabled font-weight-medium">نقش</span>
           </div>
         </div>
       </v-card-text>
     </v-card>
 
+    <!-- Full Name -->
     <v-card elevation="0" class="bg-primary overflow-hidden bubble-shape-sm bubble-primary">
       <v-card-text class="pa-5">
         <div class="d-flex align-center ga-4">
@@ -25,12 +50,14 @@ import { IconBuildingStore, IconTableShare } from '@tabler/icons-vue';
             <IconTableShare stroke-width="1.5" width="25" class="ti-icon" />
           </v-btn>
           <div>
-            <h4 class="text-h4 font-weight-medium">1,000,000 ریال</h4>
-            <span class="text-subtitle-2 text-medium-emphasis text-white">مبلغ کل محقق شده</span>
+            <h3 class="text-h3 font-weight-medium">{{ customerInfoStore.userInfo?.fullName }}</h3>
+            <span class="text-subtitle-1 text-medium-emphasis text-white">نام و نام خانوادگی</span>
           </div>
         </div>
       </v-card-text>
     </v-card>
+
+    <!-- Branch -->
     <v-card elevation="0" class="bubble-shape-sm overflow-hidden bubble-warning">
       <v-card-text class="pa-5">
         <div class="d-flex align-center ga-4">
@@ -38,14 +65,15 @@ import { IconBuildingStore, IconTableShare } from '@tabler/icons-vue';
             <IconBuildingStore stroke-width="1.5" width="25" class="ti-icon" />
           </v-btn>
           <div>
-            <h4 class="text-h4 font-weight-medium">500,000 ریال</h4>
-            <span class="text-subtitle-2 text-disabled font-weight-medium">مبلغ کل پرداخت شده</span>
+            <h3 class="text-h3 font-weight-medium">{{ customerInfoStore.userInfo?.branchCode }} - {{ customerInfoStore.userInfo?.branchName }}</h3>
+            <span class="text-subtitle-1 text-disabled font-weight-medium">شعبه</span>
           </div>
         </div>
       </v-card-text>
     </v-card>
   </div>
 </template>
+
 <style scoped>
 .total-income {
   display: flex;
