@@ -121,27 +121,6 @@ const steps = [
 
 const totalSteps = steps.length;
 
-// Navigation handlers
-const nextStep = async () => {
-  submitting.value = true;
-  try {
-    // Try to call submitData on the current step component if it exists
-    const currentStepComponent = stepperRef.value?.currentStepComponentRef;
-    if (currentStepComponent && typeof currentStepComponent.submitData === 'function') {
-      await currentStepComponent.submitData();
-    }
-    if (stepper.value < totalSteps) {
-      stepper.value++;
-    } else {
-      await router.push('/test/test');
-    }
-  } catch (err) {
-    error.value = `${err}`;
-  } finally {
-    submitting.value = false;
-  }
-};
-
 const prevStep = () => {
   if (stepper.value > 1) stepper.value--;
 };
