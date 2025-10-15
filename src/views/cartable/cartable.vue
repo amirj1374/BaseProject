@@ -83,6 +83,7 @@ const header = ref([
     key: 'customerCode',
     sortable: true,
     editable: true,
+    width: 200
   },
   {
     title: 'گروه مشتری',

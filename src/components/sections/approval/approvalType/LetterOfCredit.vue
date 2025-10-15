@@ -359,7 +359,7 @@ const formData = reactive({
 const headers = [
   { title: 'نوع مصوبه', key: 'approvalType', width: '200px' },
   { title: 'نوع ارز', key: 'currency', width: '200px' },
-  { title: 'مدت', key: 'durationDay', width: '200px' },
+  { title: 'مدت (روز)', key: 'durationDay', width: '200px' },
   { title: 'نوع اعتبار', key: 'creditType', width: '250px' },
   { title: 'نوع اعتبار اسنادی', key: 'lcContractType', width: '250px' },
   { title: 'میان دریافت', key: 'intermediatePayment', width: '200px' },
