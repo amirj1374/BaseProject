@@ -37,12 +37,13 @@ const DarkRedTheme: ThemeTypes = {
     secondary200: '#525252', // Medium gray
     white: '#1a1a1a', // Dark surface
     // Additional color variations
-    primary300: '#77a2fa',
-    primary400: '#407ce1',
-    primary500: '#1c549f',
-    primary600: '#062d5e',
-    primary700: '#051e39',
-    primary800: '#01050b',
+    primary300: '#c7d9f6',
+    primary400: '#7ea6ec',
+    primary500: '#407dd3',
+    primary600: '#1b5295',
+    primary700: '#083260',
+    primary800: '#071c3c',
+    primary900: '#01050b',
 
     secondary400: '#FFB3D1', // Light pink
     secondary600: '#FF6B9D', // Medium pink

@@ -43,6 +43,7 @@ const DarkOrangeTheme: ThemeTypes = {
     primary600: '#dc823a',
     primary700: '#884a17',
     primary800: '#603210',
+    primary900: '#351b09',
     secondary400: '#2A4040',
     secondary600: '#1F7A7A',
     secondary800: '#0F4748'

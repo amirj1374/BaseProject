@@ -112,6 +112,7 @@ const series = computed(() => percentages.value);
     <v-card variant="outlined">
       <v-card-text>
         <span class="text-subtitle-2 text-disabled font-weight-bold">وضعیت درخواست های کارتابل</span>
+        <h3 class="text-h3 mt-1">بر اساس نوع وضعیت</h3>
         <div class="mt-4">
           <template v-if="isLoading">
             <div class="d-flex justify-center py-8">

@@ -39,10 +39,11 @@ const DarkModernTheme: ThemeTypes = {
     // Additional color variations  
     primary300: '#c7d2fe',
     primary400: '#7590f1',
-    primary500: '#4338ca',
-    primary600: '#352a9f',
+    primary500: '#5a4fe4',
+    primary600: '#483bc5',
     primary700: '#22215e',
     primary800: '#0b0b5a',
+    primary900: '#03031b',
 
     secondary400: '#581c87', // Purple 800
     secondary600: '#6b21a8', // Purple 700

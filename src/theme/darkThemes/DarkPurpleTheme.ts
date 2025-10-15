@@ -43,6 +43,7 @@ const DarkPurpleTheme: ThemeTypes = {
     primary600: '#2567af',
     primary700: '#144a8f',
     primary800: '#093260',
+    primary900: '#051832',
 
     secondary400: '#4A2A5A',
     secondary600: '#7B1FA2',
