@@ -62,7 +62,7 @@ const header = ref([
     title: 'کد رهگیری',
     key: 'trackingCode',
     sortable: true,
-    width: 200,
+    width: 200
   },
   {
     title: 'وضعیت',
@@ -70,13 +70,13 @@ const header = ref([
     sortable: true,
     translate: true,
     width: 150,
-    options: CartableStatusTypeOptions,
+    options: CartableStatusTypeOptions
   },
   {
     title: 'نام مشتری',
     key: 'customerName',
     sortable: true,
-    editable: true,
+    editable: true
   },
   {
     title: 'کد مشتری',
@@ -88,7 +88,7 @@ const header = ref([
   {
     title: 'گروه مشتری',
     key: 'customerGroup',
-    sortable: true,
+    sortable: true
   },
   {
     title: 'نوع مشتری',
@@ -108,7 +108,7 @@ const header = ref([
     title: 'کد شعبه ثبت کننده درخواست',
     key: 'branchCode',
     sortable: true,
-    editable: true,
+    editable: true
   },
   {
     title: 'ایجاد شده توسط',
@@ -141,15 +141,15 @@ const regionPreApprovalReport = {
 };
 
 const flowReport = {
-  'گزارش عملیات ' : 'flowReportDetail/{id}'
-}
+  'گزارش عملیات ': 'flowReportDetail/{id}'
+};
 
 // Computed property for custom actions to ensure reactivity
 const customActions = computed(() => [
   {
     title: '⚙️ عملیات',
     component: (props: any) => h(Reference, { ...props, onSuccess: handleReferenceSuccess }),
-    condition: (item: any) => item.canSubmit === true
+    condition: (item: any) => item.canSubmit === true && item.status === 'IN_PROGRESS'
   },
   {
     title: '✍️امضا',
@@ -185,7 +185,9 @@ const customActions = computed(() => [
         cartableId: props.item.id,
         onSuccess: handleReferenceSuccess
       }),
-    condition: (item: any) => permissionsStore.hasMenuPermission('uploadExpertReport')
+    condition: (item: any) => {
+      permissionsStore.hasMenuPermission('uploadExpertReport') && item.status === 'IN_PROGRESS'
+    }
   },
   {
     title: '📜 تاریخچه کارتابل',
@@ -208,9 +210,9 @@ async function handleReferenceSuccess() {
 // Function for routes that can access item data
 const getDynamicRoutes = (item: any) => {
   const baseRoutes: Record<string, string> = {
-    ...(permissionsStore.hasMenuPermission('preApprovalReport') ? preApprovalReport : {}),
-    ...(permissionsStore.hasMenuPermission('directiveReport') ? directiveReport : {}),
-    ...(permissionsStore.hasMenuPermission('regionPreApprovalReport') ? regionPreApprovalReport : {}),
+    ...(permissionsStore.hasMenuPermission('preApprovalReport') && item.status === 'IN_PROGRESS' ? preApprovalReport : {}),
+    ...(permissionsStore.hasMenuPermission('directiveReport') && item.status === 'IN_PROGRESS' ? directiveReport : {}),
+    ...(permissionsStore.hasMenuPermission('regionPreApprovalReport') && item.status === 'IN_PROGRESS' ? regionPreApprovalReport : {}),
     ...(permissionsStore.hasMenuPermission('') ? flowReport : {})
   };
 
@@ -223,7 +225,7 @@ const getDynamicRoutes = (item: any) => {
 };
 function getCustomButtons(cartable: Cartable) {
   const buttons = [];
-  if (permissionsStore.hasMenuPermission('regenerate1016')){
+  if (permissionsStore.hasMenuPermission('regenerate1016')&& cartable.status === 'IN_PROGRESS') {
     buttons.push({
       label: '🔄 بروزرسانی فرم 1016',
       color: 'white',
@@ -232,17 +234,17 @@ function getCustomButtons(cartable: Cartable) {
           const response = await api.cartable.regenerate1016(cartable.loanRequestId);
           await tableRef.value?.fetchData();
           tableKey.value++;
-          showSnackbar('فرم 1016 با موفقیت بروزرسانی شد', 'success')
+          showSnackbar('فرم 1016 با موفقیت بروزرسانی شد', 'success');
         } catch (error) {
           console.error('Error in regenerate1016:', error);
-          showSnackbar('خطا در بروزرسانی فرم 1016', 'error')
+          showSnackbar('خطا در بروزرسانی فرم 1016', 'error');
         }
       },
       disabled: false
     });
   }
 
-  if (permissionsStore.hasMenuPermission('regenerateRegionApproval')){
+  if (permissionsStore.hasMenuPermission('regenerateRegionApproval')&& cartable.status === 'IN_PROGRESS') {
     buttons.push({
       label: '🔄 بروزرسانی پیش مصوبه منطقه',
       color: 'white',
@@ -251,17 +253,17 @@ function getCustomButtons(cartable: Cartable) {
           const response = await api.cartable.regenerateReqionApprovalLetter(cartable.id);
           await tableRef.value?.fetchData();
           tableKey.value++;
-          showSnackbar('گزارش پیش مصوبه منطقه با موفقیت بروزرسانی شد', 'success')
+          showSnackbar('گزارش پیش مصوبه منطقه با موفقیت بروزرسانی شد', 'success');
         } catch (error) {
           console.error('Error in regenerateReqionApprovalLetter:', error);
-          showSnackbar('خطا در بروزرسانی گزارش پیش مصوبه منطقه', 'error')
+          showSnackbar('خطا در بروزرسانی گزارش پیش مصوبه منطقه', 'error');
         }
       },
       disabled: false
     });
   }
 
-  if (permissionsStore.hasMenuPermission('regeneratePreApproval')){
+  if (permissionsStore.hasMenuPermission('regeneratePreApproval') && cartable.status === 'IN_PROGRESS') {
     buttons.push({
       label: '🔄 بروزرسانی گزارش پیش نویس مصوبه',
       color: 'white',
@@ -270,17 +272,17 @@ function getCustomButtons(cartable: Cartable) {
           const response = await api.cartable.regenerateCreditApprovals(cartable.id);
           await tableRef.value?.fetchData();
           tableKey.value++;
-          showSnackbar('گزارش پیش نویس مصوبه با موفقیت بروزرسانی شد', 'success')
+          showSnackbar('گزارش پیش نویس مصوبه با موفقیت بروزرسانی شد', 'success');
         } catch (error) {
           console.error('Error in regenerateCreditApprovals:', error);
-          showSnackbar('خطا در بروزرسانی گزارش پیش نویس مصوبه', 'error')
+          showSnackbar('خطا در بروزرسانی گزارش پیش نویس مصوبه', 'error');
         }
       },
       disabled: false
     });
   }
 
-  if (permissionsStore.hasMenuPermission('regenerateDirective')){
+  if (permissionsStore.hasMenuPermission('regenerateDirective')&& cartable.status === 'IN_PROGRESS') {
     buttons.push({
       label: '🔄 بروزرسانی گزارش ابلاغیه',
       color: 'white',
@@ -289,10 +291,10 @@ function getCustomButtons(cartable: Cartable) {
           const response = await api.cartable.regenerateCreditSuggestions(cartable.id);
           await tableRef.value?.fetchData();
           tableKey.value++;
-          showSnackbar('گزارش ابلاغیه با موفقیت بروزرسانی شد', 'success')
+          showSnackbar('گزارش ابلاغیه با موفقیت بروزرسانی شد', 'success');
         } catch (error) {
           console.error('Error in regenerateCreditSuggestions:', error);
-          showSnackbar('خطا در بروزرسانی گزارش ابلاغیه', 'error')
+          showSnackbar('خطا در بروزرسانی گزارش ابلاغیه', 'error');
         }
       },
       disabled: false
@@ -328,9 +330,7 @@ function getCustomButtons(cartable: Cartable) {
   <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="3000" location="top">
     {{ snackbarMessage }}
     <template v-slot:actions>
-      <v-btn color="white" variant="text" @click="snackbar = false">
-        بستن
-      </v-btn>
+      <v-btn color="white" variant="text" @click="snackbar = false"> بستن </v-btn>
     </template>
   </v-snackbar>
 </template>
