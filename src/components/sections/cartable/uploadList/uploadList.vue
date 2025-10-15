@@ -55,8 +55,8 @@ const getGroupHeaderTemplate = (groupKey: string | number, groupItems: any[]): s
 };
 
 const headers = [
-  { title: 'نوع', key: 'relationType', translate: true, options: RelationTypeOptions },
-  { title: 'عنوان مدرک', key: 'fileName' }
+  { title: 'مدرک', key: 'relationType', translate: true, options: RelationTypeOptions },
+  { title: 'عنوان مدرک', key: 'fileName', width: 500 }
 ];
 // Removed handleUpload function since we only show download buttons
 
@@ -97,7 +97,7 @@ defineExpose({ submitData });
 
 <template>
   <div class="approval-section">
-    <form @submit.prevent="submitData" class="upload-form">
+    <div class="upload-form">
       <CustomDataTable
         ref="dataTableRef"
         :headers="headers"
@@ -109,11 +109,11 @@ defineExpose({ submitData });
         :height="600"
         group-by="groupByItem"
         :default-expanded="true"
-        :page-size="50"
+        :page-size="150"
         :custom-buttons-fn="getCustomButtons"
         :group-header-template="getGroupHeaderTemplate"
       />
-    </form>
+    </div>
   </div>
 
   <!-- Removed image dialog since we only show download buttons -->

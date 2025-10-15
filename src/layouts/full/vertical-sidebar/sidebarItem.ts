@@ -1,9 +1,10 @@
-import { 
-  IconBookmarkEdit, 
-  IconClipboardData, 
-  IconDatabase, 
-  IconFileSymlink, 
-  IconHome, 
+import {
+  IconBookmarkEdit,
+  IconCheckupList,
+  IconClipboardData,
+  IconDatabase,
+  IconFileSymlink,
+  IconHome,
   IconPencilPlus,
   IconTableShare
 } from '@tabler/icons-vue';
@@ -58,7 +59,7 @@ const sidebarItem: menu[] = [
   },
   {
     title: 'گزارش عملیات',
-    icon: IconFileSymlink,
+    icon: IconCheckupList,
     to: '/flowReport',
     permissionKey: 'approvalSignerReport'
   },

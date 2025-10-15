@@ -439,8 +439,13 @@ const toggleSelectAll = () => {
   emit('selection-change', selectedItems.value);
 };
 
-// Group toggle function
-const toggleGroup = (groupKey: string | number) => selection.toggleGroup(groupKey);
+// Group toggle function with additional safety
+const toggleGroup = (groupKey: string | number) => {
+  // Small delay to ensure any focus/initialization issues are resolved
+  setTimeout(() => {
+    selection.toggleGroup(groupKey);
+  }, 0);
+};
 
 // Expand all groups
 const expandAllGroups = () => selection.expandAllGroups();
@@ -1278,7 +1283,8 @@ const handleFilterApply = (filterData: any) => {
                 class="group-header"
                 role="button"
                 tabindex="0"
-                @click="toggleGroup(group.groupKey)"
+                @click.stop="toggleGroup(group.groupKey)"
+                @mousedown.stop
                 @keydown.enter.prevent="toggleGroup(group.groupKey)"
                 @keydown.space.prevent="toggleGroup(group.groupKey)"
                 :aria-expanded="group.isExpanded ? 'true' : 'false'"
@@ -1727,6 +1733,10 @@ const handleFilterApply = (filterData: any) => {
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-bottom: 1px solid rgb(var(--v-theme-borderLight));
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .group-header:hover {

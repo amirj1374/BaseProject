@@ -92,7 +92,10 @@ export function useTableSelection<T extends Record<string, any> = Record<string,
 
   // Toggle group expansion
   const toggleGroup = (groupKey: string | number) => {
-    if (expandedGroups.value.has(groupKey)) {
+    // Prevent multiple rapid toggles and ensure state consistency
+    const isCurrentlyExpanded = expandedGroups.value.has(groupKey);
+    
+    if (isCurrentlyExpanded) {
       expandedGroups.value.delete(groupKey);
     } else {
       expandedGroups.value.add(groupKey);
@@ -101,7 +104,7 @@ export function useTableSelection<T extends Record<string, any> = Record<string,
     // Update the isExpanded property in groupedItems
     const groupIndex = groupedItems.value.findIndex(group => group.groupKey === groupKey);
     if (groupIndex !== -1) {
-      groupedItems.value[groupIndex].isExpanded = expandedGroups.value.has(groupKey);
+      groupedItems.value[groupIndex].isExpanded = !isCurrentlyExpanded;
     }
   };
 

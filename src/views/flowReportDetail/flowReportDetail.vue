@@ -16,7 +16,7 @@
       :show-pagination="true"
       :height="550"
       group-by="commiteName"
-      :page-size="100"
+      :page-size="150"
       :group-header-template="getGroupHeaderTemplate"
     />
   </div>
