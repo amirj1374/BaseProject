@@ -186,7 +186,7 @@ const customActions = computed(() => [
         onSuccess: handleReferenceSuccess
       }),
     condition: (item: any) => {
-      permissionsStore.hasMenuPermission('uploadExpertReport') && item.status === 'IN_PROGRESS'
+      return permissionsStore.hasMenuPermission('uploadExpertReport') && item.status === 'IN_PROGRESS'
     }
   },
   {
