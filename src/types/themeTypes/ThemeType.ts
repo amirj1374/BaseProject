@@ -39,6 +39,7 @@ export type ThemeTypes = {
     primary600?: string;
     primary700?: string;
     primary800: string;
+    primary900: string;
     secondary400?: string;
     secondary600?: string;
     secondary800?: string;

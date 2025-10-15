@@ -71,19 +71,19 @@ const chartOptions1 = computed(() => {
       type: 'bar',
       height: 350,
       fontFamily: `inherit`,
-      foreColor: currentTheme.value.colors.secondary,
+      foreColor: currentTheme.value.colors.darkText,
       stacked: true,
       toolbar: {
         show: false
       }
     },
     colors: [
+      currentTheme.value.colors.primary900,
       currentTheme.value.colors.primary800,
       currentTheme.value.colors.primary700,
       currentTheme.value.colors.primary600,
       currentTheme.value.colors.primary500,
       currentTheme.value.colors.primary400,
-      currentTheme.value.colors.primary,
       currentTheme.value.colors.primary300,
       currentTheme.value.colors.primary200,
     ],
@@ -114,17 +114,27 @@ const chartOptions1 = computed(() => {
       fontFamily: `'vazir', sans-serif`,
       position: 'bottom',
       offsetX: 7,
+      offsetY: 10,
       labels: {
-        useSeriesColors: false
+        useSeriesColors: false,
+        padding: 8,
+        margin: 12
       },
       markers: {
         width: 16,
         height: 16,
-        radius: 5
+        radius: 5,
+        offsetX: -2,
+        offsetY: 0
       },
       itemMargin: {
-        horizontal: 15,
-        vertical: 8
+        horizontal: 20,
+        vertical: 12
+      },
+      containerMargin: {
+        top: 10,
+        left: 0,
+        right: 0
       }
     },
     fill: {
@@ -174,7 +184,7 @@ const lineChart1 = computed(() => ({
 <!--            </v-select>-->
 <!--          </v-col>-->
         </v-row>
-        <div class="mt-4">
+        <div class="mt-4 chart-container">
           <template v-if="isLoading">
             <div class="d-flex justify-center py-8">
               <v-progress-circular indeterminate color="primary" size="40" />
@@ -187,6 +197,7 @@ const lineChart1 = computed(() => ({
               :options="chartOptions1" 
               :series="lineChart1.series"
               :key="`chart-${seriesData.length}-${groupName.length}`"
+              class="chart-wrapper"
             ></apexchart>
             <v-alert v-if="loadError" type="warning" class="mt-4" :text="loadError" variant="tonal" />
           </template>
@@ -195,3 +206,45 @@ const lineChart1 = computed(() => ({
     </v-card>
   </v-card>
 </template>
+
+<style lang="scss" scoped>
+.chart-container {
+  padding: 8px;
+  
+  .chart-wrapper {
+    margin-bottom: 16px;
+  }
+}
+
+// Enhanced legend styling
+:deep(.apexcharts-legend) {
+  padding: 16px 8px !important;
+  
+  .apexcharts-legend-series {
+    margin: 8px 12px !important;
+    
+    .apexcharts-legend-marker {
+      margin-right: 8px !important;
+    }
+    
+    .apexcharts-legend-text {
+      padding: 4px 8px !important;
+      font-size: 13px !important;
+      line-height: 1.4 !important;
+    }
+  }
+}
+
+// Better spacing for chart elements
+:deep(.apexcharts-chart) {
+  padding: 8px;
+}
+
+:deep(.apexcharts-xaxis) {
+  padding-top: 12px;
+}
+
+:deep(.apexcharts-yaxis) {
+  padding-right: 8px;
+}
+</style>

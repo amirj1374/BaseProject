@@ -43,6 +43,7 @@ const OrangeTheme: ThemeTypes = {
     primary600: '#dc823a',
     primary700: '#884a17',
     primary800: '#603210',
+    primary900: '#351b09',
 
     secondary400: '#D6E8E8',
     secondary600: '#0F4748',

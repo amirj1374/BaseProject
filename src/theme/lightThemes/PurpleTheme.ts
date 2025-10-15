@@ -43,6 +43,7 @@ const PurpleTheme: ThemeTypes = {
     primary600: '#2567af',
     primary700: '#144a8f',
     primary800: '#093260',
+    primary900: '#051832',
 
     secondary400: '#9575CD',
     secondary600: '#512DA8',

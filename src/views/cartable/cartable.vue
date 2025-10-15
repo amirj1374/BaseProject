@@ -49,7 +49,7 @@ const header = ref([
     key: 'updateDate',
     sortable: true,
     editable: true,
-    width: 180,
+    width: 200,
     isDate: true,
     formatter: (value: any, item: any) => {
       if (item.updateDate && item.updateTime) {
