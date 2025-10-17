@@ -35,7 +35,17 @@ const DarkTealTheme: ThemeTypes = {
     gray100: '#2A2A2A',
     primary200: '#1B2A2A',
     secondary200: '#1A2A2A',
-    white: '#FFFFFF'
+    white: '#FFFFFF',
+    primary300: '#73ece1',
+    primary400: '#15caab',
+    primary500: '#027a66',
+    primary600: '#025346',
+    primary700: '#012e25',
+    primary800: '#001b16',
+    primary900: '#000403',
+    secondary400: '#2A4A4A',
+    secondary600: '#64D8CB',
+    secondary800: '#26A69A'
   }
 };
 

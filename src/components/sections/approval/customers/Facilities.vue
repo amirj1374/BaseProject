@@ -317,7 +317,7 @@ const headers = [
   { title: 'نوع مصوبه', key: 'approvalType', width: '100px' },
   { title: 'نوع ارز', key: 'currency', width: '100px' },
   { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '100px' },
-  { title: 'مدت', key: 'durationDay', width: '100px' },
+  { title: 'مدت (روز)', key: 'durationDay', width: '100px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
 ];

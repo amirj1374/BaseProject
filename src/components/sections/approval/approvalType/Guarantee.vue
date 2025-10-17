@@ -362,7 +362,7 @@ const headers = [
   { title: 'نوع ضمانت نامه', key: 'contractType', width: '150px' },
   { title: 'نوع محصول', key: 'facility', width: '150px' },
   { title: 'درصد سپرده نقدی', key: 'percentDeposit', width: '200px' },
-  { title: 'مدت', key: 'durationDay', width: '100px' },
+  { title: 'مدت (روز)', key: 'durationDay', width: '100px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
 ];

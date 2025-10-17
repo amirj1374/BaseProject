@@ -193,7 +193,7 @@
                   variant="outlined"
                   density="comfortable"
                   hide-details="auto"
-                :suffix="dynamicSuffix"
+                  :suffix="dynamicSuffix"
                   :rules="[required]"
                   :disabled="props.readonly"
                 />
@@ -382,7 +382,7 @@ const formData = reactive({
   durationDay: '',
   amount: 0,
   collateral: true,
-  preferentialRate: 0,
+  preferentialRate: '',
   advancePayment: '',
   contractType: null as ContractType | null,
   facility: null as FacilityDto | null,
@@ -397,7 +397,7 @@ const headers = [
   { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '250px' },
   { title: 'نرخ ترجیحی', key: 'preferentialRate', width: '200px' },
   { title: 'پیش دریافت', key: 'advancePayment', width: '250px' },
-  { title: 'مدت', key: 'durationDay', width: '200px' },
+  { title: 'مدت (روز)', key: 'durationDay', width: '200px' },
   { title: 'مبلغ', key: 'amount', width: '200px' },
   { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
 ];
@@ -511,7 +511,7 @@ function saveFacility() {
   const facilityData: FacilitiesRequest = {
     id: editingId.value || Date.now(),
     ...formData,
-    preferentialRate: Number(formData.preferentialRate) || 0,
+    preferentialRate: formData.preferentialRate || '0',
     contractType: formData.contractType || ({} as ContractType),
     facility: formData.facility || ({} as FacilityDto),
     collaterals: selectedCollaterals.value

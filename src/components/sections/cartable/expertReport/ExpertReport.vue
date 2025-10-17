@@ -21,8 +21,18 @@
             :loading="loading"
             :disabled="!selectedFile"
           >
-            ارسال فایل
+            ارسال گزارش کارشناسی
           </v-btn>
+        </v-col>
+        
+        <!-- Download Button for existing report -->
+        <v-col v-if="props.item?.expertReportUrl" cols="12" class="d-flex justify-center">
+          <DownloadButton
+            :url="props.item.expertReportUrl"
+            title="دانلود گزارش کارشناسی"
+            color="success"
+            variant="outlined"
+          />
         </v-col>
       </v-row>
     </v-form>
@@ -30,7 +40,7 @@
     <!-- Success Snackbar -->
     <v-snackbar v-model="showSuccess" color="success" timeout="3000" location="top">
       <div class="d-flex align-center">
-        <v-icon class="me-2">mdi-check-circle</v-icon>
+        <v-icon class="me-2" :icon="icons.checkCircle"></v-icon>
         {{ successMessage }}
       </div>
     </v-snackbar>
@@ -38,7 +48,7 @@
     <!-- Error Snackbar -->
     <v-snackbar v-model="showError" color="error" timeout="5000" location="top">
       <div class="d-flex align-center">
-        <v-icon class="me-2">mdi-alert-circle</v-icon>
+        <v-icon class="me-2" :icon="icons.alertCircle"></v-icon>
         {{ errorMessage }}
       </div>
     </v-snackbar>
@@ -48,6 +58,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { api } from '@/services/api';
+import DownloadButton from '@/components/shared/DownloadButton.vue';
+import { icons } from '@/plugins/mdi-icon';
 
 interface Props {
   cartableId?: string | number;
@@ -60,6 +72,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
   close: [];
 }>();
+
 
 // Get cartableId from either direct prop or from item
 const cartableId = computed((): string | number | undefined => {

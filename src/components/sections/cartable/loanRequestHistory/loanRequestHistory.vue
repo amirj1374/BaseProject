@@ -52,7 +52,6 @@ const header = ref([
     title: 'نام شعبه',
     key: 'branchName',
     sortable: true,
-    isDate: true,
     width: 200,
   },
   {

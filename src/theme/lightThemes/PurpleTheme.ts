@@ -35,7 +35,19 @@ const PurpleTheme: ThemeTypes = {
     gray100: '#fafafa',
     primary200: '#A1D2FA',
     secondary200: '#A1D2FA',
-    white: '#FFFFFF'
+    white: '#FFFFFF',
+    // Additional color variations
+    primary300: '#9fd0f3',
+    primary400: '#87bbef',
+    primary500: '#5c9fed',
+    primary600: '#2567af',
+    primary700: '#144a8f',
+    primary800: '#093260',
+    primary900: '#051832',
+
+    secondary400: '#9575CD',
+    secondary600: '#512DA8',
+    secondary800: '#4527A0'
   }
 };
 

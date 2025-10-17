@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue';
 import type { Component } from 'vue';
+import { icons } from '@/plugins/mdi-icon';
 
 export interface CustomAction {
   title: string;
@@ -88,7 +89,7 @@ export function useTableActions(options: ActionOptions = {}) {
       if (options.actions.includes('view')) {
         actions.push({
           label: 'View',
-          icon: 'mdi-eye',
+          icon: icons.eye,
           color: 'info',
           outlined: true,
           onClick: () => openDialog(item)
@@ -98,7 +99,7 @@ export function useTableActions(options: ActionOptions = {}) {
       if (options.actions.includes('edit')) {
         actions.push({
           label: 'Edit',
-          icon: 'mdi-pencil',
+          icon: icons.pencil,
           color: 'primary',
           outlined: true,
           onClick: () => openDialog(item)
@@ -108,7 +109,7 @@ export function useTableActions(options: ActionOptions = {}) {
       if (options.actions.includes('delete')) {
         actions.push({
           label: 'Delete',
-          icon: 'mdi-delete',
+          icon: icons.delete,
           color: 'error',
           outlined: true,
           onClick: () => openDeleteDialog(item)
@@ -121,7 +122,7 @@ export function useTableActions(options: ActionOptions = {}) {
       Object.entries(options.routes).forEach(([key, route]) => {
         actions.push({
           label: key.charAt(0).toUpperCase() + key.slice(1),
-          icon: 'mdi-arrow-right',
+          icon: icons.arrowRight,
           color: 'secondary',
           outlined: true,
           onClick: () => {
@@ -136,7 +137,7 @@ export function useTableActions(options: ActionOptions = {}) {
       Object.entries(options.downloadLink).forEach(([key, url]) => {
         actions.push({
           label: `Download ${key}`,
-          icon: 'mdi-download',
+          icon: icons.download,
           color: 'success',
           outlined: true,
           onClick: () => {
@@ -152,7 +153,7 @@ export function useTableActions(options: ActionOptions = {}) {
         if (shouldShowAction(action, item)) {
           actions.push({
             label: action.title,
-            icon: 'mdi-cog',
+            icon: icons.cog,
             color: 'primary',
             outlined: true,
             onClick: () => openActionDialog(action, item)

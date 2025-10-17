@@ -35,7 +35,20 @@ const ModernTheme: ThemeTypes = {
     gray100: '#f9fafb', // Gray 50
     primary200: '#e0e7ff', // Indigo 100
     secondary200: '#f3e8ff', // Purple 100
-    white: '#FFFFFF'
+    white: '#FFFFFF',
+    // Additional color variations
+    primary300: '#c7d2fe',
+    primary400: '#7590f1',
+    primary500: '#5a4fe4',
+    primary600: '#483bc5',
+    primary700: '#22215e',
+    primary800: '#0b0b5a',
+    primary900: '#03031b',
+
+
+    secondary400: '#e9d5ff', // Purple 200
+    secondary600: '#7c3aed', // Purple 600
+    secondary800: '#5b21b6' // Purple 800
   }
 };
 

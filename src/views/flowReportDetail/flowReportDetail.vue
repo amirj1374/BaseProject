@@ -16,7 +16,7 @@
       :show-pagination="true"
       :height="550"
       group-by="commiteName"
-      :page-size="100"
+      :page-size="150"
       :group-header-template="getGroupHeaderTemplate"
     />
   </div>
@@ -25,7 +25,7 @@
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import { ref } from 'vue';
-import ApprovalRequestViewer from '@/components/sections/cartable/sign/ApprovalRequestViewer.vue';
+import ApprovalRequestViewer from '@/components/approval/ApprovalRequestViewer.vue';
 import { useRoute } from 'vue-router';
 
 const { id } = useRoute().params;

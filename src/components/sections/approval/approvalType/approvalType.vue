@@ -5,6 +5,7 @@ import { onMounted, ref, watch, defineAsyncComponent, computed } from 'vue';
 import type { CustomerDto, FacilitiesRequest, Facility, GuaranteeRequest, LcRequest, GreenLicense } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
 import { useCustomizerStore } from '@/stores/customizer';
+import envConfig from '@/config/envConfig';
 const customizerStore = useCustomizerStore();
 // Use dynamic imports for heavy components
 const Facilities = defineAsyncComponent(() => import('./Facilities.vue'));
@@ -12,8 +13,27 @@ const LetterOfCredit = defineAsyncComponent(() => import('./LetterOfCredit.vue')
 const Guarantee = defineAsyncComponent(() => import('./Guarantee.vue'));
 const GreenLicense = defineAsyncComponent(() => import('./approvalGuaranteeLicense.vue'));
 const approvalStore = useApprovalStore();
+
+// Environment detection
+const isLiveEnvironment = computed(() => {
+  return envConfig.ENVIRONMENT === 'live';
+});
+
 // Tab Management
 const activeTab = ref('facilities');
+
+// Available tabs based on environment
+const availableTabs = computed(() => {
+  if (isLiveEnvironment.value) {
+    return [{ value: 'facilities', label: 'تسهیلات' }];
+  }
+  return [
+    { value: 'facilities', label: 'تسهیلات' },
+    { value: 'guarantee', label: 'ضمانت‌نامه' },
+    { value: 'lc', label: 'اعتبار اسنادی' },
+    { value: 'greenLicense', label: 'تضامین جواز سبز' }
+  ];
+});
 
 // Search Section State
 
@@ -41,6 +61,9 @@ const greenLicenseData = ref<GreenLicense[]>([]);
 
 // Computed property to check if any data exists
 const hasAnyData = computed(() => {
+  if (isLiveEnvironment.value) {
+    return facilitiesData.value.length > 0;
+  }
   return facilitiesData.value.length > 0 || 
          guaranteeData.value.length > 0 || 
          lcData.value.length > 0 || 
@@ -77,18 +100,34 @@ const submitData = async () => {
       return Promise.reject(errorMsg);
     }
 
-    // Update store with all data
-    approvalStore.setLoanRequestDetailList({
-      summaryRequest: {
-        summary: formData.value.summary,
-        activityType: formData.value.activityType,
-        description: formData.value.description
-      },
-      facilities: facilitiesData.value[0] || {} as FacilitiesRequest,
-      guarantee: guaranteeData.value[0] || {} as GuaranteeRequest,
-      lc: lcData.value[0] || {} as LcRequest,
-      greenLicense: greenLicenseData.value[0] || {} as GreenLicense
-    });
+    // Update store with data based on environment
+    if (isLiveEnvironment.value) {
+      // In live environment, only handle facilities data
+      approvalStore.setLoanRequestDetailList({
+        summaryRequest: {
+          summary: formData.value.summary,
+          activityType: formData.value.activityType,
+          description: formData.value.description
+        },
+        facilities: facilitiesData.value[0] || {} as FacilitiesRequest,
+        guarantee: {} as GuaranteeRequest,
+        lc: {} as LcRequest,
+        greenLicense: {} as GreenLicense
+      });
+    } else {
+      // In other environments, handle all data types
+      approvalStore.setLoanRequestDetailList({
+        summaryRequest: {
+          summary: formData.value.summary,
+          activityType: formData.value.activityType,
+          description: formData.value.description
+        },
+        facilities: facilitiesData.value[0] || {} as FacilitiesRequest,
+        guarantee: guaranteeData.value[0] || {} as GuaranteeRequest,
+        lc: lcData.value[0] || {} as LcRequest,
+        greenLicense: greenLicenseData.value[0] || {} as GreenLicense
+      });
+    }
 
     return Promise.resolve();
   } catch (err) {
@@ -258,16 +297,18 @@ defineExpose({ submitData, clearAllData });
   <!-- Render only the active tab's component -->
   <div class="approval-section">
     <h4 class="group-title">درخواست مصوبه</h4>
-    <v-tabs v-model="activeTab" class="mb-2">
-      <v-tab value="facilities">تسهیلات</v-tab>
-      <v-tab value="guarantee">ضمانت‌نامه</v-tab>
-      <v-tab value="lc">اعتبار اسنادی</v-tab>
-      <v-tab value="greenLicense">تضامین جواز سبز</v-tab>
+    <v-tabs v-model="activeTab" class="mb-2" v-if="!isLiveEnvironment">
+      <v-tab 
+        v-for="tab in availableTabs" 
+        :key="tab.value" 
+        :value="tab.value"
+      >
+        {{ tab.label }}
+      </v-tab>
     </v-tabs>
-    
     <!-- Use v-show to preserve component state when switching tabs -->
     <Facilities 
-      v-show="activeTab === 'facilities'" 
+      v-show="isLiveEnvironment || activeTab === 'facilities'" 
       ref="facilitiesRef" 
       :loading="customizerStore.loading"
       @save="handleSaveFacility" 
@@ -275,7 +316,7 @@ defineExpose({ submitData, clearAllData });
       @update:facilities="facilitiesData = $event" 
     />
     <Guarantee 
-      v-show="activeTab === 'guarantee'" 
+      v-show="!isLiveEnvironment && activeTab === 'guarantee'" 
       ref="guaranteeRef" 
       :loading="customizerStore.loading"
       @save="handleSaveGuarantee" 
@@ -283,7 +324,7 @@ defineExpose({ submitData, clearAllData });
       @update:guarantee="guaranteeData = $event" 
     />
     <LetterOfCredit 
-      v-show="activeTab === 'lc'" 
+      v-show="!isLiveEnvironment && activeTab === 'lc'" 
       ref="lcRef" 
       :loading="customizerStore.loading"
       @save="handleSaveLC" 
@@ -291,7 +332,7 @@ defineExpose({ submitData, clearAllData });
       @update:lc="lcData = $event" 
     />
     <GreenLicense 
-      v-show="activeTab === 'greenLicense'" 
+      v-show="!isLiveEnvironment && activeTab === 'greenLicense'" 
       ref="greenLicenseRef" 
       :loading="customizerStore.loading"
       @save="handleSaveGreenLicense" 

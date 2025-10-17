@@ -9,6 +9,7 @@ import type { CustomerDto, FetchCustomerPayload, Facility, Guarantee, Lc, GreenL
 import { useApprovalStore } from '@/stores/approval';
 import { IconTrash } from '@tabler/icons-vue';
 import { useCustomizerStore } from '@/stores/customizer';
+import envConfig from '@/config/envConfig';
 // Use dynamic imports for heavy components
 const Facilities = defineAsyncComponent(() => import('./Facilities.vue'));
 const LetterOfCredit = defineAsyncComponent(() => import('./LetterOfCredit.vue'));
@@ -19,8 +20,26 @@ type AllowedStatus = 'nationalCode' | 'cif';
 const approvalStore = useApprovalStore();
 const customizerStore = useCustomizerStore();
 
+// Environment detection
+const isLiveEnvironment = computed(() => {
+  return envConfig.ENVIRONMENT === 'live';
+});
+
 // Tab Management
 const activeTab = ref('facilities');
+
+// Available tabs based on environment
+const availableTabs = computed(() => {
+  if (isLiveEnvironment.value) {
+    return [{ value: 'facilities', label: 'تسهیلات' }];
+  }
+  return [
+    { value: 'facilities', label: 'تسهیلات' },
+    { value: 'guarantee', label: 'ضمانت‌نامه' },
+    { value: 'lc', label: 'اعتبار اسنادی' },
+    { value: 'greenLicense', label: 'تضامین جواز سبز' }
+  ];
+});
 
 // Search Section State
 const searchParam = ref<AllowedStatus>('cif');
@@ -168,19 +187,33 @@ const submitData = async () => {
     return Promise.reject(error.value);
   }
   try {
-    // Store single objects (not arrays) for each section
-    const lcObj = lcData.value && lcData.value.length > 0 ? lcData.value[0] : undefined
-    const facilitiesObj = facilitiesData.value && facilitiesData.value.length > 0 ? facilitiesData.value[0] : undefined
-    const guaranteeObj = guaranteeData.value && guaranteeData.value.length > 0 ? guaranteeData.value[0] : undefined
-    const greenLicenseObj = greenLicenseData.value && greenLicenseData.value.length > 0 ? greenLicenseData.value[0] : undefined
+    // Store single objects (not arrays) for each section based on environment
+    if (isLiveEnvironment.value) {
+      // In live environment, only handle facilities data
+      const facilitiesObj = facilitiesData.value && facilitiesData.value.length > 0 ? facilitiesData.value[0] : undefined
 
-    approvalStore.setCustomerInfo({
-      ...firstItem,
-      facilities: facilitiesObj,
-      guarantee: guaranteeObj,
-      lc: lcObj,
-      greenLicense: greenLicenseObj,
-    });
+      approvalStore.setCustomerInfo({
+        ...firstItem,
+        facilities: facilitiesObj,
+        guarantee: undefined,
+        lc: undefined,
+        greenLicense: undefined,
+      });
+    } else {
+      // In other environments, handle all data types
+      const lcObj = lcData.value && lcData.value.length > 0 ? lcData.value[0] : undefined
+      const facilitiesObj = facilitiesData.value && facilitiesData.value.length > 0 ? facilitiesData.value[0] : undefined
+      const guaranteeObj = guaranteeData.value && guaranteeData.value.length > 0 ? guaranteeData.value[0] : undefined
+      const greenLicenseObj = greenLicenseData.value && greenLicenseData.value.length > 0 ? greenLicenseData.value[0] : undefined
+
+      approvalStore.setCustomerInfo({
+        ...firstItem,
+        facilities: facilitiesObj,
+        guarantee: guaranteeObj,
+        lc: lcObj,
+        greenLicense: greenLicenseObj,
+      });
+    }
     return Promise.resolve();
   } catch (err) {
     error.value = 'خطای ناشناخته در ثبت اطلاعات مشتری';
@@ -322,16 +355,19 @@ defineExpose({ submitData });
   <!-- Render only the active tab's component -->
   <div class="approval-section">
     <h4 class="group-title">درخواست مشتری</h4>
-    <v-tabs v-model="activeTab" class="mb-2">
-      <v-tab value="facilities">تسهیلات</v-tab>
-      <v-tab value="guarantee">ضمانت‌نامه</v-tab>
-      <v-tab value="lc">اعتبار اسنادی</v-tab>
-      <v-tab value="greenLicense">تضامین جواز سبز</v-tab>
+    <v-tabs v-model="activeTab" class="mb-2" v-if="!isLiveEnvironment">
+      <v-tab 
+        v-for="tab in availableTabs" 
+        :key="tab.value" 
+        :value="tab.value"
+      >
+        {{ tab.label }}
+      </v-tab>
     </v-tabs>
-    <Facilities ref="facilitiesRef" v-show="activeTab === 'facilities'" :loading="customizerStore.loading" @save="handleSaveFacility" @delete="handleDeleteFacility" @update:facilities="facilitiesData = $event" />
-    <Guarantee ref="guaranteeRef" :loading="customizerStore.loading" v-show="activeTab === 'guarantee'" @save="handleSaveGuarantee" @delete="handleDeleteGuarantee" @update:guarantee="guaranteeData = $event" />
-    <LetterOfCredit ref="lcRef" :loading="customizerStore.loading" v-show="activeTab === 'lc'" @save="handleSaveLC" @delete="handleDeleteLC" @update:lc="lcData = $event" />
-    <GreenLicense ref="greenLicenseRef" :loading="customizerStore.loading" v-show="activeTab === 'greenLicense'" @save="handleSaveGreenLicense" @delete="handleDeleteGreenLicense" @update:greenLicense="greenLicenseData = $event" />
+    <Facilities ref="facilitiesRef" v-show="isLiveEnvironment || activeTab === 'facilities'" :loading="customizerStore.loading" @save="handleSaveFacility" @delete="handleDeleteFacility" @update:facilities="facilitiesData = $event" />
+    <Guarantee ref="guaranteeRef" :loading="customizerStore.loading" v-show="!isLiveEnvironment && activeTab === 'guarantee'" @save="handleSaveGuarantee" @delete="handleDeleteGuarantee" @update:guarantee="guaranteeData = $event" />
+    <LetterOfCredit ref="lcRef" :loading="customizerStore.loading" v-show="!isLiveEnvironment && activeTab === 'lc'" @save="handleSaveLC" @delete="handleDeleteLC" @update:lc="lcData = $event" />
+    <GreenLicense ref="greenLicenseRef" :loading="customizerStore.loading" v-show="!isLiveEnvironment && activeTab === 'greenLicense'" @save="handleSaveGreenLicense" @delete="handleDeleteGreenLicense" @update:greenLicense="greenLicenseData = $event" />
   </div>
   <v-snackbar v-model="showError" color="error" timeout="5500">
     {{ error }}

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { api } from '@/services/api';
 import type { SubmitSignPayload } from '@/types/cartable/cartableTypes';
-import { onMounted, ref } from 'vue';
-import ApprovalRequestViewer from './ApprovalRequestViewer.vue';
+import { onMounted, ref, computed } from 'vue';
+import ApprovalRequestViewer from '../../../approval/ApprovalRequestViewer.vue';
 import { usePermissionsStore } from '@/stores/permissions';
+import DownloadButton from '@/components/shared/DownloadButton.vue';
 
 const emit = defineEmits(['close']);
 const permissionsStore = usePermissionsStore();
@@ -20,57 +21,12 @@ const description = ref('');
 const actionType = ref('');
 const loading = ref(false);
 
-const downloadExpertReport = async () => {
-  if (props.item.expertReportUrl) {
-    try {
-      // Fetch the file
-      const response = await fetch(props.item.expertReportUrl);
-      const blob = await response.blob();
-      
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'expert-report.pdf';
-      document.body.appendChild(link);
-      link.click();
-      
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading expert report:', error);
-      // Fallback to opening in new tab
-      window.open(props.item.expertReportUrl, '_blank');
-    }
-  }
-};
+// Conditional requirement for description when action type is DISAGREED or RETURNED
+const needsComment = computed(() => actionType.value === 'DISAGREED' || actionType.value === 'RETURNED');
 
-const download1016Report = async () => {
-  if (props.item.report1016Url) {
-    try {
-      // Fetch the file
-      const response = await fetch(props.item.report1016Url);
-      const blob = await response.blob();
-      
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = '1016-report.pdf';
-      document.body.appendChild(link);
-      link.click();
-      
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading 1016 report:', error);
-      // Fallback to opening in new tab
-      window.open(props.item.report1016Url, '_blank');
-    }
-  }
-};
+// Show field error instead of snackbar for this validation
+const descriptionErrors = computed(() => (needsComment.value && !description.value ? ['این فیلد الزامی است'] : []));
+
 
 // Function to determine expertReportIsSeen value based on conditions
 const getExpertReportIsSeenValue = (): boolean | null => {
@@ -89,6 +45,12 @@ const getExpertReportIsSeenValue = (): boolean | null => {
 const submitForm = async () => {
   try {
     loading.value = true;
+
+    // Guard: require description for DISAGREED or RETURNED (use field error)
+    if (needsComment.value && !description.value) {
+      return;
+    }
+
     const payload: SubmitSignPayload = {
       cartableId: Number(id.value),
       comment: description.value,
@@ -114,6 +76,8 @@ const submitForm = async () => {
     loading.value = false;
   }
 };
+// Form validation (Vuetify rule)
+const required = (v: any) => (needsComment.value ? (!!v || 'این فیلد الزامی است') : true);
 </script>
 
 <template>
@@ -126,11 +90,41 @@ const submitForm = async () => {
           <v-radio color="warning" label="عودت" :value="'RETURNED'"></v-radio>
         </v-radio-group>
       </v-col>
-      <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('downloadExpertReport')">
-        <v-btn color="info" @click="downloadExpertReport" variant="tonal"> دانلود گزارش کارشناسی </v-btn>
+        <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('downloadExpertReport')">
+        <DownloadButton 
+          :url="props.item.expertReportUrl"
+          title="دانلود گزارش کارشناسی"
+          color="secondary"
+          variant="tonal"
+          filename="expert-report.pdf"
+        />
       </v-col>
       <v-col cols="12" md="3" v-if="props.item.report1016Url && permissionsStore.hasMenuPermission('download1016')">
-        <v-btn color="info" @click="download1016Report" variant="tonal"> دانلود فرم 1016 </v-btn>
+        <DownloadButton 
+          :url="props.item.report1016Url"
+          title="دانلود فرم 1016"
+          color="secondary"
+          variant="tonal"
+          filename="form-1016.pdf"
+        />
+      </v-col>
+      <v-col cols="12" md="3" v-if="props.item.formLetterUrl && permissionsStore.hasMenuPermission('downloadDirectiveReport')">
+        <DownloadButton 
+          :url="props.item.formLetterUrl"
+          title="دانلود گزارش ابلاغیه"
+          color="secondary"
+          variant="tonal"
+          filename="directive-report.pdf"
+        />
+      </v-col>
+      <v-col cols="12" md="3" v-if="props.item.formCreditApprovalUrl && permissionsStore.hasMenuPermission('downloadApprovalReport')">
+        <DownloadButton 
+          :url="props.item.formCreditApprovalUrl"
+          title="دانلود فرم پیش مصوبه اعتبارات"
+          color="secondary"
+          variant="tonal"
+          filename="credit-approval-form.pdf"
+        />
       </v-col>
       <v-col cols="12" md="3" v-if="props.item.expertReportUrl && permissionsStore.hasMenuPermission('reviewExpertReport')">
         <v-switch v-model="props.item.expertReportIsSeen" inset color="primary" hide-details class="me-2" />
@@ -140,7 +134,13 @@ const submitForm = async () => {
         <ApprovalRequestViewer :loan-request-id="props.item.loanRequestId" />
       </v-col>
       <v-col cols="12" md="12">
-        <v-textarea v-model="description" label="توضیحات" variant="outlined" clearable />
+        <v-textarea
+          v-model="description"
+          label="توضیحات"
+          variant="outlined"
+          clearable
+          :error-messages="descriptionErrors"
+        />
       </v-col>
     </v-row>
 

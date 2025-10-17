@@ -187,7 +187,17 @@
           />
         </v-col>
         <v-col cols="12" md="3">
-          <v-text-field v-model="form.lastVisit" label="بازدید" variant="outlined" density="comfortable" placeholder="مثال: 1403/05/01" />
+          <ShamsiDatePicker
+            v-model="form.lastVisit"
+            label="بازدید"
+            variant="outlined"
+            density="comfortable"
+            mode="single"
+            format="YYYY-MM-DD"
+            displayFormat="jYYYY/jMM/jDD"
+            placeholder="تاریخ بازدید را انتخاب کنید"
+            emitWithTimezone
+          />
         </v-col>
       </v-row>
     </v-form>
@@ -198,6 +208,7 @@
 import { ref, onMounted } from 'vue';
 import { api } from '@/services/api';
 import type { CreditApprovalFinancialSummaryDTO } from '@/types/preApproval/preApprovalTypes';
+import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
 
 const props = defineProps<{
   cartableId: string;
@@ -251,8 +262,7 @@ const form = ref({
   // مانده بدهی نزد سیستم بانکی در حال حاضر
   debtOutstanding: null,
   // بازدید
-  lastVisit: '',
-
+  lastVisit: ''
 });
 
 const nonNegative = (v: any) => v == null || v === '' || Number(v) >= 0 || 'باید ≥ 0 باشد';
@@ -285,7 +295,7 @@ onMounted(async () => {
           guaranteeOutstanding: financialData.guaranteeOutstanding || null,
           creditOutstanding: financialData.creditOutstanding || null,
           debtOutstanding: financialData.debtOutstanding || null,
-          lastVisit: financialData.lastVisit || '',
+          lastVisit: financialData.lastVisit || ''
         };
       }
 

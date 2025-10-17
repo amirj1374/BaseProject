@@ -176,28 +176,27 @@ const headers = [
     key: 'avgBalanceHalf',
     sortable: true,
     width: 150,
-    isDate: true
   },
   {
-    title: 'مبلغ گردش بدهکار',
+    title: 'مبلغ گردش بستانکار',
     key: 'creditTurnoverHalf',
     sortable: true,
     width: 150
   },
   {
-    title: 'تعداد گردش بدهکار',
+    title: 'تعداد گردش بستانکار',
     key: 'countCreditTurnoverHalf',
     sortable: true,
     width: 150
   },
   {
-    title: 'تعداد گردش بستانکار',
+    title: 'تعداد گردش بدهکار',
     key: 'countDebitTurnoverHalf',
     sortable: true,
     width: 150
   },
   {
-    title: 'مبلغ گردش بستانکار',
+    title: 'مبلغ گردش بدهکار',
     key: 'debitTurnoverHalf',
     sortable: true,
     width: 150

@@ -310,7 +310,7 @@ export interface FacilitiesRequest {
   day?: string;
   durationDay?: string;
   collaterals: Collaterals[];
-  preferentialRate: number;
+  preferentialRate: string;
   advancePayment: string;
   contractType: ContractType;
   facility?: FacilityDto;
@@ -446,7 +446,20 @@ export interface BranchDto {
 }
 
 export interface RecentlyApprovalDTO {
-  recentApprovalsDesc: string,
-  remainDebtParsian: string,
-  creditEstimation: string,
+  recentApprovalsDesc: string;
+  remainDebtParsian: string;
+  creditEstimation: string;
+}
+
+export interface ApprovalRequest {
+  branchCode: string;
+  branchName: string;
+  cif: string;
+  createdBy: string;
+  customerName: string;
+  id: number;
+  nationalCode: string;
+  requestDate: string;
+  status: string;
+  trackingCode: string;
 }

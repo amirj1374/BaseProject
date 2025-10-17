@@ -215,7 +215,7 @@ defineExpose({ submitData });
 
 <template>
   <div class="approval-section">
-    <form @submit.prevent="submitData" class="upload-form">
+    <div class="upload-form">
       <CustomDataTable
         ref="dataTableRef"
         :headers="headers"
@@ -228,10 +228,10 @@ defineExpose({ submitData });
         :height="1500"
         group-by="groupByItem"
         :default-expanded="true"
-        :page-size="100"
+        :page-size="150"
         :group-header-template="getGroupHeaderTemplate"
       />
-    </form>
+    </div>
   </div>
 
   <v-dialog v-model="showUploadDialog" max-width="500px">

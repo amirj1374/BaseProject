@@ -151,4 +151,9 @@ export default (axiosInstance: AxiosInstance) => ({
   addCreditApprovalDescription(payload: addCreditApprovalDescriptionPayload) {
     return axiosInstance.post(`api/v1/credit-suggestions /add-Credit-Approval-Description`,payload);
   },
+
+  deleteApprovalRequest(id: number) {
+    return axiosInstance.delete(`api/v1/loan-requests/${id}`);
+  },
+
 });

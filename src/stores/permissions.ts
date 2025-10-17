@@ -77,15 +77,15 @@ export const usePermissionsStore = defineStore({
       },
       {
         menuKey: 'downloadDirectiveReport',
-        requiredRoles: ['SMP_DOWNLOAD_DIRECTIVE_RPT_FILE']
+        requiredRoles: ['SMP_DL_DIRECTIVE_RPT']
       },
       {
         menuKey: 'regionPreApprovalReport',
-        requiredRoles: ['SMP_DL_REGION_RPT']
+        requiredRoles: ['SMP_REGION_PRE_APPROVAL_RPT']
       },
       {
         menuKey: 'directiveReport',
-        requiredRoles: ['SMP_DL_DIRECTIVE_RPT']
+        requiredRoles: ['SMP_DIRECTIVE_RPT']
       },
       {
         menuKey: 'uploadExpertReport',
@@ -114,6 +114,10 @@ export const usePermissionsStore = defineStore({
       {
         menuKey: 'approvalSignerReport',
         requiredRoles: ['SMP_APPROVAL_SIGNER_RPT']
+      },
+      {
+        menuKey: 'downloadApprovalReport',
+        requiredRoles: ['SMP_DL_APPROVAL_RPT']
       }
     ] as MenuPermission[]
   }),

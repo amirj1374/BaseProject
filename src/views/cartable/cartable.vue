@@ -49,7 +49,7 @@ const header = ref([
     key: 'updateDate',
     sortable: true,
     editable: true,
-    width: 180,
+    width: 200,
     isDate: true,
     formatter: (value: any, item: any) => {
       if (item.updateDate && item.updateTime) {
@@ -83,6 +83,7 @@ const header = ref([
     key: 'customerCode',
     sortable: true,
     editable: true,
+    width: 200
   },
   {
     title: 'گروه مشتری',
@@ -127,6 +128,7 @@ const header = ref([
 ]);
 
 const tableRef = ref();
+const tableKey = ref(0);
 const preApprovalReport = {
   'گزارش پیش مصوبه اعتبارات': 'preApprovalReport/{id}'
 };
@@ -142,8 +144,65 @@ const flowReport = {
   'گزارش عملیات ' : 'flowReportDetail/{id}'
 }
 
-function handleReferenceSuccess() {
-  tableRef.value?.fetchData();
+// Computed property for custom actions to ensure reactivity
+const customActions = computed(() => [
+  {
+    title: '⚙️ عملیات',
+    component: (props: any) => h(Reference, { ...props, onSuccess: handleReferenceSuccess }),
+    condition: (item: any) => item.canSubmit === true
+  },
+  {
+    title: '✍️امضا',
+    component: (props: any) => h(Sign, { ...props, onSuccess: handleReferenceSuccess }),
+    condition: (item: any) => item.hasSignPermission === true
+  },
+  {
+    title: '📑 لیست مدارک',
+    component: (props: any) =>
+      h(UploadList, {
+        ...props,
+        cartableId: props.item.id,
+        trackingCode: props.item.trackingCode,
+        loanRequestId: props.item.loanRequestId
+      })
+  },
+  {
+    title: '💬 مشاهده نظرات',
+    component: (props: any) =>
+      h(SignList, {
+        ...props,
+        item: props.item,
+        onSuccess: handleReferenceSuccess
+      }),
+    condition: (item: any) => item.mainAssignee === true && item.commiteInquiries !== null
+  },
+  {
+    title: 'گزارش کارشناسی',
+    component: (props: any) =>
+      h(ExpertReport, {
+        ...props,
+        item: props.item,
+        cartableId: props.item.id,
+        onSuccess: handleReferenceSuccess
+      }),
+    condition: (item: any) => permissionsStore.hasMenuPermission('uploadExpertReport')
+  },
+  {
+    title: '📜 تاریخچه کارتابل',
+    component: CartableHistory,
+    condition: (item: any) => permissionsStore.hasMenuPermission('cartable_history')
+  },
+  {
+    title: '📜 تاریخچه درخواست مصوبه',
+    component: LoanRequestHistory,
+    condition: (item: any) => permissionsStore.hasMenuPermission('approval_history')
+  }
+]);
+
+async function handleReferenceSuccess() {
+  // Refresh data then force re-render so custom action conditions re-evaluate immediately
+  await tableRef.value?.fetchData();
+  tableKey.value++;
 }
 
 // Function for routes that can access item data
@@ -171,7 +230,8 @@ function getCustomButtons(cartable: Cartable) {
       onClick: async () => {
         try {
           const response = await api.cartable.regenerate1016(cartable.loanRequestId);
-          console.log('Response:', response);
+          await tableRef.value?.fetchData();
+          tableKey.value++;
           showSnackbar('فرم 1016 با موفقیت بروزرسانی شد', 'success')
         } catch (error) {
           console.error('Error in regenerate1016:', error);
@@ -189,7 +249,8 @@ function getCustomButtons(cartable: Cartable) {
       onClick: async () => {
         try {
           const response = await api.cartable.regenerateReqionApprovalLetter(cartable.id);
-          console.log('Response:', response);
+          await tableRef.value?.fetchData();
+          tableKey.value++;
           showSnackbar('گزارش پیش مصوبه منطقه با موفقیت بروزرسانی شد', 'success')
         } catch (error) {
           console.error('Error in regenerateReqionApprovalLetter:', error);
@@ -207,7 +268,8 @@ function getCustomButtons(cartable: Cartable) {
       onClick: async () => {
         try {
           const response = await api.cartable.regenerateCreditApprovals(cartable.id);
-          console.log('Response:', response);
+          await tableRef.value?.fetchData();
+          tableKey.value++;
           showSnackbar('گزارش پیش نویس مصوبه با موفقیت بروزرسانی شد', 'success')
         } catch (error) {
           console.error('Error in regenerateCreditApprovals:', error);
@@ -225,7 +287,8 @@ function getCustomButtons(cartable: Cartable) {
       onClick: async () => {
         try {
           const response = await api.cartable.regenerateCreditSuggestions(cartable.id);
-          console.log('Response:', response);
+          await tableRef.value?.fetchData();
+          tableKey.value++;
           showSnackbar('گزارش ابلاغیه با موفقیت بروزرسانی شد', 'success')
         } catch (error) {
           console.error('Error in regenerateCreditSuggestions:', error);
@@ -244,6 +307,7 @@ function getCustomButtons(cartable: Cartable) {
   <!-- Custom Data Table Component -->
   <div class="upload-form">
     <CustomDataTable
+      :key="tableKey"
       ref="tableRef"
       :apiResource="`cartable`"
       :headers="header"
@@ -255,59 +319,7 @@ function getCustomButtons(cartable: Cartable) {
       :custom-buttons-fn="getCustomButtons"
       :selectable="true"
       :bulkMode="true"
-      :custom-actions="[
-        {
-          title: '⚙️ عملیات',
-          component: (props) => h(Reference, { ...props, onSuccess: handleReferenceSuccess }),
-          condition: (item) => item.canSubmit === true
-        },
-        {
-          title: '✍️امضا',
-          component: (props) => h(Sign, { ...props, onSuccess: handleReferenceSuccess }),
-          condition: (item) => item.hasSignPermission === true
-        },
-        {
-          title: '📑 لیست مدارک',
-          component: (props) =>
-            h(UploadList, {
-              ...props,
-              cartableId: props.item.id,
-              trackingCode: props.item.trackingCode,
-              loanRequestId: props.item.loanRequestId
-            })
-        },
-        {
-          title: '💬 مشاهده نظرات',
-          component: (props) =>
-            h(SignList, {
-              ...props,
-              item: props.item,
-              onSuccess: handleReferenceSuccess
-            }),
-          condition: (item) => item.mainAssignee === true && item.commiteInquiries !== null
-        },
-        {
-          title: 'گزارش کارشناسی',
-          component: (props) =>
-            h(ExpertReport, {
-              ...props,
-              item: props.item,
-              cartableId: props.item.id,
-              onSuccess: handleReferenceSuccess
-            }),
-          condition: (item) => permissionsStore.hasMenuPermission('uploadExpertReport')
-        },
-        {
-          title: '📜 تاریخچه کارتابل',
-          component: CartableHistory,
-          condition: (item) => permissionsStore.hasMenuPermission('cartable_history')
-        },
-        {
-          title: '📜 تاریخچه درخواست مصوبه',
-          component: LoanRequestHistory,
-          condition: (item) => permissionsStore.hasMenuPermission('approval_history')
-        }
-      ]"
+      :custom-actions="customActions"
       :routes="getDynamicRoutes"
     />
   </div>

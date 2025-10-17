@@ -35,7 +35,19 @@ const TealTheme: ThemeTypes = {
     gray100: '#fafafa',
     primary200: '#b2dfdb',
     secondary200: '#b2dfdb',
-    white: '#FFFFFF'
+    white: '#FFFFFF',
+    // Additional color variations
+    primary300: '#73ece1',
+    primary400: '#15caab',
+    primary500: '#027a66',
+    primary600: '#025346',
+    primary700: '#012e25',
+    primary800: '#001b16',
+    primary900: '#000403',
+
+    secondary400: '#80CBC4',
+    secondary600: '#26A69A',
+    secondary800: '#00695C'
   }
 };
 
