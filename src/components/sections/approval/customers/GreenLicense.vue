@@ -98,7 +98,7 @@
                 :headers="[
                   { title: 'نوع وثیقه', key: 'collateral.description', sortable: true },
                   { title: 'مبلغ وثیقه', key: 'amount', sortable: true, align: 'end' },
-                  { title: 'درصد ارزش گذاری', key: 'percent', sortable: true, align: 'end' },
+                  { title: 'درصد پوشش', key: 'percent', sortable: true, align: 'end' },
                   { title: 'ارزش معادل وثیقه', key: 'equivalentValue', sortable: true, align: 'end' },
                   { title: 'عملیات', key: 'actions', sortable: false, align: 'center' }
                 ]"
