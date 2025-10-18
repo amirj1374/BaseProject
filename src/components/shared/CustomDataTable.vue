@@ -121,6 +121,7 @@ const emit = defineEmits<{
 defineOptions({ inheritAttrs: false });
 
 const items = ref<any[]>([]);
+const originalServerData = ref<any[]>([]); // Store original server data
 const loading = ref(false);
 const error = ref<string | null>(null);
 const dialog = ref(false);
@@ -541,10 +542,13 @@ const fetchData = async (queryParams?: {}) => {
 
   try {
     const response = await api.fetch(params);
-    items.value = response.data.content || [];
+    const serverData = response.data.content || [];
 
-    // Convert dates to Shamsi format
-    items.value = items.value.map((item: Record<string, any>) => {
+    // Store original server data
+    originalServerData.value = serverData;
+
+    // Convert dates to Shamsi format for display
+    items.value = serverData.map((item: Record<string, any>) => {
       const newItem = { ...item };
       props.headers.forEach((header) => {
         if (header.isDate && newItem[header.key]) {
@@ -1055,7 +1059,16 @@ onMounted(() => {
 
 const openCustomActionDialog = (action: CustomAction, item: any) => {
   customActionComponent.value = action.component;
-  customActionItem.value = item;
+
+  // Find the original server data for this item
+  const originalItem = originalServerData.value.find(originalItem => {
+    const itemId = typeof props.uniqueKey === 'function' ? props.uniqueKey(item) : item[props.uniqueKey as string];
+    const originalId = typeof props.uniqueKey === 'function' ? props.uniqueKey(originalItem) : originalItem[props.uniqueKey as string];
+    return itemId === originalId;
+  });
+
+  // Pass original server data to custom action components
+  customActionItem.value = originalItem ? { ...originalItem } : { ...item };
   customActionDialog.value = true;
 };
 
@@ -1325,10 +1338,10 @@ const handleFilterApply = (filterData: any) => {
                     <template v-slot:item="{ item, columns, index }">
                       <tr
                         :style="{
-                        background: isSelected(item) && props.bulkMode 
-                          ? 'rgb(var(--v-theme-primary200))' 
-                          : index % 2 === 0 
-                            ? 'rgb(var(--v-theme-surface))' 
+                        background: isSelected(item) && props.bulkMode
+                          ? 'rgb(var(--v-theme-primary200))'
+                          : index % 2 === 0
+                            ? 'rgb(var(--v-theme-surface))'
                             : 'rgb(var(--v-theme-lightprimary))',
                         cursor: props.bulkMode && props.selectable ? 'pointer' : 'default'
                       }"
@@ -1473,10 +1486,10 @@ const handleFilterApply = (filterData: any) => {
           <tr
             :style="{
               color: isSelected(item) && props.bulkMode ? 'rgb(var(--v-theme-white))' : 'rgb(var(--v-theme-darkText))',
-              background: isSelected(item) && props.bulkMode 
-                ? 'rgb(var(--v-theme-primary))' 
-                : index % 2 === 0 
-                  ? 'rgb(var(--v-theme-surface))' 
+              background: isSelected(item) && props.bulkMode
+                ? 'rgb(var(--v-theme-primary))'
+                : index % 2 === 0
+                  ? 'rgb(var(--v-theme-surface))'
                   : 'rgb(var(--v-theme-lightprimary))',
               cursor: props.bulkMode && props.selectable ? 'pointer' : 'default'
             }"
