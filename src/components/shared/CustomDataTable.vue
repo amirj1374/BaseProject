@@ -97,6 +97,7 @@ interface Props {
   defaultSelected?: string; // Property name to check for auto-selection (e.g., 'isSelected')
   dateWithTimezone?: boolean; // If true, save dates with local timezone offset at midnight
   bulkMode?: boolean; // Show action buttons at top with radio selection (single item)
+  enableGroupDelete?: boolean; // Enable group delete functionality for bulk mode
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -227,10 +228,7 @@ const autoHeaders = computed(() => {
 const selectionHeader = { title: '', key: 'selection', sortable: false, width: 50 } as const;
 
 const groupedHeaders = computed(() => {
-  const base = [
-    ...(props.selectable ? [selectionHeader] : []),
-    ...autoHeaders.value,
-  ];
+  const base = [...(props.selectable ? [selectionHeader] : []), ...autoHeaders.value];
 
   if (!hasAnyActions.value) {
     return base;
@@ -241,7 +239,7 @@ const groupedHeaders = computed(() => {
 
   // CRUD actions (edit, delete, view, create)
   if (props.actions) {
-    props.actions.forEach(action => {
+    props.actions.forEach((action) => {
       switch (action) {
         case 'edit':
           totalWidth += 140; // "ویرایش ✏️" button width
@@ -261,21 +259,21 @@ const groupedHeaders = computed(() => {
 
   // Route actions
   if (props.routes) {
-    Object.keys(props.routes).forEach(routeKey => {
+    Object.keys(props.routes).forEach((routeKey) => {
       totalWidth += 120; // Route button width (key.toUpperCase())
     });
   }
 
   // Download actions
   if (props.downloadLink) {
-    Object.keys(props.downloadLink).forEach(key => {
+    Object.keys(props.downloadLink).forEach((key) => {
       totalWidth += 120; // Download button width
     });
   }
 
   // Custom actions
   if (props.customActions) {
-    props.customActions.forEach(action => {
+    props.customActions.forEach((action) => {
       totalWidth += 140; // Custom action button width
     });
   }
@@ -285,13 +283,14 @@ const groupedHeaders = computed(() => {
     // For dynamic buttons, estimate based on typical button count
     totalWidth += 240; // 2 buttons * 120px each
   } else if (props.customButtons) {
-    props.customButtons.forEach(button => {
+    props.customButtons.forEach((button) => {
       totalWidth += 120; // Custom button width
     });
   }
 
   // Add spacing between buttons (8px margin per button)
-  const buttonCount = (props.actions?.length || 0) +
+  const buttonCount =
+    (props.actions?.length || 0) +
     (props.routes ? Object.keys(props.routes).length : 0) +
     (props.downloadLink ? Object.keys(props.downloadLink).length : 0) +
     (props.customActions?.length || 0) +
@@ -310,10 +309,7 @@ const groupedHeaders = computed(() => {
 });
 
 const normalHeaders = computed(() => {
-  const base = [
-    ...(props.selectable ? [selectionHeader] : []),
-    ...autoHeaders.value,
-  ];
+  const base = [...(props.selectable ? [selectionHeader] : []), ...autoHeaders.value];
 
   if (!hasAnyActions.value) {
     return base;
@@ -324,7 +320,7 @@ const normalHeaders = computed(() => {
 
   // CRUD actions (edit, delete, view, create)
   if (props.actions) {
-    props.actions.forEach(action => {
+    props.actions.forEach((action) => {
       switch (action) {
         case 'edit':
           totalWidth += 140; // "ویرایش ✏️" button width
@@ -344,21 +340,21 @@ const normalHeaders = computed(() => {
 
   // Route actions
   if (props.routes) {
-    Object.keys(props.routes).forEach(routeKey => {
+    Object.keys(props.routes).forEach((routeKey) => {
       totalWidth += 120; // Route button width (key.toUpperCase())
     });
   }
 
   // Download actions
   if (props.downloadLink) {
-    Object.keys(props.downloadLink).forEach(key => {
+    Object.keys(props.downloadLink).forEach((key) => {
       totalWidth += 120; // Download button width
     });
   }
 
   // Custom actions
   if (props.customActions) {
-    props.customActions.forEach(action => {
+    props.customActions.forEach((action) => {
       totalWidth += 140; // Custom action button width
     });
   }
@@ -368,13 +364,14 @@ const normalHeaders = computed(() => {
     // For dynamic buttons, estimate based on typical button count
     totalWidth += 240; // 2 buttons * 120px each
   } else if (props.customButtons) {
-    props.customButtons.forEach(button => {
+    props.customButtons.forEach((button) => {
       totalWidth += 120; // Custom button width
     });
   }
 
   // Add spacing between buttons (8px margin per button)
-  const buttonCount = (props.actions?.length || 0) +
+  const buttonCount =
+    (props.actions?.length || 0) +
     (props.routes ? Object.keys(props.routes).length : 0) +
     (props.downloadLink ? Object.keys(props.downloadLink).length : 0) +
     (props.customActions?.length || 0) +
@@ -465,9 +462,9 @@ const validSelectedItems = computed(() => {
   if (!props.selectable || !props.bulkMode) return selectedItems.value;
 
   // Filter selected items to only include those that exist in current items
-  return selectedItems.value.filter(selectedItem => {
+  return selectedItems.value.filter((selectedItem) => {
     const uniqueValue = getUniqueValue(selectedItem);
-    return items.value.some(item => getUniqueValue(item) === uniqueValue);
+    return items.value.some((item) => getUniqueValue(item) === uniqueValue);
   });
 });
 
@@ -570,9 +567,7 @@ const fetchData = async (queryParams?: {}) => {
 
     // Auto-select items if defaultSelected prop is provided
     if (props.defaultSelected && items.value.length > 0 && props.defaultSelected in items.value[0]) {
-      const defaultSelectedItems = items.value.filter(
-        (item) => item[props.defaultSelected!] === true
-      );
+      const defaultSelectedItems = items.value.filter((item) => item[props.defaultSelected!] === true);
       selectedItems.value = [...defaultSelectedItems];
       emit('update:selectedItems', selectedItems.value);
       emit('selection-change', selectedItems.value);
@@ -621,16 +616,16 @@ watch(
   (newItems) => {
     if (props.selectable && props.bulkMode && selectedItems.value.length > 0) {
       // Check if any selected items are no longer in the current data
-      const invalidSelections = selectedItems.value.filter(selectedItem => {
+      const invalidSelections = selectedItems.value.filter((selectedItem) => {
         const uniqueValue = getUniqueValue(selectedItem);
-        return !newItems.some(item => getUniqueValue(item) === uniqueValue);
+        return !newItems.some((item) => getUniqueValue(item) === uniqueValue);
       });
 
       // If there are invalid selections, remove them
       if (invalidSelections.length > 0) {
-        const validSelections = selectedItems.value.filter(selectedItem => {
+        const validSelections = selectedItems.value.filter((selectedItem) => {
           const uniqueValue = getUniqueValue(selectedItem);
-          return newItems.some(item => getUniqueValue(item) === uniqueValue);
+          return newItems.some((item) => getUniqueValue(item) === uniqueValue);
         });
 
         selectedItems.value = validSelections;
@@ -703,9 +698,7 @@ const loadMore = async () => {
 
     // Auto-select new items if defaultSelected prop is provided
     if (props.defaultSelected && props.selectable) {
-      const newSelectedItems = formattedItems.filter(
-        (item: any) => item[props.defaultSelected!] === true
-      );
+      const newSelectedItems = formattedItems.filter((item: any) => item[props.defaultSelected!] === true);
       if (newSelectedItems.length > 0) {
         selectedItems.value = [...selectedItems.value, ...newSelectedItems];
         emit('update:selectedItems', selectedItems.value);
@@ -780,6 +773,33 @@ const openDialog = (item?: any) => {
 const openDeleteDialog = (item: any) => {
   itemToDelete.value = item;
   deleteDialog.value = true;
+};
+
+const groupDeleteDialog = ref(false);
+
+const openGroupDeleteDialog = () => {
+  groupDeleteDialog.value = true;
+};
+
+const deleteGroupItems = async () => {
+  try {
+    const selectedIds = validSelectedItems.value.map((item) => getUniqueValue(item));
+
+    // Use bulk delete endpoint with comma-separated IDs
+    const idsParam = selectedIds.join(',');
+    await api.delete(`?ids=${idsParam}`);
+
+    groupDeleteDialog.value = false;
+    clearSelection();
+    await fetchData();
+
+    snackbarMessage.value = `✅ ${selectedIds.length} آیتم با موفقیت حذف شد`;
+    snackbar.value = true;
+  } catch (err) {
+    console.error('خطا در حذف گروهی اطلاعات', err);
+    snackbarMessage.value = '❌ خطا در حذف گروهی اطلاعات!';
+    snackbar.value = true;
+  }
 };
 
 /**
@@ -913,9 +933,9 @@ const download = async (key: string, item: any) => {
     const response = await fetch(fileUrl, {
       method: 'GET',
       headers: {
-        'Accept': 'application/octet-stream,application/pdf,image/*,*/*',
+        Accept: 'application/octet-stream,application/pdf,image/*,*/*'
       },
-      credentials: 'include', // Include cookies for authentication
+      credentials: 'include' // Include cookies for authentication
     });
 
     if (!response.ok) {
@@ -981,7 +1001,7 @@ const download = async (key: string, item: any) => {
       const axiosResponse = await axiosInstance.get(fileUrl, {
         responseType: 'blob',
         headers: {
-          'Accept': 'application/octet-stream,application/pdf,image/*,*/*',
+          Accept: 'application/octet-stream,application/pdf,image/*,*/*'
         }
       });
 
@@ -1061,7 +1081,7 @@ const openCustomActionDialog = (action: CustomAction, item: any) => {
   customActionComponent.value = action.component;
 
   // Find the original server data for this item
-  const originalItem = originalServerData.value.find(originalItem => {
+  const originalItem = originalServerData.value.find((originalItem) => {
     const itemId = typeof props.uniqueKey === 'function' ? props.uniqueKey(item) : item[props.uniqueKey as string];
     const originalId = typeof props.uniqueKey === 'function' ? props.uniqueKey(originalItem) : originalItem[props.uniqueKey as string];
     return itemId === originalId;
@@ -1171,7 +1191,6 @@ const handleFilterApply = (filterData: any) => {
   debouncedFetchData();
   filterDialog.value = false;
 };
-
 </script>
 
 <template>
@@ -1194,9 +1213,15 @@ const handleFilterApply = (filterData: any) => {
 
     <!-- Action Buttons for Selected Items -->
     <transition name="slide-left" appear>
-      <div v-if="props.bulkMode && hasValidSelection" class="selected-actions">
-        <!-- Individual Actions for Selected Items -->
-        <template v-for="item in validSelectedItems" :key="getUniqueValue(item)">
+      <div v-if="(props.bulkMode && hasValidSelection) || (props.enableGroupDelete && hasSelection)" class="selected-actions">
+        <!-- Group Actions -->
+        <v-btn v-if="props.enableGroupDelete" color="red" size="small" class="me-2" @click="openGroupDeleteDialog">
+          <span class="me-1">🗑️</span>
+          حذف گروهی ({{ selectedCount }})
+        </v-btn>
+
+        <!-- Individual Actions for Selected Items (only in bulk mode) -->
+        <template v-if="props.bulkMode" v-for="item in validSelectedItems" :key="getUniqueValue(item)">
           <!-- CRUD Actions -->
           <v-btn v-if="props.actions?.includes('edit')" color="blue" size="small" class="me-2" @click="openDialog(item)">
             <span class="me-1">✏️</span>
@@ -1274,7 +1299,13 @@ const handleFilterApply = (filterData: any) => {
   </div>
 
   <!-- Data Table Container (fills parent height) -->
-  <div class="data-table-container" v-bind="$attrs" role="region" :aria-busy="loading || isLoadingMore" :aria-live="(loading || isLoadingMore) ? 'polite' : 'off'">
+  <div
+    class="data-table-container"
+    v-bind="$attrs"
+    role="region"
+    :aria-busy="loading || isLoadingMore"
+    :aria-live="loading || isLoadingMore ? 'polite' : 'off'"
+  >
     <template v-if="loading && !isLoadingMore">
       <v-skeleton-loader type="table" :loading="loading" class="mx-auto" max-width="100%" :boilerplate="false" />
     </template>
@@ -1313,7 +1344,13 @@ const handleFilterApply = (filterData: any) => {
 
               <!-- Group Items -->
               <transition name="group-expand" appear>
-                <div v-if="group.isExpanded" class="group-items" :id="`group-panel-${group.groupKey}`" :aria-labelledby="`group-header-${group.groupKey}`" role="region">
+                <div
+                  v-if="group.isExpanded"
+                  class="group-items"
+                  :id="`group-panel-${group.groupKey}`"
+                  :aria-labelledby="`group-header-${group.groupKey}`"
+                  role="region"
+                >
                   <v-data-table
                     :headers="groupedHeaders"
                     :items="group.items"
@@ -1338,13 +1375,14 @@ const handleFilterApply = (filterData: any) => {
                     <template v-slot:item="{ item, columns, index }">
                       <tr
                         :style="{
-                        background: isSelected(item) && props.bulkMode
-                          ? 'rgb(var(--v-theme-primary200))'
-                          : index % 2 === 0
-                            ? 'rgb(var(--v-theme-surface))'
-                            : 'rgb(var(--v-theme-lightprimary))',
-                        cursor: props.bulkMode && props.selectable ? 'pointer' : 'default'
-                      }"
+                          background:
+                            isSelected(item) && props.bulkMode
+                              ? 'rgb(var(--v-theme-primary200))'
+                              : index % 2 === 0
+                                ? 'rgb(var(--v-theme-surface))'
+                                : 'rgb(var(--v-theme-lightprimary))',
+                          cursor: props.bulkMode && props.selectable ? 'pointer' : 'default'
+                        }"
                         :tabindex="props.selectable ? 0 : -1"
                         @keydown.enter.prevent="props.selectable && toggleSelection(item)"
                         @click="props.bulkMode && props.selectable && selectSingleItem(item)"
@@ -1353,11 +1391,11 @@ const handleFilterApply = (filterData: any) => {
                           v-for="column in columns"
                           :key="column.key"
                           :style="{
-                           ...getColumnStyle(column, item),
-                           ...(column.width
-                             ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' }
-                             : {})
-                         }"
+                            ...getColumnStyle(column, item),
+                            ...(column.width
+                              ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' }
+                              : {})
+                          }"
                         >
                           <!-- Selection Checkbox/Radio -->
                           <template v-if="column.key === 'selection'">
@@ -1389,7 +1427,7 @@ const handleFilterApply = (filterData: any) => {
                               size="small"
                               class="mr-2"
                               @click="openDeleteDialog(item)"
-                            >حذف ❌
+                              >حذف ❌
                             </v-btn>
                             <v-btn
                               v-if="props.actions?.includes('view')"
@@ -1397,14 +1435,20 @@ const handleFilterApply = (filterData: any) => {
                               size="small"
                               class="mr-2"
                               @click="goToRoute('view', item)"
-                            >🔍 نمایش
+                              >🔍 نمایش
                             </v-btn>
                             <template v-for="(routePath, routeKey) in getRoutesForItem(item)" :key="routeKey">
                               <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(routeKey, item)">
                                 {{ routeKey.toUpperCase() }}
                               </v-btn>
                             </template>
-                            <v-btn v-for="(value, key) in props.downloadLink" size="small" class="mr-2" :key="key" @click="download(key, item)">
+                            <v-btn
+                              v-for="(value, key) in props.downloadLink"
+                              size="small"
+                              class="mr-2"
+                              :key="key"
+                              @click="download(key, item)"
+                            >
                               {{ key }} ⬇️
                             </v-btn>
                             <template v-for="(action, index) in props.customActions" :key="action.title || index">
@@ -1486,11 +1530,12 @@ const handleFilterApply = (filterData: any) => {
           <tr
             :style="{
               color: isSelected(item) && props.bulkMode ? 'rgb(var(--v-theme-white))' : 'rgb(var(--v-theme-darkText))',
-              background: isSelected(item) && props.bulkMode
-                ? 'rgb(var(--v-theme-primary))'
-                : index % 2 === 0
-                  ? 'rgb(var(--v-theme-surface))'
-                  : 'rgb(var(--v-theme-lightprimary))',
+              background:
+                isSelected(item) && props.bulkMode
+                  ? 'rgb(var(--v-theme-primary))'
+                  : index % 2 === 0
+                    ? 'rgb(var(--v-theme-surface))'
+                    : 'rgb(var(--v-theme-lightprimary))',
               cursor: props.bulkMode && props.selectable ? 'pointer' : 'default'
             }"
             :tabindex="props.selectable ? 0 : -1"
@@ -1501,9 +1546,9 @@ const handleFilterApply = (filterData: any) => {
               v-for="column in columns"
               :key="column.key"
               :style="{
-                 ...getColumnStyle(column, item),
-                 ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
-               }"
+                ...getColumnStyle(column, item),
+                ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
+              }"
             >
               <!-- Selection Checkbox/Radio -->
               <template v-if="column.key === 'selection'">
@@ -1530,10 +1575,10 @@ const handleFilterApply = (filterData: any) => {
                   ویرایش ✏️
                 </v-btn>
                 <v-btn v-if="props.actions?.includes('delete')" color="red" size="small" class="mr-2" @click="openDeleteDialog(item)"
-                >حذف ❌
+                  >حذف ❌
                 </v-btn>
                 <v-btn v-if="props.actions?.includes('view')" color="purple" size="small" class="mr-2" @click="goToRoute('view', item)"
-                >🔍 نمایش
+                  >🔍 نمایش
                 </v-btn>
                 <template v-for="(routePath, routeKey) in getRoutesForItem(item)" :key="routeKey">
                   <v-btn color="indigo" size="small" class="mr-2" @click="goToRoute(routeKey, item)">
@@ -1653,6 +1698,27 @@ const handleFilterApply = (filterData: any) => {
     </v-card>
   </v-dialog>
 
+  <!-- Group Delete Confirmation Dialog -->
+  <v-dialog v-model="groupDeleteDialog" max-width="500">
+    <v-card>
+      <v-card-title class="text-h6">
+        <v-icon color="red" class="me-2">🗑️</v-icon>
+        حذف گروهی
+      </v-card-title>
+      <v-card-text>
+        <p>
+          آیا مایل به حذف <strong>{{ selectedCount }}</strong> آیتم انتخاب شده هستید؟
+        </p>
+        <v-alert type="warning" variant="tonal" class="mt-3"> این عمل قابل بازگشت نیست! </v-alert>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="grey" @click="groupDeleteDialog = false">انصراف</v-btn>
+        <v-btn color="red" @click="deleteGroupItems" :loading="loading"> حذف {{ selectedCount }} آیتم </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <v-dialog v-model="customActionDialog" max-width="1300">
     <v-card>
       <v-card-title>
@@ -1684,9 +1750,7 @@ const handleFilterApply = (filterData: any) => {
   <v-snackbar v-if="snackbar" v-model="snackbar" :timeout="3000" location="top">
     {{ snackbarMessage }}
     <template v-slot:actions>
-      <v-btn color="white" variant="text" @click="snackbar = false">
-        بستن
-      </v-btn>
+      <v-btn color="white" variant="text" @click="snackbar = false"> بستن </v-btn>
     </template>
   </v-snackbar>
 </template>
