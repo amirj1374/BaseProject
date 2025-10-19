@@ -1,11 +1,16 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
-import { api } from '@/services/api';
+import { onMounted, ref, watch } from 'vue';
 //type
 import { useApprovalStore } from '@/stores/approval';
 
 const approvalStore = useApprovalStore();
 const error = ref<string | null>(null);
+const showError = ref(false);
+
+// Watch for error changes
+watch(error, (newError) => {
+  showError.value = !!newError;
+});
 // initial data
 const formData = ref({
   summary: '',
@@ -65,7 +70,7 @@ defineExpose({ submitData });
         </v-col>
         <v-divider inset></v-divider>
       </v-row>
-      <v-snackbar v-if="error" v-model="error" color="error" timeout="5500">
+      <v-snackbar v-if="error" v-model="showError" color="error" timeout="5500">
         {{ error }}
       </v-snackbar>
     </form>

@@ -202,7 +202,6 @@
   import { IconTrash, IconX, IconPencil } from '@tabler/icons-vue';
   import { ApprovalTypeOptions } from '@/constants/enums/approval';
   import { useBaseStore } from '@/stores/base';
-  import { api } from '@/services/api';
   import MoneyInput from '@/components/shared/MoneyInput.vue';
   import { useApprovalStore } from '@/stores/approval';
   import type { CollateralDto, GreenLicense } from '@/types/approval/approvalType';
@@ -264,7 +263,7 @@
     { title: 'نوع مصوبه', key: 'approvalType', width: '100px' },
     { title: 'نوع ارز', key: 'currency', width: '100px' },
     { title: 'مبلغ', key: 'amount', width: '150px' },
-    { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
+    { title: 'عملیات', key: 'actions', align: 'center' as const, width: '100px' }
   ];
   
   const onCollateralDialogSave = (data: { collateral: CollateralDto | null; amount: string; percent: string }) => {

@@ -22,7 +22,7 @@
         {{ baseStore.currency.find((cur) => cur.code === item.currency)?.description || '-' }}
       </template>
       <template #item.repaymentType="{ item }">
-        {{ RepaymentTypeOptions.find((opt) => opt.value === item.repaymentType)?.title || '-' }}
+        {{ RepaymentTypeOptions.find((opt) => opt.value === (item as any).repaymentType)?.title || '-' }}
       </template>
       <template #item.facility="{ item }">
         {{ item.facility?.facilityName || '-' }}
@@ -364,7 +364,7 @@ const headers = [
   { title: 'درصد سپرده نقدی', key: 'percentDeposit', width: '200px' },
   { title: 'مدت (روز)', key: 'durationDay', width: '100px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
-  { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
+  { title: 'عملیات', key: 'actions', align: 'center' as const, width: '100px' }
 ];
 
 const onCollateralDialogSave = (data: { collateral: CollateralDto | null; amount: string; percent: string }) => {

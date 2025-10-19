@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { api } from '@/services/api';
-import { useApprovalStore } from '@/stores/approval';
+import { ref, watch } from 'vue';
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import { RelationTypeOptions } from '@/types/enums/global';
 
@@ -42,6 +40,13 @@ const emit = defineEmits<{
 
 const docs = ref<Document[]>([]);
 const error = ref<string | null>(null);
+const showError = ref(false);
+
+// Watch for error changes
+watch(error, (newError) => {
+  showError.value = !!newError;
+});
+
 // Removed upload and image dialog refs since we only show download buttons
 const dataTableRef = ref();
 
@@ -118,7 +123,7 @@ defineExpose({ submitData });
 
   <!-- Removed image dialog since we only show download buttons -->
 
-  <v-snackbar v-model="error" color="error" timeout="5500">
+  <v-snackbar v-model="showError" color="error" timeout="5500">
     {{ error }}
   </v-snackbar>
 </template>

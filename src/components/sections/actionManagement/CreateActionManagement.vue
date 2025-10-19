@@ -82,8 +82,8 @@ const roleOptions = ref<SamapRoleDTO[]>([]);
 interface FormData {
   fromDepartmentLevel: string;
   toDepartmentLevel: string;
-  toRole: string;
-  fromRole: string;
+  toRole: any;
+  fromRole: any;
   actionType: string;
 }
 

@@ -9,7 +9,7 @@
       :disabled="disabled"
       :readonly="readonly"
       :clearable="clearable"
-      :counter="showCounter"
+      :counter="showCounter || undefined"
       variant="outlined"
       density="comfortable"
       auto-grow
@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { ref, watch } from 'vue';
 
 interface Props {
   modelValue?: string;

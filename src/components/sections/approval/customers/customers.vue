@@ -68,7 +68,7 @@ const formData = ref({
 
 const headers = ref([
   { title: 'کد مشتری', key: 'cif', width: '200px', sortable: true },
-  { title: 'کدملی / شناسه ملی', align: 'center', key: 'nationalCode', width: '250px', sortable: true },
+  { title: 'کدملی / شناسه ملی', align: 'center' as const, key: 'nationalCode', width: '250px', sortable: true },
   { title: 'نام مشتری', key: 'customerName', width: '160px', sortable: true },
   { title: 'گروه مشتری', key: 'clientGroupName', width: '140px', sortable: true },
   { title: 'نام شعبه', key: 'branchName', width: '140px', sortable: true },

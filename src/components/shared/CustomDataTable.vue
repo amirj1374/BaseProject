@@ -1389,7 +1389,7 @@ const handleFilterApply = (filterData: any) => {
                       >
                         <td
                           v-for="column in columns"
-                          :key="column.key"
+                          :key="column.key || 'unknown'"
                           :style="{
                             ...getColumnStyle(column, item),
                             ...(column.width
@@ -1489,7 +1489,7 @@ const handleFilterApply = (filterData: any) => {
                             </template>
                           </template>
                           <template v-else>
-                            {{ getTranslatedValue(getNestedValue(item, column.key), column, item) }}
+                            {{ getTranslatedValue(getNestedValue(item, column.key || ''), column, item) }}
                           </template>
                         </td>
                       </tr>
@@ -1544,7 +1544,7 @@ const handleFilterApply = (filterData: any) => {
           >
             <td
               v-for="column in columns"
-              :key="column.key"
+              :key="column.key || 'unknown'"
               :style="{
                 ...getColumnStyle(column, item),
                 ...(column.width ? { width: column.width + 'px', minWidth: column.width + 'px', maxWidth: column.width + 'px' } : {})
@@ -1626,7 +1626,7 @@ const handleFilterApply = (filterData: any) => {
                 </template>
               </template>
               <template v-else>
-                {{ getTranslatedValue(getNestedValue(item, column.key), column, item) }}
+                {{ getTranslatedValue(getNestedValue(item, column.key || ''), column, item) }}
               </template>
             </td>
           </tr>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useApprovalStore } from '@/stores/approval';
 
 // Define props
@@ -14,7 +14,13 @@ const props = withDefaults(defineProps<Props>(), {
 
 const isDialogActive = ref(false);
 const error = ref<string | null>(null);
+const showError = ref(false);
 const approvalStore = useApprovalStore()
+
+// Watch for error changes
+watch(error, (newError) => {
+  showError.value = !!newError;
+});
 
 // Check if editing is disabled
 const isEditingDisabled = computed(() => {
@@ -72,7 +78,7 @@ const header = ref([
       </v-card-actions>
     </v-card>
   </v-dialog>
-  <v-snackbar v-if="error" v-model="error" color="error" timeout="2500">
+  <v-snackbar v-if="error" v-model="showError" color="error" timeout="2500">
     {{ error }}
   </v-snackbar>
 </template>

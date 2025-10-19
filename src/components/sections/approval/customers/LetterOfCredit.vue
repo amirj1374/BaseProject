@@ -257,11 +257,10 @@ import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { IconTrash, IconX, IconPencil } from '@tabler/icons-vue';
 import { ApprovalTypeOptions } from '@/constants/enums/approval';
 import { useBaseStore } from '@/stores/base';
-import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import { api } from '@/services/api';
 import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { useApprovalStore } from '@/stores/approval';
-import type { CollateralDto, Guarantee, Lc } from '@/types/approval/approvalType';
+import type { CollateralDto, Lc } from '@/types/approval/approvalType';
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
 import { CreditTypeOptions } from '@/types/enums/global';
@@ -332,7 +331,7 @@ const headers = [
   { title: 'نوع اعتبار اسنادی', key: 'creditType', width: '100px' },
   { title: 'مدت (روز)', key: 'durationDay', width: '100px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
-  { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
+  { title: 'عملیات', key: 'actions', align: 'center' as const, width: '100px' }
 ];
 
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { api } from '@/services/api';
 import type { SubmitSignPayload } from '@/types/cartable/cartableTypes';
-import { onMounted, ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import ApprovalRequestViewer from '../../../approval/ApprovalRequestViewer.vue';
 import { usePermissionsStore } from '@/stores/permissions';
 import DownloadButton from '@/components/shared/DownloadButton.vue';
@@ -12,6 +12,13 @@ const snackbarMessage = ref<string>('');
 const snackbarColor = ref<string>('');
 const snackbar = ref<boolean>(false);
 const error = ref<string>('');
+const showError = ref(false);
+
+// Watch for error changes
+watch(error, (newError) => {
+  showError.value = !!newError;
+});
+
 const props = defineProps<{
   item: any;
   onSuccess?: () => void;
@@ -84,7 +91,7 @@ const required = (v: any) => (needsComment.value ? (!!v || 'این فیلد ال
   <form @submit.prevent="submitForm">
     <v-row>
       <v-col cols="12" md="3">
-        <v-radio-group v-model="actionType" color="primary" class="d-flex flex-column justify-center" direction="center">
+        <v-radio-group v-model="actionType" color="primary" class="d-flex flex-column justify-center" direction="vertical">
           <v-radio color="success" label="موافقم" :value="'AGREED'"></v-radio>
           <v-radio color="error" label="مخالفم" :value="'DISAGREED'"></v-radio>
           <v-radio color="warning" label="عودت" :value="'RETURNED'"></v-radio>
@@ -151,7 +158,7 @@ const required = (v: any) => (needsComment.value ? (!!v || 'این فیلد ال
     </v-row>
   </form>
 
-  <v-snackbar v-if="error" v-model="error" color="error" timeout="2500">
+  <v-snackbar v-if="error" v-model="showError" color="error" timeout="2500">
     {{ error }}
   </v-snackbar>
   <v-snackbar v-if="snackbar" v-model="snackbar" :color="snackbarColor" timeout="2500">

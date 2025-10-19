@@ -23,13 +23,13 @@ const searchTypes = ref<{ title: string; value: AllowedStatus }[]>([
   { title: 'کدملی', value: 'nationalCode' }
 ]);
 const headers = ref([
-  { title: 'نام ضامن', key: 'guarantorName', align: 'center' },
-  { title: 'کدملی / شناسه ملی', key: 'nationalCode', align: 'left' },
+  { title: 'نام ضامن', key: 'guarantorName', align: 'center' as const },
+  { title: 'کدملی / شناسه ملی', key: 'nationalCode', align: 'start' as const },
   { title: 'تاریخ', key: 'createdAt', isDate: true },
   { title: 'رتبه', key: 'label' },
   { title: 'امتیاز مشتری', key: 'value' },
   { title: 'وضعیت استعلام', key: 'sapInquiryStatus' },
-  { title: 'عملیات', key: 'actions', align: 'center' }
+  { title: 'عملیات', key: 'actions', align: 'center' as const }
 ]);
 
 // initial data
@@ -292,7 +292,7 @@ defineExpose({ submitData });
               </v-chip>
             </template>
             <template v-slot:item.createdAt="{ item }">
-              {{ new Date(item.createdAt).toLocaleDateString('fa-IR') }}
+              {{ item.createdAt ? new Date(item.createdAt).toLocaleDateString('fa-IR') : '-' }}
             </template>
             <template v-slot:item.actions="{ item }">
               <v-btn size="x-small" @click="deleteGuarantor(item)" :disabled="approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"> ❌حذف</v-btn>

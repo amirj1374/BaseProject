@@ -399,7 +399,7 @@ const headers = [
   { title: 'پیش دریافت', key: 'advancePayment', width: '250px' },
   { title: 'مدت (روز)', key: 'durationDay', width: '200px' },
   { title: 'مبلغ', key: 'amount', width: '200px' },
-  { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
+  { title: 'عملیات', key: 'actions', align: 'center' as const, width: '100px' }
 ];
 
 const onCollateralDialogSave = (data: { collateral: CollateralDto | null; amount: string; percent: string }) => {

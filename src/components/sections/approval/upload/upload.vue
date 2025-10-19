@@ -19,7 +19,13 @@ interface Document {
 const customizerStore = useCustomizerStore();
 const docs = ref<Document[]>([]);
 const error = ref<string | null>(null);
+const showError = ref(false);
 const approvalStore = useApprovalStore();
+
+// Watch for error changes
+watch(error, (newError) => {
+  showError.value = !!newError;
+});
 const showUploadDialog = ref(false);
 const selectedDoc = ref<Document | null>(null);
 const selectedFile = ref<File | null>(null);
@@ -295,7 +301,7 @@ defineExpose({ submitData });
     </v-card>
   </v-dialog>
 
-  <v-snackbar v-model="error" color="error" timeout="5500">
+  <v-snackbar v-model="showError" color="error" timeout="5500">
     {{ error }}
   </v-snackbar>
 </template>

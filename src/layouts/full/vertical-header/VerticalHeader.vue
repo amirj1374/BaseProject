@@ -3,15 +3,12 @@ import { ref, computed } from 'vue';
 import { useCustomizerStore } from '@/stores/customizer';
 import { useCustomerInfoStore } from '@/stores/customerInfo';
 import sidebarItems, { getFilteredSidebarItems } from '../vertical-sidebar/sidebarItem';
-import Logo from '../logo/LogoMain.vue';
 // Icon Imports
-import { IconMenu2, IconSearch, IconBell, IconSettings, IconPalette, IconChevronDown } from '@tabler/icons-vue';
+import { IconMenu2, IconBell, IconSettings, IconPalette, IconChevronDown } from '@tabler/icons-vue';
 
 // dropdown imports
 import NotificationDD from './NotificationDD.vue';
 import ProfileDD from './ProfileDD.vue';
-import Searchbar from './SearchBarPanel.vue';
-import LogoUser from '../logo/LogoUser.vue';
 
 const customizer = useCustomizerStore();
 const customerInfo = useCustomerInfoStore();
@@ -93,7 +90,7 @@ const headerMenu = computed(() => {
             v-if="item.chip"
             :color="item.chipColor"
             :size="item.chipIcon ? 'small' : 'default'"
-            :variant="item.chipVariant"
+            :variant="item.chipVariant as any"
             :prepend-icon="item.chipIcon"
             class="ml-2"
           >

@@ -1,13 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import ApprovalRequestViewer from '@/components/approval/ApprovalRequestViewer.vue';
-import { usePermissionsStore } from '@/stores/permissions';
 
 const emit = defineEmits(['close']);
 const snackbarMessage = ref<string>('');
 const snackbarColor = ref<string>('');
 const snackbar = ref<boolean>(false);
 const error = ref<string>('');
+const showError = ref(false);
+
+// Watch for error changes
+watch(error, (newError) => {
+  showError.value = !!newError;
+});
+
 const props = defineProps<{
   item: any;
   onSuccess?: () => void;
@@ -22,7 +28,7 @@ const props = defineProps<{
         <ApprovalRequestViewer :loan-request-id="props.item.loanRequestId" />
       </v-col>
     </v-row>
-  <v-snackbar v-if="error" v-model="error" color="error" timeout="2500">
+  <v-snackbar v-if="error" v-model="showError" color="error" timeout="2500">
     {{ error }}
   </v-snackbar>
   <v-snackbar v-if="snackbar" v-model="snackbar" :color="snackbarColor" timeout="2500">

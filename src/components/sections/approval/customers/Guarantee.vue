@@ -22,7 +22,7 @@
         {{ baseStore.currency.find(cur => cur.code === item.currency)?.description || '-' }}
       </template>
       <template #item.repaymentType="{ item }">
-        {{ RepaymentTypeOptions.find(opt => opt.value === item.repaymentType)?.title || '-' }}
+        {{ RepaymentTypeOptions.find(opt => opt.value === (item as any).repaymentType)?.title || '-' }}
       </template>
       <template #item.amount="{ item }">
         {{ formatNumberWithCommas(item.amount) }}
@@ -313,7 +313,7 @@ const headers = [
   { title: 'نوع ارز', key: 'currency', width: '100px' },
   { title: 'مدت (روز)', key: 'durationDay', width: '100px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
-  { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
+  { title: 'عملیات', key: 'actions', align: 'center' as const, width: '100px' }
 ];
 
 const onCollateralDialogSave = (data: { collateral: CollateralDto | null; amount: string; percent: string }) => {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { api } from '@/services/api';
 import type { SignerData, SubmitChangeSignerPayload } from '@/types/cartable/cartableTypes';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 const emit = defineEmits(['close']);
 
 const signerData = ref<SignerData[]>([]);
@@ -11,6 +11,13 @@ const snackbarMessage = ref<string>('');
 const snackbarColor = ref<string>('');
 const snackbar = ref<boolean>(false);
 const error = ref<string>('');
+const showError = ref(false);
+
+// Watch for error changes
+watch(error, (newError) => {
+  showError.value = !!newError;
+});
+
 const props = defineProps<{
   item: any;
   id?: string | number;
@@ -87,7 +94,7 @@ const submitForm = async () => {
       </v-col>
     </v-row>
   </form>
-  <v-snackbar v-if="error" v-model="error" color="error" timeout="2500">
+  <v-snackbar v-if="error" v-model="showError" color="error" timeout="2500">
     {{ error }}
   </v-snackbar>
   <v-snackbar v-if="snackbar" v-model="snackbar" :color="snackbarColor" timeout="2500">

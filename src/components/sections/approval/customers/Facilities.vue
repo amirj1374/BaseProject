@@ -319,7 +319,7 @@ const headers = [
   { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '100px' },
   { title: 'مدت (روز)', key: 'durationDay', width: '100px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
-  { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
+  { title: 'عملیات', key: 'actions', align: 'center' as const, width: '100px' }
 ];
 
 const onCollateralDialogSave = (data: { collateral: CollateralDto | null; amount: string; percent: string }) => {

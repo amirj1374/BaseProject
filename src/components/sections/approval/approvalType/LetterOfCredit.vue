@@ -22,13 +22,13 @@
         {{ baseStore.currency.find((cur) => cur.code === item.currency)?.description || '-' }}
       </template>
       <template #item.repaymentType="{ item }">
-        {{ RepaymentTypeOptions.find((opt) => opt.value === item.repaymentType)?.title || '-' }}
+        {{ RepaymentTypeOptions.find((opt) => opt.value === (item as any).repaymentType)?.title || '-' }}
       </template>
       <template #item.facility="{ item }">
-        {{ item.facility?.facilityName || '-' }}
+        {{ (item as any).facility?.facilityName || '-' }}
       </template>
       <template #item.contractType="{ item }">
-        {{ item.contractType?.longTitle || '-' }}
+        {{ (item as any).contractType?.longTitle || '-' }}
       </template>
       <template #item.lcContractType="{ item }">
         {{ LcTypeOptions.find((opt) => opt.value === item.lcContractType)?.title || '-' }}
@@ -294,7 +294,7 @@ import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import { api } from '@/services/api';
 import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { useApprovalStore } from '@/stores/approval';
-import type { CollateralDto, ContractType, FacilitiesRequest, Facility, FacilityDto, LcRequest } from '@/types/approval/approvalType';
+import type { CollateralDto, ContractType, FacilityDto, LcRequest } from '@/types/approval/approvalType';
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
 import { CreditTypeOptions, LcTypeOptions } from '@/types/enums/global';
@@ -365,7 +365,7 @@ const headers = [
   { title: 'میان دریافت', key: 'intermediatePayment', width: '200px' },
   { title: 'پیش دریافت', key: 'advancePayment', width: '200px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
-  { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
+  { title: 'عملیات', key: 'actions', align: 'center' as const, width: '100px' }
 ];
 
 const onCollateralDialogSave = (data: { collateral: CollateralDto | null; amount: string; percent: string }) => {

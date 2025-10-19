@@ -20,7 +20,13 @@ const snackbarMessage = ref<string>('');
 const snackbarColor = ref<string>('');
 const snackbar = ref<boolean>(false);
 const error = ref<string>('');
+const showError = ref(false);
 const selectedDate = ref<string | null>(null);
+
+// Watch for error changes
+watch(error, (newError) => {
+  showError.value = !!newError;
+});
 const props = defineProps<{
   item: any;
   onSuccess?: () => void;
@@ -38,7 +44,7 @@ const fetchValidUsers = async (selectedValue: string) => {
     if (actionsData.value.length > 0) {
       selectedAction.value = actionsData.value[0];
       if (roleOptions.value.length > 0) {
-        selectedRole.value = roleOptions.value[0];
+        selectedRole.value = roleOptions.value[0] as any;
       }
     }
   }
@@ -51,7 +57,7 @@ const required = (v: any) => !!v || 'این فیلد الزامی است';
 // When action changes, auto-select its first role (from roleOptions)
 watch(selectedAction, () => {
   if (roleOptions.value.length > 0) {
-    selectedRole.value = roleOptions.value[0];
+    selectedRole.value = roleOptions.value[0] as any;
   } else {
     selectedRole.value = null;
   }
@@ -226,7 +232,7 @@ watch(validUserOptions, (newOptions) => {
       </v-col>
       <v-col cols="12" md="4">
         <v-select
-          v-model="selectedRole"
+          v-model="selectedRole as any"
           :items="roleOptions"
           item-title="display"
           item-value="roleCode"
@@ -337,7 +343,7 @@ watch(validUserOptions, (newOptions) => {
     @confirm="submitForm"
   >
   </ConfirmDialog>
-  <v-snackbar v-if="error" v-model="error" color="error" timeout="2500">
+  <v-snackbar v-if="error" v-model="showError" color="error" timeout="2500">
     {{ error }}
   </v-snackbar>
   <v-snackbar v-if="snackbar" v-model="snackbar" :color="snackbarColor" timeout="2500">
