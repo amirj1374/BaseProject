@@ -107,8 +107,4 @@ const headers = [
     translate: true
   }
 ];
-onMounted(() => {
-  // Check if user has permission to access this page
-  requirePermission('approval_edit');
-});
 </script>
