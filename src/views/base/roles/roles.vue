@@ -24,6 +24,7 @@ const header = ref([
     title: 'نقش سماپ',
     key: 'samapRole',
     sortable: true,
+    width: 200,
     nestedKey: 'samapRole.description',
        formatter: (value: any, item: any) => {
       if (item.samapRole && typeof item.samapRole === 'object') {
@@ -36,6 +37,7 @@ const header = ref([
     title: 'نقش لوتوسی',
     key: 'lotusRoles',
     sortable: true,
+    width: 200,
     nestedKey: 'lotusRoles.description',
        formatter: (value: any, item: any) => {
       if (item.lotusRoles && Array.isArray(item.lotusRoles)) {

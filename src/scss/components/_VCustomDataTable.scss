@@ -5,8 +5,8 @@
   background: rgb(var(--v-theme-surface));
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  will-change: transform, margin-top;
+  transition: opacity 0.3s ease;
+  contain: layout;
 }
 
 /* Grouped Table Styles */
@@ -162,8 +162,8 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  will-change: height, margin-bottom;
+  transition: opacity 0.3s ease;
+  contain: layout;
 }
 
 .selection-actions {
@@ -181,8 +181,8 @@
   margin-top: 5px;
   flex-wrap: wrap;
   flex-direction: row-reverse;
-  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  will-change: transform, opacity, height;
+  transition: opacity 0.3s ease;
+  contain: layout;
 }
 
 :deep(.v-data-table__wrapper table thead) {
@@ -235,27 +235,35 @@
   transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
+/* Skeleton container to prevent layout shifts */
+.skeleton-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgb(var(--v-theme-surface));
+  border-radius: 8px;
+  contain: layout;
+}
+
 /* Enhanced slide transition for bulk mode actions */
 .slide-left-enter-active {
-  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: opacity 0.3s ease;
 }
 
 .slide-left-leave-active {
-  transition: all 0.6s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  transition: opacity 0.3s ease;
 }
 
 .slide-left-enter-from {
-  transform: translateX(-100%) scale(0.95);
   opacity: 0;
 }
 
 .slide-left-leave-to {
-  transform: translateX(-100%) scale(0.95);
   opacity: 0;
 }
 
 .slide-left-enter-to,
 .slide-left-leave-from {
-  transform: translateX(0) scale(1);
   opacity: 1;
 }

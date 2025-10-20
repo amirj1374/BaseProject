@@ -68,15 +68,19 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, defineAsyncComponent } from 'vue';
 import { useCustomerInfoStore } from '@/stores/customerInfo';
 import { IconUserCircle } from '@tabler/icons-vue';
-import PopularStocks from '@/views/dashboards/default/components/PopularStocks.vue';
-import TotalEarning from '@/views/dashboards/default/components/TotalEarning.vue';
-import TotalPay from '@/views/dashboards/default/components/TotalPay.vue';
-import TotalGrowth from '@/views/dashboards/default/components/TotalGrowth.vue';
-import TotalIncome from '@/views/dashboards/default/components/TotalIncome.vue';
-import DataLabels from '@/views/dashboards/default/components/DataLabels.vue';
+
+// Lazy load dashboard components for better performance
+const TotalIncome = defineAsyncComponent(() => import('@/views/dashboards/default/components/TotalIncome.vue'));
+const TotalGrowth = defineAsyncComponent(() => import('@/views/dashboards/default/components/TotalGrowth.vue'));
+const DataLabels = defineAsyncComponent(() => import('@/views/dashboards/default/components/DataLabels.vue'));
+
+// Additional components (lazy loaded for non-critical content)
+const PopularStocks = defineAsyncComponent(() => import('@/views/dashboards/default/components/PopularStocks.vue'));
+const TotalEarning = defineAsyncComponent(() => import('@/views/dashboards/default/components/TotalEarning.vue'));
+const TotalPay = defineAsyncComponent(() => import('@/views/dashboards/default/components/TotalPay.vue'));
 
 const customerInfoStore = useCustomerInfoStore();
 

@@ -7,7 +7,7 @@ import path from 'path';
 export default defineConfig(({ command, mode }) => {
   // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, process.cwd(), '');
-  
+
   return {
     plugins: [
       vue({
@@ -38,8 +38,13 @@ export default defineConfig(({ command, mode }) => {
         output: {
           manualChunks: {
             'vendor': ['vue', 'vue-router', 'pinia'],
-            'vuetify': ['vuetify'],
+            'vuetify': ['vuetify', '@mdi/js'],
             'charts': ['apexcharts', 'vue3-apexcharts'],
+            'utils': ['lodash', 'lodash-es', 'dayjs', 'date-fns'],
+            'icons': ['@tabler/icons-vue', 'remixicon'],
+            'forms': ['vee-validate', 'yup'],
+            'pdf': ['jspdf'],
+            'lottie': ['lottie-web', 'vue3-lottie']
           }
         }
       },
@@ -47,9 +52,16 @@ export default defineConfig(({ command, mode }) => {
       terserOptions: {
         compress: {
           drop_console: env.VITE_DEBUG !== 'true',
-          drop_debugger: env.VITE_DEBUG !== 'true'
+          drop_debugger: env.VITE_DEBUG !== 'true',
+          pure_funcs: ['console.log', 'console.info'],
+          passes: 2
+        },
+        mangle: {
+          safari10: true
         }
-      }
+      },
+      target: 'esnext',
+      cssCodeSplit: true
     },
     optimizeDeps: {
       exclude: ['vuetify'],

@@ -37,29 +37,38 @@ app.component('Vue3PersianDatetimePicker', Vue3PersianDatetimePicker);
 app.directive('digit-limit', DigitLimit);
 app.directive('permission', vPermission);
 
-// Mount the app first so loading component can be rendered
+// Mount the app immediately for faster initial render
 app.use(vuetify).mount('#app');
 
-// Set loading to true and start initialization after nextTick
+// Optimize initialization - show UI first, then load data
 nextTick(async () => {
   // Import and use store after pinia is installed
   const { useCustomizerStore } = await import('@/stores/customizer');
   const customizer = useCustomizerStore();
   
-  // Set loading to true BEFORE starting initialization
+  // Show minimal loading state briefly, then start data loading
   customizer.SET_LOADING(true);
   
-  // Start the actual API calls
-  startInitialization();
-  
-  // Wait for initialization to complete
-  initPromise
-    .then(() => {
-      // App initialized successfully
-    })
-    .catch((error) => {
-      // App initialization failed
-    });
+  // Use requestIdleCallback or setTimeout to defer heavy operations
+  const loadData = () => {
+    startInitialization();
+    
+    // Wait for initialization to complete
+    initPromise
+      .then(() => {
+        // App initialized successfully
+      })
+      .catch((error) => {
+        // App initialization failed
+      });
+  };
+
+  // Defer data loading to allow initial render
+  if (window.requestIdleCallback) {
+    window.requestIdleCallback(loadData, { timeout: 100 });
+  } else {
+    setTimeout(loadData, 50);
+  }
 });
 
 

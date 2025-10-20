@@ -275,7 +275,7 @@ defineExpose({ submitData });
             <img
               :src="imageDialogUrl"
               alt="تصویر"
-              style="max-width: 100%; max-height: 400px; border-radius: 8px"
+              style="max-width: 100%; max-height: 400px; min-height: 200px; border-radius: 8px; object-fit: contain; background: #f5f5f5;"
               @error="handleImageError"
               @load="handleImageLoad"
             />
@@ -283,7 +283,7 @@ defineExpose({ submitData });
           <template v-else>
             <iframe
               :src="imageDialogUrl"
-              style="width: 100%; height: 80vh; border: none; border-radius: 8px"
+              style="width: 100%; height: 80vh; min-height: 400px; border: none; border-radius: 8px; background: #f5f5f5;"
             ></iframe>
           </template>
           <div v-if="error" class="error-message mt-3">

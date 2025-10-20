@@ -70,12 +70,12 @@ export async function startInitialization() {
 
   try {
     customerInfoStore.clearError();
-    
-    // Sequential API calls - one after another
+
+    // Critical API call first (user info) - this is the most important
     const userInfo = await api.user.getUserInfo();
     customerInfoStore.setUserInfo(userInfo.data);
-    
-    // Set and validate customizer settings
+
+    // Set and validate customizer settings immediately
     if (userInfo.data.customizer) {
       customizer.actTheme = validateTheme(userInfo.data.customizer.actTheme);
       customizer.fontTheme = validateFontTheme(userInfo.data.customizer.fontTheme);
@@ -84,25 +84,43 @@ export async function startInitialization() {
       customizer.layoutType = validateLayoutType(userInfo.data.customizer.layoutType || 'SideBar');
     }
 
-    const currency = await api.approval.fetchCurrencies();
-    baseStore.setCurrencyList(currency.data);
-    
-    const collateral = await api.approval.getCollateral();
-    baseStore.setCollateralList(collateral.data);
-    
-    const regions = await api.approval.getRegions();
-    baseStore.setRegionsList(regions.data);
-
-    const departmentLevel = await api.user.getDepartmentsLevel();
-    baseStore.setDepartmentLevel(departmentLevel.data);
-    
+    // Resolve critical initialization immediately after user info
     resolveInit?.(userInfo.data);
-    
+
+    // Defer non-critical API calls to improve LCP
+    setTimeout(async () => {
+      try {
+        // Parallel API calls for non-critical data
+        const [currency, collateral, regions, departmentLevel] = await Promise.allSettled([
+          api.approval.fetchCurrencies(),
+          api.approval.getCollateral(),
+          api.approval.getRegions(),
+          api.user.getDepartmentsLevel()
+        ]);
+
+        // Handle successful responses
+        if (currency.status === 'fulfilled') {
+          baseStore.setCurrencyList(currency.value.data);
+        }
+        if (collateral.status === 'fulfilled') {
+          baseStore.setCollateralList(collateral.value.data);
+        }
+        if (regions.status === 'fulfilled') {
+          baseStore.setRegionsList(regions.value.data);
+        }
+        if (departmentLevel.status === 'fulfilled') {
+          baseStore.setDepartmentLevel(departmentLevel.value.data);
+        }
+      } catch (error) {
+        console.warn('Non-critical data loading failed:', error);
+      }
+    }, 100);
+
   } catch (error) {
     customerInfoStore.setError(error instanceof Error ? error.message : 'Failed to load application data');
     rejectInit?.(error);
   } finally {
-    // Always set loading to false when done
+    // Set loading to false immediately after critical data is loaded
     customizer.SET_LOADING(false);
     isInitializing = false;
   }

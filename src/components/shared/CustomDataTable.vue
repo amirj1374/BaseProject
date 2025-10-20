@@ -1307,7 +1307,9 @@ const handleFilterApply = (filterData: any) => {
     :aria-live="loading || isLoadingMore ? 'polite' : 'off'"
   >
     <template v-if="loading && !isLoadingMore">
-      <v-skeleton-loader type="table" :loading="loading" class="mx-auto" max-width="100%" :boilerplate="false" />
+      <div class="skeleton-container" :style="{ height: `${props.height}px` }">
+        <v-skeleton-loader type="table" :loading="loading" class="mx-auto" max-width="100%" :boilerplate="false" />
+      </div>
     </template>
     <template v-else>
       <!-- Grouped Table Structure -->

@@ -33,22 +33,22 @@ html {
   backdrop-filter: blur(10px);
 }
 $sizes: (
-  'display-1': 44px,
-  'display-2': 40px,
-  'display-3': 30px,
-  'h1': 36px,
-  'h2': 30px,
-  'h3': 21px,
-  'h4': 18px,
-  'h5': 16px,
-  'h6': 14px,
-  'text-8': 8px,
-  'text-10': 10px,
-  'text-13': 13px,
-  'text-18': 18px,
-  'text-20': 20px,
-  'text-24': 24px,
-  'body-text-1': 10px
+        'display-1': 44px,
+        'display-2': 40px,
+        'display-3': 30px,
+        'h1': 36px,
+        'h2': 30px,
+        'h3': 21px,
+        'h4': 18px,
+        'h5': 16px,
+        'h6': 14px,
+        'text-8': 8px,
+        'text-10': 10px,
+        'text-13': 13px,
+        'text-18': 18px,
+        'text-20': 20px,
+        'text-24': 24px,
+        'body-text-1': 10px
 );
 
 @each $pixel, $size in $sizes {
@@ -74,56 +74,68 @@ $sizes: (
 
 @font-face {
   font-family: 'yekanLight';
-  src: url('/src/assets/fonts/BYekan.woff') format('woff');
+  src: url('/src/assets/fonts/BYekan.woff2') format('woff2'),
+  url('/src/assets/fonts/BYekan.woff') format('woff');
   font-weight: 300;
   font-style: normal;
+  font-display: swap;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
 @font-face {
   font-family: 'iranSans';
-  src: url('/src/assets/fonts/IRANSansWeb.ttf') format('truetype');
+  src: url('/src/assets/fonts/IRANSansXMedium.woff2') format('woff2'),
+  url('/src/assets/fonts/IRANSansXMedium.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
+  font-display: swap;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
 @font-face {
   font-family: 'kalamehLight';
-  src: url('/src/assets/fonts/kalamehRegular.woff') format('woff');
+  src: url('/src/assets/fonts/kalamehRegular.woff2') format('woff2'),
+  url('/src/assets/fonts/kalamehRegular.woff') format('woff');
   font-weight: 300;
   font-style: normal;
+  font-display: swap;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
 @font-face {
   font-family: 'vazir';
-  src: url('/src/assets/fonts/Vazir-Medium-FD.woff') format('woff');
+  src: url('/src/assets/fonts/Vazir-Medium-FD.woff2') format('woff2'),
+  url('/src/assets/fonts/Vazir-Medium-FD.woff') format('woff');
   font-weight: 300;
   font-style: normal;
+  font-display: swap;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
-
 @font-face {
   font-family: 'IranNastaliq';
   src: url('/src/assets/fonts/IranNastaliq.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
+  font-display: swap;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
-
 @font-face {
   font-family: 'Massir';
   src: url('/src/assets/fonts/A Massir Spray.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
+  font-display: swap;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
-
-// IranNastaliq font with bigger size
-.iran-nastaliq-large {
-  font-family: 'IranNastaliq', serif;
-  font-size: 24px;
-  line-height: 1.6;
-}
-
-.iran-nastaliq-extra-large {
-  font-family: 'IranNastaliq', serif;
-  font-size: 32px;
-  line-height: 1.5;
-}
-
 body {
   font-family: var(--font-theme), sans-serif;
 }
