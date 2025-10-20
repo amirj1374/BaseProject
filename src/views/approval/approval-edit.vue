@@ -149,20 +149,20 @@ const headers = [
     title: 'کد رهگیری',
     key: 'trackingCode',
     sortable: true,
-    width: 200
+    width: 250
   },
   {
     title: 'تاریخ درخواست',
     key: 'requestDate',
     sortable: true,
-    width: 150,
+    width: 200,
     isDate: true
   },
   {
     title: 'وضعیت',
     key: 'status',
     sortable: true,
-    width: 150,
+    width: 200,
     options: LoanRequestStatusOptions,
     translate: true
   }

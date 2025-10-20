@@ -49,7 +49,7 @@ const header = ref([
     key: 'updateDate',
     sortable: true,
     editable: true,
-    width: 200,
+    width: 250,
     isDate: true,
     formatter: (value: any, item: any) => {
       if (item.updateDate && item.updateTime) {
@@ -62,7 +62,7 @@ const header = ref([
     title: 'کد رهگیری',
     key: 'trackingCode',
     sortable: true,
-    width: 200
+    width: 250
   },
   {
     title: 'وضعیت',
@@ -76,33 +76,36 @@ const header = ref([
     title: 'نام مشتری',
     key: 'customerName',
     sortable: true,
-    editable: true
+    editable: true,
+    width: 200,
+
   },
   {
     title: 'کد مشتری',
     key: 'customerCode',
     sortable: true,
     editable: true,
-    width: 200
+    width: 150,
   },
   {
     title: 'گروه مشتری',
     key: 'customerGroup',
-    sortable: true
+    sortable: true,
+    width: 200,
   },
   {
     title: 'نوع مشتری',
     key: 'customerType',
     sortable: true,
     translate: true,
-    options: CustomerTypeOptions
+    options: CustomerTypeOptions,
+    width: 200
   },
   {
     title: 'شعبه ثبت کننده درخواست',
     key: 'branchName',
     sortable: true,
     editable: true,
-    width: 200
   },
   {
     title: 'کد شعبه ثبت کننده درخواست',
