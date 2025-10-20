@@ -1,24 +1,28 @@
 <script setup lang="ts">
-import { shallowRef, computed } from 'vue';
-import { useCustomizerStore } from '@/stores/customizer';
 import { useCustomerInfoStore } from '@/stores/customerInfo';
+import { useCustomizerStore } from '@/stores/customizer';
+import { computed } from 'vue';
 import sidebarItems, { getFilteredSidebarItems } from './sidebarItem';
 
+import Logo from '../logo/LogoMain.vue';
+import NavCollapse from './NavCollapse/NavCollapse.vue';
 import NavGroup from './NavGroup/NavGroup.vue';
 import NavItem from './NavItem/NavItem.vue';
-import NavCollapse from './NavCollapse/NavCollapse.vue';
-import Logo from '../logo/LogoMain.vue';
 
 const customizer = useCustomizerStore();
 const customerInfo = useCustomerInfoStore();
 
 // Use filtered menu items based on user permissions
 const sidebarMenu = computed(() => {
-  // Only filter menu items if user info is loaded
-  if (customerInfo.isUserInfoLoaded) {
-    return getFilteredSidebarItems();
+  // Only filter menu items if user info is loaded and has roles
+  if (customerInfo.isUserInfoLoaded && customerInfo.getUserRoles.length > 0) {
+    const filteredItems = getFilteredSidebarItems();
+    console.log('Sidebar: Filtered menu items:', filteredItems.length, 'out of', sidebarItems.length);
+    return filteredItems;
   }
-  // Return all items if user info is not loaded yet
+  // Return all items if user info is not loaded yet or has no roles
+  // This ensures sidebar is always visible during loading or if permissions fail
+  console.log('Sidebar: Using all menu items (user info not loaded or no roles)');
   return sidebarItems;
 });
 </script>
@@ -31,7 +35,7 @@ const sidebarMenu = computed(() => {
     rail-width="80"
     mobile-breakpoint="lg"
     app
-    class="rightSidebar"
+    :class="['rightSidebar', { 'sidebar-closed': !customizer.Sidebar_drawer }]"
     :rail="customizer.mini_sidebar"
   >
     <!---Logo part -->
@@ -57,9 +61,29 @@ const sidebarMenu = computed(() => {
           <!---End Single Item-->
         </template>
       </v-list>
-      <div class="pa-4 text-center">
+      <div v-if="customizer.Sidebar_drawer" class="pa-4 text-center">
         <v-chip color="inputBorder" size="small">نمایشی</v-chip>
       </div>
     </perfect-scrollbar>
   </v-navigation-drawer>
 </template>
+
+<style>
+/* Completely hide text when sidebar is closed */
+.rightSidebar.sidebar-closed .v-list-item-title,
+.rightSidebar.sidebar-closed .v-list-item-subtitle,
+.rightSidebar.sidebar-closed .v-list-subheader {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Also hide when in rail mode */
+.rightSidebar.v-navigation-drawer--rail .v-list-item-title,
+.rightSidebar.v-navigation-drawer--rail .v-list-item-subtitle,
+.rightSidebar.v-navigation-drawer--rail .v-list-subheader {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+</style>

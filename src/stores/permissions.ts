@@ -130,8 +130,14 @@ export const usePermissionsStore = defineStore({
 
       if (!permission) return true; // If no permission defined, allow access
 
-      const userRoles = customerInfo.getUserRoles;
-      const userLotusRoles = customerInfo.getLotusRoles;
+      // If user info is not loaded, allow access to prevent sidebar from being empty
+      if (!customerInfo.isUserInfoLoaded) return true;
+
+      const userRoles = customerInfo.getUserRoles || [];
+      const userLotusRoles = customerInfo.getLotusRoles || [];
+
+      // If user has no roles at all, allow access to prevent sidebar from being empty
+      if (userRoles.length === 0 && userLotusRoles.length === 0) return true;
 
       // Check required roles
       const hasRequiredRole = permission.requiredRoles.some((role) => userRoles.includes(role));

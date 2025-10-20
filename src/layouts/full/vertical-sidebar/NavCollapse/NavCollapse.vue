@@ -1,8 +1,10 @@
 <script setup>
-import NavItem from '../NavItem/NavItem.vue';
+import { useCustomizerStore } from '@/stores/customizer';
 import Icon from '../IconSet.vue';
+import NavItem from '../NavItem/NavItem.vue';
 
 const props = defineProps({ item: Object, level: Number });
+const customizer = useCustomizerStore();
 </script>
 
 <template>
@@ -20,9 +22,9 @@ const props = defineProps({ item: Object, level: Number });
           <Icon :item="item.icon" :level="level" />
         </template>
         <!---Title  -->
-        <v-list-item-title class="ml-auto">{{ item.title }}</v-list-item-title>
+        <v-list-item-title v-if="customizer.Sidebar_drawer" class="ml-auto">{{ item.title }}</v-list-item-title>
         <!---If Caption-->
-        <v-list-item-subtitle v-if="item.subCaption" class="text-caption mt-n1 hide-menu">
+        <v-list-item-subtitle v-if="item.subCaption && customizer.Sidebar_drawer" class="text-caption mt-n1 hide-menu">
           {{ item.subCaption }}
         </v-list-item-subtitle>
       </v-list-item>
