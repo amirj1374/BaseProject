@@ -1512,7 +1512,6 @@ const handleFilterApply = (filterData: any) => {
         class="elevation-1"
         no-data-text="رکوردی یافت نشد"
         hover
-        fixed-header
         :height="props.height"
       >
         <!-- Custom Header for Selection -->

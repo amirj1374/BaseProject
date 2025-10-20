@@ -202,7 +202,7 @@ onMounted(async () => {
           :loading="loading"
           :disabled="!selectedLotusRoles || selectedLotusRoles.length === 0"
         >
-          <IconDeviceFloppy size="16" class="mr-1" />
+          <IconDeviceFloppy size="16" class="ml-1" />
           بروزرسانی نقش
         </v-btn>
         <v-btn 
@@ -211,7 +211,7 @@ onMounted(async () => {
           @click="emit('close')"
           :disabled="loading"
         >
-          <IconX size="16" class="mr-1" />
+          <IconX size="16" class="ml-1" />
           انصراف
         </v-btn>
       </v-col>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconChevronRight, IconHome } from '@tabler/icons-vue';
+import { IconArrowBadgeLeft   , IconHome } from '@tabler/icons-vue';
 import type { PropType } from 'vue';
 
 type Breadcrumb = {
@@ -28,14 +28,14 @@ const props = defineProps({
           <v-col md="7" sm="12" cols="12">
             <v-breadcrumbs :items="props.breadcrumbs" class="text-h5 justify-md-end pa-1">
               <template v-slot:divider>
-                <div class="d-flex align-center">
-                  <IconChevronRight size="17" />
+                <div class="d-flex align-center gap-2">
+                  <IconArrowBadgeLeft stroke={2} />
                 </div>
               </template>
               <template v-slot:prepend>
                 <IconHome size="16" class="text-secondary ml-2" />
-                <div class="d-flex align-center">
-                  <IconChevronRight size="17" />
+                <div class="d-flex align-center gap-2">
+                  <IconArrowBadgeLeft stroke={2} />
                 </div>
               </template>
             </v-breadcrumbs>

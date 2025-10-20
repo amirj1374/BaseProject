@@ -186,11 +186,36 @@
 }
 
 :deep(.v-data-table__wrapper table thead) {
-  position: sticky;
-  top: 0;
   background: rgb(var(--v-theme-surface));
   z-index: 1;
   box-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+}
+
+/* Custom sticky header implementation to avoid freezing */
+:deep(.v-data-table__wrapper table thead) {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: rgb(var(--v-theme-surface)) !important;
+  box-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Ensure all header cells are properly positioned */
+:deep(.v-data-table__wrapper table thead th) {
+  position: relative !important;
+  z-index: 1 !important;
+  background: rgb(var(--v-theme-surface)) !important;
+}
+
+/* Fix for table wrapper to enable proper scrolling */
+:deep(.v-data-table__wrapper) {
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+}
+
+:deep(.v-data-table__wrapper table) {
+  width: 100% !important;
+  table-layout: auto !important;
 }
 
 :deep(.v-data-table__wrapper tbody tr:nth-child(even)) {
