@@ -160,7 +160,7 @@ const lineChart1 = computed(() => ({
 
 <template>
   <v-card elevation="0">
-    <v-card variant="outlined">
+    <v-card>
       <v-card-text>
         <v-row>
           <v-col cols="12" sm="9">

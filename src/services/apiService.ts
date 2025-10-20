@@ -1,10 +1,10 @@
-import type { AxiosInstance } from "axios";
 import { apiConfig } from '@/config/envConfig';
+import type { AxiosInstance } from "axios";
 import axiosInstance from './axiosInstance';
 
 // Original apiService function (for backward compatibility)
 export default (axiosInstance: AxiosInstance, resource: string) => ({
-  fetch(filters?: Record<string, any>) {
+  fetch(filters?: Record<string, unknown>) {
     return axiosInstance.get(`api/v1/${resource}`, {
       params: { 
         ...filters,
@@ -12,15 +12,15 @@ export default (axiosInstance: AxiosInstance, resource: string) => ({
     });
   },
 
-  create(data: Record<string, any>) {
+  create(data: Record<string, unknown>) {
     return axiosInstance.post(`api/v1/${resource}`, data);
   },  
 
-  update(data: Record<string, any>) {
+  update(data: Record<string, unknown>) {
     return axiosInstance.put(`api/v1/${resource}`, data);
   },
 
-  delete(id: string | Record<string, any>) {
+  delete(id: string | Record<string, unknown>) {
     return axiosInstance.delete(`api/v1/${resource}/${id}`);
   },
 });
@@ -44,7 +44,7 @@ export const centralizedApiService = {
   cartable: {
     getCreditApproval: (cartableId: string) => 
       axiosInstance.get(`api/v1/cartable/credit-approval/${cartableId}`),
-    saveCreditApproval: (data: any) => 
+    saveCreditApproval: (data: Record<string, unknown>) => 
       axiosInstance.post('api/v1/cartable/credit-approval', data),
   },
 
@@ -75,3 +75,4 @@ export const centralizedApiService = {
 
 // Export both for compatibility
 export { centralizedApiService as apiService };
+

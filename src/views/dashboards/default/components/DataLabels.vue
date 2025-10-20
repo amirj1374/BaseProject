@@ -109,7 +109,7 @@ const series = computed(() => percentages.value);
 
 <template>
   <v-card elevation="0">
-    <v-card variant="outlined">
+    <v-card>
       <v-card-text>
         <span class="text-subtitle-2 text-disabled font-weight-bold">وضعیت درخواست های کارتابل</span>
         <h3 class="text-h3 mt-1">بر اساس نوع وضعیت</h3>

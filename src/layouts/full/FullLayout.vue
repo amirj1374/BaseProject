@@ -1,11 +1,33 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
-import VerticalSidebarVue from './vertical-sidebar/VerticalSidebar.vue';
-import VerticalHeaderVue from './vertical-header/VerticalHeader.vue';
-import Customizer from './customizer/CustomizerPanel.vue';
-import { useCustomizerStore } from '@/stores/customizer';
 import Loading from '@/components/Loading.vue';
+import { useCustomizerStore } from '@/stores/customizer';
+import { onMounted, onUnmounted, ref } from 'vue';
+import { RouterView } from 'vue-router';
+import Customizer from './customizer/CustomizerPanel.vue';
+import VerticalHeaderVue from './vertical-header/VerticalHeader.vue';
+import VerticalSidebarVue from './vertical-sidebar/VerticalSidebar.vue';
+
 const customizer = useCustomizerStore();
+
+// Global notification system
+const showNotification = ref(false);
+const notificationMessage = ref('');
+const notificationType = ref<'success' | 'error' | 'warning'>('error');
+
+function handleGlobalNotification(event: CustomEvent) {
+  const { message, type } = event.detail;
+  notificationMessage.value = message;
+  notificationType.value = type;
+  showNotification.value = true;
+}
+
+onMounted(() => {
+  window.addEventListener('show-notification', handleGlobalNotification as EventListener);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('show-notification', handleGlobalNotification as EventListener);
+});
 
 </script>
 
@@ -36,6 +58,21 @@ const customizer = useCustomizerStore();
           </div>
         </v-container>
       </v-main>
+      
+      <!-- Global Notification Snackbar -->
+      <v-snackbar 
+        v-model="showNotification" 
+        :color="notificationType === 'error' ? 'error' : notificationType === 'warning' ? 'warning' : 'success'"
+        :timeout="5000" 
+        location="top"
+      >
+        {{ notificationMessage }}
+        <template v-slot:actions>
+          <v-btn color="white" variant="text" @click="showNotification = false">
+            بستن
+          </v-btn>
+        </template>
+      </v-snackbar>
     </v-app>
   </v-locale-provider>
 </template>

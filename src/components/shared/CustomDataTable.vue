@@ -16,87 +16,31 @@
  * - Adds ARIA attributes to group headers and busy regions
  * - Keyboard support for toggling groups and activating selection on rows
  */
-import { computed, onMounted, ref, watch, shallowRef, onBeforeUnmount } from 'vue';
-import type { Ref } from 'vue';
-import { useTableSelection } from '@/composables/useTableSelection';
-import axiosInstance from '@/services/axiosInstance';
-import apiService from '@/services/apiService';
-import { useRouter } from 'vue-router';
-import type { Component } from 'vue';
-import { DateConverter } from '@/utils/date-convertor';
-import { useDebounceFn } from '@vueuse/core';
 import MoneyInput from '@/components/shared/MoneyInput.vue';
+import { useTableSelection } from '@/composables/useTableSelection';
+import apiService from '@/services/apiService';
+import axiosInstance from '@/services/axiosInstance';
+import { DateConverter } from '@/utils/date-convertor';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
-import { IconChevronRight, IconChevronDown } from '@tabler/icons-vue';
+import { IconChevronDown, IconChevronRight } from '@tabler/icons-vue';
+import { useDebounceFn } from '@vueuse/core';
+import type { Component, Ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
+import { useRouter } from 'vue-router';
+
+import type {
+  ApiResponse,
+  CustomAction,
+  DataTableProps,
+  Header,
+  TableItem
+} from '@/types/componentTypes/DataTableTypes';
 
 /**
- * Table header definition
+ * Component props - using proper types from DataTableTypes
  */
-interface Header {
-  title: string;
-  key: string;
-  sortable?: boolean;
-  editable?: boolean;
-  width?: number;
-  hidden?: boolean;
-  defaultValue?: string | number | boolean;
-  isDate?: boolean;
-  style?: Record<string, string>;
-  translate?: boolean;
-  options?: Array<{ title: string; value: string | number | boolean }>;
-  conditionalStyle?: (value: any, item: any) => Record<string, string>;
-  // New properties for custom JSON support
-  nestedKey?: string; // For nested properties like "user.name"
-  customRenderer?: (item: any) => string | number | boolean; // Custom renderer function
-  formatter?: (value: any, item: any) => string; // Custom formatter function
-  type?: string;
-}
-
-interface CustomAction {
-  title: string;
-  component: Component;
-  condition?: (item: any) => boolean; // Optional condition function
-}
-
-interface CustomButtonAction {
-  label: string;
-  color?: string;
-  onClick: (item: any) => void;
-  disabled?: boolean;
-}
-
-/**
- * Component props
- */
-interface Props {
-  apiResource: string;
-  headers: Header[];
-  actions?: ('create' | 'edit' | 'delete' | 'view')[];
-  routes?: Record<string, string> | ((item: any) => Record<string, string>);
-  downloadLink?: Record<string, string>;
-  formComponent?: Component;
-  customActions?: CustomAction[];
-  customButtons?: CustomButtonAction[];
-  customButtonsFn?: (item: any) => CustomButtonAction[];
-  filterComponent?: Component;
-  autoFetch?: boolean;
-  queryParams?: Record<string, any>;
-  showPagination?: boolean;
-  height: number;
-  pagination?: any;
-  showRefreshButton?: boolean; // Shows refresh button in action buttons
-  title?: string; // Custom title for the page
-  selectable?: boolean; // Enable row selection
-  multiSelect?: boolean; // Allow multiple row selection
-  selectedItems?: any[]; // External selected items (for v-model)
-  uniqueKey?: string | ((item: any) => string | number); // Custom unique key for selection
-  pageSize?: number; // Page size for pagination (default: 10)
-  groupBy?: string | ((item: any) => string | number); // Property to group items by
-  groupHeaderTemplate?: (groupKey: string | number, groupItems: any[]) => string; // Custom group header template
-  defaultExpanded?: boolean; // Whether groups are expanded by default
-  defaultSelected?: string; // Property name to check for auto-selection (e.g., 'isSelected')
-  dateWithTimezone?: boolean; // If true, save dates with local timezone offset at midnight
-  bulkMode?: boolean; // Show action buttons at top with radio selection (single item)
+interface Props extends Omit<DataTableProps, 'routes'> {
+  routes?: Record<string, string> | ((item: TableItem) => Record<string, string>);
   enableGroupDelete?: boolean; // Enable group delete functionality for bulk mode
 }
 
@@ -115,22 +59,22 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  (e: 'update:selectedItems', items: any[]): void;
-  (e: 'selection-change', items: any[]): void;
+  (e: 'update:selectedItems', items: TableItem[]): void;
+  (e: 'selection-change', items: TableItem[]): void;
 }>();
 
 defineOptions({ inheritAttrs: false });
 
-const items = ref<any[]>([]);
-const originalServerData = ref<any[]>([]); // Store original server data
+const items = ref<TableItem[]>([]);
+const originalServerData = ref<TableItem[]>([]); // Store original server data
 const loading = ref(false);
 const error = ref<string | null>(null);
 const dialog = ref(false);
 const deleteDialog = ref(false);
 const isEditing = ref(false);
-const editedItem = ref<Record<string, any> | null>(null);
-const formModel = ref<Record<string, any>>({});
-const itemToDelete = ref<Record<string, any> | null>(null);
+const editedItem = ref<TableItem | null>(null);
+const formModel = ref<Record<string, unknown>>({});
+const itemToDelete = ref<TableItem | null>(null);
 const snackbar = ref(false);
 const snackbarMessage = ref('');
 const router = useRouter();
@@ -517,11 +461,11 @@ const hasFilterComponent = computed(() => {
  * Converts date fields to Shamsi for display and computes grouping/selection state.
  * @param queryParams Optional extra query params to merge with filter and pagination
  */
-const fetchData = async (queryParams?: {}) => {
+const fetchData = async (queryParams?: Record<string, unknown>) => {
   loading.value = true;
   error.value = null;
 
-  let params: Record<string, any> = {
+  let params: Record<string, unknown> = {
     ...cleanFilterModel.value,
     ...props.queryParams
   };
@@ -538,7 +482,7 @@ const fetchData = async (queryParams?: {}) => {
   };
 
   try {
-    const response = await api.fetch(params);
+    const response = await api.fetch(params) as ApiResponse<TableItem>;
     const serverData = response.data.content || [];
 
     // Store original server data
@@ -916,21 +860,24 @@ const goToRoute = (key: string, item?: any) => {
  * Downloads a file from a URL present on the item. Tries fetch and falls back
  * to axios with blob response, handling common server error content types.
  */
-const download = async (key: string, item: any) => {
+const download = async (key: string | number, item: TableItem) => {
   if (!props.downloadLink || !item) return;
 
   const fileKey = props.downloadLink[key];
-  const fileUrl = item[fileKey];
+  const url = item[fileKey];
 
-  if (!fileUrl) {
+  if (!url || typeof url !== 'string') {
     snackbarMessage.value = `❌ لینک فایل یافت نشد.`;
     snackbar.value = true;
     return;
   }
 
+  // Type assertion after validation
+  const fileUrlString = url as string;
+
   try {
     // Method 1: Fetch file as blob with proper headers
-    const response = await fetch(fileUrl, {
+    const response = await fetch(fileUrlString, {
       method: 'GET',
       headers: {
         Accept: 'application/octet-stream,application/pdf,image/*,*/*'
@@ -949,7 +896,7 @@ const download = async (key: string, item: any) => {
     console.log('Response headers:', {
       contentType,
       contentLength,
-      url: fileUrl
+      url: fileUrlString
     });
 
     // If content-type is XML, it's likely an error response
@@ -980,7 +927,7 @@ const download = async (key: string, item: any) => {
     link.href = url;
 
     // Extract filename from URL or use default
-    const filename = fileUrl.split('/').pop() || 'download';
+    const filename = fileUrlString.split('/').pop() || 'download';
     link.download = filename;
 
     // Add to DOM, click, and cleanup
@@ -998,7 +945,7 @@ const download = async (key: string, item: any) => {
 
     // Method 2: Try with axios instance (includes auth headers)
     try {
-      const axiosResponse = await axiosInstance.get(fileUrl, {
+      const axiosResponse = await axiosInstance.get(fileUrlString, {
         responseType: 'blob',
         headers: {
           Accept: 'application/octet-stream,application/pdf,image/*,*/*'
@@ -1012,12 +959,12 @@ const download = async (key: string, item: any) => {
       console.log('Axios response headers:', {
         contentType,
         contentLength,
-        url: fileUrl
+        url: fileUrlString
       });
 
       // If it's XML, convert to text to see the error
       if (contentType && contentType.includes('xml')) {
-        const textResponse = await axiosInstance.get(fileUrl, {
+        const textResponse = await axiosInstance.get(fileUrlString, {
           responseType: 'text'
         });
         console.error('Server returned XML error:', textResponse.data);
@@ -1031,7 +978,7 @@ const download = async (key: string, item: any) => {
 
       const link = document.createElement('a');
       link.href = url;
-      const filename = fileUrl.split('/').pop() || 'download';
+      const filename = fileUrlString.split('/').pop() || 'download';
       link.download = filename;
 
       document.body.appendChild(link);
@@ -1048,7 +995,7 @@ const download = async (key: string, item: any) => {
       // Try to get the error response as text
       if (axiosError.response) {
         try {
-          const errorText = await axiosInstance.get(fileUrl, {
+          const errorText = await axiosInstance.get(url, {
             responseType: 'text'
           });
           console.error('Server error response:', errorText.data);
@@ -1362,6 +1309,7 @@ const handleFilterApply = (filterData: any) => {
                     no-data-text="رکوردی یافت نشد"
                     hover
                     :height="'auto'"
+                    density="compact"
                   >
                     <!-- Custom Header for Selection -->
                     <template v-slot:header.selection="{ column }">
@@ -1515,6 +1463,7 @@ const handleFilterApply = (filterData: any) => {
         no-data-text="رکوردی یافت نشد"
         hover
         :height="props.height"
+        density="compact"
       >
         <!-- Custom Header for Selection -->
         <template v-slot:header.selection="{ column }">
@@ -1663,7 +1612,7 @@ const handleFilterApply = (filterData: any) => {
                 <template v-if="!header.hidden">
                   <MoneyInput
                     v-if="String(header.type).toLowerCase() === 'money'"
-                    v-model="formModel[header.key]"
+                    v-model="formModel[header.key] as number"
                     :label="header.title"
                     :disabled="header.editable === false"
                   />
@@ -1694,7 +1643,7 @@ const handleFilterApply = (filterData: any) => {
       <v-card-text> آیا مایل به حذف این رکورد هستید ?</v-card-text>
       <v-card-actions>
         <v-btn color="grey" @click="deleteDialog = false">انصراف</v-btn>
-        <v-btn color="red" @click="deleteItem(itemToDelete?.id)">حذف</v-btn>
+        <v-btn color="red" @click="deleteItem(String(itemToDelete?.id || ''))">حذف</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -1755,3 +1704,48 @@ const handleFilterApply = (filterData: any) => {
     </template>
   </v-snackbar>
 </template>
+
+<style scoped>
+/* Compact row height adjustments */
+:deep(.v-data-table .v-table__wrapper table tr) {
+  height: 36px;
+}
+:deep(.v-data-table .v-table__wrapper table td),
+:deep(.v-data-table .v-table__wrapper table th) {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  padding-left: 8px;
+  padding-right: 8px;
+  line-height: 1.2;
+}
+
+/* Even tighter density for group tables */
+:deep(.group-table .v-table__wrapper table tr) {
+  height: 34px;
+}
+:deep(.group-table .v-table__wrapper table td),
+:deep(.group-table .v-table__wrapper table th) {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+/* Checkbox/radio compact spacing */
+:deep(.v-selection-control) {
+  --v-selection-control-size: 18px;
+}
+:deep(.v-selection-control .v-label) {
+  margin: 0;
+}
+
+/* Buttons inside cells */
+:deep(td .v-btn) {
+  min-height: 28px;
+  height: 28px;
+  padding: 0 8px;
+}
+
+/* Chips inside headers or cells */
+:deep(.v-chip) {
+  height: 22px;
+}
+</style>

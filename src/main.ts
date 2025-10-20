@@ -1,15 +1,14 @@
-import { createApp } from 'vue';
-import { createPinia } from 'pinia';
-import App from './App.vue';
-import { router } from './router';
-import vuetify from './plugins/vuetify';
-import '@/scss/style.scss';
-import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';
-import VueApexCharts from 'vue3-apexcharts';
-import DigitLimit from '@/directives/v-digit-limit'
+import DigitLimit from '@/directives/v-digit-limit';
 import { vPermission } from '@/directives/v-permission';
+import '@/scss/style.scss';
 import { initializeApp, startInitialization } from '@/utils/appInitializer';
-import { nextTick } from 'vue';
+import { createPinia } from 'pinia';
+import { createApp, nextTick } from 'vue';
+import VueApexCharts from 'vue3-apexcharts';
+import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';
+import App from './App.vue';
+import vuetify from './plugins/vuetify';
+import { router } from './router';
 
 import { fakeBackend } from '@/utils/helpers/fake-backend';
 

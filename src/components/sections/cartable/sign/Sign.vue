@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { api } from '@/services/api';
-import type { SubmitSignPayload } from '@/types/cartable/cartableTypes';
-import { ref, computed, watch } from 'vue';
-import ApprovalRequestViewer from '../../../approval/ApprovalRequestViewer.vue';
-import { usePermissionsStore } from '@/stores/permissions';
+// Component follows Vue multi-word naming convention
+defineOptions({
+  name: 'SignComponent'
+});
 import DownloadButton from '@/components/shared/DownloadButton.vue';
+import { api } from '@/services/api';
+import { usePermissionsStore } from '@/stores/permissions';
+import type { SubmitSignPayload } from '@/types/cartable/cartableTypes';
+import { computed, ref, watch } from 'vue';
+import ApprovalRequestViewer from '../../../approval/ApprovalRequestViewer.vue';
 
 const emit = defineEmits(['close']);
 const permissionsStore = usePermissionsStore();
