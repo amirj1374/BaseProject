@@ -79,6 +79,18 @@ const sidebarItem: menu[] = [
         icon: IconDatabase,
         to: '/base/department-managment',
         permissionKey: 'flowManagement'
+      },
+      {
+        title: 'گروه وثیقه',
+        icon: IconDatabase,
+        to: '/base/collateralsGroup',
+        permissionKey: 'flowManagement'
+      },
+      {
+        title: 'گروه ضمانتنامه',
+        icon: IconDatabase,
+        to: '/base/guaranteeGroup',
+        permissionKey: 'flowManagement'
       }
     ]
   }

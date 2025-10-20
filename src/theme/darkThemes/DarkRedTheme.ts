@@ -33,11 +33,11 @@ const DarkRedTheme: ThemeTypes = {
     twitter: '#1da1f2',
     linkedin: '#0e76a8',
     gray100: '#0f0f0f', // Very dark gray
-    primary200: '#404040', // Dark gray
+    primary200: '#c7d9f6',
     secondary200: '#525252', // Medium gray
     white: '#1a1a1a', // Dark surface
     // Additional color variations
-    primary300: '#c7d9f6',
+    primary300: '#90caf9',
     primary400: '#7ea6ec',
     primary500: '#407dd3',
     primary600: '#1b5295',

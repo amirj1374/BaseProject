@@ -96,6 +96,18 @@ const MainRoutes = {
       meta: { requiresAuth: false, permission: '' },
       component: () => import('@/views/flowReport/flowReport.vue')
     },
+    {
+      name: 'collateralsGroup',
+      path: '/base/collateralsGroup',
+      meta: { requiresAuth: false, permission: '' },
+      component: () => import('@/views/base/collateralsGroup/collateralsGroup.vue')
+    },
+    {
+      name: 'guaranteeGroup',
+      path: '/base/guaranteeGroup',
+      meta: { requiresAuth: false, permission: '' },
+      component: () => import('@/views/base/guaranteeGroup/guaranteeGroup.vue')
+    },
   ]
 };
 

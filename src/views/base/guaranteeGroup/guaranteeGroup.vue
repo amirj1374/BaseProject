@@ -1,22 +1,22 @@
 <template>
-    <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
-    <div class="upload-form">
-      <CustomDataTable
-        ref="dataTableRef"
-        :headers="headers"
-        api-resource="referral-config-template"
-        :auto-fetch="true"
-        :show-pagination="true"
-        :height="550"
-        :actions="['create', 'edit', 'delete']"
-        :form-component="CreateActionManagement"
-        :filter-component="FilterActionManagment"
-        :show-refresh-button="true"
-        @item-created="onItemCreated"
-        @item-updated="onItemUpdated"
-        @item-deleted="onItemDeleted"
-      />
-    </div>
+  <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
+  <div class="upload-form">
+    <CustomDataTable
+      ref="dataTableRef"
+      :headers="headers"
+      api-resource="public-category-group"
+      :auto-fetch="true"
+      :show-pagination="true"
+      :height="550"
+      :actions="['create', 'edit', 'delete']"
+      :form-component="CreateActionManagement"
+      :filter-component="FilterActionManagment"
+      :show-refresh-button="true"
+      @item-created="onItemCreated"
+      @item-updated="onItemUpdated"
+      @item-deleted="onItemDeleted"
+    />
+  </div>
   <!-- Success/Error Messages -->
   <v-snackbar v-model="showSnackbar" :color="snackbarColor" timeout="3000">
     {{ snackbarMessage }}

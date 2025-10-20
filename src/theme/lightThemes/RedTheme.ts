@@ -33,11 +33,12 @@ const RedTheme: ThemeTypes = {
     twitter: '#1da1f2',
     linkedin: '#0e76a8',
     gray100: '#fafafa',
-    primary200: '#90caf9',
+    primary200: '#c7d9f6',
     secondary200: '#FDE8EF',
     white: '#FFFFFF',
     // Additional color variations
-    primary300: '#c7d9f6',
+
+    primary300: '#90caf9',
     primary400: '#7ea6ec',
     primary500: '#407dd3',
     primary600: '#1b5295',
