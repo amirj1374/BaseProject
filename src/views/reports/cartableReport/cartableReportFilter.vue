@@ -77,10 +77,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, computed, defineProps, defineEmits } from 'vue';
-import { useBaseStore } from '@/stores/base';
-import type { BranchDto, ContractType, RegionsDto } from '@/types/approval/approvalType';
 import { api } from '@/services/api';
+import { useBaseStore } from '@/stores/base';
+import type { BranchDto } from '@/types/approval/approvalType';
+import { computed, reactive, ref, watch } from 'vue';
 const branchList = ref<BranchDto[]>([]);
 const baseStore = useBaseStore();
 const branchAutocomplete = ref();

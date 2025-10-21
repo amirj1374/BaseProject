@@ -58,7 +58,7 @@
   
   <script setup lang="ts">
   import { LoanRequestStatusOptions } from '@/types/enums/global';
-import { ref, reactive, watch, defineProps, defineEmits } from 'vue';
+import { reactive, watch } from 'vue';
   
   interface FilterModel {
     dateFrom: string;

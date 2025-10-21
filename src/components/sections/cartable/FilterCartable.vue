@@ -105,8 +105,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, defineProps, defineEmits, computed } from 'vue';
 import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
+import { computed, reactive, ref, watch } from 'vue';
 
 interface FilterModel {
   dateFrom: string;

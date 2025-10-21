@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { IconCheck, IconClock, IconPencil } from '@tabler/icons-vue';
-import { ref, watch, nextTick, onMounted, onBeforeUnmount, defineEmits } from 'vue';
-import type { Component, ComponentPublicInstance } from 'vue';
 import '@/scss/components/_VStepper.scss';
+import { IconCheck, IconClock, IconPencil } from '@tabler/icons-vue';
+import type { Component, ComponentPublicInstance } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 const props = defineProps({
   steps: {

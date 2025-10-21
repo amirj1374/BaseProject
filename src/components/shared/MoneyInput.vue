@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineEmits, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   modelValue: {

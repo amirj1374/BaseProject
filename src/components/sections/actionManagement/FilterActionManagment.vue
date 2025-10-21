@@ -74,9 +74,9 @@
 
 <script setup lang="ts">
 import { api } from '@/services/api';
-import { ActionTypeOptions, DepartmentTypeOptions } from '@/types/enums/global';
-import { ref, reactive, watch, defineProps, defineEmits, onMounted } from 'vue';
 import type { SamapRoleDTO } from '@/types/cartable/cartableTypes';
+import { ActionTypeOptions, DepartmentTypeOptions } from '@/types/enums/global';
+import { onMounted, reactive, ref, watch } from 'vue';
 const roleOptions = ref<SamapRoleDTO[]>([]);
 
 interface FilterModel {
