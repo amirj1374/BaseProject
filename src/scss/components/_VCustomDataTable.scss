@@ -5,8 +5,8 @@
   background: rgb(var(--v-theme-surface));
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-  transition: opacity 0.3s ease;
-  contain: layout;
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform, margin-top;
 }
 
 /* Grouped Table Styles */
@@ -162,8 +162,8 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  transition: opacity 0.3s ease;
-  contain: layout;
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: height, margin-bottom;
 }
 
 .selection-actions {
@@ -181,41 +181,16 @@
   margin-top: 5px;
   flex-wrap: wrap;
   flex-direction: row-reverse;
-  transition: opacity 0.3s ease;
-  contain: layout;
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform, opacity, height;
 }
 
 :deep(.v-data-table__wrapper table thead) {
+  position: sticky;
+  top: 0;
   background: rgb(var(--v-theme-surface));
   z-index: 1;
   box-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-}
-
-/* Custom sticky header implementation to avoid freezing */
-:deep(.v-data-table__wrapper table thead) {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 10 !important;
-  background: rgb(var(--v-theme-surface)) !important;
-  box-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.04) !important;
-}
-
-/* Ensure all header cells are properly positioned */
-:deep(.v-data-table__wrapper table thead th) {
-  position: relative !important;
-  z-index: 1 !important;
-  background: rgb(var(--v-theme-surface)) !important;
-}
-
-/* Fix for table wrapper to enable proper scrolling */
-:deep(.v-data-table__wrapper) {
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-}
-
-:deep(.v-data-table__wrapper table) {
-  width: 100% !important;
-  table-layout: auto !important;
 }
 
 :deep(.v-data-table__wrapper tbody tr:nth-child(even)) {
@@ -235,35 +210,27 @@
   transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Skeleton container to prevent layout shifts */
-.skeleton-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: rgb(var(--v-theme-surface));
-  border-radius: 8px;
-  contain: layout;
-}
-
 /* Enhanced slide transition for bulk mode actions */
 .slide-left-enter-active {
-  transition: opacity 0.3s ease;
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .slide-left-leave-active {
-  transition: opacity 0.3s ease;
+  transition: all 0.6s cubic-bezier(0.55, 0.055, 0.675, 0.19);
 }
 
 .slide-left-enter-from {
+  transform: translateX(-100%) scale(0.95);
   opacity: 0;
 }
 
 .slide-left-leave-to {
+  transform: translateX(-100%) scale(0.95);
   opacity: 0;
 }
 
 .slide-left-enter-to,
 .slide-left-leave-from {
+  transform: translateX(0) scale(1);
   opacity: 1;
 }

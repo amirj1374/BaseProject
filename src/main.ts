@@ -1,14 +1,15 @@
-import DigitLimit from '@/directives/v-digit-limit';
-import { vPermission } from '@/directives/v-permission';
-import '@/scss/style.scss';
-import { initializeApp, startInitialization } from '@/utils/appInitializer';
+import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import { createApp, nextTick } from 'vue';
-import VueApexCharts from 'vue3-apexcharts';
-import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';
 import App from './App.vue';
-import vuetify from './plugins/vuetify';
 import { router } from './router';
+import vuetify from './plugins/vuetify';
+import '@/scss/style.scss';
+import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';
+import VueApexCharts from 'vue3-apexcharts';
+import DigitLimit from '@/directives/v-digit-limit'
+import { vPermission } from '@/directives/v-permission';
+import { initializeApp, startInitialization } from '@/utils/appInitializer';
+import { nextTick } from 'vue';
 
 import { fakeBackend } from '@/utils/helpers/fake-backend';
 
@@ -23,10 +24,8 @@ fakeBackend();
 const pinia = createPinia();
 app.use(pinia);
 
-// Create initialization promise BEFORE setting up router (skip in demo mode)
-const initPromise = import.meta.env.VITE_APP_ENV === 'demo' 
-  ? Promise.resolve({ demo: true }) 
-  : initializeApp();
+// Create initialization promise BEFORE setting up router
+const initPromise = initializeApp();
 
 app.use(router);
 app.use(PerfectScrollbarPlugin);
@@ -38,50 +37,29 @@ app.component('Vue3PersianDatetimePicker', Vue3PersianDatetimePicker);
 app.directive('digit-limit', DigitLimit);
 app.directive('permission', vPermission);
 
-// Mount the app immediately for faster initial render
+// Mount the app first so loading component can be rendered
 app.use(vuetify).mount('#app');
 
-// Optimize initialization - show UI first, then load data
+// Set loading to true and start initialization after nextTick
 nextTick(async () => {
   // Import and use store after pinia is installed
   const { useCustomizerStore } = await import('@/stores/customizer');
   const customizer = useCustomizerStore();
   
-  // Show minimal loading state briefly, then start data loading
+  // Set loading to true BEFORE starting initialization
   customizer.SET_LOADING(true);
   
-  // Use requestIdleCallback or setTimeout to defer heavy operations
-  const loadData = () => {
-    // Skip initialization in demo mode
-    if (import.meta.env.VITE_APP_ENV !== 'demo') {
-      startInitialization();
-    } else {
-      console.log('🎭 Demo mode - skipping data initialization');
-      customizer.SET_LOADING(false);
-    }
-    
-    // Wait for initialization to complete
-    initPromise
-      .then(() => {
-        // App initialized successfully
-        if (import.meta.env.VITE_APP_ENV === 'demo') {
-          customizer.SET_LOADING(false);
-        }
-      })
-      .catch((error) => {
-        // App initialization failed
-        if (import.meta.env.VITE_APP_ENV === 'demo') {
-          customizer.SET_LOADING(false);
-        }
-      });
-  };
-
-  // Defer data loading to allow initial render
-  if (window.requestIdleCallback) {
-    window.requestIdleCallback(loadData, { timeout: 100 });
-  } else {
-    setTimeout(loadData, 50);
-  }
+  // Start the actual API calls
+  startInitialization();
+  
+  // Wait for initialization to complete
+  initPromise
+    .then(() => {
+      // App initialized successfully
+    })
+    .catch((error) => {
+      // App initialization failed
+    });
 });
 
 

@@ -74,67 +74,39 @@ $sizes: (
 
 @font-face {
   font-family: 'yekanLight';
-  src: url('/src/assets/fonts/BYekan.woff2') format('woff2'),
-  url('/src/assets/fonts/BYekan.woff') format('woff');
+  src: url('/src/assets/fonts/BYekan.woff') format('woff');
   font-weight: 300;
   font-style: normal;
-  font-display: swap;
-  ascent-override: 90%;
-  descent-override: 22%;
-  line-gap-override: 0%;
 }
 @font-face {
   font-family: 'iranSans';
-  src: url('/src/assets/fonts/IRANSansXMedium.woff2') format('woff2'),
-  url('/src/assets/fonts/IRANSansXMedium.ttf') format('truetype');
+  src: url('/src/assets/fonts/IRANSansWeb.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
-  font-display: swap;
-  ascent-override: 90%;
-  descent-override: 22%;
-  line-gap-override: 0%;
 }
 @font-face {
   font-family: 'kalamehLight';
-  src: url('/src/assets/fonts/kalamehRegular.woff2') format('woff2'),
-  url('/src/assets/fonts/kalamehRegular.woff') format('woff');
+  src: url('/src/assets/fonts/kalamehRegular.woff') format('woff');
   font-weight: 300;
   font-style: normal;
-  font-display: swap;
-  ascent-override: 90%;
-  descent-override: 22%;
-  line-gap-override: 0%;
 }
 @font-face {
   font-family: 'vazir';
-  src: url('/src/assets/fonts/Vazir-Medium-FD.woff2') format('woff2'),
-  url('/src/assets/fonts/Vazir-Medium-FD.woff') format('woff');
+  src: url('/src/assets/fonts/Vazir-Medium-FD.woff') format('woff');
   font-weight: 300;
   font-style: normal;
-  font-display: swap;
-  ascent-override: 90%;
-  descent-override: 22%;
-  line-gap-override: 0%;
 }
 @font-face {
   font-family: 'IranNastaliq';
   src: url('/src/assets/fonts/IranNastaliq.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
-  font-display: swap;
-  ascent-override: 90%;
-  descent-override: 22%;
-  line-gap-override: 0%;
 }
 @font-face {
   font-family: 'Massir';
   src: url('/src/assets/fonts/A Massir Spray.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
-  font-display: swap;
-  ascent-override: 90%;
-  descent-override: 22%;
-  line-gap-override: 0%;
 }
 body {
   font-family: var(--font-theme), sans-serif;

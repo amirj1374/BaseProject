@@ -1,108 +1,22 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" href="/favicon.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta
-    name="keywords"
-    content="Caspian Dashboard"
-  />
-  <meta name="description" content="Berry is a free Material UI admin dashboard template built with VueJs and Vuetify framework. " />
-
-  <!-- DNS prefetch for external resources -->
-  <link rel="dns-prefetch" href="//fonts.googleapis.com">
-  <link rel="dns-prefetch" href="//fonts.gstatic.com">
-  
-  <!-- Preconnect to external domains -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <!-- Preload critical fonts with higher priority -->
-  <link rel="preload" href="/src/assets/fonts/Vazir-Medium-FD.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/src/assets/fonts/BYekan.woff2" as="font" type="font/woff2" crossorigin>
-  
-  <!-- Preload critical CSS - removed SCSS preload as it's processed by Vite -->
-  
-  <!-- Preload critical JavaScript -->
-  <link rel="modulepreload" href="/src/main.ts">
-  <link rel="modulepreload" href="/src/views/dashboards/default/Dashboard.vue">
-
-  <!-- Critical CSS inline for instant LCP -->
-  <style>
-    /* Critical above-the-fold styles - optimized for LCP */
-    * { box-sizing: border-box; }
-    html { font-size: 16px; }
-    body { 
-      margin: 0; 
-      font-family: 'vazir', system-ui, -apple-system, sans-serif; 
-      background: #f8f9fa;
-      line-height: 1.5;
-      color: #333;
-    }
-    #app { 
-      min-height: 100vh; 
-      display: flex; 
-      flex-direction: column; 
-    }
-    
-    /* Critical loading styles */
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.95);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-    
-    /* Critical dashboard skeleton */
-    .dashboard-skeleton {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .skeleton-card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      min-height: 200px;
-    }
-    
-    /* Prevent layout shift */
-    .v-container { max-width: 1200px; margin: 0 auto; }
-    .v-row { margin: 0; }
-    .v-col { padding: 12px; }
-    
-    /* Font loading optimization */
-    .font-loading { font-family: system-ui, -apple-system, sans-serif; }
-  </style>
-
-  <!-- Defer Google Fonts to prevent render blocking -->
-  <link
-    rel="preload"
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
-    as="style"
-    onload="this.onload=null;this.rel='stylesheet'"
-  >
-  <noscript>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="keywords"
+      content="Caspian Dashboard"
+    />
+    <meta name="description" content="Berry is a free Material UI admin dashboard template built with VueJs and Vuetify framework. " />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
-    >
-  </noscript>
-
-  <title>سامانه سماپ - بانک پارسیان </title>
-</head>
-<body>
-<div id="app"></div>
-<script type="module" src="/src/main.ts"></script>
-</body>
+    />
+    <title>سامانه سماپ - بانک پارسیان</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>
