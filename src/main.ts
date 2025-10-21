@@ -23,8 +23,10 @@ fakeBackend();
 const pinia = createPinia();
 app.use(pinia);
 
-// Create initialization promise BEFORE setting up router
-const initPromise = initializeApp();
+// Create initialization promise BEFORE setting up router (skip in demo mode)
+const initPromise = import.meta.env.VITE_APP_ENV === 'demo' 
+  ? Promise.resolve({ demo: true }) 
+  : initializeApp();
 
 app.use(router);
 app.use(PerfectScrollbarPlugin);
@@ -50,15 +52,27 @@ nextTick(async () => {
   
   // Use requestIdleCallback or setTimeout to defer heavy operations
   const loadData = () => {
-    startInitialization();
+    // Skip initialization in demo mode
+    if (import.meta.env.VITE_APP_ENV !== 'demo') {
+      startInitialization();
+    } else {
+      console.log('🎭 Demo mode - skipping data initialization');
+      customizer.SET_LOADING(false);
+    }
     
     // Wait for initialization to complete
     initPromise
       .then(() => {
         // App initialized successfully
+        if (import.meta.env.VITE_APP_ENV === 'demo') {
+          customizer.SET_LOADING(false);
+        }
       })
       .catch((error) => {
         // App initialization failed
+        if (import.meta.env.VITE_APP_ENV === 'demo') {
+          customizer.SET_LOADING(false);
+        }
       });
   };
 
