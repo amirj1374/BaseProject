@@ -41,6 +41,12 @@ let rejectInit: ((reason?: any) => void) | null = null;
 let isInitializing = false;
 
 export async function initializeApp() {
+  // Skip initialization in demo mode
+  if (import.meta.env.VITE_APP_ENV === 'demo') {
+    console.log('🎭 Demo mode detected - skipping app initialization');
+    return Promise.resolve({ demo: true });
+  }
+
   // If already initializing, return the existing promise
   if (initializationPromise) {
     return initializationPromise;
@@ -59,6 +65,12 @@ export async function initializeApp() {
 }
 
 export async function startInitialization() {
+  // Skip initialization in demo mode
+  if (import.meta.env.VITE_APP_ENV === 'demo') {
+    console.log('🎭 Demo mode detected - skipping startInitialization');
+    return;
+  }
+
   if (!isInitializing) {
     return;
   }

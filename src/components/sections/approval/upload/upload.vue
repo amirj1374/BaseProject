@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import { useCustomizerStore } from '@/stores/customizer';
 import { IconX } from '@tabler/icons-vue';
+import { ref, watch } from 'vue';
 
 interface Document {
   nationalCode: string;
@@ -149,7 +149,7 @@ const handleFileUpload = async () => {
   }
 };
 
-function getCustomButtons(doc: Document) {
+function getCustomButtons(doc: any) {
   const hasImage = !!(doc.filePath && doc.filePath.match(/\.(jpg|jpeg|png|pdf)$/i));
   const hasFile = !!doc.filePath;
   const isEditDisabled = approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION';

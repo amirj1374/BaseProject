@@ -1,15 +1,14 @@
-import { createApp } from 'vue';
-import { createPinia } from 'pinia';
-import App from './App.vue';
-import { router } from './router';
-import vuetify from './plugins/vuetify';
-import '@/scss/style.scss';
-import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';
-import VueApexCharts from 'vue3-apexcharts';
-import DigitLimit from '@/directives/v-digit-limit'
+import DigitLimit from '@/directives/v-digit-limit';
 import { vPermission } from '@/directives/v-permission';
+import '@/scss/style.scss';
 import { initializeApp, startInitialization } from '@/utils/appInitializer';
-import { nextTick } from 'vue';
+import { createPinia } from 'pinia';
+import { createApp, nextTick } from 'vue';
+import VueApexCharts from 'vue3-apexcharts';
+import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';
+import App from './App.vue';
+import vuetify from './plugins/vuetify';
+import { router } from './router';
 
 import { fakeBackend } from '@/utils/helpers/fake-backend';
 
@@ -46,20 +45,27 @@ nextTick(async () => {
   const { useCustomizerStore } = await import('@/stores/customizer');
   const customizer = useCustomizerStore();
   
-  // Set loading to true BEFORE starting initialization
-  customizer.SET_LOADING(true);
-  
-  // Start the actual API calls
-  startInitialization();
-  
-  // Wait for initialization to complete
-  initPromise
-    .then(() => {
-      // App initialized successfully
-    })
-    .catch((error) => {
-      // App initialization failed
-    });
+  // Check if we're in demo mode
+  if (import.meta.env.VITE_APP_ENV === 'demo') {
+    // Skip initialization and set loading to false immediately
+    console.log('🎭 Demo mode detected - skipping initialization');
+    customizer.SET_LOADING(false);
+  } else {
+    // Set loading to true BEFORE starting initialization
+    customizer.SET_LOADING(true);
+    
+    // Start the actual API calls
+    startInitialization();
+    
+    // Wait for initialization to complete
+    initPromise
+      .then(() => {
+        // App initialized successfully
+      })
+      .catch((error) => {
+        // App initialization failed
+      });
+  }
 });
 
 

@@ -2,7 +2,7 @@
   <div>
     <v-container fluid>
       <!-- Loading State -->
-      <v-row v-if="customerInfoStore.isLoading">
+      <v-row v-if="customizer.loading">
         <v-col cols="12" class="text-center">
           <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
           <p class="mt-4">در حال بارگذاری اطلاعات کاربر...</p>
@@ -68,17 +68,15 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
 import { useCustomerInfoStore } from '@/stores/customerInfo';
-import { IconUserCircle } from '@tabler/icons-vue';
-import PopularStocks from '@/views/dashboards/default/components/PopularStocks.vue';
-import TotalEarning from '@/views/dashboards/default/components/TotalEarning.vue';
-import TotalPay from '@/views/dashboards/default/components/TotalPay.vue';
+import { useCustomizerStore } from '@/stores/customizer';
+import DataLabels from '@/views/dashboards/default/components/DataLabels.vue';
 import TotalGrowth from '@/views/dashboards/default/components/TotalGrowth.vue';
 import TotalIncome from '@/views/dashboards/default/components/TotalIncome.vue';
-import DataLabels from '@/views/dashboards/default/components/DataLabels.vue';
+import { computed } from 'vue';
 
 const customerInfoStore = useCustomerInfoStore();
+const customizer = useCustomizerStore();
 
 // Get user info from store
 const userInfo = computed(() => customerInfoStore.getUserInfo);

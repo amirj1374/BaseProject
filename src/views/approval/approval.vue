@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { ref, computed, defineAsyncComponent, onMounted, onBeforeUnmount, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import AppStepper from '@/components/common/AppStepper.vue';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
-import AppStepper from '@/components/common/AppStepper.vue';
 import { useBaseStore } from '@/stores/base';
-import type { GuarantorInfoDTO, SaveGeneralPayload } from '@/types/approval/approvalType';
 import { useCustomizerStore } from '@/stores/customizer';
+import type { GuarantorInfoDTO, SaveGeneralPayload } from '@/types/approval/approvalType';
+import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
 const approvalStore = useApprovalStore();
@@ -161,7 +161,7 @@ const handleSave = async () => {
     
     const res = await api.approval.saveGeneral(payload);
     if (res.status === 200) {
-      customizerStore.loading = false
+      customizerStore.loading = false;
       showSuccess.value = true
       successMessage.value = 'مصوبه با موفقیت بروزرسانی شد'
       await router.push('/approval/edit');
@@ -170,6 +170,7 @@ const handleSave = async () => {
     console.error('Error in handleSave:', err);
     error.value = typeof err === 'string' ? err : err && (err as any).message ? (err as any).message : 'خطا در ذخیره‌سازی اطلاعات';
     showError.value = true;
+    customizerStore.loading = false;
   } finally {
     submitting.value = false;
     customizerStore.loading = false;

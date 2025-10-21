@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted } from 'vue';
 import { api } from '@/services/api';
-import type { FetchGuarantorPayload, GuarantorDto, SaveGeneralPayload, GuarantorInfoDTO } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
 import { useCustomizerStore } from '@/stores/customizer';
+import type { FetchGuarantorPayload, GuarantorDto, GuarantorInfoDTO, SaveGeneralPayload } from '@/types/approval/approvalType';
 import { IconRefresh } from '@tabler/icons-vue';
+import { computed, onMounted, ref } from 'vue';
 const customizerStore = useCustomizerStore();
 const approvalStore = useApprovalStore();
 const dialog = ref(false);
