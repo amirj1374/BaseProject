@@ -51,6 +51,58 @@ let initializationPromise: Promise<any> | null = null;
 let resolveInit: ((value: any) => void) | null = null;
 let rejectInit: ((reason?: any) => void) | null = null;
 let isInitializing = false;
+let hasCompletedInitialization = false;
+
+// Function to load other APIs sequentially after initializer
+async function loadOtherAPIs(baseStore: any) {
+  console.log('🔄 Starting sequential API calls...');
+  
+  // 1. Fetch currencies first
+  try {
+    console.log('📡 Calling fetchCurrencies...');
+    const currencyResponse = await api.approval.fetchCurrencies();
+    baseStore.setCurrencyList(currencyResponse.data);
+    console.log('✅ fetchCurrencies completed successfully');
+  } catch (error) {
+    console.warn('❌ Currency API failed:', error);
+    showNotification('خطا در بارگذاری لیست ارزها', 'error');
+  }
+
+  // 2. Fetch collateral second
+  try {
+    console.log('📡 Calling getCollateral...');
+    const collateralResponse = await api.approval.getCollateral();
+    baseStore.setCollateralList(collateralResponse.data);
+    console.log('✅ getCollateral completed successfully');
+  } catch (error) {
+    console.warn('❌ Collateral API failed:', error);
+    showNotification('خطا در بارگذاری لیست وثیقه‌ها', 'error');
+  }
+
+  // 3. Fetch regions third
+  try {
+    console.log('📡 Calling getRegions...');
+    const regionsResponse = await api.approval.getRegions();
+    baseStore.setRegionsList(regionsResponse.data);
+    console.log('✅ getRegions completed successfully');
+  } catch (error) {
+    console.warn('❌ Regions API failed:', error);
+    showNotification('خطا در بارگذاری لیست مناطق', 'error');
+  }
+
+  // 4. Fetch department levels last
+  try {
+    console.log('📡 Calling getDepartmentsLevel...');
+    const departmentResponse = await api.user.getDepartmentsLevel();
+    baseStore.setDepartmentLevel(departmentResponse.data);
+    console.log('✅ getDepartmentsLevel completed successfully');
+  } catch (error) {
+    console.warn('❌ Department Level API failed:', error);
+    showNotification('خطا در بارگذاری اطلاعات دپارتمان ها', 'error');
+  }
+
+  console.log('🎉 All sequential API calls completed!');
+}
 
 export async function initializeApp() {
   // If already initializing, return the existing promise
@@ -71,7 +123,14 @@ export async function initializeApp() {
 }
 
 export async function startInitialization() {
+  // Check if initialization has already been completed
+  if (hasCompletedInitialization) {
+    console.log('⚠️ App already initialized, skipping initialization');
+    return;
+  }
+  
   if (!isInitializing) {
+    console.log('⚠️ App is not in initializing state, skipping initialization');
     return;
   }
 
@@ -131,61 +190,14 @@ export async function startInitialization() {
       customizer.layoutType = validateLayoutType(userInfo.data.customizer.layoutType || 'SideBar');
     }
 
+    // Wait for initializer to complete, then call other APIs
+    console.log('✅ Initializer completed, now starting other API calls...');
+    
+    // Call other APIs sequentially after initializer is done
+    await loadOtherAPIs(baseStore);
+    
     // Always resolve initialization to prevent app from breaking
     resolveInit?.(userInfo.data);
-
-    // Defer non-critical API calls to improve LCP - increased delay
-    setTimeout(async () => {
-      try {
-        // Use requestIdleCallback for better performance
-        const loadNonCriticalData = async () => {
-          const [currency, collateral, regions, departmentLevel] = await Promise.allSettled([
-            api.approval.fetchCurrencies(),
-            api.approval.getCollateral(),
-            api.approval.getRegions(),
-            api.user.getDepartmentsLevel()
-          ]);
-
-          // Handle successful responses
-          if (currency.status === 'fulfilled') {
-            baseStore.setCurrencyList(currency.value.data);
-          } else if (currency.status === 'rejected') {
-            console.warn('Currency API failed:', currency.reason);
-            showNotification('خطا در بارگذاری لیست ارزها', 'warning');
-          }
-          
-          if (collateral.status === 'fulfilled') {
-            baseStore.setCollateralList(collateral.value.data);
-          } else if (collateral.status === 'rejected') {
-            console.warn('Collateral API failed:', collateral.reason);
-            showNotification('خطا در بارگذاری لیست وثیقه‌ها', 'warning');
-          }
-          
-          if (regions.status === 'fulfilled') {
-            baseStore.setRegionsList(regions.value.data);
-          } else if (regions.status === 'rejected') {
-            console.warn('Regions API failed:', regions.reason);
-            showNotification('خطا در بارگذاری لیست مناطق', 'warning');
-          }
-          
-          if (departmentLevel.status === 'fulfilled') {
-            baseStore.setDepartmentLevel(departmentLevel.value.data);
-          } else if (departmentLevel.status === 'rejected') {
-            console.warn('Department Level API failed:', departmentLevel.reason);
-            showNotification('خطا در بارگذاری اطلاعات بخش‌ها', 'warning');
-          }
-        };
-
-        // Use requestIdleCallback if available, otherwise setTimeout
-        if (window.requestIdleCallback) {
-          window.requestIdleCallback(loadNonCriticalData, { timeout: 2000 });
-        } else {
-          setTimeout(loadNonCriticalData, 500);
-        }
-      } catch (error) {
-        console.warn('Non-critical data loading failed:', error);
-      }
-    }, 200);
 
   } catch (error) {
     console.warn('Critical initialization error, using fallback:', error);
@@ -225,12 +237,14 @@ export async function startInitialization() {
     // Set loading to false immediately after critical data is loaded
     customizer.SET_LOADING(false);
     isInitializing = false;
+    hasCompletedInitialization = true;
+    console.log('✅ App initialization completed successfully');
   }
 }
 
 // Function to check if app is initialized
 export function isAppInitialized(): boolean {
-  return initializationPromise !== null && !isInitializing;
+  return hasCompletedInitialization;
 }
 
 // Function to wait for initialization
@@ -239,4 +253,14 @@ export function waitForInitialization(): Promise<any> {
     return initializationPromise;
   }
   return Promise.resolve();
+}
+
+// Function to reset initialization state (useful for logout)
+export function resetInitialization() {
+  initializationPromise = null;
+  resolveInit = null;
+  rejectInit = null;
+  isInitializing = false;
+  hasCompletedInitialization = false;
+  console.log('🔄 App initialization state reset');
 } 

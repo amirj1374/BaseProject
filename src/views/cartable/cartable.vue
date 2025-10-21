@@ -1,19 +1,18 @@
 <script setup lang="ts">
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import { ref, h, computed } from 'vue';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import Reference from '@/components/sections/cartable/reference/Reference.vue';
 import CartableHistory from '@/components/sections/cartable/cartableHistory/cartableHistory.vue';
-import UploadList from '@/components/sections/cartable/uploadList/uploadList.vue';
-import LoanRequestHistory from '@/components/sections/cartable/loanRequestHistory/loanRequestHistory.vue';
-import FilterCartable from '@/components/sections/cartable/FilterCartable.vue';
-import Sign from '@/components/sections/cartable/sign/Sign.vue';
-import { CartableStatusTypeOptions, CustomerTypeOptions } from '@/types/enums/global';
-import { usePermissionsStore } from '@/stores/permissions';
-import SignList from '@/components/sections/cartable/signList/SignList.vue';
 import ExpertReport from '@/components/sections/cartable/expertReport/ExpertReport.vue';
+import FilterCartable from '@/components/sections/cartable/FilterCartable.vue';
+import LoanRequestHistory from '@/components/sections/cartable/loanRequestHistory/loanRequestHistory.vue';
+import Reference from '@/components/sections/cartable/reference/Reference.vue';
+import Sign from '@/components/sections/cartable/sign/Sign.vue';
+import SignList from '@/components/sections/cartable/signList/SignList.vue';
+import UploadList from '@/components/sections/cartable/uploadList/uploadList.vue';
+import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
+import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import { api } from '@/services/api';
-import type { Cartable } from '@/types/cartable/cartableTypes';
+import { usePermissionsStore } from '@/stores/permissions';
+import { CartableStatusTypeOptions, CustomerTypeOptions } from '@/types/enums/global';
+import { computed, h, ref } from 'vue';
 
 const permissionsStore = usePermissionsStore();
 
@@ -226,7 +225,7 @@ const getDynamicRoutes = (item: any) => {
 
   return baseRoutes;
 };
-function getCustomButtons(cartable: Cartable) {
+function getCustomButtons(cartable: any) {
   const buttons = [];
   if (permissionsStore.hasMenuPermission('regenerate1016')&& cartable.status === 'IN_PROGRESS') {
     buttons.push({
