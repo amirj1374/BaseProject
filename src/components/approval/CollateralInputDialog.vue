@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { ref, type PropType, watch } from 'vue';
-import type { CollateralDto } from '@/types/approval/approvalType'; // Import your CollateralDto
+import CustomAutocomplete from '@/components/shared/CustomAutocomplete.vue';
 import MoneyInput from '@/components/shared/MoneyInput.vue';
+import type { CollateralDto } from '@/types/approval/approvalType'; // Import your CollateralDto
+import { ref, watch, type PropType } from 'vue';
 
 // Interface for the structure of emitted data
 interface EmittedCollateralData {
@@ -20,6 +21,11 @@ const props = defineProps({
   collateralOptions: {
     type: Array as PropType<CollateralDto[]>,
     required: true,
+    default: () => []
+  },
+  existingCollaterals: {
+    type: Array as PropType<CollateralDto[]>,
+    required: false,
     default: () => []
   },
   // Prop to receive an item to edit, if needed in the future
@@ -72,6 +78,35 @@ const handleSave = () => {
     return;
   }
 
+  // Validation: prevent adding group together with its subitems and vice versa
+  const selected = selectedCollateralDto.value as unknown as Record<string, any>;
+  const isGroup = !!selected.isMainGroup;
+  const groupId = selected.groupId;
+
+  if (groupId !== null && groupId !== undefined) {
+    // Check if we're trying to add a group when subitems already exist
+    if (isGroup) {
+      const hasSubitems = props.existingCollaterals.some((c: any) => 
+        c.groupId === groupId && !c.isMainGroup
+      );
+      if (hasSubitems) {
+        errorMessage.value = 'امکان ثبت گروه در حالی که زیرگروه‌های آن قبلاً ثبت شده‌اند وجود ندارد.';
+        return;
+      }
+    }
+    
+    // Check if we're trying to add a subitem when its group already exists
+    if (!isGroup) {
+      const hasGroup = props.existingCollaterals.some((c: any) => 
+        c.groupId === groupId && !!c.isMainGroup
+      );
+      if (hasGroup) {
+        errorMessage.value = 'امکان ثبت زیرگروه در حالی که گروه آن قبلاً ثبت شده است وجود ندارد.';
+        return;
+      }
+    }
+  }
+
   emit('save', {
     collateral: selectedCollateralDto.value,
     amount: amount.value !== undefined && amount.value !== null ? amount.value.toString() : '0',
@@ -109,18 +144,23 @@ watch(() => props.modelValue, (isVisible) => {
         <v-container>
           <v-row>
             <v-col cols="12" md="12">
-              <v-select
+              <CustomAutocomplete
                 v-model="selectedCollateralDto"
                 :items="props.collateralOptions"
-                item-title="description" 
-                item-value="collateralTypeCode"
+                :fields="{
+                  title: 'description',
+                  value: 'collateralTypeCode',
+                  group: 'groupId',
+                  isMainGroup: 'isMainGroup',
+                }"
+                displayStyle="detailed"
                 label="نوع وثیقه"
-                variant="outlined"
+                placeholder="جستجو در انواع وثیقه..."
                 density="comfortable"
                 return-object
                 clearable
                 hide-details="auto"
-              ></v-select>
+              />
             </v-col>
 
             <v-col cols="12" md="6">
