@@ -260,7 +260,6 @@ defineExpose({ submitData });
         </v-card>
       </v-col>
 
-      <!-- چک‌های برگشتی با انیمیشن چرخشی -->
       <v-col cols="12" md="6">
         <div class="inquiry-card-wrapper">
           <v-card color="grey-lighten-4" class="pa-4 text-start mb-4" rounded="sm" variant="outlined">
