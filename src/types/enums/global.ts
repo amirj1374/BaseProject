@@ -158,6 +158,24 @@ export const CartableStatusTypeOptions = [
   { title: 'بسته شده', value: CartableStatusTypeEnum.CLOSED },
 ];
 
+// Credit Contract Type  
+
+export const CreditContractTypeEnum = {
+  SIGHT_PAYMENT: 'SIGHT_PAYMENT',
+  SIGHT_PAYMENT_EXPORT: 'SIGHT_PAYMENT_EXPORT',
+  DEFERRED_PAYMENT: 'DEFERRED_PAYMENT',
+  DEFERRED_PAYMENT_EXPORT: 'DEFERRED_PAYMENT_EXPORT'
+} as const;
+
+export type CreditContractType = (typeof CreditContractTypeEnum)[keyof typeof CreditContractTypeEnum];
+
+export const CreditContractTypeOptions = [
+  { title: 'داخلی دیداری', value: CreditContractTypeEnum.SIGHT_PAYMENT },
+  { title: 'دیداری وارداتی', value: CreditContractTypeEnum.SIGHT_PAYMENT_EXPORT },
+  { title: 'داخلی مدت دار', value: CreditContractTypeEnum.DEFERRED_PAYMENT },
+  { title: 'وارداتی مدت دار', value: CreditContractTypeEnum.DEFERRED_PAYMENT_EXPORT },
+];
+
 
 // department type
 export const DepartmentypeEnum = {

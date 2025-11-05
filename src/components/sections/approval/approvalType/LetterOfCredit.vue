@@ -2,7 +2,7 @@
   <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">اعتبار اسنادی</h4>
-      <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="loading || lc.length >= 1"> افزودن اعتبار اسنادی</v-btn>
+      <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="loading || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION' || lc.length >= 4"> افزودن اعتبار اسنادی</v-btn>
     </div>
 
     <v-data-table-virtual
@@ -30,11 +30,8 @@
       <template #item.contractType="{ item }">
         {{ (item as any).contractType?.longTitle || '-' }}
       </template>
-      <template #item.lcContractType="{ item }">
-        {{ LcTypeOptions.find((opt) => opt.value === item.lcContractType)?.title || '-' }}
-      </template>
-      <template #item.creditType="{ item }">
-        {{ CreditTypeOptions.find((opt) => opt.value === item.creditType)?.title || '-' }}
+      <template #item.CreditContractType="{ item }">
+        {{ CreditContractTypeOptions.find((opt) => opt.value === (item as any).creditContractType)?.title || '-' }}
       </template>
       <template #item.amount="{ item }">
         {{ formatNumberWithCommas(item.amount) }}
@@ -90,7 +87,7 @@
               </v-col>
               <v-col cols="12" md="4">
                 <v-select
-                  v-model="formData.lcContractType"
+                  v-model="formData.creditContractType"
                   label="نوع اعتبار اسنادی"
                   variant="outlined"
                   density="comfortable"
@@ -162,7 +159,7 @@
                   variant="outlined"
                   density="comfortable"
                   hide-details="auto"
-               :suffix="dynamicSuffix"
+                  :suffix="dynamicSuffix"
                   :rules="[required]"
                     :disabled="props.readonly"
                 />
@@ -195,19 +192,6 @@
                   min="1"
                   max="100"
                   :rules="[percentRule]"
-                    :disabled="props.readonly"
-                />
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" md="4">
-                <v-select
-                  v-model="formData.creditType"
-                  label="نوع اعتبار"
-                  variant="outlined"
-                  density="comfortable"
-                  :items="CreditTypeOptions || []"
-                  :rules="[required]"
                     :disabled="props.readonly"
                 />
               </v-col>
@@ -286,18 +270,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, watch } from 'vue';
-import { IconTrash, IconX, IconPencil } from '@tabler/icons-vue';
+import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
+import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { ApprovalTypeOptions } from '@/constants/enums/approval';
-import { useBaseStore } from '@/stores/base';
 import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import { api } from '@/services/api';
-import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { useApprovalStore } from '@/stores/approval';
+import { useBaseStore } from '@/stores/base';
 import type { CollateralDto, ContractType, FacilityDto, LcRequest } from '@/types/approval/approvalType';
-import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
+import { CreditContractTypeOptions, LcTypeOptions } from '@/types/enums/global';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
-import { CreditTypeOptions, LcTypeOptions } from '@/types/enums/global';
+import { IconPencil, IconTrash, IconX } from '@tabler/icons-vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const baseStore = useBaseStore();
 const approvalStore = useApprovalStore();
@@ -352,16 +336,14 @@ const formData = reactive({
   collateral: true,
   intermediatePayment: '',
   advancePayment: '',
-  creditType: '',
-  lcContractType : ''
+  creditContractType : ''
 });
 
 const headers = [
   { title: 'نوع مصوبه', key: 'approvalType', width: '200px' },
   { title: 'نوع ارز', key: 'currency', width: '200px' },
   { title: 'مدت (روز)', key: 'durationDay', width: '200px' },
-  { title: 'نوع اعتبار', key: 'creditType', width: '250px' },
-  { title: 'نوع اعتبار اسنادی', key: 'lcContractType', width: '250px' },
+  { title: 'نوع اعتبار اسنادی', key: 'CreditContractType', width: '250px' },
   { title: 'میان دریافت', key: 'intermediatePayment', width: '200px' },
   { title: 'پیش دریافت', key: 'advancePayment', width: '200px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
@@ -456,8 +438,7 @@ function editItem(item: LcRequest) {
   selectedCollaterals.value = item.collaterals ? item.collaterals : [];
   formData.intermediatePayment = item.intermediatePayment;
   formData.advancePayment = item.advancePayment;
-  formData.creditType = item.creditType;
-  formData.lcContractType  = item.lcContractType;
+  (formData as any).creditContractType  = (item as any).creditContractType;
   dialog.value = true;
 }
 
@@ -481,7 +462,6 @@ function saveLc() {
     }
   } else {
     lc.value.push(facilityData);
-    emit('save', facilityData);
   }
   closeDialog();
 }
@@ -508,10 +488,22 @@ function isObjectEmpty(obj: any): boolean {
 onMounted(async () => {
   const res = await api.approval.getContractType('LetterOfCredit');
   contractTypes.value = res.data.generalParameterList || [];
-  if (approvalStore.loanRequestDetailList?.lc && !isObjectEmpty(approvalStore.loanRequestDetailList.lc)) {
-    lc.value = [approvalStore.loanRequestDetailList.lc];
+  const storeLc = approvalStore.loanRequestDetailList?.lc as LcRequest[] | undefined;
+  if (Array.isArray(storeLc) && storeLc.length > 0) {
+    lc.value = storeLc;
   }
 });
+
+watch(
+  () => approvalStore.loanRequestDetailList?.lc,
+  (newVal: LcRequest[] | undefined) => {
+    const arr = newVal as LcRequest[] | undefined;
+    if (Array.isArray(arr)) {
+      lc.value = arr;
+    }
+  },
+  { immediate: false, deep: true }
+);
 
 watch(
   lc,

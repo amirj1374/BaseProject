@@ -2,7 +2,7 @@
   <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">ضمانت‌نامه</h4>
-      <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="loading || guarantee.length >= 1"> افزودن ضمانت‌نامه</v-btn>
+      <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="loading"> افزودن ضمانت‌نامه</v-btn>
     </div>
 
     <v-data-table-virtual
@@ -287,17 +287,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue';
-import { IconTrash, IconX, IconPencil } from '@tabler/icons-vue';
+import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
+import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { ApprovalTypeOptions } from '@/constants/enums/approval';
-import { useBaseStore } from '@/stores/base';
 import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import { api } from '@/services/api';
-import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { useApprovalStore } from '@/stores/approval';
+import { useBaseStore } from '@/stores/base';
 import type { CollateralDto, ContractType, FacilityDto, GuaranteeRequest } from '@/types/approval/approvalType';
-import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
+import { IconPencil, IconTrash, IconX } from '@tabler/icons-vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const baseStore = useBaseStore();
 const approvalStore = useApprovalStore();
@@ -509,10 +509,30 @@ function isObjectEmpty(obj: any): boolean {
 onMounted(async () => {
   const res = await api.approval.getContractType('GuaranteeType');
   contractTypes.value = res.data.generalParameterList || [];
-  if (approvalStore.loanRequestDetailList?.guarantee && !isObjectEmpty(approvalStore.loanRequestDetailList.guarantee)) {
-    guarantee.value = [approvalStore.loanRequestDetailList.guarantee];
+  const storeGuarantee = approvalStore.loanRequestDetailList?.guarantee as GuaranteeRequest[] | undefined;
+  if (Array.isArray(storeGuarantee) && storeGuarantee.length > 0) {
+    guarantee.value = storeGuarantee;
   }
 });
+
+watch(
+  () => approvalStore.loanRequestDetailList?.guarantee,
+  (newVal: GuaranteeRequest[] | undefined) => {
+    const arr = newVal as GuaranteeRequest[] | undefined;
+    if (Array.isArray(arr)) {
+      guarantee.value = arr;
+    }
+  },
+  { immediate: false, deep: true }
+);
+
+watch(
+  guarantee,
+  (newVal: GuaranteeRequest[]) => {
+    emit('update:guarantee', newVal);
+  },
+  { deep: true }
+);
 
 defineExpose({ guarantee });
 </script>

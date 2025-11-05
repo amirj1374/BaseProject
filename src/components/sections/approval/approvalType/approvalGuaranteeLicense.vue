@@ -2,7 +2,7 @@
     <div class="approval-section">
       <div class="section-header">
         <h4 class="section-title">تضامین جواز سبز</h4>
-        <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="loading || greenLicense.length >= 1"> افزودن تضامین جواز سبز</v-btn>    </div>
+        <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="loading || greenLicense.length >= 4"> افزودن تضامین جواز سبز</v-btn>    </div>
   
       <v-data-table-virtual
         :headers="headers"
@@ -198,15 +198,15 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, reactive, onMounted, computed, watch } from 'vue';
-  import { IconTrash, IconX, IconPencil } from '@tabler/icons-vue';
-  import { ApprovalTypeOptions } from '@/constants/enums/approval';
-  import { useBaseStore } from '@/stores/base';
-  import MoneyInput from '@/components/shared/MoneyInput.vue';
-  import { useApprovalStore } from '@/stores/approval';
-  import type { CollateralDto, GreenLicense } from '@/types/approval/approvalType';
   import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
-  import { formatNumberWithCommas } from '@/utils/number-formatter';
+import MoneyInput from '@/components/shared/MoneyInput.vue';
+import { ApprovalTypeOptions } from '@/constants/enums/approval';
+import { useApprovalStore } from '@/stores/approval';
+import { useBaseStore } from '@/stores/base';
+import type { CollateralDto, GreenLicense } from '@/types/approval/approvalType';
+import { formatNumberWithCommas } from '@/utils/number-formatter';
+import { IconPencil, IconTrash, IconX } from '@tabler/icons-vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
   
   const baseStore = useBaseStore();
   const approvalStore = useApprovalStore();
@@ -364,16 +364,20 @@
     emit('delete', item);
     emit('update:greenLicense', greenLicense.value);
   }
-  function isObjectEmpty(obj: any): boolean {
-    if (!obj) return true;
-    return Object.values(obj).every((v) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0));
-  }
   onMounted(() => {
-    if (approvalStore.loanRequestDetailList?.greenLicense && !isObjectEmpty(approvalStore.loanRequestDetailList.greenLicense)) {
-      greenLicense.value = [approvalStore.loanRequestDetailList.greenLicense];
+    const storeGreen = approvalStore.loanRequestDetailList?.greenLicense as GreenLicense[] | undefined;
+    if (Array.isArray(storeGreen) && storeGreen.length > 0) {
+      greenLicense.value = storeGreen;
       emit('update:greenLicense', greenLicense.value);
     }
   });
+
+  watch(() => approvalStore.loanRequestDetailList?.greenLicense, (newVal) => {
+    const arr = newVal as GreenLicense[] | undefined;
+    if (Array.isArray(arr)) {
+      greenLicense.value = arr;
+    }
+  }, { immediate: false, deep: true });
   
   watch(greenLicense, (newVal) => {
     emit('update:greenLicense', newVal);

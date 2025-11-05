@@ -2,7 +2,7 @@
   <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">تسهیلات</h4>
-      <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="customizerStore.loading || facilities.length >= 1"> افزودن تسهیلات</v-btn>
+      <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="customizerStore.loading"> افزودن تسهیلات</v-btn>
     </div>
 
     <v-data-table-virtual
@@ -314,18 +314,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, watch } from 'vue';
-import { IconTrash, IconX, IconPencil } from '@tabler/icons-vue';
+import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
+import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { ApprovalTypeOptions } from '@/constants/enums/approval';
-import { useBaseStore } from '@/stores/base';
 import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import { api } from '@/services/api';
-import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { useApprovalStore } from '@/stores/approval';
-import type { CollateralDto, ContractType, FacilitiesRequest, FacilityDto } from '@/types/approval/approvalType';
-import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
-import { formatNumberWithCommas } from '@/utils/number-formatter';
+import { useBaseStore } from '@/stores/base';
 import { useCustomizerStore } from '@/stores/customizer';
+import type { CollateralDto, ContractType, FacilitiesRequest, FacilityDto } from '@/types/approval/approvalType';
+import { formatNumberWithCommas } from '@/utils/number-formatter';
+import { IconPencil, IconTrash, IconX } from '@tabler/icons-vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 const customizerStore = useCustomizerStore();
 const baseStore = useBaseStore();
 const approvalStore = useApprovalStore();
@@ -558,8 +558,9 @@ onMounted(async () => {
   try {
     const res = await api.approval.getContractType('ContractCode');
     contractTypes.value = res.data.generalParameterList || [];
-    if (approvalStore.loanRequestDetailList?.facilities && !isObjectEmpty(approvalStore.loanRequestDetailList.facilities)) {
-      facilities.value = [approvalStore.loanRequestDetailList.facilities];
+    const storeFacilities = approvalStore.loanRequestDetailList?.facilities as FacilitiesRequest[] | undefined;
+    if (Array.isArray(storeFacilities) && storeFacilities.length > 0) {
+      facilities.value = storeFacilities;
     }
   } catch (err) {
     error.value = 'خطا در دریافت انواع قرارداد';
@@ -567,6 +568,17 @@ onMounted(async () => {
     console.error('Error fetching contract types:', err);
   }
 });
+
+watch(
+  () => approvalStore.loanRequestDetailList?.facilities,
+  (newVal) => {
+    const arr = newVal as FacilitiesRequest[] | undefined;
+    if (Array.isArray(arr)) {
+      facilities.value = arr;
+    }
+  },
+  { immediate: false, deep: true }
+);
 
 watch(
   facilities,

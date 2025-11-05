@@ -1,5 +1,5 @@
+import type { CustomerDto, FacilitiesRequest, Facility, GreenLicense, Guarantee, GuaranteeRequest, GuarantorDto, Lc, LcRequest, LoanRequestDetail, SummaryDto } from '@/types/approval/approvalType'
 import { defineStore } from 'pinia'
-import type { CustomerDto, LoanRequestDetail, SummaryDto, GuarantorDto, Facility, Guarantee, Lc, FacilitiesRequest, GuaranteeRequest, LcRequest, GreenLicense } from '@/types/approval/approvalType'
 
 export const useApprovalStore = defineStore('approvalStore', {
   state: () => ({
@@ -65,66 +65,66 @@ export const useApprovalStore = defineStore('approvalStore', {
       if (!this.loanRequestDetailList) {
         this.loanRequestDetailList = {
           summaryRequest: summary,
-          facilities: {} as FacilitiesRequest,
-          guarantee: {} as GuaranteeRequest,
-          lc: {} as LcRequest,
-          greenLicense: {} as GreenLicense
+          facilities: [] as FacilitiesRequest[],
+          guarantee: [] as GuaranteeRequest[],
+          lc: [] as LcRequest[],
+          greenLicense: [] as GreenLicense[]
         }
       } else {
         this.loanRequestDetailList.summaryRequest = summary
       }
     },
 
-    updateFacilities(facilities: FacilitiesRequest) {
+    updateFacilities(facilities: FacilitiesRequest[]) {
       if (!this.loanRequestDetailList) {
         this.loanRequestDetailList = {
           summaryRequest: {} as SummaryDto,
-          facilities: {} as FacilitiesRequest,
-          guarantee: {} as GuaranteeRequest,
-          lc: {} as LcRequest,
-          greenLicense: {} as GreenLicense
+          facilities: [] as FacilitiesRequest[],
+          guarantee: [] as GuaranteeRequest[],
+          lc: [] as LcRequest[],
+          greenLicense: [] as GreenLicense[]
         }
       } else {
         this.loanRequestDetailList.facilities = facilities
       }
     },
 
-    updateGuarantee(guarantee: GuaranteeRequest) {
+    updateGuarantee(guarantee: GuaranteeRequest[]) {
       if (!this.loanRequestDetailList) {
         this.loanRequestDetailList = {
           summaryRequest: {} as SummaryDto,
-          facilities: {} as FacilitiesRequest,
-          guarantee: {} as GuaranteeRequest,
-          lc: {} as LcRequest,
-          greenLicense: {} as GreenLicense
+          facilities: [] as FacilitiesRequest[],
+          guarantee: [] as GuaranteeRequest[],
+          lc: [] as LcRequest[],
+          greenLicense: [] as GreenLicense[]
         }
       } else {
         this.loanRequestDetailList.guarantee = guarantee
       }
     },
 
-    updateLc(lc: LcRequest) {
+    updateLc(lc: LcRequest[]) {
       if (!this.loanRequestDetailList) {
         this.loanRequestDetailList = {
           summaryRequest: {} as SummaryDto,
-          facilities: {} as FacilitiesRequest,
-          guarantee: {} as GuaranteeRequest,
-          lc: {} as LcRequest,
-          greenLicense: {} as GreenLicense
+          facilities: [] as FacilitiesRequest[],
+          guarantee: [] as GuaranteeRequest[],
+          lc: [] as LcRequest[],
+          greenLicense: [] as GreenLicense[]
         }
       } else {
         this.loanRequestDetailList.lc = lc
       }
     },
 
-    updateGreenLicense(greenLicense: GreenLicense) {
+    updateGreenLicense(greenLicense: GreenLicense[]) {
       if (!this.loanRequestDetailList) {
         this.loanRequestDetailList = {
           summaryRequest: {} as SummaryDto,
-          facilities: {} as FacilitiesRequest,
-          guarantee: {} as GuaranteeRequest,
-          lc: {} as LcRequest,
-          greenLicense: {} as GreenLicense
+          facilities: [] as FacilitiesRequest[],
+          guarantee: [] as GuaranteeRequest[],
+          lc: [] as LcRequest[],
+          greenLicense: [] as GreenLicense[]
         }
       } else {
         this.loanRequestDetailList.greenLicense = greenLicense

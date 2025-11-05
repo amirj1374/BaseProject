@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { onMounted, ref, watch, defineAsyncComponent, computed } from 'vue';
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue';
 //utils
 //type
-import type { CustomerDto, FacilitiesRequest, Facility, GuaranteeRequest, LcRequest, GreenLicense } from '@/types/approval/approvalType';
+import envConfig from '@/config/envConfig';
 import { useApprovalStore } from '@/stores/approval';
 import { useCustomizerStore } from '@/stores/customizer';
-import envConfig from '@/config/envConfig';
+import type { CustomerDto, FacilitiesRequest, GreenLicense, GuaranteeRequest, LcRequest } from '@/types/approval/approvalType';
 const customizerStore = useCustomizerStore();
 // Use dynamic imports for heavy components
 const Facilities = defineAsyncComponent(() => import('./Facilities.vue'));
@@ -102,30 +102,30 @@ const submitData = async () => {
 
     // Update store with data based on environment
     if (isLiveEnvironment.value) {
-      // In live environment, only handle facilities data
+      // In live environment, only handle facilities data as array
       approvalStore.setLoanRequestDetailList({
         summaryRequest: {
           summary: formData.value.summary,
           activityType: formData.value.activityType,
           description: formData.value.description
         },
-        facilities: facilitiesData.value[0] || {} as FacilitiesRequest,
-        guarantee: {} as GuaranteeRequest,
-        lc: {} as LcRequest,
-        greenLicense: {} as GreenLicense
+        facilities: facilitiesData.value,
+        guarantee: [],
+        lc: [],
+        greenLicense: []
       });
     } else {
-      // In other environments, handle all data types
+      // In other environments, handle all data types as arrays
       approvalStore.setLoanRequestDetailList({
         summaryRequest: {
           summary: formData.value.summary,
           activityType: formData.value.activityType,
           description: formData.value.description
         },
-        facilities: facilitiesData.value[0] || {} as FacilitiesRequest,
-        guarantee: guaranteeData.value[0] || {} as GuaranteeRequest,
-        lc: lcData.value[0] || {} as LcRequest,
-        greenLicense: greenLicenseData.value[0] || {} as GreenLicense
+        facilities: facilitiesData.value,
+        guarantee: guaranteeData.value,
+        lc: lcData.value,
+        greenLicense: greenLicenseData.value
       });
     }
 
@@ -140,31 +140,31 @@ const submitData = async () => {
 
 // Add watch to load data when editing for all data types
 watch(() => approvalStore.loanRequestDetailList?.facilities, (newFacilities) => {
-  if (newFacilities && !isObjectEmpty(newFacilities)) {
-    facilitiesData.value = [newFacilities];
+  if (Array.isArray(newFacilities) && newFacilities.length > 0) {
+    facilitiesData.value = newFacilities;
   }
-  // Don't clear local data if store has empty object - this prevents data loss when navigating
+  // Don't clear local data if store has empty array - this prevents data loss when navigating
 }, { immediate: true });
 
 watch(() => approvalStore.loanRequestDetailList?.guarantee, (newGuarantee) => {
-  if (newGuarantee && !isObjectEmpty(newGuarantee)) {
-    guaranteeData.value = [newGuarantee];
+  if (Array.isArray(newGuarantee) && newGuarantee.length > 0) {
+    guaranteeData.value = newGuarantee;
   }
-  // Don't clear local data if store has empty object - this prevents data loss when navigating
+  // Don't clear local data if store has empty array - this prevents data loss when navigating
 }, { immediate: true });
 
 watch(() => approvalStore.loanRequestDetailList?.lc, (newLc) => {
-  if (newLc && !isObjectEmpty(newLc)) {
-    lcData.value = [newLc];
+  if (Array.isArray(newLc) && newLc.length > 0) {
+    lcData.value = newLc;
   }
-  // Don't clear local data if store has empty object - this prevents data loss when navigating
+  // Don't clear local data if store has empty array - this prevents data loss when navigating
 }, { immediate: true });
 
 watch(() => approvalStore.loanRequestDetailList?.greenLicense, (newGreenLicense) => {
-  if (newGreenLicense && !isObjectEmpty(newGreenLicense)) {
-    greenLicenseData.value = [newGreenLicense];
+  if (Array.isArray(newGreenLicense) && newGreenLicense.length > 0) {
+    greenLicenseData.value = newGreenLicense;
   }
-  // Don't clear local data if store has empty object - this prevents data loss when navigating
+  // Don't clear local data if store has empty array - this prevents data loss when navigating
 }, { immediate: true });
 
 function isObjectEmpty(obj: any): boolean {
@@ -186,45 +186,57 @@ function isObjectEmpty(obj: any): boolean {
 }
 
 function handleSaveFacility(data: FacilitiesRequest) {
-  facilitiesData.value = [data];
-  approvalStore.updateFacilities(data);
+  facilitiesData.value = [...facilitiesData.value, data];
+  approvalStore.updateFacilities(facilitiesData.value);
 }
 
 function handleDeleteFacility(item: FacilitiesRequest) {
-  facilitiesData.value = [];
+  const id = (item as any).id;
+  facilitiesData.value = id != null
+    ? facilitiesData.value.filter((i: any) => i.id !== id)
+    : facilitiesData.value.filter((i) => i !== item);
   // Don't update store with empty object, let it remain as is
   // This prevents the watch from clearing data when navigating back
 }
 
 function handleSaveLC(data: LcRequest) {
-  lcData.value = [data];
-  approvalStore.updateLc(data);
+  lcData.value = [...lcData.value, data];
+  approvalStore.updateLc(lcData.value);
 }
 
 function handleDeleteLC(item: LcRequest) {
-  lcData.value = [];
+  const id = (item as any).id;
+  lcData.value = id != null
+    ? lcData.value.filter((i: any) => i.id !== id)
+    : lcData.value.filter((i) => i !== item);
   // Don't update store with empty object, let it remain as is
   // This prevents the watch from clearing data when navigating back
 }
 
 function handleSaveGuarantee(data: GuaranteeRequest) {
-  guaranteeData.value = [data];
-  approvalStore.updateGuarantee(data);
+  guaranteeData.value = [...guaranteeData.value, data];
+  approvalStore.updateGuarantee(guaranteeData.value);
 }
 
 function handleDeleteGuarantee(item: GuaranteeRequest) {
-  guaranteeData.value = [];
+  const id = (item as any).id;
+  guaranteeData.value = id != null
+    ? guaranteeData.value.filter((i: any) => i.id !== id)
+    : guaranteeData.value.filter((i) => i !== item);
   // Don't update store with empty object, let it remain as is
   // This prevents the watch from clearing data when navigating back
 }
 
 function handleSaveGreenLicense(data: GreenLicense) {
-  greenLicenseData.value = [data];
-  approvalStore.updateGreenLicense(data);
+  greenLicenseData.value = [...greenLicenseData.value, data];
+  approvalStore.updateGreenLicense(greenLicenseData.value);
 }
 
 function handleDeleteGreenLicense(item: GreenLicense) {
-  greenLicenseData.value = [];
+  const id = (item as any).id;
+  greenLicenseData.value = id != null
+    ? greenLicenseData.value.filter((i: any) => i.id !== id)
+    : greenLicenseData.value.filter((i) => i !== item);
   // Don't update store with empty object, let it remain as is
   // This prevents the watch from clearing data when navigating back
 }
@@ -243,10 +255,10 @@ function clearAllData() {
   // Clear the store as well
   approvalStore.setLoanRequestDetailList({
     summaryRequest: {} as any,
-    facilities: {} as FacilitiesRequest,
-    guarantee: {} as GuaranteeRequest,
-    lc: {} as LcRequest,
-    greenLicense: {} as GreenLicense
+    facilities: [],
+    guarantee: [],
+    lc: [],
+    greenLicense: []
   });
 }
 
@@ -329,7 +341,7 @@ defineExpose({ submitData, clearAllData });
       :loading="customizerStore.loading"
       @save="handleSaveLC" 
       @delete="handleDeleteLC" 
-      @update:lc="lcData = $event" 
+      @update:lc="(val) => { lcData = val; approvalStore.updateLc(val); }" 
     />
     <GreenLicense 
       v-show="!isLiveEnvironment && activeTab === 'greenLicense'" 

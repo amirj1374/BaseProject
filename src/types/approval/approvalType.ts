@@ -293,10 +293,10 @@ export interface Collateral {
 
 export interface LoanRequestDetail {
   summaryRequest: SummaryDto;
-  facilities: FacilitiesRequest;
-  guarantee: GuaranteeRequest;
-  lc: LcRequest;
-  greenLicense: GreenLicense;
+  facilities: FacilitiesRequest[];
+  guarantee: GuaranteeRequest[];
+  lc: LcRequest[];
+  greenLicense: GreenLicense[];
 }
 
 export interface FacilitiesRequest {
@@ -341,12 +341,11 @@ export interface LcRequest {
   year?: string;
   month?: string;
   day?: string;
-  creditType: string;
   durationDay?: string;
   collaterals: Collaterals[];
   intermediatePayment: string;
   advancePayment: string;
-  lcContractType: string;
+  creditContractType: string;
 }
 
 export interface ContractType {
