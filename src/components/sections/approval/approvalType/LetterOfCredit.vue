@@ -89,9 +89,11 @@
                 <v-select
                   v-model="formData.creditContractType"
                   label="نوع اعتبار اسنادی"
+                  item-title="title"
+                  item-value="value"
                   variant="outlined"
                   density="comfortable"
-                  :items="LcTypeOptions || []"
+                  :items="CreditContractTypeOptions || []"
                   :rules="[required]"
                     :disabled="props.readonly"
                 />
