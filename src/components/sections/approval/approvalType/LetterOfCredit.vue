@@ -247,7 +247,7 @@
     </v-dialog>
 
     <!-- CollateralInputDialog component -->
-    <CollateralInputDialog v-model="showCollateralInputDialog" :collateral-options="baseStore.collateral" @save="onCollateralDialogSave" />
+    <CollateralInputDialog v-model="showCollateralInputDialog" :collateral-options="baseStore.collateral" @save="onCollateralDialogSave" :existing-collaterals="selectedCollaterals.map(item => item.collateral)" />
 
     <!-- Confirmation Dialog -->
     <v-dialog v-model="showDeleteConfirm" max-width="400">

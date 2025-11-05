@@ -158,6 +158,7 @@
       <CollateralInputDialog 
         v-model="showCollateralInputDialog" 
         :collateral-options="baseStore.collateral"
+        :existing-collaterals="selectedCollaterals.map(item => item.collateral)"
         @save="onCollateralDialogSave" 
       />
   
