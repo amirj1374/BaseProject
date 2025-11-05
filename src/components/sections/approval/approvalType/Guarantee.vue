@@ -2,7 +2,7 @@
   <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">ضمانت‌نامه</h4>
-      <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="loading"> افزودن ضمانت‌نامه</v-btn>
+      <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="loading || guarantee.length >= 4 || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"> افزودن ضمانت‌نامه</v-btn>
     </div>
 
     <v-data-table-virtual
