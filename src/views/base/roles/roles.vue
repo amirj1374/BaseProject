@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import { ref, h } from 'vue';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import FilterRole from '@/components/sections/roles/filter/FilterRole.vue';
+import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
+import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import { BooleanEnumOptions } from '@/types/enums/global';
+import { h, ref } from 'vue';
 
 const breadcrumbs = ref([
   {
@@ -87,7 +87,7 @@ function handleReferenceSuccess() {
       :custom-actions="[
         { 
           title: 'ویرایش', 
-          component: (props) => h(FilterRole, { ...props, onSuccess: handleReferenceSuccess }),
+          component: (props: any) => h(FilterRole, { ...props, onSuccess: handleReferenceSuccess }),
         },
       ]"
     />

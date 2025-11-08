@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
 import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import type { TableItem } from '@/types/componentTypes/DataTableTypes';
 import { RelationTypeOptions } from '@/types/enums/global';
+import { ref, watch } from 'vue';
 
 interface Document {
   nationalCode: string;
@@ -80,7 +81,8 @@ const handleView = (doc: Document) => {
 
 // Removed handleFileUpload function since we only show download buttons
 
-function getCustomButtons(doc: Document) {
+function getCustomButtons(item: TableItem) {
+  const doc = item as unknown as Document;
   const hasFile = !!doc.filePath;
   return [
     {

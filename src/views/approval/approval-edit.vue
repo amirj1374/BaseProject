@@ -39,19 +39,21 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
-import { useRouteGuard } from '@/composables/useRouteGuard';
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import { LoanRequestStatusOptions } from '@/types/enums/global';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import ApprovalEdit from '@/components/sections/approval/approvalEdit/approvalEdit.vue';
-import type { ApprovalRequest } from '@/types/approval/approvalType';
+import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
+import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { useRouteGuard } from '@/composables/useRouteGuard';
 import { api } from '@/services/api';
+import type { ApprovalRequest } from '@/types/approval/approvalType';
+import type { TableItem } from '@/types/componentTypes/DataTableTypes';
+import { LoanRequestStatusOptions } from '@/types/enums/global';
+import { onMounted, ref } from 'vue';
 
 const routes = {
   'جزییات بیشتر⬅️': '/approval/{id}'
 };
-function getCustomButtons(approval: ApprovalRequest) {
+function getCustomButtons(item: TableItem) {
+  const approval = item as unknown as ApprovalRequest;
   const buttons = [];
   if (approval.status === 'TEMPORARY_REGISTRATION') {
     // delete button when just with TEMPORARY_REGISTRATION status

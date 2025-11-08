@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import { ref, h } from 'vue';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import Reference from '@/components/sections/cartable/reference/Reference.vue';
-import { useRoute } from 'vue-router';
 import SelectSigner from '@/components/sections/cartable/changeSigner/selectSigner/SelectSigner.vue';
+import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
+import CustomDataTable from '@/components/shared/CustomDataTable.vue';
 import { BooleanEnumOptions } from '@/types/enums/global';
+import { h, ref } from 'vue';
+import { useRoute } from 'vue-router';
 
 const { id } = useRoute().params;
 const breadcrumbs = ref([
@@ -72,7 +71,7 @@ function handleChangeSignerSuccess() {
       :custom-actions="[
         {
           title: '⚙️ تغییر امضا دار',
-          component: (props) => h(SelectSigner, { ...props, id: id, onSuccess: handleChangeSignerSuccess }),
+          component: (props: any) => h(SelectSigner, { ...props, id: id, onSuccess: handleChangeSignerSuccess }),
         },
       ]"
     />
