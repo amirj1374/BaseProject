@@ -1708,7 +1708,7 @@ const handleFilterApply = (filterData: any) => {
 <style scoped>
 /* Compact row height adjustments */
 :deep(.v-data-table .v-table__wrapper table tr) {
-  height: 36px;
+  height: 48px;
 }
 :deep(.v-data-table .v-table__wrapper table td),
 :deep(.v-data-table .v-table__wrapper table th) {
