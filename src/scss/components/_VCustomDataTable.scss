@@ -234,3 +234,49 @@
   transform: translateX(0) scale(1);
   opacity: 1;
 }
+
+/* Compact row height adjustments */
+.data-table-container .v-data-table .v-table__wrapper table tr {
+  height: 45px;
+}
+
+.data-table-container .v-data-table .v-table__wrapper table td,
+.data-table-container .v-data-table .v-table__wrapper table th {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  padding-left: 8px;
+  padding-right: 8px;
+  line-height: 1.2;
+}
+
+/* Even tighter density for group tables */
+.group-table .v-table__wrapper table tr {
+  height: 34px;
+}
+
+.group-table .v-table__wrapper table td,
+.group-table .v-table__wrapper table th {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+/* Checkbox/radio compact spacing */
+.data-table-container .v-selection-control {
+  --v-selection-control-size: 18px;
+}
+
+.data-table-container .v-selection-control .v-label {
+  margin: 0;
+}
+
+/* Buttons inside cells */
+.data-table-container td .v-btn {
+  min-height: 28px;
+  height: 28px;
+  padding: 0 8px;
+}
+
+/* Chips inside headers or cells */
+.data-table-container .v-chip {
+  height: 22px;
+}
