@@ -52,12 +52,19 @@ class SamapAppInitializer extends AppInitializer {
   }
 
   protected override async runInitialization(): Promise<AppInitializationResult> {
+    if (import.meta.env.DEV) {
+      console.log('[SamapAppInitializer] runInitialization start');
+    }
     const customerInfoStore = useCustomerInfoStore();
     const customizerStore = useCustomizerStore();
     const baseStore = useBaseStore();
 
+    customizerStore.SET_LOADING(true);
     customerInfoStore.clearError();
 
+    if (import.meta.env.DEV) {
+      console.log('[SamapAppInitializer] Fetching user info');
+    }
     const userInfo = await api.user.getUserInfo();
     customerInfoStore.setUserInfo(userInfo.data);
 
@@ -79,9 +86,15 @@ class SamapAppInitializer extends AppInitializer {
     const regions = await api.approval.getRegions();
     baseStore.setRegionsList(regions.data);
 
+    if (import.meta.env.DEV) {
+      console.log('[SamapAppInitializer] Fetching department level');
+    }
     const departmentLevel = await api.user.getDepartmentsLevel();
     baseStore.setDepartmentLevel(departmentLevel.data);
 
+    if (import.meta.env.DEV) {
+      console.log('[SamapAppInitializer] runInitialization completed');
+    }
     return userInfo.data as AppInitializationResult;
   }
 
@@ -104,4 +117,5 @@ export const initializeApp = () => samapAppInitializer.initializeApp();
 export const startInitialization = () => samapAppInitializer.startInitialization();
 export const isAppInitialized = () => samapAppInitializer.isAppInitialized();
 export const waitForInitialization = () => samapAppInitializer.waitForInitialization();
+export const reinitializeApp = () => samapAppInitializer.reinitialize();
 

@@ -1,42 +1,62 @@
-import axios, { type AxiosInstance } from "axios";
-import { apiConfig } from '@/config/envConfig';
+import envConfig, { apiConfig } from '@/config/envConfig';
+import axios, { type AxiosInstance } from 'axios';
 
 const createAxiosInstance = (): AxiosInstance => {
   const instance = axios.create({
     baseURL: apiConfig.baseURL,
-    timeout: 5000, // Optional: Request timeout in milliseconds
+    timeout: 5000,
     headers: {
-      "Content-Type": "application/json",
-    },
+      'Content-Type': 'application/json'
+    }
   });
 
-  // Interceptors for requests
   instance.interceptors.request.use(
     (config) => {
-      // You can modify the create before sending, e.g., add tokens
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem('authToken');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
       return config;
     },
-    (error) => {
-      // Handle create errors
-      return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
   );
 
-  // Interceptors for responses
   instance.interceptors.response.use(
-    (response) => {
-      return response;
-    },
-    (error) => {
+    (response) => response,
+    async (error) => {
       if (error.response?.status === 401) {
-        // Example: Redirect to login if unauthorized
-        window.location.href = "back/oauth2/authorization/master"
-        console.error("Unauthorized, redirecting to login...");
+        switch (envConfig.AUTH_MODE) {
+          case 'keycloak': {
+            window.location.href = 'back/oauth2/authorization/master';
+            break;
+          }
+          case 'jwt': {
+            const { router } = await import('@/router');
+            if (router.currentRoute.value.path !== '/auth/login') {
+              router.push('/auth/login');
+            }
+            break;
+          }
+          case 'initializer': {
+            window.location.href = 'back/oauth2/authorization/master';
+            break;
+          }
+          case 'dev': {
+            const { router } = await import('@/router');
+            if (router.currentRoute.value.path !== '/auth/login') {
+              router.push('/auth/login');
+            }
+            break;
+          }
+          default: {
+            const { router } = await import('@/router');
+            if (router.currentRoute.value.path !== '/auth/login') {
+              router.push('/auth/login');
+            }
+          }
+        }
       }
+
       return Promise.reject(error);
     }
   );

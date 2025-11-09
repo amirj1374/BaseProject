@@ -37,6 +37,16 @@ export abstract class AppInitializer {
   }
 
   /**
+   * Force a brand-new initialization cycle.
+   */
+  async reinitialize(): Promise<AppInitializationResult> {
+    this.resetInitializationState();
+    const promise = this.initializeApp();
+    await this.startInitialization();
+    return promise;
+  }
+
+  /**
    * Triggers the actual initialization work.
    * Consumers should call this once (e.g., in router guard or app bootstrap).
    */
@@ -51,10 +61,19 @@ export abstract class AppInitializer {
     } catch (error) {
       this.handleInitializationError(error);
       this.rejectInit?.(error);
+      this.resetInitializationState();
+      throw error;
     } finally {
       this.onInitializationFinally();
       this.isInitializing = false;
     }
+  }
+
+  private resetInitializationState(): void {
+    this.initializationPromise = null;
+    this.resolveInit = null;
+    this.rejectInit = null;
+    this.isInitializing = false;
   }
 
   /**

@@ -1,16 +1,21 @@
+import envConfig from '@/config/envConfig';
 import DigitLimit from '@/directives/v-digit-limit';
 import { vPermission } from '@/directives/v-permission';
 import '@/scss/style.scss';
+import { api } from '@/services/api';
+import { fakeBackend } from '@/utils/helpers/fake-backend';
 import { initializeApp, startInitialization } from '@/utils/samapAppInitializer';
 import { createPinia } from 'pinia';
-import { createApp, nextTick } from 'vue';
+import { createApp } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';
 import App from './App.vue';
 import vuetify from './plugins/vuetify';
 import { router } from './router';
 
-import { fakeBackend } from '@/utils/helpers/fake-backend';
+// Keycloak
+import type { VueKeycloakInstance } from '@dsb-norge/vue-keycloak-js';
+import { setupKeycloak } from './plugins/key-clock';
 
 // print
 import print from 'vue3-print-nb';
@@ -20,52 +25,79 @@ import Vue3PersianDatetimePicker from 'vue3-persian-datetime-picker';
 
 const app = createApp(App);
 fakeBackend();
+
 const pinia = createPinia();
 app.use(pinia);
 
-// Create initialization promise BEFORE setting up router
-const initPromise = initializeApp();
+const authMode = envConfig.AUTH_MODE ?? 'keycloak';
+console.log('🔐 Resolved auth mode:', authMode);
 
-app.use(router);
-app.use(PerfectScrollbarPlugin);
-app.use(print);
-app.use(VueApexCharts);
-app.component('Vue3PersianDatetimePicker', Vue3PersianDatetimePicker);
+async function bootstrap() {
+  console.log('🚀 Bootstrap starting with authMode:', authMode);
 
-// Register directives
-app.directive('digit-limit', DigitLimit);
-app.directive('permission', vPermission);
-
-// Mount the app first so loading component can be rendered
-app.use(vuetify).mount('#app');
-
-// Set loading to true and start initialization after nextTick
-nextTick(async () => {
-  // Import and use store after pinia is installed
-  const { useCustomizerStore } = await import('@/stores/customizer');
-  const customizer = useCustomizerStore();
-  
-  // Check if we're in demo mode
-  if (import.meta.env.VITE_APP_ENV === 'demo') {
-    // Skip initialization and set loading to false immediately
-    console.log('🎭 Demo mode detected - skipping initialization');
-    customizer.SET_LOADING(false);
+  if (authMode === 'keycloak') {
+    setupKeycloak(app);
+  } else if (authMode === 'jwt') {
+    try {
+      const response = await api.user.getUserInfo();
+      if (response?.data) {
+        const { useAuthStore } = await import('@/stores/auth');
+        const authStore = useAuthStore();
+        authStore.user = response.data;
+        localStorage.setItem('user', JSON.stringify(response.data));
+      }
+    } catch (error: any) {
+      if (error?.response?.status !== 401) {
+        console.warn('⚠️ getAccount API call failed:', error?.message ?? error);
+      }
+    }
   } else {
-    // Set loading to true BEFORE starting initialization
+    console.log('📱 Initializing app via AppInitializer...');
+
+    const initPromise = initializeApp();
+
+    const { useCustomizerStore } = await import('@/stores/customizer');
+    const customizer = useCustomizerStore();
     customizer.SET_LOADING(true);
-    
-    // Start the actual API calls
-    startInitialization();
-    
-    // Wait for initialization to complete
-    initPromise
-      .then(() => {
-        // App initialized successfully
-      })
-      .catch((error) => {
-        // App initialization failed
-      });
+
+    try {
+      await startInitialization();
+      await initPromise;
+    } catch (error) {
+      console.error('App initialization failed:', error);
+      const { router } = await import('@/router');
+      if (router.currentRoute.value.path !== '/auth/login') {
+        router.push('/auth/login');
+      }
+      return;
+    }
+
+    if (authMode === 'dev') {
+      console.log('🔧 Dev mode: forcing loading false');
+      customizer.SET_LOADING(false);
+      setTimeout(() => customizer.SET_LOADING(false), 100);
+    }
   }
+
+  app.use(router);
+  app.use(PerfectScrollbarPlugin);
+  app.use(print);
+  app.use(VueApexCharts);
+  app.component('Vue3PersianDatetimePicker', Vue3PersianDatetimePicker);
+
+  // Register directives
+  app.directive('digit-limit', DigitLimit);
+  app.directive('permission', vPermission);
+
+  app.use(vuetify).mount('#app');
+}
+
+bootstrap().catch((error) => {
+  console.error('Bootstrap error:', error);
 });
 
-
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $keycloak: VueKeycloakInstance;
+  }
+}
