@@ -17,6 +17,7 @@
  * - Keyboard support for toggling groups and activating selection on rows
  */
 import MoneyInput from '@/components/shared/MoneyInput.vue';
+import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
 import { useTableSelection } from '@/composables/useTableSelection';
 import apiService from '@/services/apiService';
 import axiosInstance from '@/services/axiosInstance';
@@ -25,7 +26,7 @@ import { formatNumberWithCommas } from '@/utils/number-formatter';
 import { IconChevronDown, IconChevronRight } from '@tabler/icons-vue';
 import { useDebounceFn } from '@vueuse/core';
 import type { Component, Ref } from 'vue';
-import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
+import { computed, isRef, onBeforeUnmount, onMounted, ref, shallowRef, unref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 import type {
@@ -35,6 +36,19 @@ import type {
   Header,
   TableItem
 } from '@/types/componentTypes/DataTableTypes';
+
+type AutocompleteItemsSource =
+  | any[]
+  | Ref<any[] | undefined>
+  | (() => any[] | undefined);
+
+type EnhancedHeader = Header & {
+  autocompleteItems?: AutocompleteItemsSource;
+  autocompleteItemTitle?: string;
+  autocompleteItemValue?: string;
+  autocompleteReturnObject?: boolean;
+  autocompleteMultiple?: boolean;
+};
 
 /**
  * Component props - using proper types from DataTableTypes
@@ -73,7 +87,7 @@ const dialog = ref(false);
 const deleteDialog = ref(false);
 const isEditing = ref(false);
 const editedItem = ref<TableItem | null>(null);
-const formModel = ref<Record<string, unknown>>({});
+const formModel = ref<Record<string, any>>({});
 const itemToDelete = ref<TableItem | null>(null);
 const snackbar = ref(false);
 const snackbarMessage = ref('');
@@ -332,6 +346,50 @@ const normalHeaders = computed(() => {
 
   return [...base, { title: 'عملیات', key: 'actions', sortable: false, width: actionWidth }];
 });
+
+const hasAutocomplete = (header: Header): header is EnhancedHeader => {
+  return Boolean((header as EnhancedHeader).autocompleteItems);
+};
+
+const resolveAutocompleteItems = (header: Header): any[] => {
+  const enhancedHeader = header as EnhancedHeader;
+  const source = enhancedHeader.autocompleteItems;
+
+  if (!source) return [];
+
+  try {
+    if (typeof source === 'function') {
+      return source() ?? [];
+    }
+
+    if (isRef(source)) {
+      return source.value ?? [];
+    }
+
+    const resolved = unref(source);
+    return Array.isArray(resolved) ? resolved : [];
+  } catch (error) {
+    console.error('Error resolving autocomplete items for header:', header.key, error);
+    return [];
+  }
+};
+
+const resolveAutocompleteItemTitle = (header: Header): string => {
+  return (header as EnhancedHeader).autocompleteItemTitle ?? 'title';
+};
+
+const resolveAutocompleteItemValue = (header: Header): string => {
+  return (header as EnhancedHeader).autocompleteItemValue ?? 'value';
+};
+
+const resolveAutocompleteReturnObject = (header: Header): boolean => {
+  const value = (header as EnhancedHeader).autocompleteReturnObject;
+  return value !== false;
+};
+
+const resolveAutocompleteMultiple = (header: Header): boolean => {
+  return (header as EnhancedHeader).autocompleteMultiple === true;
+};
 
 // Helper function to get unique value from item
 const getUniqueValue = (item: any): string | number => {
@@ -692,6 +750,25 @@ const openDialog = (item?: any) => {
 
   // Sync form model with editedItem
   formModel.value = { ...editedItem.value };
+
+  // Normalize autocomplete fields based on header configuration
+  props.headers.forEach((header) => {
+    if (!hasAutocomplete(header)) return;
+
+    const enhancedHeader = header as EnhancedHeader;
+    const currentValue = formModel.value[header.key];
+    const valueKey = resolveAutocompleteItemValue(header);
+
+    if (enhancedHeader.autocompleteReturnObject === false) {
+      if (Array.isArray(currentValue)) {
+        formModel.value[header.key] = currentValue.map((item: any) =>
+          item && typeof item === 'object' ? item[valueKey] ?? null : item
+        );
+      } else if (currentValue && typeof currentValue === 'object') {
+        formModel.value[header.key] = currentValue[valueKey] ?? null;
+      }
+    }
+  });
 
   // Ensure date fields in edit mode are in Gregorian YYYY-MM-DD for the date picker
   if (isEditing.value) {
@@ -1610,8 +1687,29 @@ const handleFilterApply = (filterData: any) => {
             <v-row>
               <v-col v-for="header in props.headers" :key="header.key" cols="12" md="4">
                 <template v-if="!header.hidden">
+                  <ShamsiDatePicker
+                    v-if="header.isDate"
+                    v-model="formModel[header.key]"
+                    :label="header.title"
+                    :disabled="header.editable === false"
+                  />
+                  <v-autocomplete
+                    v-else-if="hasAutocomplete(header)"
+                    v-model="formModel[header.key]"
+                    :label="header.title"
+                    :items="resolveAutocompleteItems(header)"
+                    :item-title="resolveAutocompleteItemTitle(header)"
+                    :item-value="resolveAutocompleteItemValue(header)"
+                    :return-object="resolveAutocompleteReturnObject(header)"
+                    :multiple="resolveAutocompleteMultiple(header)"
+                    :chips="resolveAutocompleteMultiple(header)"
+                    :closable-chips="resolveAutocompleteMultiple(header)"
+                    :disabled="header.editable === false"
+                    clearable
+                    variant="outlined"
+                  />
                   <MoneyInput
-                    v-if="String(header.type).toLowerCase() === 'money'"
+                    v-else-if="String(header.type).toLowerCase() === 'money'"
                     v-model="formModel[header.key] as number"
                     :label="header.title"
                     :disabled="header.editable === false"
