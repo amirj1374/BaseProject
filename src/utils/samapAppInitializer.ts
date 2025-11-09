@@ -62,6 +62,18 @@ class SamapAppInitializer extends AppInitializer {
     customizerStore.SET_LOADING(true);
     customerInfoStore.clearError();
 
+    const baseDataPromise = Promise.all([
+      api.approval.fetchCurrencies(),
+      api.approval.getCollateral(),
+      api.approval.getRegions(),
+      (async () => {
+        if (import.meta.env.DEV) {
+          console.log('[SamapAppInitializer] Fetching department level');
+        }
+        return api.user.getDepartmentsLevel();
+      })()
+    ]);
+
     if (import.meta.env.DEV) {
       console.log('[SamapAppInitializer] Fetching user info');
     }
@@ -77,19 +89,10 @@ class SamapAppInitializer extends AppInitializer {
       customizerStore.layoutType = validateLayoutType(customizer.layoutType || 'SideBar');
     }
 
-    const currency = await api.approval.fetchCurrencies();
+    const [currency, collateral, regions, departmentLevel] = await baseDataPromise;
     baseStore.setCurrencyList(currency.data);
-
-    const collateral = await api.approval.getCollateral();
     baseStore.setCollateralList(collateral.data);
-
-    const regions = await api.approval.getRegions();
     baseStore.setRegionsList(regions.data);
-
-    if (import.meta.env.DEV) {
-      console.log('[SamapAppInitializer] Fetching department level');
-    }
-    const departmentLevel = await api.user.getDepartmentsLevel();
     baseStore.setDepartmentLevel(departmentLevel.data);
 
     if (import.meta.env.DEV) {
