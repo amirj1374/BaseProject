@@ -314,7 +314,13 @@ export interface FacilitiesRequest {
   advancePayment: string;
   contractType: ContractType;
   facility?: FacilityDto;
+  contractTypeAndFacilityList?: FacilitySelection[];
   considerPreviousDebt: boolean;
+}
+
+export interface FacilitySelection {
+  contractType: ContractType;
+  facility: FacilityDto;
 }
 
 export interface GuaranteeRequest {

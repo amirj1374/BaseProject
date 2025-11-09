@@ -25,10 +25,24 @@
         {{ RepaymentTypeOptions.find((opt) => opt.value === item.repaymentType)?.title || '-' }}
       </template>
       <template #item.facility="{ item }">
-        {{ item.facility?.facilityName || '-' }}
+        <div v-if="Array.isArray(item.contractTypeAndFacilityList) && item.contractTypeAndFacilityList.length">
+          <div v-for="(selection, index) in item.contractTypeAndFacilityList" :key="`facility-${item.id}-${index}`">
+            {{ selection.facility?.facilityName || '-' }}
+          </div>
+        </div>
+        <span v-else>
+          {{ item.facility?.facilityName || '-' }}
+        </span>
       </template>
       <template #item.contractType="{ item }">
-        {{ item.contractType?.longTitle || '-' }}
+        <div v-if="Array.isArray(item.contractTypeAndFacilityList) && item.contractTypeAndFacilityList.length">
+          <div v-for="(selection, index) in item.contractTypeAndFacilityList" :key="`contract-${item.id}-${index}`">
+            {{ selection.contractType?.longTitle || '-' }}
+          </div>
+        </div>
+        <span v-else>
+          {{ item.contractType?.longTitle || '-' }}
+        </span>
       </template>
       <template #item.amount="{ item }">
         {{ formatNumberWithCommas(item.amount) }}
@@ -95,41 +109,48 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="12" md="4">
-                <v-autocomplete
-                  v-model="formData.contractType"
-                  :items="contractTypes"
-                  item-title="longTitle"
-                  item-value="coreId"
-                  label="نوع عقد"
-                  variant="outlined"
-                  no-data-text="دیتا یافت نشد"
-                  clearable
-                  return-object
-                  :rules="[required]"
-                  @update:model-value="(val: ContractType | null) => {
-                    formData.facility = null;
-                    fetchFacilities(val);
-                  }"
-                  :disabled="props.readonly"
-                ></v-autocomplete>
-              </v-col>
-              <v-col cols="12" md="8">
-                <v-autocomplete
-                  :items="facilityList"
-                  v-model="formData.facility"
-                  item-title="facilityName"
-                  item-value="facilityCode"
-                  no-data-text="لطفا ابتدا نوع عقد رو انتخاب کنید"
-                  label="نوع محصول"
-                  variant="outlined"
-                  clearable
-                  return-object
-                  :rules="[required]"
-                  :disabled="props.readonly"
-                ></v-autocomplete>
+              <v-col cols="12">
+                <v-btn
+                  color="primary"
+                  variant="tonal"
+                  :disabled="props.readonly || (!requiresFacilitySelection && contractTypeAndFacilityList.length >= 1)"
+                  class="mb-4"
+                  @click="showFacilityProductDialog = true"
+                >
+                  افزودن نوع عقد و محصول
+                </v-btn>
               </v-col>
             </v-row>
+            <v-data-table-virtual
+              v-if="facilitySelectionTableItems.length > 0"
+              :headers="[
+                { title: 'نوع عقد', key: 'contractTypeTitle', width: '250px' },
+                { title: 'نوع محصول', key: 'facilityTitle', width: '250px' },
+                { title: 'عملیات', key: 'actions', align: 'center', width: '100px' }
+              ]"
+              :items="facilitySelectionTableItems"
+              density="compact"
+              class="elevation-1 mb-4"
+              hide-default-footer
+              no-data-text="هیچ محصولی اضافه نشده است."
+            >
+              <template #item.actions="{ index }">
+                <v-tooltip location="top" text="حذف محصول">
+                  <template #activator="{ props: tooltipProps }">
+                    <v-btn
+                      :disabled="props.readonly"
+                      variant="text"
+                      size="small"
+                      color="error"
+                      v-bind="tooltipProps"
+                      @click="removeFacilitySelection(index)"
+                    >
+                      ❌
+                    </v-btn>
+                  </template>
+                </v-tooltip>
+              </template>
+            </v-data-table-virtual>
             <v-row>
               <v-col cols="12" md="2">
                 <v-text-field
@@ -280,7 +301,13 @@
         </v-card-text>
         <v-card-actions>
           <div style="display: flex; justify-content: space-evenly; width: 100%">
-            <v-btn v-if="!props.readonly" color="primary" @click="saveFacility" :loading="loading" :disabled="!isFormValid || !collateralRequired">
+            <v-btn
+              v-if="!props.readonly"
+              color="primary"
+              @click="saveFacility"
+              :loading="loading"
+              :disabled="!isFormValid || !collateralRequired || !facilitySelectionValid"
+            >
               {{ 'ذخیره' }}
             </v-btn>
             <v-btn v-if="!props.readonly" color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
@@ -289,6 +316,13 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <FacilityProductDialog
+      v-model="showFacilityProductDialog"
+      :contract-types="contractTypes"
+      :existing-selections="contractTypeAndFacilityList"
+      @save="onFacilityProductDialogSave"
+    />
 
     <!-- CollateralInputDialog component -->
     <CollateralInputDialog v-model="showCollateralInputDialog" :collateral-options="baseStore.collateral" @save="onCollateralDialogSave" />
@@ -315,6 +349,7 @@
 
 <script setup lang="ts">
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
+import FacilityProductDialog from '@/components/approval/FacilityProductDialog.vue';
 import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { ApprovalTypeOptions } from '@/constants/enums/approval';
 import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
@@ -322,7 +357,13 @@ import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import { useBaseStore } from '@/stores/base';
 import { useCustomizerStore } from '@/stores/customizer';
-import type { CollateralDto, ContractType, FacilitiesRequest, FacilityDto } from '@/types/approval/approvalType';
+import type {
+  CollateralDto,
+  ContractType,
+  FacilitiesRequest,
+  FacilityDto,
+  FacilitySelection
+} from '@/types/approval/approvalType';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
 import { IconPencil, IconTrash, IconX } from '@tabler/icons-vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
@@ -333,9 +374,11 @@ const dialog = ref(false);
 const form = ref();
 const isFormValid = ref(false);
 const facilities = ref<FacilitiesRequest[]>([]);
+const isInitializingForm = ref(false);
 const isEditing = ref(false);
 const editingId = ref<number | null>(null);
 const showCollateralInputDialog = ref(false);
+const showFacilityProductDialog = ref(false);
 const showDeleteConfirm = ref(false);
 const collateralToDelete = ref<number | null>(null);
 const error = ref('');
@@ -349,7 +392,7 @@ const selectedCollaterals = ref<
 >([]);
 const required = (v: any) => !!v || 'این فیلد الزامی است';
 const contractTypes = ref<ContractType[]>([]);
-const facilityList = ref<FacilityDto[]>([]);
+const contractTypeAndFacilityList = ref<FacilitySelection[]>([]);
 const collateralTableItems = computed(() =>
   selectedCollaterals.value.map((item) => ({
     ...item,
@@ -372,6 +415,12 @@ const emit = defineEmits<{
   (e: 'update:facilities', facilities: FacilitiesRequest[]): void;
 }>();
 const collateralRequired = computed(() => selectedCollaterals.value.length > 0);
+const facilitySelectionTableItems = computed(() =>
+  contractTypeAndFacilityList.value.map((item) => ({
+    contractTypeTitle: item.contractType.longTitle,
+    facilityTitle: item.facility.facilityName
+  }))
+);
 const formData = reactive({
   approvalType: '',
   currency: '',
@@ -389,11 +438,14 @@ const formData = reactive({
   considerPreviousDebt: false
 });
 
+const requiresFacilitySelection = computed(() => formData.approvalType === 'ANNUAL_LIMIT');
+const facilitySelectionValid = computed(() => !requiresFacilitySelection.value || contractTypeAndFacilityList.value.length > 0);
+
 const headers = [
   { title: 'نوع مصوبه', key: 'approvalType', width: '200px' },
   { title: 'نوع ارز', key: 'currency', width: '200px' },
-  { title: 'نوع عقد', key: 'contractType', width: '200px' },
-  { title: 'نوع محصول', key: 'facility', width: '200px' },
+  { title: 'نوع عقد', key: 'contractType', width: '150px' },
+  { title: 'نوع محصول', key: 'facility', width: '500px' },
   { title: 'نحوه بازپرداخت', key: 'repaymentType', width: '250px' },
   { title: 'نرخ ترجیحی', key: 'preferentialRate', width: '200px' },
   { title: 'پیش دریافت', key: 'advancePayment', width: '250px' },
@@ -418,6 +470,39 @@ const onCollateralDialogSave = (data: { collateral: CollateralDto | null; amount
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'خطا در افزودن وثیقه';
     showError.value = true;
+  }
+};
+
+const onFacilityProductDialogSave = (payload: FacilitySelection) => {
+  if (requiresFacilitySelection.value) {
+    contractTypeAndFacilityList.value = [...contractTypeAndFacilityList.value, payload];
+  } else {
+    contractTypeAndFacilityList.value = [payload];
+  }
+
+  if (!requiresFacilitySelection.value || contractTypeAndFacilityList.value.length === 1) {
+    formData.contractType = payload.contractType;
+    formData.facility = payload.facility;
+  }
+
+  showFacilityProductDialog.value = false;
+};
+
+const removeFacilitySelection = (index: number) => {
+  contractTypeAndFacilityList.value = contractTypeAndFacilityList.value.filter((_, i) => i !== index);
+
+  if (requiresFacilitySelection.value) {
+    if (contractTypeAndFacilityList.value.length > 0) {
+      const primary = contractTypeAndFacilityList.value[0];
+      formData.contractType = primary.contractType;
+      formData.facility = primary.facility;
+    } else {
+      formData.contractType = null;
+      formData.facility = null;
+    }
+  } else if (contractTypeAndFacilityList.value.length === 0) {
+    formData.contractType = null;
+    formData.facility = null;
   }
 };
 
@@ -468,9 +553,34 @@ const dayCalculate = async () => {
     return formData.currency === 'IRR' ? ' میلیون ریال' : '';
   });
 
+watch(
+  () => formData.approvalType,
+  (newVal, oldVal) => {
+    if (newVal === oldVal || isInitializingForm.value) {
+      return;
+    }
+
+    if (newVal === 'ANNUAL_LIMIT') {
+      return;
+    } else {
+      if (contractTypeAndFacilityList.value.length > 1) {
+        contractTypeAndFacilityList.value = [contractTypeAndFacilityList.value[0]];
+      }
+      if (contractTypeAndFacilityList.value.length > 0) {
+        formData.contractType = contractTypeAndFacilityList.value[0].contractType;
+        formData.facility = contractTypeAndFacilityList.value[0].facility;
+      } else {
+        formData.contractType = null;
+        formData.facility = null;
+      }
+    }
+  }
+);
+
 async function openDialog() {
   isEditing.value = false;
   editingId.value = null;
+  form.value?.resetValidation();
   dialog.value = true;
 }
 
@@ -480,13 +590,19 @@ function closeDialog() {
 }
 
 function resetForm() {
+  isInitializingForm.value = true;
   formData.amount = 0;
   formData.repaymentType = '';
+  formData.contractType = null;
+  formData.facility = null;
   selectedCollaterals.value = [];
+  contractTypeAndFacilityList.value = [];
   form.value?.reset();
+  isInitializingForm.value = false;
 }
 
 function editItem(item: FacilitiesRequest) {
+  isInitializingForm.value = true;
   isEditing.value = true;
   editingId.value = item.id;
   formData.approvalType = item.approvalType || '';
@@ -498,23 +614,78 @@ function editItem(item: FacilitiesRequest) {
   formData.day = item.day || '';
   formData.durationDay = item.durationDay || '';
   selectedCollaterals.value = item.collaterals ? item.collaterals : [];
-  formData.contractType = item.contractType || null;
-  formData.facility = item.facility || null;
+  const existingSelections = Array.isArray(item.contractTypeAndFacilityList) && item.contractTypeAndFacilityList.length > 0
+    ? item.contractTypeAndFacilityList
+    : item.contractType && item.facility
+      ? [{ contractType: item.contractType, facility: item.facility }]
+      : [];
+
+  contractTypeAndFacilityList.value = existingSelections.map((selection) => ({
+    contractType: selection.contractType,
+    facility: selection.facility
+  }));
+
+  const primarySelection = contractTypeAndFacilityList.value[0];
+
+  if (item.approvalType === 'ANNUAL_LIMIT') {
+    formData.contractType = primarySelection?.contractType || null;
+    formData.facility = primarySelection?.facility || null;
+  } else {
+    formData.contractType = primarySelection?.contractType || item.contractType || null;
+    formData.facility = primarySelection?.facility || item.facility || null;
+    if (contractTypeAndFacilityList.value.length > 1) {
+      contractTypeAndFacilityList.value = [contractTypeAndFacilityList.value[0]];
+    }
+  }
   formData.preferentialRate = item.preferentialRate;
   formData.advancePayment = item.advancePayment;
   formData.considerPreviousDebt = item.considerPreviousDebt;
   dialog.value = true;
+  isInitializingForm.value = false;
 }
 
 function saveFacility() {
-  if (!isFormValid.value) return;
+  if (!isFormValid.value) {
+    return;
+  }
+
+  if (!facilitySelectionValid.value) {
+    if (requiresFacilitySelection.value) {
+      error.value = 'حداقل یک ترکیب عقد و محصول باید انتخاب شود.';
+      showError.value = true;
+    }
+    return;
+  }
+
+  if (requiresFacilitySelection.value) {
+    if (contractTypeAndFacilityList.value.length === 0) {
+      error.value = 'حداقل یک ترکیب عقد و محصول باید انتخاب شود.';
+      showError.value = true;
+      return;
+    }
+    const primarySelection = contractTypeAndFacilityList.value[0];
+    formData.contractType = primarySelection.contractType;
+    formData.facility = primarySelection.facility;
+  } else if (contractTypeAndFacilityList.value.length > 0) {
+    const primarySelection = contractTypeAndFacilityList.value[0];
+    formData.contractType = primarySelection.contractType;
+    formData.facility = primarySelection.facility;
+  }
+  const base_id = editingId.value ?? Date.now();
+
   const facilityData: FacilitiesRequest = {
-    id: editingId.value || Date.now(),
+    id: base_id,
     ...formData,
     preferentialRate: formData.preferentialRate || '0',
     contractType: formData.contractType || ({} as ContractType),
     facility: formData.facility || ({} as FacilityDto),
-    collaterals: selectedCollaterals.value
+    collaterals: selectedCollaterals.value,
+    contractTypeAndFacilityList: contractTypeAndFacilityList.value.length
+      ? contractTypeAndFacilityList.value.map((selection) => ({
+          contractType: selection.contractType,
+          facility: selection.facility
+        }))
+      : undefined
   };
   if (isEditing.value) {
     const index = facilities.value.findIndex((f) => f.id === editingId.value);
@@ -523,7 +694,6 @@ function saveFacility() {
       emit('edit', facilityData);
     }
   } else {
-    facilities.value.push(facilityData);
     emit('save', facilityData);
   }
   closeDialog();
@@ -534,18 +704,6 @@ function deleteItem(item: FacilitiesRequest) {
   if (index !== -1) {
     facilities.value.splice(index, 1);
     emit('delete', item);
-  }
-}
-
-async function fetchFacilities(newContractType: ContractType | null) {
-  if (!newContractType) return;
-  try {
-    const res = await api.approval.getFacilities(newContractType.coreId, 'ContractCode');
-    facilityList.value = res.data.facilityDtoList || [];
-  } catch (err) {
-    error.value = 'خطا در دریافت لیست تسهیلات';
-    showError.value = true;
-    console.error('Error fetching facilities:', err);
   }
 }
 
