@@ -1,7 +1,7 @@
 import DigitLimit from '@/directives/v-digit-limit';
 import { vPermission } from '@/directives/v-permission';
 import '@/scss/style.scss';
-import { initializeApp, startInitialization } from '@/utils/appInitializer';
+import { initializeApp, startInitialization } from '@/utils/samapAppInitializer';
 import { createPinia } from 'pinia';
 import { createApp, nextTick } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';

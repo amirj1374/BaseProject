@@ -1,134 +1,109 @@
-import { api } from '@/services/api';
-import { useBaseStore } from '@/stores/base';
-import { useCustomerInfoStore } from '@/stores/customerInfo';
-import { useCustomizerStore } from '@/stores/customizer';
+export type AppInitializationResult = unknown;
 
-// Validation arrays
-const validThemes = [
-  'ModernTheme', 'PurpleTheme', 'SteelTealGreen', 'OrangeTheme', 'TealTheme', 'SilverTheme', 'RedTheme',
-  'DarkModernTheme', 'DarkPurpleTheme', 'DarkSteelTealGreen', 'DarkOrangeTheme', 'DarkTealTheme', 'DarkSilverTheme', 'DarkRedTheme'
-];
-
-const validLayoutTypes = ['SideBar', 'NavBar'];
-const validFontThemes = ['vazir', 'yekanLight', 'iranSans', 'kalamehLight'];
-const validThemeModes = ['light', 'dark'];
-
-// Validation functions
-function validateTheme(theme: string): string {
-  return validThemes.includes(theme) ? theme : 'PurpleTheme';
+export interface AppInitializerOptions {
+  demoEnvKey?: string;
+  demoEnvValue?: string;
+  demoFallbackResult?: AppInitializationResult;
 }
 
-function validateLayoutType(layout: string): string {
-  return validLayoutTypes.includes(layout) ? layout : 'SideBar';
-}
+export abstract class AppInitializer {
+  private initializationPromise: Promise<AppInitializationResult> | null = null;
+  private resolveInit: ((value: AppInitializationResult) => void) | null = null;
+  private rejectInit: ((reason?: any) => void) | null = null;
+  private isInitializing = false;
 
-function validateFontTheme(font: string): string {
-  return validFontThemes.includes(font) ? font : 'vazir';
-}
+  protected constructor(private readonly options: AppInitializerOptions = {}) {}
 
-function validateThemeMode(mode: string): string {
-  return validThemeModes.includes(mode) ? mode : 'light';
-}
-
-function validateInputBg(inputBg: boolean): boolean {
-  return typeof inputBg === 'boolean' ? inputBg : false;
-}
-
-// Global initialization promise
-let initializationPromise: Promise<any> | null = null;
-let resolveInit: ((value: any) => void) | null = null;
-let rejectInit: ((reason?: any) => void) | null = null;
-let isInitializing = false;
-
-export async function initializeApp() {
-  // Skip initialization in demo mode
-  if (import.meta.env.VITE_APP_ENV === 'demo') {
-    console.log('🎭 Demo mode detected - skipping app initialization');
-    return Promise.resolve({ demo: true });
-  }
-
-  // If already initializing, return the existing promise
-  if (initializationPromise) {
-    return initializationPromise;
-  }
-
-  // Create promise immediately for router guard
-  initializationPromise = new Promise((resolve, reject) => {
-    resolveInit = resolve;
-    rejectInit = reject;
-  });
-
-  // Mark as initializing
-  isInitializing = true;
-
-  return initializationPromise;
-}
-
-export async function startInitialization() {
-  // Skip initialization in demo mode
-  if (import.meta.env.VITE_APP_ENV === 'demo') {
-    console.log('🎭 Demo mode detected - skipping startInitialization');
-    return;
-  }
-
-  if (!isInitializing) {
-    return;
-  }
-
-  // Initialize stores
-  const customerInfoStore = useCustomerInfoStore();
-  const customizer = useCustomizerStore();
-  const baseStore = useBaseStore();
-
-  try {
-    customerInfoStore.clearError();
-    
-    // Sequential API calls - one after another
-    const userInfo = await api.user.getUserInfo();
-    customerInfoStore.setUserInfo(userInfo.data);
-    
-    // Set and validate customizer settings
-    if (userInfo.data.customizer) {
-      customizer.actTheme = validateTheme(userInfo.data.customizer.actTheme);
-      customizer.fontTheme = validateFontTheme(userInfo.data.customizer.fontTheme);
-      customizer.inputBg = validateInputBg(userInfo.data.customizer.inputBg);
-      customizer.themeMode = validateThemeMode(userInfo.data.customizer.themeMode);
-      customizer.layoutType = validateLayoutType(userInfo.data.customizer.layoutType || 'SideBar');
+  /**
+   * Public API to start initialization flow.
+   * Returns the same promise for all callers while the process is running.
+   */
+  initializeApp(): Promise<AppInitializationResult> {
+    if (this.isDemoMode()) {
+      return Promise.resolve(this.options.demoFallbackResult ?? { demo: true });
     }
 
-    const currency = await api.approval.fetchCurrencies();
-    baseStore.setCurrencyList(currency.data);
-    
-    const collateral = await api.approval.getCollateral();
-    baseStore.setCollateralList(collateral.data);
-    
-    const regions = await api.approval.getRegions();
-    baseStore.setRegionsList(regions.data);
+    if (this.initializationPromise) {
+      return this.initializationPromise;
+    }
 
-    const departmentLevel = await api.user.getDepartmentsLevel();
-    baseStore.setDepartmentLevel(departmentLevel.data);
-    
-    resolveInit?.(userInfo.data);
-    
-  } catch (error) {
-    customerInfoStore.setError(error instanceof Error ? error.message : 'Failed to load application data');
-    rejectInit?.(error);
-  } finally {
-    // Always set loading to false when done
-    customizer.SET_LOADING(false);
-    isInitializing = false;
+    this.initializationPromise = new Promise<AppInitializationResult>((resolve, reject) => {
+      this.resolveInit = resolve;
+      this.rejectInit = reject;
+    });
+
+    this.isInitializing = true;
+    return this.initializationPromise;
+  }
+
+  /**
+   * Triggers the actual initialization work.
+   * Consumers should call this once (e.g., in router guard or app bootstrap).
+   */
+  async startInitialization(): Promise<void> {
+    if (this.isDemoMode() || !this.isInitializing) {
+      return;
+    }
+
+    try {
+      const result = await this.runInitialization();
+      this.resolveInit?.(result);
+    } catch (error) {
+      this.handleInitializationError(error);
+      this.rejectInit?.(error);
+    } finally {
+      this.onInitializationFinally();
+      this.isInitializing = false;
+    }
+  }
+
+  /**
+   * Indicates whether initialization has completed successfully or failed.
+   */
+  isAppInitialized(): boolean {
+    return this.initializationPromise !== null && !this.isInitializing;
+  }
+
+  /**
+   * Waits for the initialization process to complete.
+   * Returns resolved promise immediately if initialization never started.
+   */
+  waitForInitialization(): Promise<AppInitializationResult> {
+    if (this.initializationPromise) {
+      return this.initializationPromise;
+    }
+    return Promise.resolve();
+  }
+
+  /**
+   * Override point for subclasses to provide demo-mode detection
+   * when the default environment check is insufficient.
+   */
+  protected isDemoMode(): boolean {
+    const envValue = this.options.demoEnvValue ?? import.meta.env.VITE_APP_ENV;
+    return envValue === 'demo';
+  }
+
+  /**
+   * Implement this method in subclasses to perform the actual initialization logic.
+   * Should throw on failure to propagate the error to initializeApp callers.
+   */
+  protected abstract runInitialization(): Promise<AppInitializationResult>;
+
+  /**
+   * Optional hook for centralized error handling/logging.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected handleInitializationError(error: unknown): void {
+    if (import.meta.env.DEV) {
+      console.error('[AppInitializer] Initialization failed', error);
+    }
+  }
+
+  /**
+   * Optional hook executed after initialization finishes, regardless of success.
+   */
+  protected onInitializationFinally(): void {
+    // No-op by default
   }
 }
-
-// Function to check if app is initialized
-export function isAppInitialized(): boolean {
-  return initializationPromise !== null && !isInitializing;
-}
-
-// Function to wait for initialization
-export function waitForInitialization(): Promise<any> {
-  if (initializationPromise) {
-    return initializationPromise;
-  }
-  return Promise.resolve();
-} 

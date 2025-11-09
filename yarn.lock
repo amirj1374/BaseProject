@@ -32,6 +32,13 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.27.1"
 
+"@dsb-norge/vue-keycloak-js@^3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@dsb-norge/vue-keycloak-js/-/vue-keycloak-js-3.0.3.tgz#af7518117cce4185e0a921bb589846e1fa023b5d"
+  integrity sha512-YS0fOUrBYL889H6rbBJUMjPC6QqiJl4+4dDcffwx4hDcQ0pxOyjrDyRCQC+uJ0OjNum0pcRYlBKWKD4/4xWR1g==
+  dependencies:
+    keycloak-js "26.2.0"
+
 "@esbuild/aix-ppc64@0.21.5":
   version "0.21.5"
   resolved "https://registry.yarnpkg.com/@esbuild/aix-ppc64/-/aix-ppc64-0.21.5.tgz#c7184a326533fcdf1b8ee0733e21c713b975575f"
@@ -1637,6 +1644,11 @@ jspdf@^3.0.0:
     core-js "^3.6.0"
     dompurify "^3.2.4"
     html2canvas "^1.0.0-rc.5"
+
+keycloak-js@26.2.0:
+  version "26.2.0"
+  resolved "https://registry.yarnpkg.com/keycloak-js/-/keycloak-js-26.2.0.tgz#0924feec13a014563b2e041e255657c24c145714"
+  integrity sha512-CrFcXTN+d6J0V/1v3Zpioys6qHNWE6yUzVVIsCUAmFn9H14GZ0vuYod+lt+SSpMgWGPuneDZBSGBAeLBFuqjsw==
 
 keyv@^4.5.3:
   version "4.5.4"
