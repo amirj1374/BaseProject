@@ -2,7 +2,14 @@
   <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">تسهیلات</h4>
-      <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="customizerStore.loading"> افزودن تسهیلات</v-btn>
+      <v-btn
+        v-if="!props.readonly"
+        color="secondary"
+        @click="openDialog"
+        :disabled="customizerStore.loading || facilities.length >= 4"
+      >
+        افزودن تسهیلات
+      </v-btn>
     </div>
 
     <v-data-table-virtual
@@ -578,6 +585,11 @@ watch(
 );
 
 async function openDialog() {
+  if (facilities.value.length >= 4) {
+    error.value = 'حداکثر ۴ تسهیلات قابل ثبت است.';
+    showError.value = true;
+    return;
+  }
   isEditing.value = false;
   editingId.value = null;
   form.value?.resetValidation();
