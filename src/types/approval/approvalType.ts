@@ -336,6 +336,9 @@ export interface GuaranteeRequest {
   percentDeposit: string;
   contractType: ContractType;
   facility?: FacilityDto;
+  contractTypeAndFacilityList?: Array<{
+    contractType: ContractType;
+  }>;
   considerPreviousDebt: boolean;
 }
 

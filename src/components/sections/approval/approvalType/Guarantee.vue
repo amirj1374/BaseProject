@@ -2,7 +2,14 @@
   <div class="approval-section">
     <div class="section-header">
       <h4 class="section-title">ضمانت‌نامه</h4>
-      <v-btn v-if="!props.readonly" color="secondary" @click="openDialog" :disabled="loading || guarantee.length >= 4 || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"> افزودن ضمانت‌نامه</v-btn>
+      <v-btn
+        v-if="!props.readonly"
+        color="secondary"
+        @click="openDialog"
+        :disabled="loading || guarantee.length >= 4 || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
+      >
+        افزودن ضمانت‌نامه</v-btn
+      >
     </div>
 
     <v-data-table-virtual
@@ -28,7 +35,14 @@
         {{ item.facility?.facilityName || '-' }}
       </template>
       <template #item.contractType="{ item }">
-        {{ item.contractType?.longTitle || '-' }}
+        <div v-if="Array.isArray(item.contractTypeAndFacilityList) && item.contractTypeAndFacilityList.length">
+          <div v-for="(entry, index) in item.contractTypeAndFacilityList" :key="`guarantee-contract-${item.id}-${index}`">
+            {{ entry.contractType?.longTitle || '-' }}
+          </div>
+        </div>
+        <span v-else>
+          {{ item.contractType?.longTitle || '-' }}
+        </span>
       </template>
       <template #item.amount="{ item }">
         {{ formatNumberWithCommas(item.amount) }}
@@ -39,7 +53,7 @@
             <IconPencil color="blue" size="20" />
           </v-btn>
           <v-btn v-if="!props.readonly" size="small" variant="text" @click="deleteItem(item)">
-            <IconTrash  color="red" size="20" />
+            <IconTrash color="red" size="20" />
           </v-btn>
         </div>
       </template>
@@ -65,7 +79,7 @@
                   variant="outlined"
                   density="comfortable"
                   :rules="[required]"
-                    :disabled="props.readonly"
+                  :disabled="props.readonly"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -79,7 +93,7 @@
                   item-value="code"
                   :items="baseStore.currency"
                   :rules="[required]"
-                    :disabled="props.readonly"
+                  :disabled="props.readonly"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -95,31 +109,33 @@
                   :rules="[percentRule]"
                   min="1"
                   max="100"
-                    :disabled="props.readonly"
+                  :disabled="props.readonly"
                 />
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="12" md="4">
-                <v-autocomplete
-                  v-model="formData.contractType"
+              <v-col cols="12" md="12">
+                <CustomAutocomplete
+                  v-model="contractTypeModel"
                   :items="contractTypes"
-                  item-title="longTitle"
-                  item-value="coreId"
                   label="نوع ضمانت نامه"
-                  variant="outlined"
-                  no-data-text="دیتا یافت نشد"
+                  placeholder="انتخاب نوع ضمانت‌نامه..."
+                  :multiple="isAnnualLimit"
+                  :return-object="true"
                   clearable
-                  return-object
+                  density="comfortable"
                   :rules="[required]"
-                    :disabled="props.readonly"
-                  @update:model-value="(val: ContractType | null) => {
-                    formData.facility = null;
-                    fetchFacilities(val);
+                  :disabled="props.readonly"
+                  display-style="detailed"
+                  :fields="{
+                    title: 'longTitle',
+                    value: 'coreId',
+                    group: 'groupId',
+                    isMainGroup: 'isMainGroup',
                   }"
-                ></v-autocomplete>
+                />
               </v-col>
-              <v-col cols="12" md="8">
+              <!-- <v-col cols="12" md="8">
                 <v-autocomplete
                   :items="facilityList"
                   v-model="formData.facility"
@@ -133,7 +149,7 @@
                   :rules="[required]"
                     :disabled="props.readonly"
                 ></v-autocomplete>
-              </v-col>
+              </v-col> -->
             </v-row>
             <v-row>
               <v-col cols="12" md="2">
@@ -145,7 +161,7 @@
                   color="primary"
                   label="سال"
                   type="number"
-                    :disabled="props.readonly"
+                  :disabled="props.readonly"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="2">
@@ -157,7 +173,7 @@
                   color="primary"
                   label="ماه"
                   type="number"
-                    :disabled="props.readonly"
+                  :disabled="props.readonly"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="2">
@@ -169,7 +185,7 @@
                   color="primary"
                   label="روز"
                   type="number"
-                    :disabled="props.readonly"
+                  :disabled="props.readonly"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="2">
@@ -185,7 +201,7 @@
                   readonly
                   suffix="روز"
                   :rules="[required]"
-                    :disabled="props.readonly"
+                  :disabled="props.readonly"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="4">
@@ -196,27 +212,29 @@
                   variant="outlined"
                   density="comfortable"
                   hide-details="auto"
-                 :suffix="dynamicSuffix"
+                  :suffix="dynamicSuffix"
                   :rules="[required]"
-                    :disabled="props.readonly"
+                  :disabled="props.readonly"
                 />
               </v-col>
             </v-row>
             <v-row>
               <v-col cols="12" md="6">
-                  <v-checkbox
-                    :model-value="Boolean(formData.considerPreviousDebt)"
-                    @update:model-value="(value: any) => formData.considerPreviousDebt = Boolean(value)"
-                    label="بدهی قبلی لحاظ شود؟"
-                    density="comfortable"
-                      :disabled="props.readonly"
-                         v-if="formData.approvalType === 'ANNUAL_LIMIT'"
-                  />
-                </v-col>
+                <v-checkbox
+                  :model-value="Boolean(formData.considerPreviousDebt)"
+                  @update:model-value="(value: any) => (formData.considerPreviousDebt = Boolean(value))"
+                  label="بدهی قبلی لحاظ شود؟"
+                  density="comfortable"
+                  :disabled="props.readonly"
+                  v-if="formData.approvalType === 'ANNUAL_LIMIT'"
+                />
+              </v-col>
             </v-row>
             <v-row>
               <v-col cols="12">
-                <v-btn color="primary" variant="tonal" :disabled="props.readonly" @click="showCollateralInputDialog = true" class="mb-4"> افزودن وثیقه </v-btn>
+                <v-btn color="primary" variant="tonal" :disabled="props.readonly" @click="showCollateralInputDialog = true" class="mb-4">
+                  افزودن وثیقه
+                </v-btn>
               </v-col>
             </v-row>
             <v-data-table-virtual
@@ -244,7 +262,16 @@
               <template v-slot:item.actions="{ index }">
                 <v-tooltip location="top" text="حذف وثیقه">
                   <template v-slot:activator="{ props: tooltipProps }">
-                    <v-btn v-if="!props.readonly" variant="text" size="small" color="error" v-bind="tooltipProps" @click="removeCollateralItem(index)"> ❌ </v-btn>
+                    <v-btn
+                      v-if="!props.readonly"
+                      variant="text"
+                      size="small"
+                      color="error"
+                      v-bind="tooltipProps"
+                      @click="removeCollateralItem(index)"
+                    >
+                      ❌
+                    </v-btn>
                   </template>
                 </v-tooltip>
               </template>
@@ -253,7 +280,13 @@
         </v-card-text>
         <v-card-actions>
           <div style="display: flex; justify-content: space-evenly; width: 100%">
-            <v-btn v-if="!props.readonly" color="primary" @click="saveGuarantee" :loading="loading" :disabled="!isFormValid || !collateralRequired">
+            <v-btn
+              v-if="!props.readonly"
+              color="primary"
+              @click="saveGuarantee"
+              :loading="loading"
+              :disabled="!isFormValid || !collateralRequired"
+            >
               {{ 'ذخیره' }}
             </v-btn>
             <v-btn v-if="!props.readonly" color="error" variant="text" @click="closeDialog"> انصراف</v-btn>
@@ -288,6 +321,7 @@
 
 <script setup lang="ts">
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
+import CustomAutocomplete from '@/components/shared/CustomAutocomplete.vue';
 import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { ApprovalTypeOptions } from '@/constants/enums/approval';
 import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
@@ -304,7 +338,10 @@ const approvalStore = useApprovalStore();
 const dialog = ref(false);
 const form = ref();
 const isFormValid = ref(false);
-const guarantee = ref<GuaranteeRequest[]>([]);
+type GuaranteeSelection = { contractType: ContractType };
+type GuaranteeRow = GuaranteeRequest & { contractTypeAndFacilityList?: GuaranteeSelection[] };
+
+const guarantee = ref<GuaranteeRow[]>([]);
 const isEditing = ref(false);
 const editingId = ref<number | null>(null);
 const showCollateralInputDialog = ref(false);
@@ -319,9 +356,15 @@ const selectedCollaterals = ref<
     percent: number;
   }>
 >([]);
-const required = (v: any) => !!v || 'این فیلد الزامی است';
+const required = (v: any) => {
+  if (Array.isArray(v)) {
+    return v.length > 0 || 'این فیلد الزامی است';
+  }
+  return (v !== null && v !== undefined && v !== '') || 'این فیلد الزامی است';
+};
 const contractTypes = ref<ContractType[]>([]);
 const facilityList = ref<FacilityDto[]>([]);
+const contractTypeList = ref<ContractType[]>([]);
 const collateralTableItems = computed(() =>
   selectedCollaterals.value.map((item) => ({
     ...item,
@@ -341,6 +384,8 @@ const emit = defineEmits<{
   (e: 'update:guarantee', guarantee: GuaranteeRequest[]): void;
 }>();
 const collateralRequired = computed(() => selectedCollaterals.value.length > 0);
+const isAnnualLimit = computed(() => formData.approvalType === 'ANNUAL_LIMIT');
+
 const formData = reactive({
   approvalType: '',
   currency: '',
@@ -356,11 +401,42 @@ const formData = reactive({
   considerPreviousDebt: false
 });
 
+const contractTypeModel = computed({
+  get: () => (isAnnualLimit.value ? contractTypeList.value : formData.contractType),
+  set: (value: unknown) => {
+    if (isAnnualLimit.value) {
+      const list = Array.isArray(value) ? (value as ContractType[]) : value ? [value as ContractType] : [];
+      contractTypeList.value = list;
+      formData.contractType = list[0] ?? null;
+      formData.facility = null;
+      const lastSelected = list[list.length - 1] ?? null;
+    } else {
+      const single = Array.isArray(value) ? (value as ContractType[])[0] ?? null : (value as ContractType | null) ?? null;
+      formData.contractType = single;
+      contractTypeList.value = single ? [single] : [];
+      formData.facility = null;
+    }
+  }
+});
+
+const mapToViewRow = (item: GuaranteeRequest): GuaranteeRow => {
+  const existingList = item.contractTypeAndFacilityList;
+  const selections =
+    Array.isArray(existingList) && existingList.length
+      ? existingList.map((entry) => entry.contractType)
+      : item.contractType
+        ? [item.contractType]
+        : [];
+  return {
+    ...item,
+    contractTypeAndFacilityList: selections.map((contract) => ({ contractType: contract }))
+  };
+};
+
 const headers = [
   { title: 'نوع مصوبه', key: 'approvalType', width: '150px' },
   { title: 'نوع ارز', key: 'currency', width: '150px' },
   { title: 'نوع ضمانت نامه', key: 'contractType', width: '150px' },
-  { title: 'نوع محصول', key: 'facility', width: '150px' },
   { title: 'درصد سپرده نقدی', key: 'percentDeposit', width: '200px' },
   { title: 'مدت (روز)', key: 'durationDay', width: '100px' },
   { title: 'مبلغ', key: 'amount', width: '150px' },
@@ -438,14 +514,18 @@ function closeDialog() {
 
 function resetForm() {
   formData.amount = 0;
+  formData.contractType = null;
+  formData.facility = null;
+  contractTypeList.value = [];
+  facilityList.value = [];
   selectedCollaterals.value = [];
   form.value?.reset();
 }
 
-  // Dynamic suffix based on currency code
-  const dynamicSuffix = computed(() => {
-    return formData.currency === 'IRR' ? ' میلیون ریال' : '';
-  });
+// Dynamic suffix based on currency code
+const dynamicSuffix = computed(() => {
+  return formData.currency === 'IRR' ? ' میلیون ریال' : '';
+});
 
 function editItem(item: GuaranteeRequest) {
   isEditing.value = true;
@@ -458,7 +538,15 @@ function editItem(item: GuaranteeRequest) {
   formData.day = item.day || '';
   formData.durationDay = item.durationDay || '';
   selectedCollaterals.value = item.collaterals ? item.collaterals : [];
-  formData.contractType = item.contractType || null;
+  contractTypeList.value =
+    Array.isArray(item.contractTypeAndFacilityList) && item.contractTypeAndFacilityList.length
+      ? item.contractTypeAndFacilityList
+          .map((entry) => entry.contractType)
+          .filter((contract): contract is ContractType => Boolean(contract))
+      : item.contractType
+        ? [item.contractType]
+        : [];
+  formData.contractType = contractTypeList.value[0] || item.contractType || null;
   formData.facility = item.facility || null;
   formData.percentDeposit = item.percentDeposit;
   formData.considerPreviousDebt = item.considerPreviousDebt;
@@ -467,39 +555,69 @@ function editItem(item: GuaranteeRequest) {
 
 function saveGuarantee() {
   if (!isFormValid.value) return;
-  const facilityData: GuaranteeRequest = {
+
+  const selectedContracts = isAnnualLimit.value ? [...contractTypeList.value] : formData.contractType ? [formData.contractType] : [];
+
+  if (selectedContracts.length === 0) {
+    error.value = 'لطفاً حداقل یک نوع ضمانت نامه انتخاب کنید.';
+    showError.value = true;
+    return;
+  }
+
+  const primaryContract = selectedContracts[0];
+  formData.contractType = primaryContract || null;
+
+  const contractSelections: GuaranteeSelection[] = selectedContracts.map((contract) => ({ contractType: contract }));
+
+  const guaranteePayload: GuaranteeRequest = {
     id: editingId.value || Date.now(),
     ...formData,
     contractType: formData.contractType || ({} as ContractType),
     facility: formData.facility || ({} as FacilityDto),
-    collaterals: selectedCollaterals.value
+    collaterals: selectedCollaterals.value,
+    contractTypeAndFacilityList: contractSelections
   };
+
+  const viewRow: GuaranteeRow = { ...guaranteePayload };
+
   if (isEditing.value) {
     const index = guarantee.value.findIndex((f) => f.id === editingId.value);
     if (index !== -1) {
-      guarantee.value[index] = facilityData;
-      emit('edit', facilityData);
+      guarantee.value[index] = viewRow;
+      emit('edit', guaranteePayload);
     }
   } else {
-    guarantee.value.push(facilityData);
-    emit('save', facilityData);
+    guarantee.value = [...guarantee.value.filter((row) => row.id !== viewRow.id), viewRow];
+    emit('save', guaranteePayload);
   }
   closeDialog();
 }
 
-function deleteItem(item: GuaranteeRequest) {
+function deleteItem(item: GuaranteeRow) {
   const index = guarantee.value.findIndex((f) => f.id === item.id);
   if (index !== -1) {
-    guarantee.value.splice(index, 1);
-    emit('delete', item);
+    const [removed] = guarantee.value.splice(index, 1);
+    emit('delete', removed as GuaranteeRequest);
   }
 }
 
-async function fetchFacilities(newContractType: ContractType | null) {
-  if (!newContractType) return;
-  const res = await api.approval.getFacilities(newContractType.coreId, 'GuaranteeType');
-  facilityList.value = res.data.facilityDtoList || [];
-}
+watch(
+  () => formData.approvalType,
+  (newVal, oldVal) => {
+    if (newVal === oldVal) {
+      return;
+    }
+
+    if (newVal === 'ANNUAL_LIMIT') {
+      contractTypeList.value = formData.contractType ? [formData.contractType] : [...contractTypeList.value];
+    } else {
+      const primary = contractTypeList.value[0] ?? formData.contractType ?? null;
+      contractTypeList.value = primary ? [primary] : [];
+      formData.contractType = primary;
+      formData.facility = null;
+    }
+  }
+);
 
 function isObjectEmpty(obj: any): boolean {
   if (!obj) return true;
@@ -511,7 +629,7 @@ onMounted(async () => {
   contractTypes.value = res.data.generalParameterList || [];
   const storeGuarantee = approvalStore.loanRequestDetailList?.guarantee as GuaranteeRequest[] | undefined;
   if (Array.isArray(storeGuarantee) && storeGuarantee.length > 0) {
-    guarantee.value = storeGuarantee;
+    guarantee.value = storeGuarantee.map(mapToViewRow);
   }
 });
 
@@ -520,7 +638,7 @@ watch(
   (newVal: GuaranteeRequest[] | undefined) => {
     const arr = newVal as GuaranteeRequest[] | undefined;
     if (Array.isArray(arr)) {
-      guarantee.value = arr;
+      guarantee.value = arr.map(mapToViewRow);
     }
   },
   { immediate: false, deep: true }
@@ -528,7 +646,7 @@ watch(
 
 watch(
   guarantee,
-  (newVal: GuaranteeRequest[]) => {
+  (newVal: GuaranteeRow[]) => {
     emit('update:guarantee', newVal);
   },
   { deep: true }
