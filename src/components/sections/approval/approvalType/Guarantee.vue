@@ -625,8 +625,8 @@ function isObjectEmpty(obj: any): boolean {
 }
 
 onMounted(async () => {
-  const res = await api.approval.getContractType('GuaranteeType');
-  contractTypes.value = res.data.generalParameterList || [];
+  const res = await api.approval.getGuaranteeType();
+  contractTypes.value = res.data.generalParameters || [];
   const storeGuarantee = approvalStore.loanRequestDetailList?.guarantee as GuaranteeRequest[] | undefined;
   if (Array.isArray(storeGuarantee) && storeGuarantee.length > 0) {
     guarantee.value = storeGuarantee.map(mapToViewRow);

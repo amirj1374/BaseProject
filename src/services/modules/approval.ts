@@ -35,6 +35,9 @@ export default (axiosInstance: AxiosInstance) => ({
       timeout: 60000
     });
   },
+  getGuaranteeType() {
+    return axiosInstance.get("api/v1/general/get-guarantee-type");
+  },
   getFacilities(contractId: number, loanRequestTypeCode: string) {
     return axiosInstance.get("api/v1/general/get-facilities", {
       params: {contractId, loanRequestTypeCode}

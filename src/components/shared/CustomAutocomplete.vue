@@ -149,6 +149,8 @@ function isMainGroup(item: any): boolean {
           :open-delay="tooltipOpenDelay"
           :close-delay="tooltipCloseDelay"
           :text="undefined"
+          width="300px"
+          height="300px"
         >
           <template #activator="{ props: activatorProps }">
             <v-list-item
@@ -160,7 +162,7 @@ function isMainGroup(item: any): boolean {
                 <div class="ca-item-title">
                   {{ resolveTitle(item.raw ?? item) }}
                   <v-chip
-                    size="x-small"
+                    size="small"
                     color="primary"
                     variant="tonal"
                     class="ca-group-chip"
@@ -286,7 +288,7 @@ function isMainGroup(item: any): boolean {
 }
 
 .ca-group-members {
-  max-height: 200px;
+  max-height: 300px;
   overflow-y: auto;
 }
 
