@@ -131,7 +131,7 @@
                     title: 'longTitle',
                     value: 'coreId',
                     group: 'groupId',
-                    isMainGroup: 'isMainGroup',
+                    isMainGroup: 'isMainGroup'
                   }"
                 />
               </v-col>
