@@ -532,21 +532,22 @@ const fetchData = async (queryParams?: Record<string, unknown>) => {
     params = { ...params, ...queryParams };
   }
 
-  // Add pagination params last
-  params = {
-    ...params,
-    page: currentPage.value - 1,
-    size: itemsPerPage.value
-  };
-
   try {
-    const response = await api.fetch(params) as ApiResponse<TableItem>;
-    const serverData = response.data.content || [];
+    const shouldPaginate = props.showPagination !== false;
+    const requestParams = shouldPaginate
+      ? {
+          ...params,
+          page: currentPage.value - 1,
+          size: itemsPerPage.value
+        }
+      : params;
 
-    // Store original server data
+    const response = await api.fetch(requestParams) as ApiResponse<TableItem>;
+    const serverRawData = shouldPaginate ? response.data?.content ?? [] : response.data ?? [];
+    const serverData = Array.isArray(serverRawData) ? serverRawData : [];
+
     originalServerData.value = serverData;
 
-    // Convert dates to Shamsi format for display
     items.value = serverData.map((item: Record<string, any>) => {
       const newItem = { ...item };
       props.headers.forEach((header) => {
@@ -561,13 +562,16 @@ const fetchData = async (queryParams?: Record<string, unknown>) => {
       return newItem;
     });
 
-    totalSize.value = response.data.page.totalElements;
-    totalPages.value = response.data.page.totalPages;
-    hasMore.value = currentPage.value < response.data.page.totalPages;
+    if (shouldPaginate && response.data?.page) {
+      totalSize.value = response.data.page.totalElements;
+      totalPages.value = response.data.page.totalPages;
+      hasMore.value = currentPage.value < response.data.page.totalPages;
+    } else {
+      totalSize.value = serverData.length;
+      totalPages.value = 1;
+      hasMore.value = false;
+    }
 
-    // Grouping is handled automatically by useTableSelection composable
-
-    // Auto-select items if defaultSelected prop is provided
     if (props.defaultSelected && items.value.length > 0 && props.defaultSelected in items.value[0]) {
       const defaultSelectedItems = items.value.filter((item) => item[props.defaultSelected!] === true);
       selectedItems.value = [...defaultSelectedItems];
