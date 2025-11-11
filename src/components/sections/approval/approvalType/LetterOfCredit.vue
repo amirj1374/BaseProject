@@ -280,7 +280,7 @@ import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import { useBaseStore } from '@/stores/base';
 import type { CollateralDto, ContractType, FacilityDto, LcRequest } from '@/types/approval/approvalType';
-import { CreditContractTypeOptions, LcTypeOptions } from '@/types/enums/global';
+import { CreditContractTypeOptions } from '@/types/enums/global';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
 import { IconPencil, IconTrash, IconX } from '@tabler/icons-vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
@@ -457,13 +457,13 @@ function saveLc() {
     collaterals: selectedCollaterals.value
   };
   if (isEditing.value) {
-    const index = lc.value.findIndex((f) => f.id === editingId.value);
-    if (index !== -1) {
-      lc.value[index] = facilityData;
+    const targetId = editingId.value;
+    if (targetId !== null && lc.value.some((f) => f.id === targetId)) {
+      lc.value = lc.value.map((f) => (f.id === targetId ? facilityData : f));
       emit('edit', facilityData);
     }
   } else {
-    lc.value.push(facilityData);
+    lc.value = [...lc.value, facilityData];
   }
   closeDialog();
 }
@@ -471,7 +471,7 @@ function saveLc() {
 function deleteItem(item: LcRequest) {
   const index = lc.value.findIndex((f) => f.id === item.id);
   if (index !== -1) {
-    lc.value.splice(index, 1);
+    lc.value = lc.value.filter((f) => f.id !== item.id);
     emit('delete', item);
   }
 }
@@ -504,15 +504,14 @@ watch(
       lc.value = arr;
     }
   },
-  { immediate: false, deep: true }
+  { immediate: false }
 );
 
 watch(
   lc,
   (newVal) => {
     emit('update:lc', newVal);
-  },
-  { deep: true }
+  }
 );
 
 defineExpose({ lc });

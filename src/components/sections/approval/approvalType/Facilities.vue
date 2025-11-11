@@ -700,9 +700,9 @@ function saveFacility() {
       : undefined
   };
   if (isEditing.value) {
-    const index = facilities.value.findIndex((f) => f.id === editingId.value);
-    if (index !== -1) {
-      facilities.value[index] = facilityData;
+    const targetId = editingId.value;
+    if (targetId !== null && facilities.value.some((f) => f.id === targetId)) {
+      facilities.value = facilities.value.map((f) => (f.id === targetId ? facilityData : f));
       emit('edit', facilityData);
     }
   } else {
@@ -714,7 +714,7 @@ function saveFacility() {
 function deleteItem(item: FacilitiesRequest) {
   const index = facilities.value.findIndex((f) => f.id === item.id);
   if (index !== -1) {
-    facilities.value.splice(index, 1);
+    facilities.value = facilities.value.filter((f) => f.id !== item.id);
     emit('delete', item);
   }
 }
@@ -747,15 +747,14 @@ watch(
       facilities.value = arr;
     }
   },
-  { immediate: false, deep: true }
+  { immediate: false }
 );
 
 watch(
   facilities,
   (newVal) => {
     emit('update:facilities', newVal);
-  },
-  { deep: true }
+  }
 );
 
 defineExpose({ facilities });

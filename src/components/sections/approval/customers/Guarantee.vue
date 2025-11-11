@@ -243,17 +243,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, watch } from 'vue';
-import { IconTrash, IconX, IconPencil } from '@tabler/icons-vue';
+import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
+import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { ApprovalTypeOptions } from '@/constants/enums/approval';
-import { useBaseStore } from '@/stores/base';
 import { RepaymentTypeOptions } from '@/constants/enums/repaymentType';
 import { api } from '@/services/api';
-import MoneyInput from '@/components/shared/MoneyInput.vue';
 import { useApprovalStore } from '@/stores/approval';
+import { useBaseStore } from '@/stores/base';
 import type { CollateralDto, Guarantee } from '@/types/approval/approvalType';
-import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
 import { formatNumberWithCommas } from '@/utils/number-formatter';
+import { IconPencil, IconTrash, IconX } from '@tabler/icons-vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const baseStore = useBaseStore();
 const approvalStore = useApprovalStore();
@@ -420,13 +420,13 @@ function saveGuarantee() {
     collaterals: selectedCollaterals.value
   };
   if (isEditing.value) {
-    const index = guarantee.value.findIndex((f) => f.id === editingId.value);
-    if (index !== -1) {
-      guarantee.value[index] = saveGuaranteeData;
+    const targetId = editingId.value;
+    if (targetId !== null && guarantee.value.some((f) => f.id === targetId)) {
+      guarantee.value = guarantee.value.map((f) => (f.id === targetId ? saveGuaranteeData : f));
       emit('edit', saveGuaranteeData);
     }
   } else {
-    guarantee.value.push(saveGuaranteeData);
+    guarantee.value = [...guarantee.value, saveGuaranteeData];
     emit('save', saveGuaranteeData);
   }
   closeDialog();
@@ -435,7 +435,7 @@ function saveGuarantee() {
 function deleteItem(item: Guarantee) {
   const index = guarantee.value.findIndex((f) => f.id === item.id);
   if (index !== -1) {
-    guarantee.value.splice(index, 1);
+    guarantee.value = guarantee.value.filter((f) => f.id !== item.id);
     emit('delete', item);
   }
 }
@@ -471,7 +471,7 @@ watch(() => approvalStore.customerInfo, (newCustomerInfo) => {
 
 watch(guarantee, (newVal) => {
   emit('update:guarantee', newVal);
-}, { deep: true });
+});
 
 defineExpose({ guarantee });
 </script>

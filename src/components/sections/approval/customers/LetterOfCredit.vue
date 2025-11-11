@@ -253,17 +253,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, watch } from 'vue';
-import { IconTrash, IconX, IconPencil } from '@tabler/icons-vue';
-import { ApprovalTypeOptions } from '@/constants/enums/approval';
-import { useBaseStore } from '@/stores/base';
-import { api } from '@/services/api';
-import MoneyInput from '@/components/shared/MoneyInput.vue';
-import { useApprovalStore } from '@/stores/approval';
-import type { CollateralDto, Lc } from '@/types/approval/approvalType';
 import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
-import { formatNumberWithCommas } from '@/utils/number-formatter';
+import MoneyInput from '@/components/shared/MoneyInput.vue';
+import { ApprovalTypeOptions } from '@/constants/enums/approval';
+import { api } from '@/services/api';
+import { useApprovalStore } from '@/stores/approval';
+import { useBaseStore } from '@/stores/base';
+import type { CollateralDto, Lc } from '@/types/approval/approvalType';
 import { CreditTypeOptions } from '@/types/enums/global';
+import { formatNumberWithCommas } from '@/utils/number-formatter';
+import { IconPencil, IconTrash, IconX } from '@tabler/icons-vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const baseStore = useBaseStore();
 const approvalStore = useApprovalStore();
@@ -447,13 +447,13 @@ function saveLc() {
     collaterals: selectedCollaterals.value
   };
   if (isEditing.value) {
-    const index = lc.value.findIndex((f) => f.id === editingId.value);
-    if (index !== -1) {
-      lc.value[index] = saveLcData;
+    const targetId = editingId.value;
+    if (targetId !== null && lc.value.some((f) => f.id === targetId)) {
+      lc.value = lc.value.map((f) => (f.id === targetId ? saveLcData : f));
       emit('edit', saveLcData);
     }
   } else {
-    lc.value.push(saveLcData);
+    lc.value = [...lc.value, saveLcData];
     emit('save', saveLcData);
   }
   closeDialog();
@@ -462,7 +462,7 @@ function saveLc() {
 function deleteItem(item: Lc) {
   const index = lc.value.findIndex((f) => f.id === item.id);
   if (index !== -1) {
-    lc.value.splice(index, 1);
+    lc.value = lc.value.filter((f) => f.id !== item.id);
     emit('delete', item);
   }
 }
@@ -498,7 +498,7 @@ watch(() => approvalStore.customerInfo, (newCustomerInfo) => {
 
 watch(lc, (newVal) => {
   emit('update:lc', newVal);
-}, { deep: true });
+});
 
 defineExpose({ lc });
 </script>

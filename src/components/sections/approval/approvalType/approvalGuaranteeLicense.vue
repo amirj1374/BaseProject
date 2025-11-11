@@ -347,9 +347,9 @@ import { computed, onMounted, reactive, ref, watch } from 'vue';
       collaterals: selectedCollaterals.value
     };
     if (isEditing.value) {
-      const index = greenLicense.value.findIndex(item => item.id === editingId.value);
-      if (index !== -1) {
-        greenLicense.value[index] = facilityData;
+    const targetId = editingId.value;
+    if (targetId !== null && greenLicense.value.some(item => item.id === targetId)) {
+      greenLicense.value = greenLicense.value.map(item => (item.id === targetId ? facilityData : item));
       }
       emit('edit', facilityData);
     } else {
@@ -378,11 +378,11 @@ import { computed, onMounted, reactive, ref, watch } from 'vue';
     if (Array.isArray(arr)) {
       greenLicense.value = arr;
     }
-  }, { immediate: false, deep: true });
+  }, { immediate: false });
   
   watch(greenLicense, (newVal) => {
     emit('update:greenLicense', newVal);
-  }, { deep: true });
+  });
   
   defineExpose({ greenLicense });
   </script>

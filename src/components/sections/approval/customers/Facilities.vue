@@ -429,13 +429,13 @@ function saveFacility() {
     collaterals: selectedCollaterals.value
   };
   if (isEditing.value) {
-    const index = facilities.value.findIndex((f) => f.id === editingId.value);
-    if (index !== -1) {
-      facilities.value[index] = facilityData;
+    const targetId = editingId.value;
+    if (targetId !== null && facilities.value.some((f) => f.id === targetId)) {
+      facilities.value = facilities.value.map((f) => (f.id === targetId ? facilityData : f));
       emit('edit', facilityData);
     }
   } else {
-    facilities.value.push(facilityData);
+    facilities.value = [...facilities.value, facilityData];
     emit('save', facilityData);
   }
   closeDialog();
@@ -444,7 +444,7 @@ function saveFacility() {
 function deleteItem(item: Facility) {
   const index = facilities.value.findIndex((f) => f.id === item.id);
   if (index !== -1) {
-    facilities.value.splice(index, 1);
+    facilities.value = facilities.value.filter((f) => f.id !== item.id);
     emit('delete', item);
   }
 }
@@ -488,7 +488,7 @@ watch(() => approvalStore.customerInfo, (newCustomerInfo) => {
 
 watch(facilities, (newVal) => {
   emit('update:facilities', newVal);
-}, { deep: true });
+});
 
 defineExpose({ facilities });
 </script>

@@ -190,15 +190,15 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, reactive, onMounted, computed, watch } from 'vue';
-  import { IconTrash, IconX, IconPencil } from '@tabler/icons-vue';
-  import { ApprovalTypeOptions } from '@/constants/enums/approval';
-  import { useBaseStore } from '@/stores/base';
-  import MoneyInput from '@/components/shared/MoneyInput.vue';
-  import { useApprovalStore } from '@/stores/approval';
-  import type { CollateralDto, GreenLicense } from '@/types/approval/approvalType';
   import CollateralInputDialog from '@/components/approval/CollateralInputDialog.vue';
-  import { formatNumberWithCommas } from '@/utils/number-formatter';
+import MoneyInput from '@/components/shared/MoneyInput.vue';
+import { ApprovalTypeOptions } from '@/constants/enums/approval';
+import { useApprovalStore } from '@/stores/approval';
+import { useBaseStore } from '@/stores/base';
+import type { CollateralDto, GreenLicense } from '@/types/approval/approvalType';
+import { formatNumberWithCommas } from '@/utils/number-formatter';
+import { IconPencil, IconTrash, IconX } from '@tabler/icons-vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
   
   const baseStore = useBaseStore();
   const approvalStore = useApprovalStore();
@@ -342,13 +342,13 @@
       collaterals: selectedCollaterals.value
     };
     if (isEditing.value) {
-      const index = greenLicense.value.findIndex((f) => f.id === editingId.value);
-      if (index !== -1) {
-        greenLicense.value[index] = facilityData;
+    const targetId = editingId.value;
+    if (targetId !== null && greenLicense.value.some((f) => f.id === targetId)) {
+      greenLicense.value = greenLicense.value.map((f) => (f.id === targetId ? facilityData : f));
         emit('edit', facilityData);
       }
     } else {
-      greenLicense.value.push(facilityData);
+    greenLicense.value = [...greenLicense.value, facilityData];
       emit('save', facilityData);
     }
     closeDialog();
@@ -357,7 +357,7 @@
   function deleteItem(item: GreenLicense) {
     const index = greenLicense.value.findIndex((f) => f.id === item.id);
     if (index !== -1) {
-      greenLicense.value.splice(index, 1);
+    greenLicense.value = greenLicense.value.filter((f) => f.id !== item.id);
       emit('delete', item);
     }
   }
@@ -393,7 +393,7 @@ watch(() => approvalStore.customerInfo, (newCustomerInfo) => {
 
 watch(greenLicense, (newVal) => {
   emit('update:greenLicense', newVal);
-}, { deep: true });
+});
   
   function deepEqual(a: any, b: any): boolean {
     return JSON.stringify(a) === JSON.stringify(b);

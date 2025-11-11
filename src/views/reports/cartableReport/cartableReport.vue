@@ -86,7 +86,7 @@ const headers = [
     key: 'branchName',
     sortable: true,
     editable: true,
-    width: 200
+    width: 300
   },
   {
     title: 'ایجاد شده توسط',
@@ -115,7 +115,7 @@ const headers = [
     key: 'roleDescription',
     sortable: true,
     editable: true,
-    width: 200
+    width: 300
   }
 ];
 </script>

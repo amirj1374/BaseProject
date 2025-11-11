@@ -315,7 +315,7 @@ function getCustomButtons(cartable: any) {
       ref="tableRef"
       :apiResource="`cartable`"
       :headers="header"
-      :height="500"
+      :height="550"
       :filter-component="FilterCartable"
       :auto-fetch="true"
       :show-pagination="true"

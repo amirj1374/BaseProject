@@ -581,9 +581,9 @@ function saveGuarantee() {
   const viewRow: GuaranteeRow = { ...guaranteePayload };
 
   if (isEditing.value) {
-    const index = guarantee.value.findIndex((f) => f.id === editingId.value);
-    if (index !== -1) {
-      guarantee.value[index] = viewRow;
+    const targetId = editingId.value;
+    if (targetId !== null && guarantee.value.some((row) => row.id === targetId)) {
+      guarantee.value = guarantee.value.map((row) => (row.id === targetId ? viewRow : row));
       emit('edit', guaranteePayload);
     }
   } else {
@@ -596,7 +596,8 @@ function saveGuarantee() {
 function deleteItem(item: GuaranteeRow) {
   const index = guarantee.value.findIndex((f) => f.id === item.id);
   if (index !== -1) {
-    const [removed] = guarantee.value.splice(index, 1);
+    const removed = guarantee.value[index];
+    guarantee.value = guarantee.value.filter((row) => row.id !== item.id);
     emit('delete', removed as GuaranteeRequest);
   }
 }
@@ -641,15 +642,14 @@ watch(
       guarantee.value = arr.map(mapToViewRow);
     }
   },
-  { immediate: false, deep: true }
+  { immediate: false }
 );
 
 watch(
   guarantee,
   (newVal: GuaranteeRow[]) => {
     emit('update:guarantee', newVal);
-  },
-  { deep: true }
+  }
 );
 
 defineExpose({ guarantee });
