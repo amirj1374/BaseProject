@@ -81,17 +81,17 @@ const sidebarItem: menu[] = [
         permissionKey: 'flowManagement'
       },
       {
-        title: 'گروه وثیقه',
+        title: 'گروه اطلاعات پایه',
         icon: IconDatabase,
         to: '/base/collateralsGroup',
         permissionKey: 'flowManagement'
       },
-      {
-        title: 'گروه ضمانتنامه',
-        icon: IconDatabase,
-        to: '/base/guaranteeGroup',
-        permissionKey: 'flowManagement'
-      }
+      // {
+      //   title: 'گروه ضمانتنامه',
+      //   icon: IconDatabase,
+      //   to: '/base/guaranteeGroup',
+      //   permissionKey: 'flowManagement'
+      // }
     ]
   }
 ];

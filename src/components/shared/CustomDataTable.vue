@@ -40,7 +40,7 @@ import type {
 type AutocompleteItemsSource =
   | any[]
   | Ref<any[] | undefined>
-  | (() => any[] | undefined);
+  | ((context?: Record<string, any>) => any[] | undefined);
 
 type EnhancedHeader = Header & {
   autocompleteItems?: AutocompleteItemsSource;
@@ -351,7 +351,7 @@ const hasAutocomplete = (header: Header): header is EnhancedHeader => {
   return Boolean((header as EnhancedHeader).autocompleteItems);
 };
 
-const resolveAutocompleteItems = (header: Header): any[] => {
+const resolveAutocompleteItems = (header: Header, context?: Record<string, any>): any[] => {
   const enhancedHeader = header as EnhancedHeader;
   const source = enhancedHeader.autocompleteItems;
 
@@ -359,7 +359,8 @@ const resolveAutocompleteItems = (header: Header): any[] => {
 
   try {
     if (typeof source === 'function') {
-      return source() ?? [];
+      const baseContext = context ?? formModel.value;
+      return source(baseContext) ?? [];
     }
 
     if (isRef(source)) {
@@ -371,6 +372,29 @@ const resolveAutocompleteItems = (header: Header): any[] => {
   } catch (error) {
     console.error('Error resolving autocomplete items for header:', header.key, error);
     return [];
+  }
+};
+
+const resolveHeaderDefaultValue = (header: Header, context: Record<string, any>): any => {
+  const rawDefault = header.defaultValue;
+
+  if (rawDefault === undefined) {
+    return undefined;
+  }
+
+  try {
+    if (typeof rawDefault === 'function') {
+      return rawDefault(context);
+    }
+
+    if (isRef(rawDefault)) {
+      return unref(rawDefault);
+    }
+
+    return rawDefault;
+  } catch (error) {
+    console.error('Error resolving default value for header:', header.key, error);
+    return undefined;
   }
 };
 
@@ -390,6 +414,23 @@ const resolveAutocompleteReturnObject = (header: Header): boolean => {
 const resolveAutocompleteMultiple = (header: Header): boolean => {
   return (header as EnhancedHeader).autocompleteMultiple === true;
 };
+
+const formHeaders = computed((): Header[] => props.headers as Header[]);
+
+const isMoneyHeader = (header: Header): boolean => {
+  if (!header || typeof header.type !== 'string') {
+    return false;
+  }
+  return header.type.toLowerCase() === 'money';
+};
+
+const getFieldInputType = (header: Header): string | undefined => {
+  return typeof header?.type === 'string' ? header.type : undefined;
+};
+
+const resolveHeaderKey = (header: Header): string => header.key;
+const resolveHeaderTitle = (header: Header): string => header.title;
+const isHeaderDisabled = (header: Header): boolean => header.editable === false;
 
 // Helper function to get unique value from item
 const getUniqueValue = (item: any): string | number => {
@@ -733,7 +774,8 @@ defineExpose({
   groupedItems,
   toggleGroup,
   expandAllGroups,
-  collapseAllGroups
+  collapseAllGroups,
+  formModel
 });
 
 /**
@@ -745,9 +787,17 @@ const openDialog = (item?: any) => {
   dialog.value = true;
 
   if (!isEditing.value) {
+    const defaultContext: Record<string, any> = { ...editedItem.value };
+
     for (const header of props.headers) {
-      if (header.defaultValue !== undefined) {
-        editedItem.value![header.key] = header.defaultValue;
+      if (header.defaultValue === undefined) {
+        continue;
+      }
+
+      const resolvedDefault = resolveHeaderDefaultValue(header, defaultContext);
+      if (resolvedDefault !== undefined) {
+        editedItem.value![header.key] = resolvedDefault;
+        defaultContext[header.key] = resolvedDefault;
       }
     }
   }
@@ -1689,42 +1739,42 @@ const handleFilterApply = (filterData: any) => {
           <component v-if="props.formComponent" :is="props.formComponent" v-model="formModel" />
           <template v-else>
             <v-row>
-              <v-col v-for="header in props.headers" :key="header.key" cols="12" md="4">
+              <v-col v-for="header in formHeaders" :key="resolveHeaderKey(header)" cols="12" md="4">
                 <template v-if="!header.hidden">
                   <ShamsiDatePicker
                     v-if="header.isDate"
-                    v-model="formModel[header.key]"
-                    :label="header.title"
-                    :disabled="header.editable === false"
+                    v-model="formModel[resolveHeaderKey(header)]"
+                    :label="resolveHeaderTitle(header)"
+                    :disabled="isHeaderDisabled(header)"
                   />
                   <v-autocomplete
                     v-else-if="hasAutocomplete(header)"
-                    v-model="formModel[header.key]"
-                    :label="header.title"
-                    :items="resolveAutocompleteItems(header)"
+                    v-model="formModel[resolveHeaderKey(header)]"
+                    :label="resolveHeaderTitle(header)"
+                    :items="resolveAutocompleteItems(header, formModel.value)"
                     :item-title="resolveAutocompleteItemTitle(header)"
                     :item-value="resolveAutocompleteItemValue(header)"
                     :return-object="resolveAutocompleteReturnObject(header)"
                     :multiple="resolveAutocompleteMultiple(header)"
                     :chips="resolveAutocompleteMultiple(header)"
                     :closable-chips="resolveAutocompleteMultiple(header)"
-                    :disabled="header.editable === false"
+                    :disabled="isHeaderDisabled(header)"
                     clearable
                     variant="outlined"
                   />
                   <MoneyInput
-                    v-else-if="String(header.type).toLowerCase() === 'money'"
-                    v-model="formModel[header.key] as number"
-                    :label="header.title"
-                    :disabled="header.editable === false"
+                    v-else-if="isMoneyHeader(header)"
+                    v-model="formModel[resolveHeaderKey(header)] as number"
+                    :label="resolveHeaderTitle(header)"
+                    :disabled="isHeaderDisabled(header)"
                   />
                   <v-text-field
                     v-else
-                    v-model="formModel[header.key]"
-                    :label="header.title"
+                    v-model="formModel[resolveHeaderKey(header)]"
+                    :label="resolveHeaderTitle(header)"
                     variant="outlined"
-                    :disabled="header.editable === false"
-                    :type="header.type"
+                    :disabled="isHeaderDisabled(header)"
+                    :type="getFieldInputType(header)"
                   />
                 </template>
               </v-col>

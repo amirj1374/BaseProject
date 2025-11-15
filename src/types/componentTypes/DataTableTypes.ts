@@ -2,6 +2,7 @@
  * Enhanced type definitions for CustomDataTable component
  * Replaces all 'any' types with proper TypeScript types
  */
+import type { Ref } from 'vue';
 
 export interface TableItem {
   id?: string | number;
@@ -17,7 +18,7 @@ export interface Header {
   filterable?: boolean;
   width?: number;
   hidden?: boolean;
-  defaultValue?: string | number | boolean;
+  defaultValue?: unknown;
   isDate?: boolean;
   style?: Record<string, string>;
   translate?: boolean;
@@ -27,6 +28,11 @@ export interface Header {
   customRenderer?: (item: TableItem) => string | number | boolean;
   formatter?: (value: unknown, item: TableItem) => string;
   type?: string;
+  autocompleteItems?: any[] | Ref<any[] | undefined> | ((context?: Record<string, any>) => any[] | undefined);
+  autocompleteItemTitle?: string;
+  autocompleteItemValue?: string;
+  autocompleteReturnObject?: boolean;
+  autocompleteMultiple?: boolean;
 }
 
 export interface CustomAction {
