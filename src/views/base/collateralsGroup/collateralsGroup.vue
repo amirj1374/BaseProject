@@ -110,23 +110,29 @@ const headers = [
     key: 'children',
     sortable: true,
     width: 200,
-    nestedKey: 'children',
+    nestedKey: 'children.description',
     // Custom formatter example
     formatter: (_value: any, item: any) => {
       if (!Array.isArray(item?.children) || item.children.length === 0) {
         return ' - ';
       }
       return item.children
-        .map((child: { name?: string }) => child?.name ?? '')
+        .map((child: { name?: string; description?: string }) => child?.description ?? '')
         .filter(Boolean)
         .join(' - ');
     },
     autocompleteItems: (context?: Record<string, any>) => resolveChildrenOptionsForGroup(context?.groupId),
-    autocompleteItemTitle: 'name',
-    autocompleteItemValue: 'code',
+    autocompleteItemTitle: 'description',
+    autocompleteItemValue: 'collateralTypeCode',
     autocompleteMultiple: true,
     autocompleteReturnObject: true,
-    defaultValue: (context: Record<string, any>) => resolveChildrenOptionsForGroup(context.groupId)
+    defaultValue: (context: Record<string, any>) => {
+      const existing = Array.isArray(context?.children) ? context.children : [];
+      if (existing.length > 0) {
+        return existing;
+      }
+      return [];
+    }
   }
 ];
 

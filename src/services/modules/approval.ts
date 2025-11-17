@@ -85,7 +85,7 @@ export default (axiosInstance: AxiosInstance) => ({
   },
 
   getAllDeposit(loanRequestId: string) {
-    return axiosInstance.get('api/v1/deposit-info/get-all-deposit', {params: {loanRequestId}});
+    return axiosInstance.get('api/v1/deposit-info/get-all-deposit', {params: {loanRequestId},timeout: 50000});
   },
 
   getActiveDeposit(loanRequestId: string) {
