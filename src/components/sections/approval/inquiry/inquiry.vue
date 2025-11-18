@@ -324,7 +324,7 @@ defineExpose({ submitData });
             <template v-else-if="sapData">
               <div><b>برچسب : </b> {{ sapData?.label || 'نامشخص' }}</div>
               <div><b>وثیقه : </b> {{ sapData?.collateral || 'نامشخص' }}</div>
-              <div><b>مبلغ : </b> {{ formatNumberWithCommas(sapData?.value?.toLocaleString() || 'نامشخص') }}</div>
+              <div><b>رتبه اعتباری : </b> {{ formatNumberWithCommas(sapData?.value?.toLocaleString() || 'فاقد رتبه') }}</div>
             </template>
             <template v-else>
               <div class="text-center text-error">
