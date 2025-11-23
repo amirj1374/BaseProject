@@ -1,73 +1,63 @@
 <script setup lang="ts">
-import { useCustomerInfoStore } from '@/stores/customerInfo';
-import { useCustomizerStore } from '@/stores/customizer';
 import { computed } from 'vue';
-import sidebarItems, { getFilteredSidebarItems } from './sidebarItem';
+import { useCustomizerStore } from '@/stores/customizer';
+import { useCustomerInfoStore } from '@/stores/customerInfo';
+import sidebarItems, { getFilteredSidebarItems, type menu } from './sidebarItem';
 
-import Logo from '../logo/LogoMain.vue';
-import NavCollapse from './NavCollapse/NavCollapse.vue';
-import NavGroup from './NavGroup/NavGroup.vue';
-import NavItem from './NavItem/NavItem.vue';
+import { AppSidebar } from '@amirjalili1374/ui-kit';
+import LogoDark from '../logo/LogoDark.vue';
+import { useRoute } from 'vue-router';
 
 const customizer = useCustomizerStore();
+const route = useRoute();
 const customerInfo = useCustomerInfoStore();
 
-// Use filtered menu items based on user permissions
-const sidebarMenu = computed(() => {
-  // Only filter menu items if user info is loaded and has roles
-  if (customerInfo.isUserInfoLoaded && customerInfo.getUserRoles.length > 0) {
-    const filteredItems = getFilteredSidebarItems();
-    console.log('Sidebar: Filtered menu items:', filteredItems.length, 'out of', sidebarItems.length);
-    return filteredItems;
-  }
-  // Return all items if user info is not loaded yet or has no roles
-  // This ensures sidebar is always visible during loading or if permissions fail
-  console.log('Sidebar: Using all menu items (user info not loaded or no roles)');
-  return sidebarItems;
-});
+interface CustomMenuItem {
+  title: string;
+  to?: string;
+  icon?: any;
+  disabled?: boolean;
+  items?: CustomMenuItem[];
+  chipContent?: string;
+  chipColor?: string;
+}
+
+function toMenuItems(items: menu[]): CustomMenuItem[] {
+  return items.map((it) => ({
+    title: it.title || '',
+    to: it.to,
+    icon: it.icon as unknown as any,
+    disabled: it.disabled,
+    items: it.children ? toMenuItems(it.children) : undefined,
+    chipContent: it.chip,
+    chipColor: it.chipColor || 'primary',
+  }));
+}
+
+const rawMenu = computed<menu[]>(() =>
+  customerInfo.isUserInfoLoaded ? getFilteredSidebarItems() : sidebarItems
+);
+
+const sidebarMenu = computed<CustomMenuItem[]>(() => toMenuItems(rawMenu.value));
+
+function hasActiveChild(children: menu[]): boolean {
+  return children.some((child) => {
+    if (!child.to) return false;
+    return route.path === child.to || route.path.startsWith(child.to + '/');
+  });
+}
 </script>
 
 <template>
-  <v-navigation-drawer
-    right
-    v-model="customizer.Sidebar_drawer"
-    elevation="0"
-    rail-width="80"
-    mobile-breakpoint="lg"
-    app
-    :class="['rightSidebar', { 'sidebar-closed': !customizer.Sidebar_drawer }]"
-    :rail="customizer.mini_sidebar"
-  >
-    <!---Logo part -->
-
-    <div class="pa-5">
-      <Logo />
-    </div>
-    <!-- ---------------------------------------------- -->
-    <!---Navigation -->
-    <!-- ---------------------------------------------- -->
-    <perfect-scrollbar class="scrollnavbar">
-      <v-list class="pa-4">
-        <!---Menu Loop -->
-        <template v-for="(item, i) in sidebarMenu" :key="i">
-          <!---Item Sub Header -->
-          <NavGroup :item="item" v-if="item.header" :key="item.title" />
-          <!---Item Divider -->
-          <v-divider class="my-3" v-else-if="item.divider" />
-          <!---If Has Child -->
-          <NavCollapse class="leftPadding" :item="item" :level="0" v-else-if="item.children" />
-          <!---Single Item-->
-          <NavItem :item="item" v-else class="leftPadding" />
-          <!---End Single Item-->
-        </template>
-      </v-list>
-      <div v-if="customizer.Sidebar_drawer" class="pa-4 text-center">
-        <v-chip color="inputBorder" size="small">نمایشی</v-chip>
-      </div>
-    </perfect-scrollbar>
-  </v-navigation-drawer>
+  <AppSidebar
+    :sidebar-items="rawMenu"
+    :get-filtered-sidebar-items="getFilteredSidebarItems"
+    :logo-component="LogoDark"
+    :sidebar-drawer="customizer.Sidebar_drawer"
+    :mini-sidebar="customizer.mini_sidebar"
+    @update:sidebarDrawer="customizer.SET_SIDEBAR_DRAWER"
+  />
 </template>
-
 <style>
 /* Completely hide text when sidebar is closed */
 .rightSidebar.sidebar-closed .v-list-item-title,

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { onMounted, ref, watch, defineAsyncComponent, computed, nextTick } from 'vue';
 import { api } from '@/services/api';
-import type { FacilitiesRequest, GuaranteeRequest, LcRequest, GreenLicense } from '@/types/approval/approvalType';
+import type { FacilitiesRequest, GreenLicense, GuaranteeRequest, LcRequest } from '@/types/approval/approvalType';
+import { computed, defineAsyncComponent, nextTick, onMounted, ref, watch } from 'vue';
 
 // Use dynamic imports for heavy components
 const Facilities = defineAsyncComponent(() => import('@/components/sections/approval/approvalType/Facilities.vue'));
@@ -73,10 +73,12 @@ const fetchApprovalRequestData = async () => {
     
     if (response && response.status === 200 && response.data) {
       const data = response.data;
-      facilitiesData.value = data.facilities ? [data.facilities] : [];
-      guaranteeData.value = data.guarantee ? [data.guarantee] : [];
-      lcData.value = data.lc ? [data.lc] : [];
-      greenLicenseData.value = data.greenLicense ? [data.greenLicense] : [];
+      console.log('data', data);
+      // API returns arrays directly, so use them as-is
+      facilitiesData.value = Array.isArray(data.facilities) ? data.facilities : [];
+      guaranteeData.value = Array.isArray(data.guarantee) ? data.guarantee : [];
+      lcData.value = Array.isArray(data.lc) ? data.lc : [];
+      greenLicenseData.value = Array.isArray(data.greenLicense) ? data.greenLicense : [];
     }
   } catch (err) {
     console.error('Error fetching approval request data:', err);

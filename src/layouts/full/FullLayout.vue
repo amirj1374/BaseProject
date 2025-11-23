@@ -1,32 +1,18 @@
 <script setup lang="ts">
-import Loading from '@/components/Loading.vue';
-import { useCustomizerStore } from '@/stores/customizer';
-import { onMounted, onUnmounted, ref } from 'vue';
 import { RouterView } from 'vue-router';
-import Customizer from './customizer/CustomizerPanel.vue';
-import VerticalHeaderVue from './vertical-header/VerticalHeader.vue';
+import { computed } from 'vue';
 import VerticalSidebarVue from './vertical-sidebar/VerticalSidebar.vue';
+import VerticalHeaderVue from './vertical-header/VerticalHeader.vue';
+import Customizer from './customizer/CustomizerPanel.vue';
+import { useCustomizerStore } from '@/stores/customizer';
+import Loading from '@/components/Loading.vue';
 
 const customizer = useCustomizerStore();
 
-// Global notification system
-const showNotification = ref(false);
-const notificationMessage = ref('');
-const notificationType = ref<'success' | 'error' | 'warning'>('error');
-
-function handleGlobalNotification(event: CustomEvent) {
-  const { message, type } = event.detail;
-  notificationMessage.value = message;
-  notificationType.value = type;
-  showNotification.value = true;
-}
-
-onMounted(() => {
-  window.addEventListener('show-notification', handleGlobalNotification as EventListener);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('show-notification', handleGlobalNotification as EventListener);
+// Computed property to ensure sidebar is shown
+const showSidebar = computed(() => {
+  const orientation = customizer.menuOrientation || 'vertical';
+  return orientation === 'vertical';
 });
 
 </script>
@@ -39,8 +25,8 @@ onUnmounted(() => {
     >
       <Customizer />
       <!-- Show sidebar when menu orientation is vertical -->
-      <VerticalSidebarVue v-if="customizer.menuOrientation === 'vertical'"/>
-      <VerticalHeaderVue/>
+      <VerticalSidebarVue v-if="customizer.menuOrientation === 'vertical'" />
+      <VerticalHeaderVue />
       <v-main>
         <Loading/>
         <v-container fluid class="page-wrapper">
@@ -58,21 +44,18 @@ onUnmounted(() => {
           </div>
         </v-container>
       </v-main>
-      
-      <!-- Global Notification Snackbar -->
-      <v-snackbar 
-        v-model="showNotification" 
-        :color="notificationType === 'error' ? 'error' : notificationType === 'warning' ? 'warning' : 'success'"
-        :timeout="5000" 
-        location="top"
-      >
-        {{ notificationMessage }}
-        <template v-slot:actions>
-          <v-btn color="white" variant="text" @click="showNotification = false">
-            بستن
-          </v-btn>
-        </template>
-      </v-snackbar>
     </v-app>
   </v-locale-provider>
 </template>
+<style lang="scss">
+// Ensure sidebar and main content are positioned correctly below fixed header
+:deep(.v-navigation-drawer.app-sidebar),
+:deep(.v-navigation-drawer.rightSidebar) {
+  top: 80px !important;
+  height: calc(100vh - 80px) !important;
+}
+
+:deep(.v-main) {
+  padding-top: 80px !important;
+}
+</style>
