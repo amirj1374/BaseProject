@@ -133,7 +133,6 @@ const required = (v: any) => (needsComment.value ? (!!v || 'این فیلد ال
           :url="props.item.formCreditApprovalUrl"
           title="دانلود فرم پیش مصوبه اعتبارات"
           color="secondary"
-          variant="tonal"
           filename="credit-approval-form.pdf"
         />
       </v-col>

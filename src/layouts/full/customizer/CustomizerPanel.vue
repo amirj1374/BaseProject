@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
-import { useCustomizerStore } from '@/stores/customizer';
-import { IconSun, IconMoon } from '@tabler/icons-vue';
 import { api } from '@/services/api';
+import { useCustomizerStore } from '@/stores/customizer';
 import type { CustomizerDTO } from '@/types/models/person';
+import { IconMoon, IconSun } from '@tabler/icons-vue';
+import { onMounted, ref, watch } from 'vue';
 
 const customizer = useCustomizerStore();
 
@@ -364,7 +364,7 @@ onMounted(() => {
                   <div class="d-flex gap-2">
                     <v-btn
                       variant="outlined"
-                      :color="!customizer.Sidebar_drawer ? 'primary' : 'grey'"
+                      :color="customizer.menuOrientation === 'vertical' ? 'primary' : 'grey'"
                       @click="customizer.SET_MENU_ORIENTATION('vertical')"
                       class="flex-1"
                     >
@@ -372,7 +372,7 @@ onMounted(() => {
                     </v-btn>
                     <v-btn
                       variant="outlined"
-                      :color="customizer.Sidebar_drawer ? 'primary' : 'grey'"
+                      :color="customizer.menuOrientation === 'horizontal' ? 'primary' : 'grey'"
                        @click="customizer.SET_MENU_ORIENTATION('horizontal')"
                       class="flex-1"
                     >

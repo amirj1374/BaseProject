@@ -26,11 +26,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, defineAsyncComponent, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { api } from '@/services/api';
 import AppStepper from '@/components/common/AppStepper.vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
+import { api } from '@/services/api';
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
 
 const { id } = useRoute().params;
 const stepper = ref(1);
@@ -40,6 +40,12 @@ const error = ref<string | null>(null);
 const showError = ref(false);
 const loanRequestId = ref<string>('');
 
+onMounted(async () => {
+  const response = await api.cartable.getApprovalByCase(id as string);
+  if (response.status === 200) {
+    console.log('Approval by case:', response.data);
+  }
+});
 // Steps array for AppStepper
 const steps = [
   {

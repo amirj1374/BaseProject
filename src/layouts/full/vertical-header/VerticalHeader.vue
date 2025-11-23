@@ -84,7 +84,7 @@ const headerMenu = computed(() => {
           class="header-menu-btn mr-3"
           color="primary"
         >
-          <component :is="item.icon" v-if="item.icon" class="mr-2" size="18" />
+          <component :is="item.icon" v-if="item.icon" class="ml-2" size="18" />
           <span>{{ item.title }}</span>
           <v-chip
             v-if="item.chip"
@@ -92,7 +92,7 @@ const headerMenu = computed(() => {
             :size="item.chipIcon ? 'small' : 'default'"
             :variant="item.chipVariant as any"
             :prepend-icon="item.chipIcon"
-            class="ml-2"
+            class="mr-2"
           >
             {{ item.chip }}
           </v-chip>

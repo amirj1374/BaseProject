@@ -64,7 +64,11 @@ export default createVuetify({
       rounded: 'md'
     },
     VTextField: {
-      rounded: 'lg'
+      rounded: 'lg',
+      variant: 'outlined'
+    },
+    VSelect: {
+      variant: 'outlined'
     },
     VTooltip: {
       // set v-tooltip default location to top

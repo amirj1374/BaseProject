@@ -100,6 +100,10 @@ export default (axiosInstance: AxiosInstance) => ({
   getCarableIdtDetail(cartableId: string) {
     return axiosInstance.get(`api/v1/general/more-approval-detail?cartableId=${cartableId}`);
   },
+
+  getApprovalByCase(cartableId: string) {
+    return axiosInstance.get(`api/v1/general/more-approval-detail?cartableId=${cartableId}&approvalType=Case`);
+  },
   getCreditSuggestion(cartableId: string) {
     return axiosInstance.get(`api/v1/credit-suggestions?cartableId=${cartableId}`);
   },

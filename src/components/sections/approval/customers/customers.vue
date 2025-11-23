@@ -286,7 +286,6 @@ defineExpose({ submitData });
             v-model="searchParam"
             :items="searchTypes"
             label="نوع جستجو"
-            variant="outlined"
             density="comfortable"
             :disabled="customizerStore.loading || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
             @update:model-value="changePattern"
@@ -307,7 +306,6 @@ defineExpose({ submitData });
           <v-text-field
             v-model="formData.cif"
             label="شماره مشتری"
-            variant="outlined"
             density="comfortable"
             :disabled="customizerStore.loading || approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION'"
             :error-messages="errors.cif"
