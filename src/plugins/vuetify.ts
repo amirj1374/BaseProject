@@ -12,6 +12,7 @@ import { OrangeTheme } from '@/theme/lightThemes/OrangeTheme';
 import { SteelTealGreen } from '@/theme/lightThemes/SteelTealGreen';
 import { TealTheme } from '@/theme/lightThemes/TealTheme';
 import { SilverTheme } from '@/theme/lightThemes/SilverTheme';
+import { NavyGoldTheme } from '@/theme/lightThemes/NavyGoldTheme';
 
 // Dark Themes
 import { DarkModernTheme } from '@/theme/darkThemes/DarkModernTheme';
@@ -21,6 +22,7 @@ import { DarkSteelTealGreen } from '@/theme/darkThemes/DarkSteelTealGreen';
 import { DarkTealTheme } from '@/theme/darkThemes/DarkTealTheme';
 import { DarkSilverTheme } from '@/theme/darkThemes/DarkSilverTheme';
 import { DarkRedTheme } from '@/theme/darkThemes/DarkRedTheme';
+import { DarkNavyGoldTheme } from '@/theme/darkThemes/DarkNavyGoldTheme';
 
 
 
@@ -48,6 +50,7 @@ export default createVuetify({
       SteelTealGreen,
       TealTheme,
       SilverTheme,
+      NavyGoldTheme,
       // Dark Themes
       DarkModernTheme,
       DarkOrangeTheme,
@@ -55,7 +58,8 @@ export default createVuetify({
       DarkSteelTealGreen,
       DarkTealTheme,
       DarkSilverTheme,
-      DarkRedTheme
+      DarkRedTheme,
+      DarkNavyGoldTheme
     }
   },
   defaults: {

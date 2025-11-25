@@ -22,13 +22,15 @@ const validThemes = [
   'TealTheme',
   'SilverTheme',
   'RedTheme',
+  'NavyGoldTheme',
   'DarkModernTheme',
   'DarkPurpleTheme',
   'DarkSteelTealGreen',
   'DarkOrangeTheme',
   'DarkTealTheme',
   'DarkSilverTheme',
-  'DarkRedTheme'
+  'DarkRedTheme',
+  'DarkNavyGoldTheme'
 ];
 
 // Valid layout types
@@ -78,6 +80,11 @@ const colorPalette = ref([
     themeName: 'RedTheme',
     primary: '#203461',
     secondary: '#EC407A'
+  },
+  {
+    themeName: 'NavyGoldTheme',
+    primary: '#FFD43B',
+    secondary: '#001F54'
   }
 ]);
 

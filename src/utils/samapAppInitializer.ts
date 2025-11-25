@@ -14,13 +14,15 @@ const validThemes = [
   'TealTheme',
   'SilverTheme',
   'RedTheme',
+  'NavyGoldTheme',
   'DarkModernTheme',
   'DarkPurpleTheme',
   'DarkSteelTealGreen',
   'DarkOrangeTheme',
   'DarkTealTheme',
   'DarkSilverTheme',
-  'DarkRedTheme'
+  'DarkRedTheme',
+  'DarkNavyGoldTheme'
 ] as const;
 
 const validLayoutTypes = ['SideBar', 'NavBar'] as const;
