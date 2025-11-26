@@ -83,7 +83,7 @@ const sidebarItem: menu[] = [
       {
         title: 'گروه اطلاعات پایه',
         icon: IconDatabase,
-        to: '/base/collateralsGroup',
+        to: '/base/baseGroup',
         permissionKey: 'flowManagement'
       },
       // {

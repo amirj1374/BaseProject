@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { CustomDataTable } from '@amirjalili1374/ui-kit';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import { useCustomizerStore } from '@/stores/customizer';
@@ -32,7 +32,7 @@ const selectedFile = ref<File | null>(null);
 const showImageDialog = ref(false);
 const imageDialogUrl = ref<string | null>(null);
 const isPdf = ref<boolean>(false);
-const description= ref<string | null>(null);
+const description = ref<string | null>(null);
 const dataTableRef = ref();
 
 function fixUrl(url: string): string {
@@ -88,12 +88,15 @@ function openImageDialog(url: string) {
 
   img.src = fixedUrl;
 }
-watch(() => showUploadDialog.value, (newDialog) => {
-  if (newDialog === false) {
-    selectedFile.value = null 
-    description.value = null
+watch(
+  () => showUploadDialog.value,
+  (newDialog) => {
+    if (newDialog === false) {
+      selectedFile.value = null;
+      description.value = null;
+    }
   }
-});
+);
 const headers = [
   { title: 'عنوان مدرک', key: 'fileName' },
   { title: 'توضیحات', key: 'description' }
@@ -122,7 +125,7 @@ const handleFileUpload = async () => {
     formData.append('file', selectedFile.value);
     formData.append('customerNumber', selectedDoc.value.nationalCode);
     formData.append('docTypeCode', selectedDoc.value.fileType);
-    formData.append('description',description.value || '');
+    formData.append('description', description.value || '');
     formData.append('loanRequestId', selectedDoc.value.loanRequestId.toString());
     const response = await api.approval.saveDoc(formData);
     if (response.status === 200) {
@@ -142,9 +145,9 @@ const handleFileUpload = async () => {
     }
   } catch (err: any) {
     error.value = err.message || 'خطا در آپلود فایل';
-    customizerStore.loading = false
+    customizerStore.loading = false;
   } finally {
-    customizerStore.loading = false
+    customizerStore.loading = false;
     selectedFile.value = null;
   }
 };
@@ -153,9 +156,9 @@ function getCustomButtons(doc: any) {
   const hasImage = !!(doc.filePath && doc.filePath.match(/\.(jpg|jpeg|png|pdf)$/i));
   const hasFile = !!doc.filePath;
   const isEditDisabled = approvalStore.loanRequestStatus === 'CORRECT_FROM_REGION';
-  
+
   const buttons = [];
-  
+
   // Upload button (always enabled)
   if (!hasFile) {
     buttons.push({
@@ -165,7 +168,7 @@ function getCustomButtons(doc: any) {
       disabled: false
     });
   }
-  
+
   // Edit button (disabled when condition is met)
   if (hasFile) {
     buttons.push({
@@ -175,7 +178,7 @@ function getCustomButtons(doc: any) {
       disabled: isEditDisabled
     });
   }
-  
+
   // View image button
   buttons.push({
     label: 'مشاهده تصویر مدرک',
@@ -185,7 +188,7 @@ function getCustomButtons(doc: any) {
     },
     disabled: !hasImage
   });
-  
+
   return buttons;
 }
 // Image handling functions
@@ -225,7 +228,7 @@ defineExpose({ submitData });
       <CustomDataTable
         ref="dataTableRef"
         :headers="headers"
-        api-resource="general/get-all-doc"
+        api-resource="back/api/v1/general/get-all-doc"
         :query-params="{ loanRequestId: approvalStore.loanRequestId }"
         :show-refresh-button="true"
         :auto-fetch="true"
@@ -244,17 +247,30 @@ defineExpose({ submitData });
     <v-card>
       <v-card-title class="d-flex justify-space-between align-center">
         <span>آپلود مدرک</span>
-        <v-btn variant="text" @click="showUploadDialog = false" >
+        <v-btn variant="text" @click="showUploadDialog = false">
           <IconX size="16" />
         </v-btn>
       </v-card-title>
       <v-card-text>
-        <v-file-input v-model="selectedFile" variant="outlined" label="انتخاب فایل" accept=".pdf,.jpg,.jpeg,.png" :loading="customizerStore.loading" :disabled="customizerStore.loading" />
+        <v-file-input
+          v-model="selectedFile"
+          variant="outlined"
+          label="انتخاب فایل"
+          accept=".pdf,.jpg,.jpeg,.png"
+          :loading="customizerStore.loading"
+          :disabled="customizerStore.loading"
+        />
         <v-textarea v-model="description" label="توضیحات" rows="3" variant="outlined"></v-textarea>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn color="primary" :loading="customizerStore.loading" :disabled="!selectedFile || customizerStore.loading" @click="handleFileUpload" variant="outlined">
+        <v-btn
+          color="primary"
+          :loading="customizerStore.loading"
+          :disabled="!selectedFile || customizerStore.loading"
+          @click="handleFileUpload"
+          variant="outlined"
+        >
           آپلود
         </v-btn>
       </v-card-actions>
@@ -275,7 +291,7 @@ defineExpose({ submitData });
             <img
               :src="imageDialogUrl"
               alt="تصویر"
-              style="max-width: 100%; max-height: 400px; min-height: 200px; border-radius: 8px; object-fit: contain; background: #f5f5f5;"
+              style="max-width: 100%; max-height: 400px; min-height: 200px; border-radius: 8px; object-fit: contain; background: #f5f5f5"
               @error="handleImageError"
               @load="handleImageLoad"
             />
@@ -283,7 +299,7 @@ defineExpose({ submitData });
           <template v-else>
             <iframe
               :src="imageDialogUrl"
-              style="width: 100%; height: 80vh; min-height: 400px; border: none; border-radius: 8px; background: #f5f5f5;"
+              style="width: 100%; height: 80vh; min-height: 400px; border: none; border-radius: 8px; background: #f5f5f5"
             ></iframe>
           </template>
           <div v-if="error" class="error-message mt-3">

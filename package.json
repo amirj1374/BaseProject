@@ -29,7 +29,7 @@
     "serve": "vue-cli-service serve"
   },
   "dependencies": {
-    "@amirjalili1374/ui-kit": "^1.4.6",
+    "@amirjalili1374/ui-kit": "^1.4.8",
     "@dsb-norge/vue-keycloak-js": "^3.0.3",
     "@mdi/js": "^7.4.47",
     "@tabler/icons-vue": "^3.33.0",

@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 import { IconSettings, IconLogout, IconUser } from '@tabler/icons-vue';
 import { useAuthStore } from '@/stores/auth';
 import { useCustomerInfoStore } from '@/stores/customerInfo';
-import { GreetingUtils } from '@/utils/greetingUtils';
+import { GreetingUtils } from '@amirjalili1374/ui-kit';
 
 const swt1 = ref(true);
 const swt2 = ref(false);

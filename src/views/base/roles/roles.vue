@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import FilterRole from '@/components/sections/roles/filter/FilterRole.vue';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { CustomDataTable,BaseBreadcrumb } from '@amirjalili1374/ui-kit';
 import { BooleanEnumOptions } from '@/types/enums/global';
 import { h, ref } from 'vue';
 
@@ -78,7 +77,7 @@ function handleReferenceSuccess() {
   <div class="upload-form">
     <CustomDataTable
       ref="tableRef"
-      :apiResource="`department-role`"
+      :apiResource="`back/api/v1/department-role`"
       :headers="header"
       :height="550"
       :auto-fetch="true"

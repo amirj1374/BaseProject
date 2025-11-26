@@ -7,8 +7,8 @@ import Reference from '@/components/sections/cartable/reference/Reference.vue';
 import Sign from '@/components/sections/cartable/sign/Sign.vue';
 import SignList from '@/components/sections/cartable/signList/SignList.vue';
 import UploadList from '@/components/sections/cartable/uploadList/uploadList.vue';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+//kit
+import { CustomDataTable,BaseBreadcrumb } from '@amirjalili1374/ui-kit';
 import { api } from '@/services/api';
 import { usePermissionsStore } from '@/stores/permissions';
 import { CartableStatusTypeOptions, CustomerTypeOptions } from '@/types/enums/global';
@@ -313,7 +313,7 @@ function getCustomButtons(cartable: any) {
     <CustomDataTable
       :key="tableKey"
       ref="tableRef"
-      :apiResource="`cartable`"
+      :apiResource="`back/api/v1/cartable`"
       :headers="header"
       :height="550"
       :filter-component="FilterCartable"

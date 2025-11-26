@@ -4,8 +4,7 @@ import { onMounted, ref, watch, computed } from 'vue';
 import { api } from '@/services/api';
 import type { ConsiderationPayload } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
-import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
-import MoneyInput from '@/components/shared/MoneyInput.vue';
+import { ShamsiDatePicker, MoneyInput } from '@amirjalili1374/ui-kit';
 
 const isDialogActive = ref(false);
 const loading = ref(false);
@@ -125,7 +124,7 @@ defineExpose({ valid });
 <template>
   <v-btn size="large" :base-color="valid ? 'lightsuccess' : 'lighterror'" @click="isDialogActive = true">
     ملاحظات
-    <IconAlertCircle v-if="!valid" style="margin-right: 20px" size="20"/>
+    <IconAlertCircle v-if="!valid" style="margin-right: 20px" size="20" />
     <IconCircleCheck v-if="valid" style="margin-right: 20px" size="20" />
   </v-btn>
   <v-dialog min-width="full" min-height="full" v-model="isDialogActive">
@@ -133,7 +132,12 @@ defineExpose({ valid });
       <v-card-text>
         <v-row>
           <v-col cols="12" md="6">
-            <v-radio-group inline label="بازپرداخت تسهیلات دریافتی قبلی" v-model="formData.previousLoanAppropriate" :disabled="isEditingDisabled">
+            <v-radio-group
+              inline
+              label="بازپرداخت تسهیلات دریافتی قبلی"
+              v-model="formData.previousLoanAppropriate"
+              :disabled="isEditingDisabled"
+            >
               <v-radio label="مناسب نبوده است" :value="false"></v-radio>
               <v-radio label="مناسب بوده است" :value="true"></v-radio>
             </v-radio-group>

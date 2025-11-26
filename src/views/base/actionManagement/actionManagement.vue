@@ -4,7 +4,7 @@
       <CustomDataTable
         ref="dataTableRef"
         :headers="headers"
-        api-resource="referral-config-template"
+        api-resource="back/api/v1/referral-config-template"
         :auto-fetch="true"
         :show-pagination="true"
         :height="550"
@@ -24,15 +24,12 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
-import { useRouteGuard } from '@/composables/useRouteGuard';
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { ref } from 'vue';
+import { CustomDataTable,BaseBreadcrumb } from '@amirjalili1374/ui-kit';
 import CreateActionManagement from '@/components/sections/actionManagement/CreateActionManagement.vue';
 import { ActionTypeOptions, DepartmentTypeOptions } from '@/types/enums/global';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import FilterActionManagment from '@/components/sections/actionManagement/FilterActionManagment.vue';
 
-const { requirePermission } = useRouteGuard();
 const breadcrumbs = ref([
   {
     title: 'اطلاعات پایه',

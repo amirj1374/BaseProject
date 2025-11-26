@@ -4,7 +4,7 @@
     <CustomDataTable
       ref="dataTableRef"
       :headers="headers"
-      api-resource="public-category"
+      api-resource="back/api/v1/public-category"
       :show-pagination="true"
       :auto-fetch="true"
       :height="550"
@@ -14,8 +14,7 @@
 </template>
 
 <script lang="ts" setup>
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { CustomDataTable,BaseBreadcrumb } from '@amirjalili1374/ui-kit';
 import { useBaseStore } from '@/stores/base';
 import { computed, ref } from 'vue';
 

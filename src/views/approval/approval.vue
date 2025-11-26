@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import AppStepper from '@/components/common/AppStepper.vue';
+import { AppStepper } from '@amirjalili1374/ui-kit';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import { useBaseStore } from '@/stores/base';
@@ -158,12 +158,12 @@ const handleSave = async () => {
       loanRequestId: approvalStore.loanRequestId,
       trackingCode: approvalStore.trackingCode
     };
-    
+
     const res = await api.approval.saveGeneral(payload);
     if (res.status === 200) {
       customizerStore.loading = false;
-      showSuccess.value = true
-      successMessage.value = 'مصوبه با موفقیت بروزرسانی شد'
+      showSuccess.value = true;
+      successMessage.value = 'مصوبه با موفقیت بروزرسانی شد';
       await router.push('/approval/edit');
     }
   } catch (err) {

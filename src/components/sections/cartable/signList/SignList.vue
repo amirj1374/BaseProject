@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { DateConverter } from '@/utils/date-convertor';
+import { DateConverter } from '@amirjalili1374/ui-kit';
 import { computed } from 'vue';
 
 interface SignRow {

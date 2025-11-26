@@ -4,7 +4,7 @@
     <CustomDataTable
       ref="dataTableRef"
       :headers="headers"
-      api-resource="report"
+      api-resource="back/api/v1/report"
       :auto-fetch="true"
       :show-pagination="true"
       :height="550"
@@ -20,18 +20,14 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
-import { useRouteGuard } from '@/composables/useRouteGuard';
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import { CartableStatusTypeOptions, LoanRequestStatusOptions } from '@/types/enums/global';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import ApprovalEdit from '@/components/sections/approval/approvalEdit/approvalEdit.vue';
+import { ref } from 'vue';
+import { CustomDataTable,BaseBreadcrumb } from '@amirjalili1374/ui-kit';
+import { CartableStatusTypeOptions } from '@/types/enums/global';
 import FilterFlowReport from '@/components/sections/flowReport/FilterFlowReport.vue';
 
 const routes = {
   'جزییات بیشتر⬅️': '/flowReportDetail/{id}'
 };
-const { requirePermission } = useRouteGuard();
 const breadcrumbs = ref([
   {
     title: 'گزارش عملیات',

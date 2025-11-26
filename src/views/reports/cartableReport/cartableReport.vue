@@ -4,7 +4,7 @@
     <CustomDataTable
       ref="dataTableRef"
       :headers="headers"
-      api-resource="cartable-report"
+      api-resource="back/api/v1/cartable-report"
       :auto-fetch="true"
       :show-pagination="true"
       :height="550"
@@ -14,12 +14,11 @@
   </div>
 </template>
 <script lang="ts" setup>
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { CustomDataTable,BaseBreadcrumb } from '@amirjalili1374/ui-kit';
 import FilterCartable from '@/views/reports/cartableReport/cartableReportFilter.vue';
 import { CartableStatusTypeOptions, CustomerTypeOptions } from '@/types/enums/global';
 import Details from '@/components/sections/report/details/Details.vue';
 import { computed, h, ref } from 'vue';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 
 // Computed property for custom actions to ensure reactivity
 const customActions = computed(() => [

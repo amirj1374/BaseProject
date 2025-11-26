@@ -10,7 +10,7 @@
       class="pa-3"
       ref="dataTableRef"
       :headers="headers"
-      api-resource="report/get-flow-report"
+      api-resource="back/api/v1/report/get-flow-report"
       :queryParams="{ cartableId }"
       :auto-fetch="true"
       :show-pagination="true"
@@ -22,8 +22,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
+import { CustomDataTable,BaseBreadcrumb } from '@amirjalili1374/ui-kit';
 import { ref } from 'vue';
 import ApprovalRequestViewer from '@/components/approval/ApprovalRequestViewer.vue';
 import { useRoute } from 'vue-router';

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { CustomDataTable } from '@amirjalili1374/ui-kit';
 import { ref, computed, watch } from 'vue';
 import { useApprovalStore } from '@/stores/approval';
 
@@ -69,7 +69,7 @@ const header = ref([
         <v-row>
           <v-col cols="12" md="12">
             <CustomDataTable
-              :apiResource="`ocp`"
+              :apiResource="`back/api/v1/ocp`"
               :headers="header"
               :actions="tableActions"
               :pagination="false"

@@ -3,9 +3,8 @@ import { onMounted, ref, computed, watch } from 'vue';
 import { api } from '@/services/api';
 import type { CollateralsInfoPayload } from '@/types/approval/approvalType';
 import { useApprovalStore } from '@/stores/approval';
-import MoneyInput from '@/components/shared/MoneyInput.vue';
+import { MoneyInput } from '@amirjalili1374/ui-kit';
 import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-vue';
-import ShamsiDatePicker from '@/components/shared/ShamsiDatePicker.vue';
 
 const isDialogActive = ref(false);
 const loading = ref(false);

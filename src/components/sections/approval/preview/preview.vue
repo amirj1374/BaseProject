@@ -2,8 +2,8 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
-import PdfViewer from '@/components/shared/PdfViewer.vue';
-const approvalStore = useApprovalStore()
+import { PdfViewer } from '@amirjalili1374/ui-kit';
+const approvalStore = useApprovalStore();
 const pdfUrl = ref('');
 let pdfObjectUrl: string | null = null;
 
@@ -16,7 +16,7 @@ onMounted(async () => {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
     const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], {type: "application/pdf"});
+    const blob = new Blob([byteArray], { type: 'application/pdf' });
     pdfObjectUrl = URL.createObjectURL(blob);
     pdfUrl.value = pdfObjectUrl;
   } catch (error) {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { CustomDataTable } from '@amirjalili1374/ui-kit';
 import { useApprovalStore } from '@/stores/approval';
 import { ref, computed, watch } from 'vue';
 
@@ -72,7 +72,7 @@ const header = ref([
         <v-row>
           <v-col cols="12" md="12">
             <CustomDataTable
-              :apiResource="`loan-info-non-rial`"
+              :apiResource="`back/api/v1/loan-info-non-rial`"
               :queryParams="{ loanRequestId: approvalStore.loanRequestId }"
               :headers="header"
               :actions="tableActions"

@@ -4,7 +4,7 @@ import { api } from '@/services/api';
 import { useApprovalStore } from '@/stores/approval';
 import { IconAlertCircle } from '@tabler/icons-vue';
 import { useRoute } from 'vue-router';
-import { formatNumberWithCommas } from '@/utils/number-formatter';
+import { formatNumberWithCommas } from '@amirjalili1374/ui-kit';
 
 const approvalStore = useApprovalStore();
 const value = ref(0);

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { CustomDataTable } from '@amirjalili1374/ui-kit';
 import { ref, computed, watch } from 'vue';
 import { useApprovalStore } from '@/stores/approval';
 
@@ -63,7 +63,7 @@ const header = ref([
         <v-row>
           <v-col cols="12" md="12">
             <CustomDataTable
-              :apiResource="`bank-guarantee`"
+              :apiResource="`back/api/v1/bank-guarantee`"
               :headers="header"
               :actions="tableActions"
               :pagination="false"
