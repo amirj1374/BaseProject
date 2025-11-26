@@ -4,7 +4,7 @@
     <CustomDataTable
       ref="dataTableRef"
       :headers="headers"
-      api-resource="loan-requests/all"
+      api-resource="back/api/v1/loan-requests/all"
       :auto-fetch="true"
       :show-pagination="true"
       :height="550"
@@ -40,8 +40,7 @@
 
 <script lang="ts" setup>
 import ApprovalEdit from '@/components/sections/approval/approvalEdit/approvalEdit.vue';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import CustomDataTable from '@/components/shared/CustomDataTable.vue';
+import { CustomDataTable,BaseBreadcrumb } from '@amirjalili1374/ui-kit';
 import { useRouteGuard } from '@/composables/useRouteGuard';
 import { api } from '@/services/api';
 import type { ApprovalRequest } from '@/types/approval/approvalType';
