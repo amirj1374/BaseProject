@@ -1,12 +1,5 @@
 import {
-  IconBookmarkEdit,
-  IconCheckupList,
-  IconClipboardData,
-  IconDatabase,
-  IconFileSymlink,
   IconHome,
-  IconPencilPlus,
-  IconTableShare
 } from '@tabler/icons-vue';
 import { usePermissionsStore } from '@/stores/permissions';
 
@@ -34,66 +27,17 @@ const sidebarItem: menu[] = [
     to: '/',
   },
   {
-    title: 'درخواست مصوبه جدید',
-    icon: IconPencilPlus,
+    title: 'نوع محصول',
+    icon: IconHome,
     to: '/approval',
     permissionKey: 'approval_new',
   },
   {
-    title: 'ویرایش درخواست مصوبه',
-    icon: IconBookmarkEdit,
-    to: '/approval/edit',
-    permissionKey: 'approval_edit'
+    title: 'محصولات',
+    icon: IconHome,
+    to: '/approval',
+    permissionKey: 'approval_new',
   },
-  {
-    title: 'کارتابل',
-    icon: IconTableShare,
-    to: '/cartable',
-    permissionKey: 'cartable'
-  },
-  {
-    title: 'گزارش',
-    icon: IconFileSymlink,
-    to: '/report',
-    permissionKey: 'cartableReport'
-  },
-  {
-    title: 'گزارش عملیات',
-    icon: IconCheckupList,
-    to: '/flowReport',
-    permissionKey: 'approvalSignerReport'
-  },
-  {
-    title: 'اطلاعات پایه',
-    icon: IconDatabase,
-    permissionKey: 'flowManagement',
-    children: [
-      {
-        title: 'مدیریت نقش ها',
-        icon: IconBookmarkEdit,
-        to: '/base/role-managment',
-        permissionKey: 'flowManagement'
-      },
-      {
-        title: 'مدیریت عملیات',
-        icon: IconDatabase,
-        to: '/base/department-managment',
-        permissionKey: 'flowManagement'
-      },
-      {
-        title: 'گروه اطلاعات پایه',
-        icon: IconDatabase,
-        to: '/base/baseGroup',
-        permissionKey: 'flowManagement'
-      },
-      // {
-      //   title: 'گروه ضمانتنامه',
-      //   icon: IconDatabase,
-      //   to: '/base/guaranteeGroup',
-      //   permissionKey: 'flowManagement'
-      // }
-    ]
-  }
 ];
 
 // Function to get filtered menu items based on user permissions

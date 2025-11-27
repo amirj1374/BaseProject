@@ -28,8 +28,6 @@
 // Note: Individual component exports would need index files in each directory
 
 // Re-export services
-export * from '../services/modules/approval';
-export * from '../services/modules/cartable';
 export * from '../services/modules/user';
 
 // Re-export types
@@ -39,10 +37,6 @@ export * from '../types/models/person';
 export * from '../types/models/userInfo';
 
 // Re-export composables
-export * from '../composables/useDataTable';
 export * from '../composables/usePermissions';
 export * from '../composables/useRouteGuard';
-export * from '../composables/useTableActions';
-export * from '../composables/useTableHeaders';
-export * from '../composables/useTableSelection';
 

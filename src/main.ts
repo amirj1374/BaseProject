@@ -21,7 +21,6 @@ import '@/scss/style.scss';
 // Services and utilities
 import envConfig from '@/config/envConfig';
 import { api } from '@/services/api';
-import { fakeBackend } from '@/utils/helpers/fake-backend';
 import { initializeApp, startInitialization } from '@/utils/samapAppInitializer';
 import { setupKeycloak } from './plugins/key-clock';
 
@@ -30,8 +29,6 @@ import { setupKeycloak } from './plugins/key-clock';
 // @ts-ignore - Keycloak types may not be available in all environments
 import type { VueKeycloakInstance } from '@dsb-norge/vue-keycloak-js';
 
-// Initialize fake backend for development
-fakeBackend();
 
 // Create app instance
 const app = createApp(App);
