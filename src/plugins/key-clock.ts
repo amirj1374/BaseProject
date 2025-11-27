@@ -4,8 +4,8 @@
  * Keycloak authentication plugin for Vue 3 application
  */
 
-import type { App } from 'vue'
-import VueKeycloakJs from '@dsb-norge/vue-keycloak-js'
+import VueKeycloakJs from '@dsb-norge/vue-keycloak-js';
+import type { App } from 'vue';
 
 export function setupKeycloak(app: App) {
   return app.use(VueKeycloakJs, {
@@ -19,9 +19,6 @@ export function setupKeycloak(app: App) {
       checkLoginIframe: false,
       onLoad: 'login-required',
       pkceMethod: 'S256',
-    },
-    logout: {
-      redirectUri: window.location.origin
     },
     onAuthLogout: () => {
       console.log('User logged out from Keycloak')
