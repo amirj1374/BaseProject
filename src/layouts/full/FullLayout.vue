@@ -5,7 +5,7 @@ import VerticalSidebarVue from './vertical-sidebar/VerticalSidebar.vue';
 import VerticalHeaderVue from './vertical-header/VerticalHeader.vue';
 import Customizer from './customizer/CustomizerPanel.vue';
 import { useCustomizerStore } from '@/stores/customizer';
-import Loading from '@/components/Loading.vue';
+import { Loading } from '@amirjalili1374/ui-kit';
 
 const customizer = useCustomizerStore();
 
@@ -14,7 +14,6 @@ const showSidebar = computed(() => {
   const orientation = customizer.menuOrientation || 'vertical';
   return orientation === 'vertical';
 });
-
 </script>
 
 <template>
@@ -28,7 +27,7 @@ const showSidebar = computed(() => {
       <VerticalSidebarVue v-if="customizer.menuOrientation === 'vertical'" />
       <VerticalHeaderVue />
       <v-main>
-        <Loading/>
+        <Loading />
         <v-container fluid class="page-wrapper">
           <div>
             <RouterView />
