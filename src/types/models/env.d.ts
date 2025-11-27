@@ -1,4 +1,4 @@
-export type AuthMode = 'keycloak' | 'initializer' | 'dev' | 'jwt';
+export type AuthMode = 'keycloak' | 'initializer' | 'dev' | 'jwt' | 'demo';
 
 export interface EnvConfig {
   PORT: number;

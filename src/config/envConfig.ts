@@ -7,6 +7,7 @@ const normalizeAuthMode = (value: string | undefined): AuthMode => {
     case 'initializer':
     case 'dev':
     case 'jwt':
+    case 'demo':
       return normalized;
     default:
       return 'keycloak';

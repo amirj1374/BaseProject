@@ -1,3 +1,4 @@
+import envConfig from '@/config/envConfig';
 import { useAuthStore } from '@/stores/auth';
 import { usePermissionsStore } from '@/stores/permissions';
 import { waitForInitialization } from '@/utils/samapAppInitializer';
@@ -42,6 +43,11 @@ interface AuthStore {
 router.beforeEach(async (to, from, next) => {
   // Allow navigation to error and auth routes without initialization to avoid redirect loops
   if (to.path.startsWith('/error') || to.path.startsWith('/auth')) {
+    return next();
+  }
+
+  // In demo mode, skip initialization and authentication checks
+  if (envConfig.AUTH_MODE === 'demo') {
     return next();
   }
 

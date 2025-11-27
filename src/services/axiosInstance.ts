@@ -25,6 +25,11 @@ const createAxiosInstance = (): AxiosInstance => {
     (response) => response,
     async (error) => {
       if (error.response?.status === 401) {
+        // In demo mode, don't redirect on 401 - just let the error pass through
+        if (envConfig.AUTH_MODE === 'demo') {
+          return Promise.reject(error);
+        }
+
         switch (envConfig.AUTH_MODE) {
           case 'keycloak': {
             window.location.href = 'back/oauth2/authorization/master';
