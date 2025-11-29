@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import { IconBuildingStore, IconTableShare } from '@tabler/icons-vue'
 import { useCustomerInfoStore } from '@/stores/customerInfo'
-import { RoleTypeOptions } from '@/types/enums/global'
+// import { RoleTypeOptions } from '@/types/enums/global'
 
 // 🟢 store
 const customerInfoStore = useCustomerInfoStore()
 
 // 🟢 build a map of valid roles
-const roleTitleMap = Object.fromEntries(
-  RoleTypeOptions.map(opt => [opt.value, opt.title])
-)
+// const roleTitleMap = Object.fromEntries(
+//   RoleTypeOptions.map(opt => [opt.value, opt.title])
+// )
 
 // 🟢 translate + filter only valid roles
-const translateRoles = (roles: string[] = []): string[] =>
-  roles
-    .filter(role => role in roleTitleMap)
-    .map(role => roleTitleMap[role])
+// const translateRoles = (roles: string[] = []): string[] =>
+//   roles
+//     .filter(role => role in roleTitleMap)
+//     .map(role => roleTitleMap[role])
 </script>
 
 
@@ -30,11 +30,11 @@ const translateRoles = (roles: string[] = []): string[] =>
           </v-btn>
           <div>
             <h3 class="text-h3 font-weight-medium">
-              {{
+              <!-- {{
                 customerInfoStore.userInfo?.lotusRoles
                   ? translateRoles(customerInfoStore.userInfo.lotusRoles).join('، ')
                   : '-'
-              }}
+              }} -->
             </h3>
             <span class="text-subtitle-1 text-disabled font-weight-medium">نقش</span>
           </div>

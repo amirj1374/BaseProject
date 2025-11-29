@@ -1,5 +1,7 @@
 import {
+  IconBrandDribbble,
   IconHome,
+  IconBrandCodesandbox,
 } from '@tabler/icons-vue';
 import { usePermissionsStore } from '@/stores/permissions';
 
@@ -24,19 +26,19 @@ const sidebarItem: menu[] = [
   {
     title: 'داشبورد',
     icon: IconHome,
-    to: '/',
+    to: '/dashboard',
   },
   {
     title: 'نوع محصول',
-    icon: IconHome,
-    to: '/approval',
-    permissionKey: 'approval_new',
+    icon: IconBrandDribbble,
+    to: '/product-type',
+    permissionKey: '',
   },
   {
     title: 'محصولات',
-    icon: IconHome,
-    to: '/approval',
-    permissionKey: 'approval_new',
+    icon: IconBrandCodesandbox,
+    to: '/product',
+    permissionKey: '',
   },
 ];
 

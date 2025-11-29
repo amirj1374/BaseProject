@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-container fluid>
-      <!-- Loading State -->
+      Loading State
       <v-row v-if="customizer.loading">
         <v-col cols="12" class="text-center">
           <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
@@ -25,7 +25,7 @@
               <v-card-title class="d-flex align-center">
               </v-card-title>
               <v-card-text>
-                <total-income></total-income>
+                <!-- <total-income></total-income> -->
               </v-card-text>
             </v-card>
           </v-col>
@@ -37,7 +37,7 @@
           <v-col cols="12" md="6" class="d-flex">
             <v-card class="w-100 h-100">
               <v-card-text class="pa-0">
-                <total-growth />
+                <!-- <total-growth /> -->
               </v-card-text>
             </v-card>
           </v-col>
@@ -45,7 +45,7 @@
           <v-col cols="12" md="6" class="d-flex">
             <v-card class="w-100 h-100">
               <v-card-text class="pa-0">
-                <data-labels />
+                <!-- <data-labels /> -->
               </v-card-text>
             </v-card>
           </v-col>

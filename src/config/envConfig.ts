@@ -34,7 +34,7 @@ const envConfig: EnvConfig = {
 
 // Simple API configuration
 export const apiConfig = {
-  baseURL: envConfig.API_BASE_URL
+  baseURL: envConfig.API_BASE_URL || 'http://localhost:3000'
 };
 
 // Show current environment info
