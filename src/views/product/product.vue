@@ -48,7 +48,8 @@
       key: 'createdAt',
       sortable: true,
       width: 200,
-      isDate: true
+      isDate: true,
+      excludeFromForm: true
     },
     {
       title: 'توضیحات',
@@ -57,22 +58,37 @@
       width: 200
     },
     {
-      title: 'نوع محصول',
+      title: 'نام محصول',
       key: 'name',
       sortable: true,
       width: 200
+    },
+    {
+      title: 'نوع محصول',
+      key: 'productType',
+      sortable: false,
+      width: 100,
     },
     {
       title: 'فی',
       key: 'price',
       sortable: false,
       width: 100,
+      type: 'money'
     },
     {
       title: 'موجودی',
       key: 'stock',
       sortable: false,
       width: 100,
+    },
+    { 
+      title: 'تاریخ آخرین ویرایش',
+      key: 'updatedAt',
+      sortable: false,
+      width: 100,
+      isDate: true,
+      excludeFromForm: true
     }
   ]);
   </script>
