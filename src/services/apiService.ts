@@ -16,8 +16,11 @@ export default (axiosInstance: AxiosInstance, resource: string) => ({
     return axiosInstance.post(`api/v1/${resource}`, data);
   },  
 
-  update(data: Record<string, unknown>) {
-    return axiosInstance.put(`api/v1/${resource}`, data);
+  update(id: string | number, data: Record<string, unknown>) {
+    if (!id) {
+      throw new Error('ID is required for update operation');
+    }
+    return axiosInstance.put(`api/v1/${resource}/${id}`, data);
   },
 
   delete(id: string | Record<string, unknown>) {
