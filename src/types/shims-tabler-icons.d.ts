@@ -57,4 +57,5 @@ declare module '@tabler/icons-vue' {
   export const IconCheckupList : DefineComponent
   export const IconBrandDribbble : DefineComponent
   export const IconBrandCodesandbox : DefineComponent
+  export const IconSquareX : DefineComponent
 }

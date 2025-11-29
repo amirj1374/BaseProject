@@ -46,7 +46,8 @@ const headers = computed(() => [
     key: 'createdAt',
     sortable: true,
     width: 200,
-    isDate: true
+    isDate: true,
+    excludeFromForm: true
   },
   {
     title: 'توضیحات',
@@ -66,7 +67,16 @@ const headers = computed(() => [
     sortable: false,
     width: 100,
     translate: true,
+    type: 'toggle',
     options: BooleanEnumOptions
-  }
+  },
+  {
+    title: 'تاریخ ایجاد',
+    key: 'updatedAt',
+    sortable: true,
+    width: 200,
+    isDate: true,
+    excludeFromForm: true
+  },
 ]);
 </script>

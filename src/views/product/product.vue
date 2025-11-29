@@ -12,6 +12,10 @@
         :actions="['delete', 'edit', 'create']"
         date-with-timezone
         :axiosInstance="axiosInstance"
+        group-by="groupByItem"
+        :default-expanded="true"
+        :page-size="150"
+        :group-header-template="getGroupHeaderTemplate"
         bulkMode
         selectable
       />
@@ -34,6 +38,14 @@
       href: '#'
     }
   ]);
+  // Group header template function to show nationalCode and fullName
+  const getGroupHeaderTemplate = (groupKey: string | number, groupItems: any[]): string => {
+    if (groupItems.length > 0) {
+      const firstItem = groupItems[0];
+      return `  ${firstItem.groupByItem} : (${groupItems.length} مدرک)`;
+    }
+    return `(${groupItems.length} مدرک)`;
+  };
   const page = ref({ title: 'عملیات' });
   // Reactive data
   const dataTableRef = ref();
@@ -62,12 +74,6 @@
       key: 'name',
       sortable: true,
       width: 200
-    },
-    {
-      title: 'نوع محصول',
-      key: 'productType',
-      sortable: false,
-      width: 100,
     },
     {
       title: 'فی',

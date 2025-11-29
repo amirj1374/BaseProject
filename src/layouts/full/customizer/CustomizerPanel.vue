@@ -4,6 +4,7 @@ import { useCustomizerStore } from '@/stores/customizer';
 import type { CustomizerDTO } from '@/types/models/person';
 import { IconMoon, IconSun } from '@tabler/icons-vue';
 import { onMounted, ref, watch } from 'vue';
+import { ToggleSwitch } from '@amirjalili1374/ui-kit';
 
 const customizer = useCustomizerStore();
 
@@ -280,23 +281,18 @@ onMounted(() => {
             <v-tabs-window-item value="style">
               <div class="pa-4">
                 <!-- THEME MODE -->
-                <div class="mb-6">
-                  <h6 class="text-subtitle-1 font-weight-medium mb-3">حالت روز / شب</h6>
-                  <div class="theme-toggle-container">
-                    <div 
-                      class="theme-toggle"
-                      :class="{ 'dark-mode': customizer.themeMode === 'dark' }"
-                      @click="customizer.SET_THEME_MODE(customizer.themeMode === 'light' ? 'dark' : 'light')"
-                    >
-                      <div class="toggle-slider">
-                        <div class="toggle-icon sun-icon">
-                          <IconSun v-if="customizer.themeMode === 'light'" size="24" stroke-width="2" />
-                          <IconMoon v-else size="24" stroke-width="2" color="white" background-color="black"/>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ToggleSwitch
+                  v-model="customizer.themeMode"
+                  label="حالت روز / شب"
+                  type="string"
+                  activeColor="#38468c"
+                  inactiveColor="#f2e44d"
+                  :options="[
+                    { value: 'light', label: 'روز', icon: IconSun },
+                    { value: 'dark', label: 'شب', icon: IconMoon }
+                  ]"
+                  @update:model-value="customizer.SET_THEME_MODE($event as 'light' | 'dark')"
+                />
 
                 <!-- PRESET COLOR -->
                 <div class="mb-6">
@@ -366,22 +362,22 @@ onMounted(() => {
               
 
                 <!-- Menu Orientation -->
-                <div class="mb-6">
+                <div class="mb-6 menu-orientation-section">
                   <h6 class="text-subtitle-1 font-weight-medium mb-3">انوع منو</h6>
-                  <div class="d-flex gap-2">
+                  <div class="d-flex gap-3">
                     <v-btn
                       variant="outlined"
-                      :color="customizer.menuOrientation === 'vertical' ? 'primary' : 'grey'"
+                      :color="customizer.menuOrientation === 'vertical' ? 'secondary' : 'borderLight'"
                       @click="customizer.SET_MENU_ORIENTATION('vertical')"
-                      class="flex-1"
+                      class="flex-1 menu-orientation-btn"
                     >
                       <div class="sidebar-preview closed"></div>
                     </v-btn>
                     <v-btn
                       variant="outlined"
-                      :color="customizer.menuOrientation === 'horizontal' ? 'primary' : 'grey'"
+                      :color="customizer.menuOrientation === 'horizontal' ? 'secondary' : 'borderLight'"
                        @click="customizer.SET_MENU_ORIENTATION('horizontal')"
-                      class="flex-1"
+                      class="flex-1 menu-orientation-btn"
                     >
                       <div class="sidebar-preview open"></div>
                     </v-btn>
@@ -548,7 +544,7 @@ onMounted(() => {
 .rtl-preview {
   width: 30px;
   height: 20px;
-  border: 2px dashed #ccc;
+  border: 5px dashed #ccc;
   border-radius: 3px;
   margin: 0 auto;
   position: relative;
@@ -580,7 +576,7 @@ onMounted(() => {
 .sidebar-preview {
   width: 45px;
   height: 30px;
-  border: 2px dashed #ccc;
+  border: 2px dashed #777777;
   border-radius: 3px;
   margin: 0 auto;
   position: relative;
@@ -608,11 +604,36 @@ onMounted(() => {
   }
 }
 
+// Menu Orientation Section - Wider styling
+.menu-orientation-section {
+  .menu-orientation-btn {
+    min-height: 65px;
+    padding: 5px 5px;
+    border: 2px solid;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    
+    .sidebar-preview {
+      width: 60px;
+      height: 40px;
+      
+      &.closed::before {
+        width: 8px;
+        height: 32px;
+      }
+      
+      &.open::before {
+        width: 52px;
+        height: 8px;
+      }
+    }
+  }
+}
+
 // Menu Preview
 .menu-preview {
   width: 30px;
   height: 20px;
-  border: 2px dashed #ccc;
+  border: 2px dashed #464545;
   border-radius: 3px;
   margin: 0 auto;
   position: relative;
@@ -625,7 +646,7 @@ onMounted(() => {
     width: 4px;
     height: 16px;
     background: #1976d2;
-    border-radius: 1px;
+    border-radius: 4px;
   }
 
   &.horizontal::before {
@@ -636,7 +657,7 @@ onMounted(() => {
     width: 16px;
     height: 4px;
     background: #1976d2;
-    border-radius: 1px;
+    border-radius: 4px;
   }
 }
 
@@ -646,6 +667,10 @@ onMounted(() => {
 
 .gap-2 {
   gap: 8px;
+}
+
+.gap-3 {
+  gap: 12px;
 }
 
 // Theme Toggle Styles
@@ -698,7 +723,7 @@ onMounted(() => {
 
   .toggle-icon {
     position: absolute;
-    top: 50%;
+    top: 60%;
     left: 50%;
     transform: translate(-50%, -50%);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
